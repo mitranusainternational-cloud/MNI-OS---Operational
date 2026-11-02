@@ -28,7 +28,7 @@ Butuh Obsidian 1.9 atau lebih baru dengan core plugin **Bases** aktif (Settings 
 
 1. Buka catatan tugas di `tasks/`, ubah `status` (`todo`, `doing`, `blocked`, `review`, `done`) dan `updated`.
 2. Centang kriteria selesai dan tulis **bukti** (commit, URL, screenshot, hasil uji) di bagian Bukti. Tanpa bukti, jangan ubah ke `done`.
-3. Jalankan `node scripts/progress-report.mjs` untuk menyegarkan [[PROGRESS_SNAPSHOT]]. Skrip menandai dependensi atau status yang salah.
+3. Jalankan `node scripts/sync-vault.mjs`: menyegarkan [[PROGRESS_SNAPSHOT]] dan properti epic, menandai dependensi atau status yang salah, dan menulis [[VAULT_HEALTH]]. Hasilnya harus `OK`.
 4. Tambahkan entri bertanggal di [[PROJECT_PROGRESS]] untuk perubahan yang berdampak (isi: hasil, bukti, hambatan, langkah berikut).
 
 ## Aturan

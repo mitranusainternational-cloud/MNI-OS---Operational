@@ -32,7 +32,7 @@ Roadmap ini menunjukkan urutan hasil yang perlu dibangun, bukan komitmen tanggal
 - [x] Audit read-only project Supabase yang terlihat, migration ledger, advisor, kesiapan tools, dan dokumentasikan gap checkout (19 migration records; target belum dikonfirmasi).
 - [x] Susun tahapan local-first untuk Supabase, vertical slice, Composio, GitHub, Vercel/domain, dan Docs.
 - [x] Sediakan Supabase CLI `2.122.0` melalui `npx` dan inisialisasi `apps/gudang-logistik/supabase/config.toml`; seed nonaktif, project hosted belum di-link.
-- [ ] **Blocked — akses Windows ke Docker service:** mulai Docker engine dan Supabase local stack, lalu buat migrations/seed sintetis setelah target schema/pilot disepakati.
+- [ ] **Blocked — virtualisasi BIOS nonaktif (T-010, lihat [[DOCKER_SETUP]]):** mulai Docker engine dan Supabase local stack, lalu buat migrations/seed sintetis setelah target schema/pilot disepakati.
 - [ ] **Belum terhubung:** CLI project listing butuh login/token CLI; gunakan login lokal yang aman setelah Docker/local target siap. Management connector hanya membuktikan akses metadata read-only.
 - [x] Simpan brief saldo gudang lama sebagai hipotesis pada [[apps/gudang-logistik/docs/PILOT_BRIEF|brief pilot]]; belum dipilih sebagai pilot custom.
 - [x] Tinjau dan catat temuan security/performance advisor di [[FOUNDATION_BASELINE|baseline fondasi]]; perbaikan hosted belum dijalankan.
@@ -121,7 +121,7 @@ Checklist ini menjelaskan urutan kerja antar-tools. Status hanya dicentang jika 
 ## Dependency yang sedang menahan progress
 
 - **Browser lokal:** server preview `localhost:8002` telah membuktikan respons 200 untuk halaman dan asset CSS/JS. Render visual/console belum terverifikasi oleh runner; screenshot pengguna sebelumnya memperlihatkan CSS belum termuat sebelum pemetaan server diperbaiki.
-- **Docker service:** Docker Desktop dibuka, tetapi Linux engine tidak muncul dan service `com.docker.service` tidak dapat dibuka dari sesi ini. Local Supabase stack belum dapat dijalankan.
+- **Docker/virtualisasi:** diagnosis 2026-11-02: `VirtualizationFirmwareEnabled=False`, hypervisor tidak ada, engine Docker tidak start. Panduan perbaikan: [[DOCKER_SETUP]]. Local Supabase stack belum dapat dijalankan.
 - **Supabase CLI/app connection:** CLI belum authenticated dan `projects list` meminta access token; management connector hanya read-only. Project kandidat tidak memiliki development branch. App belum punya Supabase SDK/Auth atau backend connection.
 - **Supabase target/schema lineage:** project hosted belum dipastikan sebagai backend checkout ini; SQL sibling menggunakan model `organizations`, bukan hosted `tenants`.
 - **Discovery Operasional:** current-state, requirement, prioritas, dan pilot pertama belum divalidasi bersama tim/pemilik proses.

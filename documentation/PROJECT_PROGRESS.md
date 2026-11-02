@@ -196,3 +196,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: mode mock lokal (`src/lib/local-supabase.js`, `VITE_LOCAL_MOCK=1`) dengan 5 akun dan data sintetis; adapter dimuat dinamis, bootstrap menunggu `window.claude`. Panduan: [[LOCAL_PREVIEW]].
 - Bukti: verified in browser, login admin lalu dashboard dengan data contoh, 0 error console; screenshot di [[screenshots/README]].
 - Temuan: Docker tidak bisa start karena virtualisasi CPU nonaktif di BIOS (T-010). Auth, RLS, dan Supabase sungguhan belum teruji.
+
+### 2026-11-02 — Panduan virtualisasi/Docker dan sinkronisasi vault
+
+- Selesai: [[DOCKER_SETUP]] (diagnosis mesin Lenovo 20R6, langkah BIOS, fitur Windows/WSL, Docker Desktop, `supabase start`). T-010 diubah ke `blocked` dengan pemilik tindakan (pemilik mesin) dan penyebab.
+- Selesai: `scripts/sync-vault.mjs` menggabungkan snapshot dan cek kesehatan; aturan di `AGENTS.md`, Home, dashboard, dan WORKSPACE_GUIDE kini memakainya. ROADMAP, PRODUCT_ROADMAP, dan GO_LIVE_PLAN memuat blocker yang sama.
+- Bukti: `node scripts/sync-vault.mjs` berakhir OK (69 tugas, 9 selesai, 0 link rusak). Diagnosis hardware: `VirtualizationFirmwareEnabled=False`.
+- Berikutnya: setelah BIOS, fitur Windows, dan Docker beres, kerjakan T-011, T-012, T-013, lalu T-020.

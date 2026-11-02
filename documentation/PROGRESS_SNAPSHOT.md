@@ -15,7 +15,7 @@ generated: 2026-11-02
 - Bobot effort selesai: **6 / 128.5 hari kerja** (5%)
 - Sisa effort: **122.5 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
 - Cakupan go-live (fase P0-P7): **9 / 49** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
-- Diblokir: **0**, sedang dikerjakan: **0**
+- Diblokir: **1**, sedang dikerjakan: **0**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
 ## Per fase
@@ -23,7 +23,7 @@ generated: 2026-11-02
 | Fase | Selesai | Effort selesai | Status |
 |---|---|---|---|
 | P0 Workspace dan tracking | 5/5 | 3.5/3.5 hari (100%) | selesai |
-| P1 Fondasi lokal | 2/7 | 1.5/4.5 hari (33%) | berjalan |
+| P1 Fondasi lokal | 2/7 | 1.5/4.5 hari (33%) | ada blocker |
 | P2 Aplikasi siap uji | 0/6 | 0/12 hari (0%) | belum mulai |
 | P3 Data dan proses | 0/7 | 0/13.5 hari (0%) | belum mulai |
 | P4 Environment cloud | 2/8 | 1/5.5 hari (18%) | berjalan |
@@ -65,7 +65,6 @@ generated: 2026-11-02
 
 ## Siap dikerjakan sekarang (dependensi terpenuhi)
 
-- P0 · [[tasks/T-010-aktifkan-docker-engine-di-windows|T-010]] Aktifkan Docker engine di Windows · 0.5 hari · pemilik mesin
 - P0 · [[tasks/T-030-walkthrough-proses-dengan-process-owner|T-030]] Walkthrough proses dengan process owner · 3 hari · tim Operasional
 - P0 · [[tasks/T-032-konfirmasi-owner-dan-cut-off-enam-workbook|T-032]] Konfirmasi owner dan cut-off enam workbook · 1 hari · tim Operasional
 - P2 · [[tasks/T-017-rapikan-identitas-pengguna-dan-teks-backend-di-mni|T-017]] Rapikan identitas pengguna dan teks backend di mni-app · 0.5 hari · dev
@@ -77,7 +76,7 @@ generated: 2026-11-02
 
 ## Diblokir
 
-- Tidak ada
+- [[tasks/T-010-aktifkan-docker-engine-di-windows|T-010]] Aktifkan Docker engine di Windows · pemilik mesin (BIOS + admin Windows)
 
 ## Menunggu review
 
@@ -85,7 +84,7 @@ generated: 2026-11-02
 
 ## Tugas P0 yang belum selesai
 
-- [[tasks/T-010-aktifkan-docker-engine-di-windows|T-010]] Aktifkan Docker engine di Windows · todo
+- [[tasks/T-010-aktifkan-docker-engine-di-windows|T-010]] Aktifkan Docker engine di Windows · blocked
 - [[tasks/T-011-jalankan-supabase-local-stack-dan-terapkan-migrati|T-011]] Jalankan Supabase local stack dan terapkan migration · todo · menunggu T-010
 - [[tasks/T-012-hubungkan-mni-app-ke-supabase-lokal|T-012]] Hubungkan mni-app ke Supabase lokal · todo · menunggu T-011
 - [[tasks/T-020-verifikasi-login-otp-end-to-end-lokal|T-020]] Verifikasi login OTP end-to-end (lokal) · todo · menunggu T-012, T-013

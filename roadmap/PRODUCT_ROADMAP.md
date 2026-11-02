@@ -14,7 +14,7 @@ Roadmap ini mengurutkan **hasil** (bukan tanggal) dari kondisi sekarang sampai s
 |---|---|---|
 | Kode aplikasi | Prototipe vanilla JS (sekitar 3.500 baris `app.js`) memakai 20 koleksi; scaffold `apps/mni-app` (Vite + Supabase + Vercel) memuatnya dan build lolos | [[documentation/ENVIRONMENTS]], [[documentation/DECISIONS]] |
 | Browser | Halaman login dan shell aplikasi termuat tanpa error JS dengan environment dummy | [[documentation/screenshots/README]] |
-| Database | Schema 20 tabel + RLS per role ada sebagai migration; belum pernah dijalankan; Docker belum aktif | [[documentation/FOUNDATION_BASELINE]] |
+| Database | Schema 20 tabel + RLS per role ada sebagai migration; belum pernah dijalankan; Docker belum bisa start (virtualisasi BIOS nonaktif); pratinjau lokal berjalan di mode mock | [[documentation/FOUNDATION_BASELINE]] |
 | Data | Enam workbook operasional dibaca read-only; saldo antar file belum direkonsiliasi | [[documentation/DATA_SOURCE_CATALOG]] |
 | Kebutuhan | Discovery bersama tim Operasional belum dilakukan; pilot belum dipilih | [[documentation/OPERATIONAL_DISCOVERY]] |
 | Repo dan versi | 4 branch di GitHub, `development` dan `docs` terkini; `main` belum berisi pekerjaan baru | [[documentation/VERSION_STRATEGY]] |
@@ -42,7 +42,7 @@ v0.9 Fondasi ──► v1.0 Pilot go-live ──► v1.1 Stabilisasi ──► v
 **Tujuan:** pengembang dapat menjalankan, menguji, dan melacak pekerjaan dengan andal.
 **Epic:** [[roadmap/epics/E-01-fondasi-workspace-dan-repo|E-01]] workspace dan repo, [[roadmap/epics/E-02-aplikasi-berjalan-lokal|E-02]] aplikasi berjalan lokal.
 **Keluar bila:** Supabase lokal hidup dengan 20 tabel, mni-app tersambung dan dapat login dengan user seed, `main` terproteksi.
-**Blocker:** Docker engine (T-010) dan proteksi branch `main` (T-041).
+**Blocker:** virtualisasi BIOS untuk Docker (T-010, panduan [[documentation/DOCKER_SETUP]]). Proteksi `main` (T-041) sudah selesai. Pratinjau lokal mock tersedia ([[documentation/LOCAL_PREVIEW]]).
 
 ### v1.0 Pilot go-live (rilis utama)
 **Tujuan:** satu alur Operasional dipakai nyata oleh user awal di production.

@@ -19,11 +19,11 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 
 | Area | Kondisi | Detail |
 |---|---|---|
-| Aplikasi | Scaffold `apps/mni-app` build lolos; halaman login dan shell termuat di browser tanpa error JS. Login, database, dan RLS belum diuji | [[documentation/ENVIRONMENTS]] |
-| Database | Schema 20 tabel + RLS siap sebagai migration; Docker belum aktif sehingga belum pernah dijalankan | [[documentation/FOUNDATION_BASELINE]] |
+| Aplikasi | `apps/mni-app` berjalan sebagai pratinjau lokal mode mock (login 5 role, data sintetis); Supabase, Auth nyata, dan RLS belum diuji | [[documentation/LOCAL_PREVIEW]] |
+| Database | Schema 20 tabel + RLS siap sebagai migration; Docker belum bisa start karena virtualisasi BIOS nonaktif, jadi belum pernah dijalankan | [[documentation/DOCKER_SETUP]] |
 | Data | Enam workbook terprofil read-only; sumber resmi dan saldo belum direkonsiliasi | [[documentation/DATA_SOURCE_CATALOG]] |
 | Kebutuhan | Discovery bersama tim Operasional belum dimulai; pilot belum dipilih | [[documentation/OPERATIONAL_DISCOVERY]] |
-| GitHub | `development` dan `docs` ter-push; `main` dan `versi-awal` baseline; proteksi `main` belum aktif | [[documentation/GITHUB_MIGRATION]] |
+| GitHub | `development` dan `docs` ter-push; `main` dan `versi-awal` baseline; `main` terproteksi (PR + 1 approval) | [[documentation/GITHUB_MIGRATION]] |
 | Deploy | Belum ada Supabase dev/prod, Vercel, atau CI | [[GO_LIVE_PLAN]] |
 
 ## 2. Saya ingin…
@@ -56,13 +56,13 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 | `apps/mni-app/` | Scaffold Vite + Supabase + deploy | Tangan |
 | `websites/` | Situs lain dan situs Docs (rencana) | Tangan |
 | `data/` | Hanya README; workbook privat `data/private-sources/` diabaikan Git | Lokal |
-| `scripts/` | `progress-report.mjs`, `check-vault.mjs` | Tangan |
+| `scripts/` | `sync-vault.mjs` (jalankan ini), `progress-report.mjs`, `check-vault.mjs` | Tangan |
 | `.agents/`, `.codex/` | Skill dan agent lokal | Tangan |
 
 Aturan kerja ada di `AGENTS.md`; cara memakai vault: [[documentation/WORKSPACE_GUIDE]].
 
 ## 4. Ritme kerja
 
-- **Harian:** ubah status tugas yang disentuh, tulis bukti, jalankan `node scripts/progress-report.mjs`.
-- **Mingguan:** tinjau [[PROGRESS_SNAPSHOT]], blocker, dan estimasi; catat di [[documentation/PROJECT_PROGRESS]]; jalankan `node scripts/check-vault.mjs --write`.
+- **Harian:** ubah status tugas yang disentuh, tulis bukti, jalankan `node scripts/sync-vault.mjs`.
+- **Mingguan:** tinjau [[PROGRESS_SNAPSHOT]], blocker, dan estimasi; catat di [[documentation/PROJECT_PROGRESS]]; tinjau [[VAULT_HEALTH]].
 - **Per rilis:** [[documentation/RELEASE_CHECKLIST]] dan tinjau ulang [[roadmap/PRODUCT_ROADMAP]].

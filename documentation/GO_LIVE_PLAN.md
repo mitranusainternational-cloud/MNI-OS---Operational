@@ -52,7 +52,7 @@ Struktur vault, 4 branch, repo lokal `mni-os`, scaffold `mni-app` build lolos, b
 ### P1 Fondasi lokal (T-010 sampai T-014, sekitar 3 hari)
 Docker aktif, Supabase lokal hidup dengan 2 migration, mni-app tersambung ke database lokal, seed sintetis per role, dan keputusan sumber UI.
 **Keluar bila:** `npm run db:start` sukses, 20 tabel ada, app memuat tanpa error jaringan, login dengan user seed bisa dicoba.
-**Hambatan diketahui:** Docker engine tidak dapat dibuka dari sesi agent; perlu tindakan pemilik mesin (T-010). Tanpa Docker, alternatif adalah langsung memakai project Supabase dev di cloud (T-042 dimajukan), dengan risiko data dev di cloud.
+**Hambatan diketahui:** Docker engine tidak start karena virtualisasi CPU nonaktif di BIOS; perlu tindakan pemilik mesin, langkah di [[DOCKER_SETUP]] (T-010). Sementara itu [[LOCAL_PREVIEW|pratinjau mock]] dipakai untuk meninjau UI. Tanpa Docker, alternatif adalah langsung memakai project Supabase dev di cloud (T-042 dimajukan), dengan risiko data dev di cloud.
 
 ### P2 Aplikasi siap uji (T-020 sampai T-025, sekitar 12 hari)
 Login OTP end-to-end, CRUD dan realtime untuk 20 koleksi, matriks RLS per role, smoke test Playwright, perbaikan bug, screenshot dan panduan pengguna.
