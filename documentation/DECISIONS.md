@@ -6,6 +6,14 @@ updated: 2026-11-02
 
 # Log keputusan workspace
 
+## 2026-11-02 — Sumber kebenaran UI untuk build mni-app (T-014)
+
+- **Konteks:** `apps/mni-app` mengekstrak UI ke `public/app.*` dan semula meminta `mni-gudang.html` yang tidak ada. Dua kandidat sumber: `apps/gudang-logistik/reference/*.html` (salinan HTML lama) dan `apps/gudang-logistik/{index.html,assets/}` (sumber aktif).
+- **Bukti (source-level):** setelah whitespace dinormalisasi, JS reference 224.784 karakter vs sumber aktif 369.415; reference hanya memakai 15 dari 20 koleksi di schema `mni-app` (tidak ada `mwc`, `log`, `uinv`, `muser`, `ureq`), sumber aktif memakai ke-20-nya.
+- **Keputusan:** sumber kebenaran UI = `apps/gudang-logistik/` (index.html, assets/css/app.css, assets/js/app.js). `reference/` hanya arsip pembanding dan tidak dipakai build. `scripts/extract-app.js` memakai sumber itu secara default; `--source` dan `--input` tetap tersedia.
+- **Alasan:** hanya sumber aktif yang sesuai dengan schema 20 tabel; perubahan UI dikerjakan di satu tempat; extract reproducible tanpa file di luar repo.
+- **Konsekuensi:** `public/app.*` tetap dihasilkan dan di-ignore Git. Perubahan di `gudang-logistik` otomatis ikut build mni-app, jadi regresi harus dicek di keduanya. Verifikasi: ekstrak, build, dan muat di browser tanpa error JS (nav 15 item, `window.claude` ada).
+
 ## 2026-11-02 — MNI OS custom berdasarkan kebutuhan Operasional
 
 - **Konteks:** arah sebelumnya terlalu menempatkan ERP Antlia dan praktik fit-gap vendor sebagai acuan produk.

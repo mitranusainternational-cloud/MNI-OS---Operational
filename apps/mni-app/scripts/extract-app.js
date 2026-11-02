@@ -2,19 +2,24 @@
 /**
  * MNI Gudang - Extract App Script
  *
- * The original mni-gudang.html is a single-file app.
- * This script extracts the <script> content from it and
- * writes it to public/app.js so Vite can serve it.
+ * Menyiapkan public/app.js, public/app.css, dan public/app-body.html yang
+ * dimuat oleh index.html (lihat bootstrap di index.html).
+ *
+ * SUMBER KEBENARAN UI: ../gudang-logistik/ (index.html, assets/css/app.css,
+ * assets/js/app.js). Lihat documentation/DECISIONS.md (2026-11-02). Folder
+ * gudang-logistik/reference/ hanya salinan HTML lama (15 dari 20 koleksi)
+ * dan tidak dipakai untuk build.
  *
  * USAGE:
- *   node scripts/extract-app.js
- *   node scripts/extract-app.js --input ./path/to/mni-gudang.html
+ *   node scripts/extract-app.js                       # default: ../gudang-logistik
+ *   node scripts/extract-app.js --source /path/to/app # folder dengan index.html + assets/
+ *   node scripts/extract-app.js --input file.html     # mode lama: satu file HTML
  *
- * The extracted app.js is a non-module script (global scope),
- * intentionally — the original app uses globals like window.claude.
+ * app.js dimuat sebagai script biasa (global scope): aplikasi memakai global
+ * seperti window.claude.
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -22,73 +27,65 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
 const args = process.argv.slice(2);
-const inputIdx = args.indexOf('--input');
-const INPUT = inputIdx >= 0
-  ? resolve(args[inputIdx + 1])
-  : resolve(ROOT, '..', 'mni-gudang.html'); // default: sibling of mni-app/
+const arg = (name) => {
+  const i = args.indexOf(name);
+  return i >= 0 ? args[i + 1] : undefined;
+};
 
-const OUTPUT_JS = resolve(ROOT, 'public', 'app.js');
-const OUTPUT_CSS = resolve(ROOT, 'public', 'app.css');
+const OUT = resolve(ROOT, 'public');
+const fail = (msg) => {
+  console.error(`\n❌ ${msg}\n`);
+  process.exit(1);
+};
+
+let css;
+let js;
+let bodyHtml;
+let origin;
+
+function bodyFragment(html) {
+  const m = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  return (m ? m[1] : '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<title>[\s\S]*?<\/title>/gi, '')
+    .replace(/<(meta|link)\b[^>]*>/gi, '')
+    .trim();
+}
+
+if (arg('--input')) {
+  // Mode lama: satu file HTML dengan <style> dan <script> inline.
+  const file = resolve(arg('--input'));
+  if (!existsSync(file)) fail(`File tidak ditemukan: ${file}`);
+  const html = readFileSync(file, 'utf-8');
+  css = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join('\n\n');
+  js = [...html.matchAll(/<script(?![^>]*\bsrc\b)(?![^>]*\btype="module"\b)[^>]*>([\s\S]*?)<\/script>/gi)]
+    .map((m) => m[1])
+    .join('\n\n');
+  bodyHtml = bodyFragment(html);
+  origin = file;
+} else {
+  const dir = resolve(arg('--source') || resolve(ROOT, '..', 'gudang-logistik'));
+  const paths = {
+    html: resolve(dir, 'index.html'),
+    css: resolve(dir, 'assets', 'css', 'app.css'),
+    js: resolve(dir, 'assets', 'js', 'app.js'),
+  };
+  for (const p of Object.values(paths)) if (!existsSync(p)) fail(`Sumber tidak lengkap, tidak ada: ${p}`);
+  css = readFileSync(paths.css, 'utf-8');
+  js = readFileSync(paths.js, 'utf-8');
+  bodyHtml = bodyFragment(readFileSync(paths.html, 'utf-8'));
+  origin = dir;
+}
+
+if (!js.trim()) fail('JavaScript aplikasi kosong; sumber tidak sesuai.');
+if (!bodyHtml) fail('Body HTML kosong; sumber tidak sesuai.');
+
+mkdirSync(OUT, { recursive: true });
+writeFileSync(resolve(OUT, 'app.css'), `/* Dihasilkan oleh scripts/extract-app.js — jangan edit; ubah sumbernya lalu jalankan ulang */\n${css}`, 'utf-8');
+writeFileSync(resolve(OUT, 'app.js'), `/* Dihasilkan oleh scripts/extract-app.js — jangan edit; ubah sumbernya lalu jalankan ulang */\n${js}`, 'utf-8');
+writeFileSync(resolve(OUT, 'app-body.html'), bodyHtml, 'utf-8');
 
 console.log('📦 MNI Gudang - Extract App');
-console.log('   Input:', INPUT);
-console.log('   Output JS:', OUTPUT_JS);
-console.log('   Output CSS:', OUTPUT_CSS);
-
-let html;
-try {
-  html = readFileSync(INPUT, 'utf-8');
-} catch (e) {
-  console.error(`\n❌ Cannot read input file: ${INPUT}`);
-  console.error('   Pastikan mni-gudang.html ada di:', resolve(ROOT, '..'));
-  console.error('   Atau jalankan dengan: node scripts/extract-app.js --input /path/to/mni-gudang.html\n');
-  process.exit(1);
-}
-
-// ── Extract <style> blocks ────────────────────────────────────────────────────
-const styleMatches = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)];
-const css = styleMatches.map(m => m[1]).join('\n\n');
-
-// ── Extract <script> blocks (non-src, non-type=module) ────────────────────────
-// We want the inline scripts — the main app logic
-const scriptMatches = [...html.matchAll(/<script(?![^>]*\bsrc\b)(?![^>]*\btype="module"\b)[^>]*>([\s\S]*?)<\/script>/gi)];
-const js = scriptMatches.map(m => m[1]).join('\n\n');
-
-// ── Extract <body> HTML (non-script, non-style) ───────────────────────────────
-// Get body content for HTML injection
-let bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-let bodyHtml = bodyMatch ? bodyMatch[1] : '';
-
-// Remove script and style tags from body HTML
-bodyHtml = bodyHtml
-  .replace(/<script[\s\S]*?<\/script>/gi, '')
-  .replace(/<style[\s\S]*?<\/style>/gi, '')
-  .trim();
-
-// ── Write outputs ─────────────────────────────────────────────────────────────
-mkdirSync(resolve(ROOT, 'public'), { recursive: true });
-
-// CSS
-if (css.trim()) {
-  writeFileSync(OUTPUT_CSS, `/* Auto-extracted from mni-gudang.html */\n${css}`, 'utf-8');
-  console.log(`✅ CSS written: ${css.length} chars`);
-} else {
-  console.log('⏭  No CSS found');
-}
-
-// JS
-const jsHeader = `/* Auto-extracted from mni-gudang.html — DO NOT EDIT DIRECTLY */
-/* Edit the source file and re-run: node scripts/extract-app.js */
-
-`;
-
-writeFileSync(OUTPUT_JS, jsHeader + js, 'utf-8');
-console.log(`✅ JS written: ${js.length} chars`);
-
-// HTML fragment (for reference / future SPA builds)
-const htmlFragOutput = resolve(ROOT, 'public', 'app-body.html');
-writeFileSync(htmlFragOutput, bodyHtml, 'utf-8');
-console.log(`✅ Body HTML written: ${bodyHtml.length} chars`);
-
-console.log('\n✨ Done! Files ready in public/');
-console.log('   Run: npm run dev');
+console.log('   Sumber:', origin);
+console.log(`✅ app.css ${css.length} | app.js ${js.length} | app-body.html ${bodyHtml.length} karakter`);

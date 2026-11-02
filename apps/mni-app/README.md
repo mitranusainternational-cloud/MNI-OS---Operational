@@ -13,7 +13,7 @@ Sistem manajemen produksi, gudang, dan logistik berbasis web.
 - Node.js 18+
 - [Supabase CLI](https://supabase.com/docs/guides/cli) (opsional, untuk local Supabase)
 - Akun [Supabase](https://supabase.com) (gratis OK untuk dev)
-- File `mni-gudang.html` (app asli, taruh di folder parent: `../mni-gudang.html`)
+- Sumber UI: `../gudang-logistik/` (index.html + assets/), sudah ada di repo ini
 
 ### 2. Clone & Install
 
@@ -40,14 +40,14 @@ Keys ada di: **Supabase Dashboard → Project Settings → API**
 
 ### 4. Extract App dari HTML Original
 
-Script ini mengambil JS dan CSS dari `mni-gudang.html` dan menaruhnya di `public/`:
+Script ini mengambil UI dari `../gudang-logistik/` dan menaruhnya di `public/` (JS, CSS, body):
 
 ```bash
-# Default: mencari ../mni-gudang.html
+# Default: ../gudang-logistik
 npm run extract
 
 # Atau dengan path custom:
-node scripts/extract-app.js --input /path/to/mni-gudang.html
+node scripts/extract-app.js --source /path/ke/folder-app   # atau --input file.html (mode lama)
 ```
 
 ### 5. Setup Database Supabase

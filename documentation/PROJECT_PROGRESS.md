@@ -160,3 +160,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Bukti: skrip snapshot berjalan tanpa masalah data (source-level).
 - Belum diverifikasi: tampilan Bases di Obsidian (butuh versi 1.9+ dengan core plugin Bases); estimasi effort belum divalidasi.
 - Berikutnya: mulai T-010, T-030, T-032, T-040 yang sudah siap dikerjakan.
+
+### 2026-11-02 — T-014 sumber UI mni-app
+
+- Selesai: sumber kebenaran UI = `apps/gudang-logistik/` (reference hanya memakai 15 dari 20 koleksi). `extract-app.js` memakai sumber itu secara default dan reproducible dari klon bersih.
+- Bukti: extract + `vite build` + muat di browser tanpa error console (verified in browser, UI saja). Keputusan: [[DECISIONS]].
+- Dampak: T-021 kini menguji sumber yang benar-benar memakai 20 koleksi. Berikutnya: T-010 (Docker).
