@@ -6,6 +6,7 @@
 - `apps/gudang-logistik/assets/css/app.css`: seluruh CSS aplikasi.
 - `apps/gudang-logistik/assets/js/app.js`: logika runtime aplikasi.
 - `apps/gudang-logistik/docs/`: dokumentasi khusus aplikasi.
+- `apps/gudang-logistik/reference/`: salinan HTML sumber untuk pembandingan; jangan edit sebagai versi aktif.
 
 ## Jalankan untuk inspeksi
 

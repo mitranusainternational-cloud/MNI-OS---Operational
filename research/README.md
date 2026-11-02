@@ -1,6 +1,6 @@
 # Riset dan pengetahuan proses
 
-Simpan catatan riset terpisah per pertanyaan atau proses. Gunakan format `YYYY-MM-DD-topik.md`.
+Simpan catatan riset terpisah per pertanyaan atau proses. Gunakan format `YYYY-MM-DD-topik.md`. File kode dan sumber aplikasi disimpan di `apps/`, bukan di folder riset.
 
 ## Format catatan
 

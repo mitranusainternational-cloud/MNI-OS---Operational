@@ -16,6 +16,7 @@ Workspace kerja untuk mengembangkan sistem operasional MNI bersama Codex. Isi di
         ├── index.html
         ├── assets/css/app.css
         ├── assets/js/app.js
+        ├── reference/                # Salinan sumber untuk pembandingan
         └── docs/                    # Panduan serta inventaris aplikasi
 ```
 
@@ -28,7 +29,7 @@ Workspace kerja untuk mengembangkan sistem operasional MNI bersama Codex. Isi di
 
 ## Aplikasi Gudang & Logistik
 
-Mulai di [`apps/gudang-logistik/README.md`](apps/gudang-logistik/README.md). Aplikasi lokal dapat dijalankan dengan `python -m http.server 8000` dari root workspace, lalu buka <http://localhost:8000/apps/gudang-logistik/>. Aplikasi memerlukan `window.claude` agar tersambung ke database dan layanan runtime; preview lokal tanpa runtime hanya untuk meninjau UI.
+Mulai di [`apps/gudang-logistik/README.md`](apps/gudang-logistik/README.md). HTML sumber yang dipertahankan untuk pembandingan berada di `apps/gudang-logistik/reference/`; versi aktif dikembangkan dari file terpisah di folder aplikasi. Aplikasi lokal dapat dijalankan dengan `python -m http.server 8000` dari root workspace, lalu buka <http://localhost:8000/apps/gudang-logistik/>. Aplikasi memerlukan `window.claude` agar tersambung ke database dan layanan runtime; preview lokal tanpa runtime hanya untuk meninjau UI.
 
 ## GitHub
 
