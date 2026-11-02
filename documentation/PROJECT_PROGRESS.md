@@ -256,3 +256,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Rekomendasi: urutan lokal → Supabase dev → GitHub CI → Vercel preview → UAT → production dipakai; CI dipasang sebelum Vercel; VPS menjadi opsi S6 dengan kriteria terukur (mulai dari layanan pendamping), bukan langkah otomatis.
 - Bukti: source-level; agen dan skill belum dipanggil satu per satu. Regresi mock 33/33 (sebelumnya) tetap rujukan.
 - Berikutnya: login nyata dan uji Supabase (T-029), lalu CI (T-046, T-077) dan Vercel preview (T-044).
+
+### 2026-11-02 — Admin siap login (password sementara) dan baris uji dinetralkan
+
+- Selesai (atas arahan pemilik): password sementara acak untuk `mitranusainternational@gmail.com` diatur dan email dikonfirmasi lewat SQL pada project dev; bcrypt dan identitas email diverifikasi. Password tidak disimpan di vault/Git dan harus diganti pemilik setelah login pertama.
+- Baris uji SPK `9999` dinetralkan menjadi `UJI-9999` berstatus `Batal` karena perintah hapus ditolak oleh persetujuan SQL (tiga kali); penomoran SPK pertama akan 1. Hapus permanen oleh pemilik bila diinginkan.
+- Belum: login pertama dan uji alur lewat aplikasi (T-029 → T-021, T-028, T-022). Agen tidak masuk sendiri dengan kredensial ini karena kredensial akan dikirim ke layanan cloud di luar pratinjau lokal.

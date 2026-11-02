@@ -15,7 +15,7 @@ generated: 2026-11-02
 - Bobot effort selesai: **13.5 / 144 hari kerja** (9%)
 - Sisa effort: **130.5 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
 - Cakupan go-live (fase P0-P7): **15 / 58** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
-- Diblokir: **1**, sedang dikerjakan: **2**
+- Diblokir: **1**, sedang dikerjakan: **1**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
 ## Per fase
@@ -78,7 +78,6 @@ generated: 2026-11-02
 
 ## Sedang dikerjakan
 
-- [[tasks/T-029-buat-admin-awal-dan-uji-login-otp-di-supabase-dev|T-029]] Buat admin awal dan uji login OTP di Supabase dev · dev + pemilik akun
 - [[tasks/T-077-jadikan-regresi-e2e-runner-mandiri-dan-bagian-ci|T-077]] Jadikan regresi E2E runner mandiri dan bagian CI · dev
 
 ## Diblokir
@@ -87,7 +86,7 @@ generated: 2026-11-02
 
 ## Menunggu review
 
-- Tidak ada
+- [[tasks/T-029-buat-admin-awal-dan-uji-login-otp-di-supabase-dev|T-029]] Buat admin awal dan uji login OTP di Supabase dev · dev + pemilik akun
 
 ## Tugas P0 yang belum selesai
 
@@ -98,7 +97,7 @@ generated: 2026-11-02
 - [[tasks/T-021-verifikasi-crud-dan-realtime-semua-koleksi|T-021]] Verifikasi CRUD dan realtime semua koleksi · todo · menunggu T-020
 - [[tasks/T-022-uji-rls-per-role-dengan-skenario-negatif|T-022]] Uji RLS per role dengan skenario negatif · todo · menunggu T-021
 - [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]] Verifikasi adapter id, no SPK, dan master di Supabase · todo · menunggu T-012, T-021
-- [[tasks/T-029-buat-admin-awal-dan-uji-login-otp-di-supabase-dev|T-029]] Buat admin awal dan uji login OTP di Supabase dev · doing
+- [[tasks/T-029-buat-admin-awal-dan-uji-login-otp-di-supabase-dev|T-029]] Buat admin awal dan uji login OTP di Supabase dev · review
 - [[tasks/T-030-walkthrough-proses-dengan-process-owner|T-030]] Walkthrough proses dengan process owner · todo
 - [[tasks/T-031-pilih-pilot-pertama-dan-acceptance-criteria|T-031]] Pilih pilot pertama dan acceptance criteria · todo · menunggu T-030
 - [[tasks/T-032-konfirmasi-owner-dan-cut-off-enam-workbook|T-032]] Konfirmasi owner dan cut-off enam workbook · todo
