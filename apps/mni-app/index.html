@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MNI Gudang &amp; Logistik</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+  <!--
+    MNI Gudang - Local Dev Version
+    Stack: Vanilla JS + Supabase + Vite (dev) / Static (prod)
+
+    The main app logic lives in app.js (copied from mni-gudang.html).
+    This file just wires up the env, loads the Supabase adapter,
+    and provides the auth UI.
+  -->
+
+  <!-- Inject env vars (Vite replaces window.__ENV at build time) -->
+  <script>
+    window.__ENV = window.__ENV || {
+      SUPABASE_URL: '%VITE_SUPABASE_URL%',
+      SUPABASE_ANON_KEY: '%VITE_SUPABASE_ANON_KEY%',
+      APP_VERSION: '%VITE_APP_VERSION%'
+    };
+  </script>
+
+  <!-- Supabase adapter: inject BEFORE the main app script -->
+  <script type="module" src="/src/lib/claude-adapter.js"></script>
+</head>
+<body>
+  <!-- Auth gate overlay (shown when not logged in) -->
+  <div id="auth-gate" style="
+    display:none;
+    position:fixed;inset:0;
+    background:var(--bg, #EEF2F8);
+    z-index:9999;
+    display:flex;align-items:center;justify-content:center;
+  ">
+    <div style="
+      background:#fff;
+      border-radius:16px;
+      padding:40px 48px;
+      max-width:400px;width:100%;
+      box-shadow:0 8px 32px rgba(16,32,58,.12);
+      text-align:center;
+    ">
+      <div style="font-size:32px;margin-bottom:12px">🏭</div>
+      <h1 style="
+        font-family:'Barlow Semi Condensed',sans-serif;
+        font-size:24px;font-weight:700;
+        color:#12203A;margin:0 0 4px
+      ">MNI Gudang</h1>
+      <p style="color:#5B6B85;font-size:14px;margin:0 0 32px">
+        Masuk untuk melanjutkan
+      </p>
+
+      <div id="auth-email-step">
+        <input id="auth-email" type="email"
+          placeholder="Email address"
+          style="
+            width:100%;box-sizing:border-box;
+            padding:10px 14px;border:1.5px solid #DCE3EE;
+            border-radius:8px;font-size:14px;
+            font-family:'IBM Plex Sans',sans-serif;
+            outline:none;margin-bottom:12px;
+          "
+          onkeydown="if(event.key==='Enter') document.getElementById('auth-btn').click()"
+        >
+        <button id="auth-btn"
+          onclick="authSendOTP()"
+          style="
+            width:100%;padding:11px;
+            background:#1F5FD6;color:#fff;
+            border:none;border-radius:8px;
+            font-size:14px;font-weight:600;cursor:pointer;
+          "
+        >Kirim Kode Masuk</button>
+      </div>
+
+      <div id="auth-otp-step" style="display:none">
+        <p style="color:#5B6B85;font-size:13px;margin:0 0 16px">
+          Cek email Anda untuk kode 6 digit
+        </p>
+        <input id="auth-otp" type="text"
+          placeholder="123456"
+          maxlength="6"
+          style="
+            width:100%;box-sizing:border-box;
+            padding:10px 14px;border:1.5px solid #DCE3EE;
+            border-radius:8px;font-size:24px;
+            letter-spacing:8px;text-align:center;
+            font-family:'IBM Plex Mono',monospace;
+            outline:none;margin-bottom:12px;
+          "
+          oninput="if(this.value.length===6) authVerifyOTP()"
+        >
+        <button id="auth-verify-btn"
+          onclick="authVerifyOTP()"
+          style="
+            width:100%;padding:11px;
+            background:#1F5FD6;color:#fff;
+            border:none;border-radius:8px;
+            font-size:14px;font-weight:600;cursor:pointer;
+          "
+        >Verifikasi</button>
+        <button
+          onclick="document.getElementById('auth-otp-step').style.display='none';document.getElementById('auth-email-step').style.display='block'"
+          style="
+            width:100%;padding:11px;margin-top:8px;
+            background:none;color:#5B6B85;
+            border:1px solid #DCE3EE;border-radius:8px;
+            font-size:13px;cursor:pointer;
+          "
+        >← Kembali</button>
+      </div>
+
+      <div id="auth-msg" style="
+        margin-top:12px;font-size:13px;
+        color:#C2302B;min-height:20px;
+      "></div>
+    </div>
+  </div>
+
+  <!--
+    MAIN APP CONTENT will be injected by app.js.
+    The original mni-gudang.html body content is here.
+    We use a separate app.js file that contains the extracted JS
+    from the original mni-gudang.html.
+  -->
+  <div id="app-root"></div>
+
+  <!-- Auth UI script (inline, no module needed) -->
+  <script>
+    let _authEmail = '';
+
+    async function authSendOTP() {
+      const emailEl = document.getElementById('auth-email');
+      const msgEl = document.getElementById('auth-msg');
+      const email = emailEl.value.trim().toLowerCase();
+      if (!email || !email.includes('@')) {
+        msgEl.textContent = 'Masukkan email yang valid.';
+        return;
+      }
+      _authEmail = email;
+      const btn = document.getElementById('auth-btn');
+      btn.disabled = true;
+      btn.textContent = 'Mengirim...';
+      msgEl.textContent = '';
+
+      try {
+        await window.__supabase.auth.signInWithOtp({
+          email,
+          options: { shouldCreateUser: false }
+        });
+        document.getElementById('auth-email-step').style.display = 'none';
+        document.getElementById('auth-otp-step').style.display = 'block';
+      } catch (e) {
+        msgEl.textContent = e.message || 'Gagal mengirim kode.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Kirim Kode Masuk';
+      }
+    }
+
+    async function authVerifyOTP() {
+      const otp = document.getElementById('auth-otp').value.trim();
+      const msgEl = document.getElementById('auth-msg');
+      if (otp.length !== 6) { msgEl.textContent = 'Kode harus 6 digit.'; return; }
+
+      const btn = document.getElementById('auth-verify-btn');
+      btn.disabled = true;
+      btn.textContent = 'Memverifikasi...';
+      msgEl.textContent = '';
+
+      try {
+        const { error } = await window.__supabase.auth.verifyOtp({
+          email: _authEmail,
+          token: otp,
+          type: 'email'
+        });
+        if (error) throw error;
+        // Auth state change will hide the gate automatically
+      } catch (e) {
+        msgEl.textContent = 'Kode salah atau expired. Coba lagi.';
+        document.getElementById('auth-otp').value = '';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verifikasi';
+      }
+    }
+
+    // Listen for auth state from the adapter
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for supabase to be available
+      const waitSupabase = setInterval(() => {
+        if (window.__supabase) {
+          clearInterval(waitSupabase);
+          window.__supabase.auth.onAuthStateChange((event, session) => {
+            const gate = document.getElementById('auth-gate');
+            if (session) {
+              gate.style.display = 'none';
+            } else {
+              gate.style.display = 'flex';
+            }
+          });
+          // Check initial session
+          window.__supabase.auth.getSession().then(({ data: { session } }) => {
+            if (!session) {
+              document.getElementById('auth-gate').style.display = 'flex';
+            }
+          });
+        }
+      }, 100);
+    });
+  </script>
+
+  <!--
+    NOTE: The main app script (app.js) is the extracted content from
+    mni-gudang.html. During build, Vite will process it.
+    See: scripts/extract-app.js to generate public/app.js from mni-gudang.html
+  -->
+  <script src="/app.js" defer></script>
+</body>
+</html>

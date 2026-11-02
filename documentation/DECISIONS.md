@@ -1,0 +1,37 @@
+---
+type: decision-log
+status: active
+updated: 2026-11-02
+---
+
+# Log keputusan workspace
+
+## 2026-11-02 — MNI OS custom berdasarkan kebutuhan Operasional
+
+- **Konteks:** arah sebelumnya terlalu menempatkan ERP Antlia dan praktik fit-gap vendor sebagai acuan produk.
+- **Keputusan:** MNI OS dirancang sebagai sistem custom. Kebutuhan, proses aktual, kontrol, data, dan masukan tim Operasional MNI menjadi sumber utama desain dan prioritas. Antlia tidak menjadi blueprint atau daftar fitur wajib.
+- **Cara memakai referensi eksternal:** praktik rekayasa, keamanan, UX, dan data boleh dipakai sebagai pola pembanding; keputusan alur dan fitur harus ditelusuri ke bukti serta validasi pemilik proses MNI.
+- **Konsekuensi:** backlog, pilot saldo bahan baku, mapping schema hosted, dan usulan modul lama berstatus hipotesis sampai divalidasi. Model data Supabase lokal dirancang dari kebutuhan yang diterima, bukan diturunkan otomatis dari project hosted yang ditemukan.
+- **Rujukan:** [[ROADMAP|Roadmap]], [[PROJECT_PROGRESS|Progress]], dan [[research/2026-11-02-erp-rationalization-best-practice|catatan riset yang dibingkai ulang]].
+
+## 2026-11-02 — Source code dan vault berada di workspace yang sama
+
+- **Konteks:** proyek mencakup website/aplikasi, panduan, progress, roadmap, riset, dan bukti visual; semua harus mudah ditinjau dari Obsidian.
+- **Keputusan:** folder repository root dipakai sebagai vault; source tetap dalam `apps/` dan `websites/`; dokumen lintas proyek di `documentation/`; riset bertanggal di `research/`.
+- **Alasan:** satu sumber Markdown yang bisa ditautkan ke kode dan dilacak di Git tanpa menyalin source ke vault kedua.
+- **Konsekuensi:** pengaturan vault `.obsidian/` tetap lokal; preferensi pribadi tidak perlu masuk Git.
+
+## 2026-11-02 — Markdown-first untuk progress dan roadmap
+
+- **Konteks:** perlu melihat status kerja dan rencana tanpa harus memasang plugin pihak ketiga.
+- **Keputusan:** Home adalah indeks; `PROJECT_PROGRESS.md` menyimpan status/bukti; `ROADMAP.md` menyimpan urutan hasil Now/Next/Later dan checklist.
+- **Alasan:** properti, link internal, dan checklist Markdown bisa dibaca langsung, disimpan bersama source, serta menjadi basis untuk tampilan Bases bila kelak diperlukan.
+- **Konsekuensi:** status harus dipelihara pada dokumen sumbernya; plugin/database view bersifat opsional.
+- **Rujukan:** [[research/2026-11-02-obsidian-project-workspace-best-practice|Riset workflow Obsidian]].
+
+## 2026-11-02 — Klaim harus menyebut tingkat bukti
+
+- **Konteks:** source code menyebut data/runtime, tetapi browser, backend dan workbook aktual belum berhasil diakses pada sesi ini.
+- **Keputusan:** label `source-level`, `verified in browser`, dan `verified in database` dipakai terpisah; screenshot aktual menunggu akses preview yang dapat diverifikasi.
+- **Alasan:** mencegah inventaris kode atau screenshot UI dianggap sebagai bukti transaksi/persistence.
+- **Rujukan:** [[PROJECT_PROGRESS|Progress proyek]] dan [[apps/gudang-logistik/docs/DATA_INVENTORY|inventaris data indikatif]].

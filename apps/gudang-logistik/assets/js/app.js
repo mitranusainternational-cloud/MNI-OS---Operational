@@ -132,7 +132,7 @@ let rq=0,bodyPending=false;const typingInBody=()=>{const a=document.activeElemen
 document.addEventListener('focusout',()=>setTimeout(()=>{if(bodyPending&&!typingInBody()){bodyPending=false;renderBody()}},0));
 function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;if(ROLE_ON)autoClaim();renderNav();renderLive();renderMe();renderAccess();if(!$('#tools').contains(document.activeElement))renderTools();if(typingInBody())bodyPending=true;else renderBody();if(DRAWER)DRAWER();if(SHEET)renderSheet()})}
 const ready=()=>COLS.every(c=>loaded.has(c));
-const need=(c,data,id,op)=>{if(!DB)throw new Error('Database belum tersambung. Buka halaman ini di claude.ai.');if(!CAN)throw new Error('Akses Anda lihat saja.');guard(c,data,id,op||'upd')};
+const need=(c,data,id,op)=>{if(!DB)throw new Error('Fitur simpan belum tersedia di pratinjau lokal karena backend belum terhubung.');if(!CAN)throw new Error('Akses Anda lihat saja.');guard(c,data,id,op||'upd')};
 async function addDoc(c,data){need(c,data,null,'add');data.at=new Date().toISOString();data.by=ME||null;const r=await DB.collection(c).add(data);logAct(c,r&&r.id,'add',data);return r}
 async function updDoc(c,id,data){need(c,data,id,'upd');data.updAt=new Date().toISOString();data.updBy=ME||null;const r=await DB.doc(c+'/'+id).update(data);logAct(c,id,'upd',data);return r}
 async function delDoc(c,id){need(c,null,id,'del');logAct(c,id,'del',{});return DB.doc(c+'/'+id).delete()}
@@ -156,7 +156,7 @@ function renderNav(){
 }
 function renderLive(){
  const el=$('#live');el.className='live '+(LIVE==='on'?'on':LIVE==='off'?'off':'');
- el.querySelector('span').textContent=LIVE==='on'?`Realtime · tersinkron ${LAST.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`:LIVE==='off'?'Tidak tersambung ke database':'Menghubungkan…';
+ el.querySelector('span').textContent=LIVE==='on'?`Realtime · tersinkron ${LAST.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`:LIVE==='off'?'Pratinjau lokal · backend belum terhubung':'Menyiapkan pratinjau lokal…';
 }
 function route(){
  const h=(location.hash||'').slice(1);VIEW=VIEWS.some(v=>v.id===h)?h:'dashboard';
@@ -176,7 +176,7 @@ function route(){
 }
 window.addEventListener('hashchange',route);
 
-const loading=()=>`<div class="panel"><div class="empty">${LIVE==='off'?'<b>Belum tersambung ke database</b><span>Buka aplikasi ini lewat link claude.ai supaya data bersama bisa dimuat.</span>':'<b>Memuat data…</b><span>Mengambil stok, SPK, dan transaksi terbaru.</span>'}</div></div>`;
+const loading=()=>`<div class="panel"><div class="empty">${LIVE==='off'?'<b>Mode pratinjau lokal</b><span>Backend belum dikonfigurasi. Data Operasional tidak dimuat, disimpan, atau disinkronkan.</span>':'<b>Menyiapkan pratinjau…</b><span>Menunggu koneksi backend yang dikonfigurasi.</span>'}</div></div>`;
 function renderBody(){const el=$('#body');if(!ready()){el.innerHTML=loading();return}el.innerHTML=(B[VIEW]||B.dashboard)();resolveNames()}
 function renderTools(){$('#tools').innerHTML=(T[VIEW]||(()=>''))();$('#tools').hidden=!$('#tools').innerHTML;renderAccess();renderMe()}
 
@@ -3058,7 +3058,7 @@ function reqForm(){const r=byId('ureq',ME)||{};
   fld('Bagian / peran',`<select class="sel" name="role" id="m-role">${Object.entries(ROLES).filter(([k])=>k!=='admin').map(([k,x])=>`<option value="${k}" ${r.role===k?'selected':''}>${x.l} — ${x.d}</option>`).join('')}</select>`,true)+
   fld('Jabatan (opsional)',inp('jabatan',r.jabatan||'','text','placeholder="mis. Kepala Gudang, Staff PPIC"'))+fld('Catatan untuk admin (opsional)',inp('ket',r.ket||''))+
   `<div class="note full">Dengan kode undangan, akun Anda aktif otomatis. Tanpa kode, admin akan menyetujui dan menentukan peran Anda. Setelah disetujui, setiap data yang Anda input tercatat atas nama Anda.</div>`,
-  async d=>{if(!DB)throw new Error('Database belum tersambung.');if(!ME)throw new Error('Login ke Claude dulu.');if(!String(d.nama).trim())throw new Error('Isi nama lengkap.');
+  async d=>{if(!DB)throw new Error('Pembuatan pengguna belum tersedia di pratinjau lokal karena backend belum terhubung.');if(!ME)throw new Error('Autentikasi belum tersedia di pratinjau lokal.');if(!String(d.nama).trim())throw new Error('Isi nama lengkap.');
    await DB.doc('ureq/'+ME).set({kode:String(d.kode||'').toUpperCase().replace(/[^A-Z0-9]/g,''),nama:cleanName(d.nama),role:d.role,jabatan:String(d.jabatan||'').trim(),ket:String(d.ket||'').trim(),at:new Date().toISOString()})},
   {submit:'Kirim permintaan',done:'Permintaan terkirim · admin akan melihatnya langsung'})}
 function userForm(uid){

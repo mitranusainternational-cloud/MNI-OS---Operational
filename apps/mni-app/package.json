@@ -1,0 +1,28 @@
+{
+  "name": "mni-gudang",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MNI Gudang & Logistik - Production Management System",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "extract": "node scripts/extract-app.js",
+    "setup": "node scripts/extract-app.js && npm run dev",
+    "migrate": "node scripts/migrate-firestore.js",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:status": "supabase status",
+    "db:reset": "supabase db reset",
+    "db:push": "supabase db push",
+    "db:types": "supabase gen types typescript --local > src/types/supabase.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "supabase": "^1.200.3"
+  }
+}
