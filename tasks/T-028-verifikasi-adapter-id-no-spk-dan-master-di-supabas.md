@@ -29,7 +29,7 @@ Bergantung pada: T-012, T-021
 
 ## Bukti
 
-- Belum ada. Perbaikan B-007, B-008, B-009 hanya divalidasi pada mock yang meniru batasan UUID.
+- Sebagian: Postgres nyata menolak id non-UUID (`22P02`), sehingga pemetaan UUID diperlukan (lihat [[TEST_MATRIX]]). Uji penuh lewat app menunggu login nyata (T-029).
 
 ## Catatan
 

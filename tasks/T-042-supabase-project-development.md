@@ -5,7 +5,7 @@ title: "Supabase project development"
 phase: P4
 epic: E-05
 release: v1.0
-status: todo
+status: done
 priority: P0
 env: development
 effort_days: 0.5
@@ -22,13 +22,14 @@ Bergantung pada: T-011
 
 ## Kriteria selesai
 
-- [ ] Project terpisah dari prod
-- [ ] Migration diterapkan lewat CLI
-- [ ] Target dan lineage tercatat di [[FOUNDATION_BASELINE]]
+- [x] Project terpisah dari prod
+- [x] Migration diterapkan lewat CLI
+- [x] Target dan lineage tercatat di [[FOUNDATION_BASELINE]]
 
 ## Bukti
 
-- Belum ada.
+- Project `MNI Gudang - Dev` (ref `inldyqigewmziwazalun`) dibuat 2026-11-02; 3 migration terpasang; 20 tabel, 39 policy, 17 tabel realtime; advisor keamanan hanya peringatan. Keputusan: [[documentation/DECISIONS]]. Detail: [[documentation/ENVIRONMENTS]].
+- Catatan: `MNI OS - Operational` (kosong) dijeda agar muat batas gratis.
 
 ## Catatan
 

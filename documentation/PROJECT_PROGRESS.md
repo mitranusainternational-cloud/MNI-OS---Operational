@@ -228,3 +228,11 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: regresi penuh pada pratinjau mock (login, 10 modul, 22 alur inti): 33 PASS, 0 FAIL, 0 pageerror. Regresi menemukan B-010 (lembar SPK kosong yang memblokir layar setelah menerbitkan SPK, akibat pemetaan id B-007); diperbaiki dengan alias id dan penjaga `openSheet`.
 - Selesai: inventaris akun cloud hanya-baca: 3 project Supabase (dua aktif berskema ERP berbeda), Vercel team NIJ tanpa project. Opsi koneksi A/B/C tercatat di [[documentation/ENVIRONMENTS]].
 - Berikutnya: keputusan pemilik akun atas opsi A (project Supabase baru) atau B (Docker lokal); lalu T-042, T-011, T-020, T-028, T-044.
+
+### 2026-11-02 — Supabase dev dibuat dan schema diselaraskan (T-042 selesai)
+
+- Selesai: project `MNI Gudang - Dev` (ref `inldyqigewmziwazalun`); `MNI OS - Operational` (kosong) dijeda atas persetujuan pemilik karena batas 2 project gratis. Tiga migration terpasang (20 tabel, 39 policy, realtime 17 tabel). Advisor keamanan: hanya peringatan (dicatat di T-060).
+- Temuan penting: schema migration awal tidak cocok dengan bentuk dokumen app; ditambahkan model "kolom inti + JSONB `data`" (migration 3, adapter, [[documentation/DECISIONS]]). Mock diperketat meniru PostgREST/Postgres; regresi 33/33 PASS.
+- Bukti: Postgres nyata menolak id non-UUID; sisipan SPK dengan JSONB berhasil. Belum: login OTP nyata dan uji app terhadap Supabase dev (T-029).
+- Risiko: baris uji SPK `9999` tertinggal karena perintah hapus ditolak; harus dibersihkan sebelum SPK dibuat. Temuan RLS vs alur app dicatat di T-022.
+- Berikutnya: email admin awal dari pemilik (T-029), lalu T-021, T-022, T-028, dan Vercel (T-044).

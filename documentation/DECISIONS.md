@@ -6,6 +6,13 @@ updated: 2026-11-02
 
 # Log keputusan workspace
 
+## 2026-11-02 — Database dev: project Supabase baru dan model "kolom inti + JSONB data" (T-042)
+
+- **Konteks:** akun Supabase sudah memiliki dua project aktif berskema ERP berbeda dan batas paket gratis (2 project aktif) penuh. Schema migration awal `mni-app` juga tidak cocok dengan bentuk dokumen yang ditulis app: mis. `bongkar` memakai jenis/muatan/pihak, `mutasi` memakai `item` (bukan `item_id` wajib), `log` memakai c/d/k/op, `vendor`/`kirim` memuat kendaraan, riwayat, dan referensi SPK.
+- **Keputusan:** (1) buat project baru `MNI Gudang - Dev` (ref `inldyqigewmziwazalun`, ap-southeast-1) dan jeda project kosong `MNI OS - Operational` (0 baris data, bisa dipulihkan) agar muat di batas gratis, atas persetujuan pemilik; (2) tambahkan migration `20240101000003_app_shape_compat.sql`: kolom JSONB `data` di 19 tabel untuk bidang tambahan dan pelonggaran NOT NULL selain kunci bisnis (`muser.email`, `master.key`, `spk.no`); adapter memecah dan menggabungkan `data` berdasarkan `schema-columns.js`.
+- **Alasan:** membuat app berjalan di Postgres nyata sekarang tanpa menebak model data final; model normal ditetapkan setelah discovery (T-033).
+- **Konsekuensi:** kueri langsung ke bidang di `data` lebih sulit dan tanpa constraint; update parsial pada `data` adalah baca-ubah-tulis (tidak atomik). Normalisasi tabel kunci (SPK, mutasi, stok) menjadi pekerjaan lanjutan setelah pilot dipilih.
+
 ## 2026-11-02 — Sumber kebenaran UI untuk build mni-app (T-014)
 
 - **Konteks:** `apps/mni-app` mengekstrak UI ke `public/app.*` dan semula meminta `mni-gudang.html` yang tidak ada. Dua kandidat sumber: `apps/gudang-logistik/reference/*.html` (salinan HTML lama) dan `apps/gudang-logistik/{index.html,assets/}` (sumber aktif).

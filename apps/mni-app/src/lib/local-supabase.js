@@ -9,9 +9,11 @@
  * (Docker) atau project dev (tugas T-011, T-020 sampai T-022).
  */
 
+import { TABLE_COLS } from './schema-columns.js';
+
 const STORE_KEY = 'mni-local-mock-db';
 const SESSION_KEY = 'mni-local-mock-session';
-const VERSION = 3; // naikkan bila bentuk data seed berubah agar browser memuat seed baru
+const VERSION = 4; // naikkan bila bentuk data seed berubah agar browser memuat seed baru
 // Kode masuk untuk pratinjau lokal. Bukan rahasia dan tidak berlaku di environment lain.
 export const LOCAL_OTP = '123456';
 
@@ -21,7 +23,7 @@ const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Math.random
 
 function seed() {
   const now = iso();
-  const base = (o) => ({ id: uid(), created_at: now, updated_at: now, created_by: 'seed', updated_by: 'seed', ...o });
+  const base = (o) => ({ id: uid(), created_at: now, updated_at: now, created_by: 'seed', updated_by: 'seed', data: {}, ...o });
   const db = {};
   db.muser = [
     ['admin@mni.local', 'Admin Lokal', 'admin'],
@@ -63,7 +65,7 @@ function seed() {
   ];
   for (const t of ['mutasi', 'rmhist', 'vendor', 'pr', 'kirim', 'bongkar', 'opname', 'log', 'ureq', 'uinv']) db[t] = [];
   db.master = [['app_name', 'MNI Gudang'], ['app_version', '1.0.0-lokal'], ['spk_counter', 1002], ['pr_counter', 1]]
-    .map(([key, value]) => ({ key, value, ket: 'seed', created_at: now, updated_at: now }));
+    .map(([key, value]) => ({ id: uid(), key, value, ket: 'seed', updated_at: now }));
   return { v: VERSION, tables: db };
 }
 
@@ -117,6 +119,15 @@ export function createLocalClient() {
         const bad = given.find((v) => !UUID.test(String(v)));
         if (bad !== undefined) return { data: null, error: { code: '22P02', message: `invalid input syntax for type uuid: "${bad}"` } };
       }
+      // Meniru PostgREST: kolom yang tidak ada di tabel ditolak (PGRST204).
+      const cols = TABLE_COLS[this.t];
+      if (cols && this.payload && (this.op === 'insert' || this.op === 'upsert' || this.op === 'update')) {
+        for (const p of [].concat(this.payload)) {
+          const unknown = Object.keys(p || {}).find((k) => !cols.includes(k));
+          if (unknown) return { data: null, error: { code: 'PGRST204', message: `Could not find the '${unknown}' column of '${this.t}' in the schema cache` } };
+        }
+      }
+      const has = (c) => !cols || cols.includes(c);
       if (this.op === 'select') {
         out = rows.filter((r) => this.match(r));
         if (this.ord) {
@@ -128,16 +139,16 @@ export function createLocalClient() {
         for (const p of list) {
           const key = this.op === 'upsert' ? (this.opts.onConflict || pk) : pk;
           let row = this.op === 'upsert' && p[key] !== undefined ? rows.find((r) => r[key] === p[key]) : null;
-          if (row) { Object.assign(row, p, { updated_at: stamp }); emit(this.t, 'UPDATE', row); }
+          if (row) { Object.assign(row, p, has('updated_at') ? { updated_at: stamp } : {}); emit(this.t, 'UPDATE', row); }
           else {
             if (this.t === 'spk' && p.no && rows.some((r) => r.no === p.no)) return { data: null, error: { code: '23505', message: `Nomor SPK ${p.no} sudah ada` } };
-            row = { ...(pk === 'id' ? { id: uid() } : {}), created_at: stamp, updated_at: stamp, ...p };
+            row = { ...(pk === 'id' ? { id: uid() } : {}), ...(has('created_at') ? { created_at: stamp } : {}), ...(has('updated_at') ? { updated_at: stamp } : {}), ...(cols && cols.includes('data') ? { data: {} } : {}), ...p };
             rows.push(row); emit(this.t, 'INSERT', row);
           }
           out.push(row);
         }
       } else if (this.op === 'update') {
-        for (const r of rows.filter((x) => this.match(x))) { Object.assign(r, this.payload, { updated_at: stamp }); out.push(r); emit(this.t, 'UPDATE', r); }
+        for (const r of rows.filter((x) => this.match(x))) { Object.assign(r, this.payload, has('updated_at') ? { updated_at: stamp } : {}); out.push(r); emit(this.t, 'UPDATE', r); }
       } else if (this.op === 'delete') {
         for (const r of rows.filter((x) => this.match(x))) { rows.splice(rows.indexOf(r), 1); out.push(r); emit(this.t, 'DELETE', r); }
       }

@@ -31,4 +31,6 @@ Bergantung pada: T-042
 
 ## Catatan
 
+Advisor keamanan Supabase dev (2026-11-02): fungsi SECURITY DEFINER `get_user_role`, `is_authenticated`, `is_admin_or_manager` dapat dipanggil lewat RPC oleh anon dan authenticated; `pg_trgm` di schema public. Pertimbangkan memindahkan fungsi ke schema privat dan mencabut EXECUTE dari anon.
+
 -

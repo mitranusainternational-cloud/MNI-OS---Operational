@@ -54,3 +54,17 @@ Biaya project Supabase baru tidak bisa saya baca (izin konektor ditolak); periks
 | C. Pakai project yang ada | Terapkan migration ke project ERP | Tanpa project baru | Skema berbeda, risiko merusak; tidak direkomendasikan |
 
 Urutan setelah database ada: terapkan migration, uji login OTP dan adapter di Postgres (T-020, T-021, T-028), sambungkan Vercel ke GitHub (butuh izin aplikasi Vercel pada organisasi GitHub), preview dari `development`, lalu UAT.
+
+## Supabase Development (dibuat 2026-11-02)
+
+| Item | Nilai |
+|---|---|
+| Project | `MNI Gudang - Dev`, ref `inldyqigewmziwazalun`, region ap-southeast-1 |
+| URL | `https://inldyqigewmziwazalun.supabase.co` (bukan rahasia) |
+| Migration terpasang | init_schema, rls_policies, app_shape_compat (20 tabel, 19 dengan kolom `data`, 39 policy, 17 tabel realtime) |
+| Kunci di aplikasi | hanya kunci anon/publishable (publik); kunci service-role tidak dipakai di mana pun |
+| Menjalankan app ke project ini | file lokal `apps/mni-app/.env.supabase-dev.local` (diabaikan Git), lalu `npx vite --mode supabase-dev` |
+| Perubahan akun | project `MNI OS - Operational` (kosong) dijeda agar muat di batas gratis; dapat dipulihkan dari dashboard |
+| Belum ada | user admin awal (T-029), data, Vercel, CI |
+
+Temuan advisor keamanan (peringatan, bukan kritis): fungsi `get_user_role`, `is_authenticated`, `is_admin_or_manager` (SECURITY DEFINER) dapat dipanggil lewat RPC oleh anon dan authenticated; ekstensi `pg_trgm` di schema public. Dijadwalkan di T-060.

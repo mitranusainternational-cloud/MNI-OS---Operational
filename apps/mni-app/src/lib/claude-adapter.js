@@ -20,6 +20,8 @@
  */
 
 
+import { TABLE_COLS } from './schema-columns.js';
+
 // ── Config ────────────────────────────────────────────────────────────────────
 const SUPABASE_URL = window.__ENV?.SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = window.__ENV?.SUPABASE_ANON_KEY || '';
@@ -67,6 +69,27 @@ const textNo = (table, row) => {
   return row;
 };
 
+// ── Bidang tambahan ke JSONB "data" ───────────────────────────────────────────
+// Dokumen app memuat bidang di luar kolom tabel. Bidang itu disimpan di kolom JSONB "data"
+// dan digabung kembali saat dibaca (lihat rowToDoc). Kolom nyata ditentukan TABLE_COLS.
+function packRow(table, row) {
+  const cols = TABLE_COLS[table];
+  if (!cols) return { row, extra: {} };
+  const out = {};
+  const extra = {};
+  for (const [k, v] of Object.entries(row)) {
+    if (k === 'data') continue;
+    if (cols.includes(k)) out[k] = v;
+    else if (v !== undefined) extra[k] = v;
+  }
+  return { row: out, extra };
+}
+function unpackRow(row) {
+  if (!row) return row;
+  const { data, ...cols } = row;
+  return { ...(data && typeof data === 'object' ? data : {}), ...cols };
+}
+
 // ── Field name helpers ────────────────────────────────────────────────────────
 // The original app stores _id as the Firestore document ID.
 // Supabase uses `id` (UUID). We expose _id = id for compatibility.
@@ -97,8 +120,9 @@ function docToRow(docPath, data) {
   return row;
 }
 
-function rowToDoc(row) {
-  if (!row) return null;
+function rowToDoc(input) {
+  if (!input) return null;
+  const row = unpackRow(input);
   return {
     ...row,
     _id: row.id,
@@ -130,7 +154,8 @@ function makeCollection(col) {
   return {
     // Firestore: collection(col).add(data) → INSERT
     async add(data) {
-      const row = textNo(table, docToRow(null, data));
+      const packed = packRow(table, textNo(table, docToRow(null, data)));
+      const row = { ...packed.row, data: packed.extra };
       delete row.id; // let DB generate UUID
       const { data: result, error } = await supabase
         .from(table)
@@ -219,7 +244,8 @@ function makeDoc(path) {
         return;
       }
       const id = await idOf();
-      const row = textNo(table, docToRow(path, data));
+      const packed = packRow(table, textNo(table, docToRow(path, data)));
+      const row = { ...packed.row, data: packed.extra };
       row.id = id;
       const { error } = await supabase.from(table).upsert(row, { onConflict: 'id' });
       if (error) throw new Error(`[set:${table}:${id}] ${error.message}`);
@@ -236,8 +262,14 @@ function makeDoc(path) {
         return;
       }
       const id = await idOf();
-      const row = textNo(table, docToRow(path, data));
+      const packed = packRow(table, textNo(table, docToRow(path, data)));
+      const row = packed.row;
       delete row.id;
+      if (Object.keys(packed.extra).length) {
+        // Gabung dengan data lama (baca-ubah-tulis). Cukup untuk fase awal; ganti dengan RPC atomik bila ada penulisan serentak.
+        const { data: cur } = await supabase.from(table).select('data').eq('id', id).single();
+        row.data = { ...((cur && cur.data) || {}), ...packed.extra };
+      }
       const { error } = await supabase.from(table).update(row).eq('id', id);
       if (error) throw new Error(`[update:${table}:${id}] ${error.message}`);
     },

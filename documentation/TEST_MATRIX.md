@@ -93,6 +93,14 @@ B-001, B-002, dan B-005 berada di kode adapter produksi, bukan hanya mock, sehin
 
 Satu skrip Playwright menjalankan login, 10 modul, dan 22 alur inti pada data bersih: **33 PASS, 0 FAIL**, 0 pageerror, data bertahan setelah muat ulang. Regresi ini menangkap B-010, yaitu efek samping perbaikan B-007 yang tidak terlihat di uji sebelumnya. Aturan: setiap perubahan adapter atau `gudang-logistik` wajib diikuti regresi penuh.
 
+## Pembuktian di Postgres nyata (Supabase dev, 2026-11-02)
+
+- Postgres menolak id non-UUID: `select 'spk-1003'::uuid` → error `22P02` (menguatkan B-007; pemetaan UUID di adapter diperlukan).
+- Schema terpasang dengan kolom JSONB `data`, 39 policy RLS, dan realtime di 17 tabel.
+- Sisipan SPK dengan `data` JSONB berhasil dibaca balik. Baris uji bernomor `9999` sempat tertinggal karena perintah hapus ditolak; harus dibersihkan sebelum penomoran SPK dipakai (lihat T-029).
+- Regresi mock diperketat: mock kini menolak kolom yang tidak ada (seperti PostgREST) dan id non-UUID; **33 PASS, 0 FAIL** setelah adapter memecah bidang tambahan ke `data`.
+- Belum: uji aplikasi terhadap Supabase dev dengan login OTP nyata (T-029, lalu T-021, T-022, T-028).
+
 ## Belum diuji (jadwal di tracking)
 
 Tercatat di [[tasks/T-027-uji-sisa-ui-mock-void-koreksi-pr-dan-role|T-027]]: batalkan dan koreksi bongkar muat, modul PR/usulan pembelian, tab KPI & Analisa, ekspor XLSX modul gudang, opname bahan baku, tampilan per role, dan menu mobile penuh.

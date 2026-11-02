@@ -32,4 +32,6 @@ Bergantung pada: T-021
 
 ## Catatan
 
+Temuan tinjauan policy (2026-11-02, belum diuji): kunci dokumen (`lock:*`) dan pengaturan disimpan di tabel `master` yang hanya dapat ditulis admin/manager, padahal app memakai kunci saat membuat SPK; role `produksi` dan `gudang` kemungkinan gagal membuat SPK atau mutasi. Selain itu `spk`, `vendor` hanya boleh ditulis produksi, sedangkan `kirim`, `bongkar` hanya gudang; alur lintas peran perlu dicocokkan dengan proses nyata (T-030). Uji dan perbaiki sebelum UAT.
+
 -
