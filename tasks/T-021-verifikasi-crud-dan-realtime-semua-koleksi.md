@@ -28,7 +28,7 @@ Bergantung pada: T-020
 
 ## Bukti
 
-- Belum ada.
+- Sebagian lewat mock (bukan Supabase): CRUD add/update/delete dan validasi diuji pada bahan baku, barang jadi, SPK, vendor, surat jalan, bongkar muat, dan master (14 fitur PASS, lihat [[TEST_MATRIX]]). Realtime dan konflik belum diuji. Tugas tetap `todo` sampai diuji pada Supabase.
 
 ## Catatan
 

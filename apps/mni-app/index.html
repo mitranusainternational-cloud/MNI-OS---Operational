@@ -198,19 +198,17 @@
       const waitSupabase = setInterval(() => {
         if (window.__supabase) {
           clearInterval(waitSupabase);
-          window.__supabase.auth.onAuthStateChange((event, session) => {
-            const gate = document.getElementById('auth-gate');
-            if (session) {
-              gate.style.display = 'none';
-            } else {
-              gate.style.display = 'flex';
-            }
-          });
-          // Check initial session
+          const gate = document.getElementById('auth-gate');
+          // app.js membaca user/sesi sekali saat boot. Setelah login atau logout kita muat ulang
+          // halaman agar identitas, role, dan data dibaca ulang dari sesi yang benar.
           window.__supabase.auth.getSession().then(({ data: { session } }) => {
-            if (!session) {
-              document.getElementById('auth-gate').style.display = 'flex';
-            }
+            let hadSession = !!session;
+            gate.style.display = session ? 'none' : 'flex';
+            window.__supabase.auth.onAuthStateChange((event, s) => {
+              if (event === 'SIGNED_IN' && !hadSession && s) { hadSession = true; location.reload(); return; }
+              if (event === 'SIGNED_OUT' && hadSession) { hadSession = false; location.reload(); return; }
+              gate.style.display = s ? 'none' : 'flex';
+            });
           });
         }
       }, 100);

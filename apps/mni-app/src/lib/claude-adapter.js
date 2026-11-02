@@ -265,6 +265,7 @@ async function makeUserAdapter() {
     me: async () => ({
       id: user.email,
       email: user.email,
+      name: muser?.nama || user.email, // dipakai app untuk nama tampilan
       nama: muser?.nama || user.email,
       role: muser?.role || 'viewer',
       isOwner: muser?.role === 'admin',
@@ -277,6 +278,13 @@ async function makeUserAdapter() {
       }
       return role !== 'viewer';
     },
+    // App memanggil USER.profiles(ids) untuk warna dan foto avatar (API platform asli).
+    // Warna dibuat deterministik dari id; foto belum didukung.
+    profiles: async (ids = []) => Object.fromEntries(ids.map((id) => {
+      let h = 0;
+      for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) % 360;
+      return [id, { color: `hsl(${h} 55% 45%)`, avatarUrl: null }];
+    })),
     signIn: async (email) => {
       const { error } = await supabase.auth.signInWithOtp({ email });
       if (error) throw error;
@@ -294,15 +302,22 @@ const CLAUDE_SHIM = {
   use: async (service) => {
     if (service === 'db') return DB_ADAPTER;
     if (service === 'user') return makeUserAdapter();
-    if (service === 'downloads') return {
-      download: (blob, filename) => {
+    if (service === 'downloads') {
+      const saveBlob = (blob, filename) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = filename;
+        document.body.appendChild(a);
         a.click();
+        a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
-      }
-    };
+      };
+      return {
+        // API yang dipanggil app: DLS.save({ filename, data }) dengan data Blob atau Uint8Array.
+        save: async ({ filename, data }) => saveBlob(data instanceof Blob ? data : new Blob([data]), filename),
+        download: saveBlob, // bentuk lama (blob, filename)
+      };
+    }
     throw new Error(`Unknown service: ${service}`);
   }
 };

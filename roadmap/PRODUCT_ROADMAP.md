@@ -20,7 +20,7 @@ Roadmap ini mengurutkan **hasil** (bukan tanggal) dari kondisi sekarang sampai s
 | Repo dan versi | 4 branch di GitHub, `development` dan `docs` terkini; `main` belum berisi pekerjaan baru | [[documentation/VERSION_STRATEGY]] |
 | Cloud | Belum ada Supabase dev/prod, Vercel, CI, atau pengguna | [[documentation/PROJECT_PROGRESS]] |
 
-Belum diverifikasi: login OTP, baca/tulis database, realtime, RLS, dan setiap alur bisnis.
+Terverifikasi di mode mock (bukan Supabase): 10 modul UI dan 14 fitur inti ([[documentation/TEST_MATRIX]]). Belum diverifikasi: login OTP nyata, baca/tulis database, realtime, dan RLS.
 
 ## 2. Prinsip
 

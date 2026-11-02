@@ -203,3 +203,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: `scripts/sync-vault.mjs` menggabungkan snapshot dan cek kesehatan; aturan di `AGENTS.md`, Home, dashboard, dan WORKSPACE_GUIDE kini memakainya. ROADMAP, PRODUCT_ROADMAP, dan GO_LIVE_PLAN memuat blocker yang sama.
 - Bukti: `node scripts/sync-vault.mjs` berakhir OK (69 tugas, 9 selesai, 0 link rusak). Diagnosis hardware: `VirtualizationFirmwareEnabled=False`.
 - Berikutnya: setelah BIOS, fitur Windows, dan Docker beres, kerjakan T-011, T-012, T-013, lalu T-020.
+
+### 2026-11-02 — Uji modul dan fitur (mock), 5 bug diperbaiki
+
+- Selesai: uji asap 10 modul (10/10 PASS) dan 14 fitur inti (CRUD bahan baku/barang jadi/SPK/vendor/surat jalan/bongkar muat/master, validasi stok, ekspor CSV 9 modul). Matriks, bug, dan bukti: [[TEST_MATRIX]]. Tugas: T-018, T-019 selesai; T-026 (fitur belum tercakup) dijadwalkan.
+- Bug diperbaiki: `USER.profiles` hilang, identitas pengguna tidak muncul setelah login, seed tidak sesuai bentuk data app, ekspor CSV/XLSX/PDF gagal karena `DLS.save` belum ada. B-001, B-002, dan B-005 berada di kode produksi.
+- Bukti: verified in browser (mock, data sintetis), 0 pageerror. Skrip: `apps/mni-app/tests/e2e/modules.mjs`, `flows.mjs` (flows belum dijalankan sebagai berkas mandiri).
+- Belum: Supabase nyata, login OTP nyata, RLS, realtime, XLSX/PDF, opname, edit/hapus. Menunggu Docker (T-010) dan T-026.

@@ -11,7 +11,7 @@
 
 const STORE_KEY = 'mni-local-mock-db';
 const SESSION_KEY = 'mni-local-mock-session';
-const VERSION = 1;
+const VERSION = 3; // naikkan bila bentuk data seed berubah agar browser memuat seed baru
 // Kode masuk untuk pratinjau lokal. Bukan rahasia dan tidak berlaku di environment lain.
 export const LOCAL_OTP = '123456';
 
@@ -46,18 +46,19 @@ function seed() {
     ['Baut M8', 'M8 x 30', 'pcs', null, null, null, null, 5000, 1000],
   ].map(([item, ukuran, satuan, grade, tebal, lebar, panjang, stok_awal, buffer]) =>
     base({ item, ukuran, satuan, grade, tebal, lebar, panjang, stok_awal, tgl_stok_awal: day(-30), buffer }));
+  // Bentuk mengikuti label app: kategori + type + ukuran + panjang + finishing + tebal.
   db.fg = [
-    ['Rak', 'Rak Susun', '60 x 40 x 150', 'Powder coat', 'unit', 12],
-    ['Rak', 'Rak Gantung', '80 x 30 x 100', 'Powder coat', 'unit', 7],
-    ['Meja', 'Meja Kerja', '120 x 60 x 75', 'Cat duco', 'unit', 4],
-  ].map(([kategori, type, ukuran, finishing, satuan, stok_awal]) =>
-    base({ kategori, type, ukuran, finishing, satuan, stok_awal, tgl_stok_awal: day(-30) }));
+    ['Hollow', 'Galvanis', '40x40', 6000, 'HDG', 1.6, 'Btg', 120],
+    ['Hollow', 'Galvanis', '50x100', 6000, 'PDC', 2.0, 'Btg', 60],
+    ['Pipa', 'Bulat', '2 inch', 6000, 'ELG', 1.2, 'Btg', 200],
+  ].map(([kategori, type, ukuran, panjang, finishing, tebal, satuan, stok_awal]) =>
+    base({ kategori, type, ukuran, panjang, finishing, tebal, satuan, stok_awal, tgl_stok_awal: day(-30) }));
   db.spk = [
-    base({ no: 'SPK-1001', tgl: day(-5), customer: 'Customer Contoh A', po: 'PO-CONTOH-01', due: day(5), status: 'Terbit', rev: 0, material: 'SPCC', tebal: '1.2',
-      items: [{ d: 'Rak Susun 60x40x150', g: 'Rak', q: 10, u: 'Pcs', w: 0, ket: '', catatan: '', prod: 4 }, { d: 'Rak Gantung 80x30x100', g: 'Rak', q: 5, u: 'Pcs', w: 0, ket: '', catatan: '', prod: 0 }],
+    base({ no: '1001', tgl: day(-5), customer: 'Customer Contoh A', po: 'PO-CONTOH-01', due: day(5), status: 'Terbit', rev: 0, material: 'SPCC', tebal: '1.2',
+      items: [{ d: 'Hollow 40x40 t1.6 HDG', g: 'Hollow', q: 10, u: 'Btg', w: 0, ket: '', catatan: '', prod: 4 }, { d: 'Hollow 50x100 t2.0 PDC', g: 'Hollow', q: 5, u: 'Btg', w: 0, ket: '', catatan: '', prod: 0 }],
       prod_log: [], catatan: 'Data sintetis', terbit_at: now, terbit_by: 'admin@mni.local' }),
-    base({ no: 'SPK-1002', tgl: day(-2), customer: 'Customer Contoh B', po: 'PO-CONTOH-02', due: day(-1), status: 'Terbit', rev: 0, material: 'SUS304', tebal: '1.0',
-      items: [{ d: 'Meja Kerja 120x60x75', g: 'Meja', q: 3, u: 'Pcs', w: 0, ket: '', catatan: '', prod: 0 }],
+    base({ no: '1002', tgl: day(-2), customer: 'Customer Contoh B', po: 'PO-CONTOH-02', due: day(-1), status: 'Terbit', rev: 0, material: 'SUS304', tebal: '1.0',
+      items: [{ d: 'Pipa Bulat 2in t1.2 ELG', g: 'Pipa', q: 3, u: 'Btg', w: 0, ket: '', catatan: '', prod: 0 }],
       prod_log: [], catatan: 'Data sintetis, sengaja lewat jatuh tempo', terbit_at: now, terbit_by: 'admin@mni.local' }),
   ];
   for (const t of ['mutasi', 'rmhist', 'vendor', 'pr', 'kirim', 'bongkar', 'opname', 'log', 'ureq', 'uinv']) db[t] = [];

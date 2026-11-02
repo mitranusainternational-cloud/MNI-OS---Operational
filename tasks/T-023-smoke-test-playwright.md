@@ -28,7 +28,7 @@ Bergantung pada: T-021
 
 ## Bukti
 
-- Belum ada.
+- Skrip awal: `apps/mni-app/tests/e2e/modules.mjs` (smoke 10 modul) dan `flows.mjs` (alur inti). Dijalankan manual lewat Playwright MCP. Sisa: runner `npm run test:e2e`, dependensi Playwright, dan integrasi CI (T-046).
 
 ## Catatan
 

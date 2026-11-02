@@ -39,8 +39,9 @@ Enam bahan baku, tiga barang jadi, dua SPK (satu sengaja lewat jatuh tempo), mas
 
 - Hak akses per role belum ditegakkan (di aplikasi `ROLE_ON=false`; mock tidak meniru RLS).
 - Realtime hanya dalam satu tab, bukan antar pengguna.
-- Sidebar masih menampilkan "Tamu" dan "Backend belum terhubung" (teks bawaan prototipe); lihat [[tasks/T-017-rapikan-identitas-pengguna-dan-teks-backend-di-mni|T-017]].
+- Nama pengguna kini tampil setelah login (B-002). Teks "Backend belum terhubung" bawaan prototipe masih ada di sidebar; lihat [[tasks/T-017-rapikan-identitas-pengguna-dan-teks-backend-di-mni|T-017]].
+- Seed memakai nomor SPK numerik (1001, 1002) dan bentuk barang jadi sesuai label app; jika browser menyimpan seed lama, versi seed (`VERSION` di `local-supabase.js`) menimpanya otomatis.
 - Mock hanya aktif di `localhost` / `127.0.0.1` dan menolak dijalankan di host lain.
 - Pengujian nyata tetap butuh Supabase lokal. Di mesin ini Docker Desktop tidak dapat start karena virtualisasi CPU nonaktif di BIOS (lihat [[tasks/T-010-aktifkan-docker-engine-di-windows|T-010]]).
 
-Bukti: [[screenshots/README]].
+Hasil uji modul dan fitur: [[TEST_MATRIX]]. Bukti: [[screenshots/README]].
