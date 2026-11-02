@@ -3,7 +3,7 @@ type: task
 id: T-041
 title: "Push empat branch dan proteksi main"
 phase: P4
-status: todo
+status: doing
 priority: P0
 env: main
 effort_days: 0.5
@@ -19,13 +19,14 @@ Bergantung pada: T-040
 
 ## Kriteria selesai
 
-- [ ] versi-awal, development, main, docs ada di GitHub
+- [x] versi-awal, development, main, docs ada di GitHub
 - [ ] Default main; PR + review wajib
 - [ ] Jangan force-push ke riwayat yang berbeda
 
 ## Bukti
 
-- Belum ada.
+- `development` dan `docs` di-push ke `dfbc7a3` secara fast-forward (tanpa force); `main` dan `versi-awal` sudah identik di `636325b`. Diverifikasi lewat `gh api .../branches`.
+- Sisa: set default branch `main` dan proteksi `main` (PR + review) di GitHub Settings.
 
 ## Catatan
 

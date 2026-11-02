@@ -46,6 +46,6 @@ Mulai dari [`apps/gudang-logistik/README.md`](apps/gudang-logistik/README.md), [
 
 ## GitHub
 
-Repo ini masih **lokal** (belum ada remote). Migrasi ke GitHub mengikuti [`documentation/GITHUB_MIGRATION.md`](documentation/GITHUB_MIGRATION.md). Branch: `versi-awal` (baseline beku), `development` (kerja), `main` (rilis), `docs` (dokumentasi). Lihat `documentation/VERSION_STRATEGY.md` dan `documentation/ENVIRONMENTS.md`.
+Remote: [mitranusainternational-cloud/MNI-OS---Operational](https://github.com/mitranusainternational-cloud/MNI-OS---Operational). Migrasi ke GitHub mengikuti [`documentation/GITHUB_MIGRATION.md`](documentation/GITHUB_MIGRATION.md). Branch: `versi-awal` (baseline beku), `development` (kerja), `main` (rilis), `docs` (dokumentasi). Lihat `documentation/VERSION_STRATEGY.md` dan `documentation/ENVIRONMENTS.md`.
 
 Jangan menyimpan kredensial, data operasional personal, atau ekspor transaksi ke repository. Detail historis dan sumber riset harus diberi tanggal serta tautan sumber.

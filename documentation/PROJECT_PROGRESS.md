@@ -166,3 +166,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: sumber kebenaran UI = `apps/gudang-logistik/` (reference hanya memakai 15 dari 20 koleksi). `extract-app.js` memakai sumber itu secara default dan reproducible dari klon bersih.
 - Bukti: extract + `vite build` + muat di browser tanpa error console (verified in browser, UI saja). Keputusan: [[DECISIONS]].
 - Dampak: T-021 kini menguji sumber yang benar-benar memakai 20 koleksi. Berikutnya: T-010 (Docker).
+
+### 2026-11-02 — Terhubung ke GitHub
+
+- Selesai: `gh` login sebagai `mitranusainternational-cloud` (push: true). Remote `origin` dipasang di `mni-os`; `development` dan `docs` di-push (fast-forward, `be457dc` ke `dfbc7a3`). Terverifikasi lewat GitHub API.
+- Sisa T-041: default branch `main` dan branch protection. `main` belum berisi pekerjaan baru; promosi lewat [[RELEASE_CHECKLIST]].
+- Catatan: push memakai `-c credential.helper="!gh auth git-credential"` karena Git Credential Manager menyimpan akun lama.
