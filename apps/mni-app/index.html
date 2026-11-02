@@ -22,7 +22,8 @@
     window.__ENV = window.__ENV || {
       SUPABASE_URL: '%VITE_SUPABASE_URL%',
       SUPABASE_ANON_KEY: '%VITE_SUPABASE_ANON_KEY%',
-      APP_VERSION: '%VITE_APP_VERSION%'
+      APP_VERSION: '%VITE_APP_VERSION%',
+      LOCAL_MOCK: '%VITE_LOCAL_MOCK%'
     };
   </script>
 
@@ -228,6 +229,8 @@
       css.rel = "stylesheet";
       css.href = "/app.css";
       document.head.appendChild(css);
+      // Adapter (modul) harus selesai lebih dulu: app.js membaca window.claude saat dimuat.
+      await new Promise((ok) => { const t = setInterval(() => { if (window.claude) { clearInterval(t); ok(); } }, 20); });
       const res = await fetch("/app-body.html");
       if (!res.ok) throw new Error("app-body.html missing; run npm run extract");
       document.getElementById("app-root").innerHTML = await res.text();

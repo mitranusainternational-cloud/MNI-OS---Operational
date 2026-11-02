@@ -30,4 +30,4 @@ Fase: P1 Fondasi lokal
 
 ## Catatan
 
-Blocker lokal utama; sesi agent tidak bisa membuka service Docker.
+Blocker lokal utama. Diagnosis 2026-11-02: Docker Desktop dijalankan tetapi engine tidak start; `VirtualizationFirmwareEnabled=False` dan hypervisor tidak ada. Tindakan pemilik mesin: aktifkan Intel VT-x/Virtualization di BIOS, aktifkan fitur Windows Virtual Machine Platform dan WSL (admin), `wsl --install --no-distribution`, restart. Sementara itu pratinjau memakai [[LOCAL_PREVIEW|mode mock]] (T-016).

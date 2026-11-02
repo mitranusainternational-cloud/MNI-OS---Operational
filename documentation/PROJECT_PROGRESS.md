@@ -184,3 +184,15 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 - Selesai: proteksi `main` di GitHub: PR wajib dengan 1 approval, dismiss stale review, percakapan harus selesai, force-push dan delete dilarang; `enforce_admins` mati. Terverifikasi lewat GitHub API.
 - Dampak: `main` hanya berubah lewat PR dari `development` sesuai [[RELEASE_CHECKLIST]]. Required status check ditambahkan setelah CI ada (T-046). Karena pemilik repo juga satu-satunya pengembang, approval perlu akun kedua atau bypass admin; putuskan saat PR pertama.
+
+### 2026-11-02 — Pratinjau lokal dan login (T-016)
+
+- Selesai: mode mock lokal (`src/lib/local-supabase.js`, `VITE_LOCAL_MOCK=1`) dengan 5 akun dan data sintetis; adapter dimuat dinamis, bootstrap menunggu `window.claude`. Panduan: [[LOCAL_PREVIEW]].
+- Bukti: verified in browser, login admin lalu dashboard dengan data contoh, 0 error console; screenshot di [[screenshots/README]].
+- Temuan: Docker tidak bisa start karena virtualisasi CPU nonaktif di BIOS (T-010). Auth, RLS, dan Supabase sungguhan belum teruji.
+
+### 2026-11-02 — Pratinjau lokal dan login (T-016)
+
+- Selesai: mode mock lokal (`src/lib/local-supabase.js`, `VITE_LOCAL_MOCK=1`) dengan 5 akun dan data sintetis; adapter dimuat dinamis, bootstrap menunggu `window.claude`. Panduan: [[LOCAL_PREVIEW]].
+- Bukti: verified in browser, login admin lalu dashboard dengan data contoh, 0 error console; screenshot di [[screenshots/README]].
+- Temuan: Docker tidak bisa start karena virtualisasi CPU nonaktif di BIOS (T-010). Auth, RLS, dan Supabase sungguhan belum teruji.

@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
 
     build: {
       outDir: 'dist',
+      target: 'esnext', // adapter memakai top-level await
       emptyOutDir: true,
       rollupOptions: {
         input: {
@@ -40,7 +41,8 @@ export default defineConfig(({ mode }) => {
       'window.__ENV': JSON.stringify({
         SUPABASE_URL: env.VITE_SUPABASE_URL || '',
         SUPABASE_ANON_KEY: env.VITE_SUPABASE_ANON_KEY || '',
-        APP_VERSION: env.VITE_APP_VERSION || '1.0.0'
+        APP_VERSION: env.VITE_APP_VERSION || '1.0.0',
+        LOCAL_MOCK: env.VITE_LOCAL_MOCK || ''
       })
     },
 

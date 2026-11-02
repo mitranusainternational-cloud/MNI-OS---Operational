@@ -49,3 +49,5 @@ Contoh nama: `2026-11-02__spk__monitoring__development.png`.
 |---|---|---|---|---|
 | `2026-11-02-mni-app-login-development.png` | Login `apps/mni-app`, `127.0.0.1:5174`, tanpa data | `development`, sebelum commit | UI login termuat; console error `addEventListener` pada null. Auth/DB tidak diuji. | Verified in browser (UI saja) |
 | `2026-11-02-mni-app-login-fixed.png` | Login `apps/mni-app` setelah perbaikan bootstrap, `127.0.0.1:5175`, env dummy | `development` | UI login tampil penuh, tanpa error JS. Auth/DB tidak diuji. | Verified in browser (UI saja) |
+| `2026-11-02-mni-app-dashboard-local-mock.png` | Dashboard `apps/mni-app` setelah login lokal, `127.0.0.1:5173`, data sintetis | `development` | UI, login lokal mock, dan pembacaan data contoh terverifikasi. Supabase/RLS tidak diuji. | Verified in browser (mock) |
+| `2026-11-02-mni-app-dashboard-local-mock.png` | Dashboard `apps/mni-app` setelah login lokal, `127.0.0.1:5173`, data sintetis | `development` | UI, login lokal mock, dan pembacaan data contoh terverifikasi. Supabase/RLS tidak diuji. | Verified in browser (mock) |

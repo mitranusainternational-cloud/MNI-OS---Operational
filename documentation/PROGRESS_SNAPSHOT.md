@@ -11,10 +11,10 @@ generated: 2026-11-02
 
 ## Ringkasan
 
-- Tugas selesai: **8 / 67** (12%)
-- Bobot effort selesai: **5 / 127 hari kerja** (4%)
-- Sisa effort: **122 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
-- Cakupan go-live (fase P0-P7): **8 / 47** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
+- Tugas selesai: **9 / 69** (13%)
+- Bobot effort selesai: **6 / 128.5 hari kerja** (5%)
+- Sisa effort: **122.5 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
+- Cakupan go-live (fase P0-P7): **9 / 49** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
 - Diblokir: **0**, sedang dikerjakan: **0**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
@@ -23,7 +23,7 @@ generated: 2026-11-02
 | Fase | Selesai | Effort selesai | Status |
 |---|---|---|---|
 | P0 Workspace dan tracking | 5/5 | 3.5/3.5 hari (100%) | selesai |
-| P1 Fondasi lokal | 1/5 | 0.5/3 hari (17%) | berjalan |
+| P1 Fondasi lokal | 2/7 | 1.5/4.5 hari (33%) | berjalan |
 | P2 Aplikasi siap uji | 0/6 | 0/12 hari (0%) | belum mulai |
 | P3 Data dan proses | 0/7 | 0/13.5 hari (0%) | belum mulai |
 | P4 Environment cloud | 2/8 | 1/5.5 hari (18%) | berjalan |
@@ -38,7 +38,7 @@ generated: 2026-11-02
 
 | Rilis | Tema | Tugas | Effort | Status |
 |---|---|---|---|---|
-| v0.9 | Fondasi | 8/12 | 5/7.5 hari (67%) | active |
+| v0.9 | Fondasi | 9/14 | 6/9 hari (67%) | active |
 | v1.0 | Pilot go-live | 0/35 | 0/54.5 hari (0%) | planned |
 | v1.1 | Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | planned |
 | v1.2 | Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | planned |
@@ -49,7 +49,7 @@ generated: 2026-11-02
 | Epic | Rilis | Tugas | Progress | Status |
 |---|---|---|---|---|
 | [[roadmap/epics/E-01-fondasi-workspace-dan-repo\|E-01]] Fondasi workspace dan repo | v0.9 | 5/5 | 100% | done |
-| [[roadmap/epics/E-02-aplikasi-berjalan-lokal\|E-02]] Aplikasi berjalan lokal | v0.9 | 3/7 | 38% | active |
+| [[roadmap/epics/E-02-aplikasi-berjalan-lokal\|E-02]] Aplikasi berjalan lokal | v0.9 | 4/9 | 45% | active |
 | [[roadmap/epics/E-03-kualitas-aplikasi-dan-keamanan-data\|E-03]] Kualitas aplikasi dan keamanan data | v1.0 | 0/5 | 0% | planned |
 | [[roadmap/epics/E-04-proses-data-dan-pilot\|E-04]] Proses, data, dan pilot | v1.0 | 0/7 | 0% | planned |
 | [[roadmap/epics/E-05-environment-cloud-dan-ci-cd\|E-05]] Environment cloud dan CI/CD | v1.0 | 0/6 | 0% | planned |
@@ -68,6 +68,7 @@ generated: 2026-11-02
 - P0 · [[tasks/T-010-aktifkan-docker-engine-di-windows|T-010]] Aktifkan Docker engine di Windows · 0.5 hari · pemilik mesin
 - P0 · [[tasks/T-030-walkthrough-proses-dengan-process-owner|T-030]] Walkthrough proses dengan process owner · 3 hari · tim Operasional
 - P0 · [[tasks/T-032-konfirmasi-owner-dan-cut-off-enam-workbook|T-032]] Konfirmasi owner dan cut-off enam workbook · 1 hari · tim Operasional
+- P2 · [[tasks/T-017-rapikan-identitas-pengguna-dan-teks-backend-di-mni|T-017]] Rapikan identitas pengguna dan teks backend di mni-app · 0.5 hari · dev
 - P2 · [[tasks/T-070-pilih-generator-situs-docs-dan-klasifikasi-materi|T-070]] Pilih generator situs docs dan klasifikasi materi · 1 hari · dev
 
 ## Sedang dikerjakan

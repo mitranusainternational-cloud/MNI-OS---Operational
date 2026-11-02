@@ -19,15 +19,24 @@
  *   DB.doc(path).acquire(opts)        → optimistic lock (simplified)
  */
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const SUPABASE_URL = window.__ENV?.SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = window.__ENV?.SUPABASE_ANON_KEY || '';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true }
-});
+// VITE_LOCAL_MOCK=1: pratinjau lokal tanpa backend (data sintetis di localStorage).
+// Selain itu memakai Supabase sungguhan. Modul dimuat dinamis agar mode mock tidak butuh internet.
+const LOCAL_MOCK = window.__ENV?.LOCAL_MOCK === '1';
+let supabase;
+if (LOCAL_MOCK) {
+  const { createLocalClient } = await import('./local-supabase.js');
+  supabase = createLocalClient();
+} else {
+  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true }
+  });
+}
 
 // ── Field name helpers ────────────────────────────────────────────────────────
 // The original app stores _id as the Firestore document ID.
@@ -302,4 +311,4 @@ const CLAUDE_SHIM = {
 window.claude = CLAUDE_SHIM;
 window.__supabase = supabase;
 
-console.log('[MNI Gudang] Supabase adapter ready. URL:', SUPABASE_URL || '(NOT SET)');
+console.log('[MNI Gudang] Adapter siap.', LOCAL_MOCK ? 'MODE MOCK LOKAL (bukan Supabase)' : 'Supabase URL: ' + (SUPABASE_URL || '(NOT SET)'));
