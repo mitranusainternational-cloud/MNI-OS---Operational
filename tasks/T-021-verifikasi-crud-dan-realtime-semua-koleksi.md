@@ -5,7 +5,7 @@ title: "Verifikasi CRUD dan realtime semua koleksi"
 phase: P2
 epic: E-03
 release: v1.0
-status: todo
+status: doing
 priority: P0
 env: development
 effort_days: 3
@@ -31,6 +31,8 @@ Bergantung pada: T-020
 - Sebagian lewat mock (bukan Supabase): CRUD add/update/delete dan validasi diuji pada bahan baku, barang jadi, SPK, vendor, surat jalan, bongkar muat, dan master (14 fitur PASS, lihat [[TEST_MATRIX]]). Realtime dan konflik belum diuji. Tugas tetap `todo` sampai diuji pada Supabase.
 
 ## Catatan
+
+Uji tulis nyata di Supabase dev (2026-11-02): 12 jenis tulis PASS, log sebagian gagal (B-013, diperbaiki di adapter; perlu uji ulang). Sisa: terima/pakai material, revisi/duplikat SPK, ubah/hapus master. Lihat [[TEST_MATRIX]].
 
 Jalur baca terverifikasi pada Supabase nyata dengan sesi admin (19 koleksi, semua 200, 2026-11-02). Penulisan lewat aplikasi diuji dengan skenario U-01 sampai U-12 di [[documentation/UJI_SUPABASE_DEV]].
 

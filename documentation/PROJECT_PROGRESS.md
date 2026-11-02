@@ -268,3 +268,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: login password admin berhasil (15:38 UTC). Log API: token 200, `muser` per email 200, lalu 19 koleksi dimuat dengan semua respons 200 dan realtime tersambung (dua kali karena halaman dimuat ulang setelah login, sesuai B-002). RLS memberi admin akses baca.
 - Bukti: verified in database + log (bukan hanya source-level). Belum ada penulisan lewat aplikasi.
 - Berikutnya: pemilik menjalankan skenario U-01 sampai U-12 ([[UJI_SUPABASE_DEV]]); agen memverifikasi di database dan log, memperbaiki yang gagal, lalu T-021, T-028, T-022 diperbarui.
+
+### 2026-11-02 — Uji tulis nyata di Supabase dev dan B-013
+
+- Selesai: pemilik menjalankan alur di aplikasi yang tersambung ke Supabase dev. Log API dan isi tabel menunjukkan penulisan berhasil untuk rm, fg, mutasi (opname), spk (id UUID, no "1"), mcustomer, mwc, marmada, mvendor, vendor, kirim, bongkar, dan master (katalog, counter, lock). Ringkasan di [[TEST_MATRIX]].
+- Temuan: B-013 — 16 dari sekitar 24 penulisan `log` ditolak karena string kosong pada kolom timestamp; kelas masalah yang sama mengancam `spk.due` kosong dan kolom numerik. Diperbaiki di adapter (`STRICT_COLS`), mock diperketat, regresi mock **36/36**; perlu uji ulang di Supabase. Noise 406 dari `.single()` diganti `maybeSingle()`.
+- Catatan desain: `mutasi.item_id` NULL (item di `data`), kunci lock bertumpuk dan tidak dilepas; dicatat untuk normalisasi data setelah discovery (T-033).
+- Berikutnya: pemilik memuat ulang aplikasi dan mengulang U-02, U-03, U-06 ([[UJI_SUPABASE_DEV]]); agen memverifikasi dan menutup T-021 dan T-028.

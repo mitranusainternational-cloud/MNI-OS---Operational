@@ -1,5 +1,5 @@
 // Regresi penuh pratinjau lokal mode mock (VITE_LOCAL_MOCK=1): login, 10 modul, dan 22 alur inti.
-// Berasal dari skenario yang dijalankan lewat Playwright MCP pada 2026-11-02 (33 PASS, 0 FAIL;
+// Berasal dari skenario yang dijalankan lewat Playwright MCP pada 2026-11-02 (36 PASS, 0 FAIL;
 // hasil di documentation/TEST_MATRIX.md). Menerima objek `page` Playwright:
 //
 //   const { pass, fail, detail } = await runRegression(page, 'http://127.0.0.1:5173/');
@@ -14,6 +14,8 @@ export async function runRegression(page, base) {
   const ok = (id, pass, info = '') => R.push((pass ? 'PASS ' : 'FAIL ') + id + (info ? ' · ' + info : ''));
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e.message).slice(0, 160)));
+  const consoleErr = [];
+  page.on('console', (m) => { if (m.type() === 'error') consoleErr.push(m.text().slice(0, 120)); });
   const tab = (t) => page.evaluate((t) => JSON.parse(localStorage.getItem('mni-local-mock-db')).tables[t], t);
   const closeAll = async () => {
     await page.evaluate(() => {
@@ -109,6 +111,13 @@ export async function runRegression(page, base) {
   await page.fill('#ed-cust', 'Customer Duplikat'); await page.fill('#ed-due', '2026-12-20'); await page.fill('#ed-d-0-0', 'Item dup'); await page.fill('#ed-q-0-0', '2'); await page.fill('#ed-u-0-0', 'Btg');
   await page.click('#editor [data-act="ed-save"]:has-text("draft")'); await page.waitForTimeout(1500);
   ok('F-23 duplikat SPK -> draft', (await tab('spk')).length === n + 1 && (await tab('spk')).some((s) => s.status === 'Draft'));
+  // B-013: SPK tanpa tanggal due (string kosong) harus tersimpan sebagai NULL
+  await go('spk'); n = (await tab('spk')).length;
+  await page.click('#tools [data-act="newspk"]'); await page.waitForTimeout(700);
+  await page.fill('#ed-cust', 'Customer Tanpa Due'); await page.fill('#ed-due', ''); await page.fill('#ed-d-0-0', 'Item tanpa due'); await page.fill('#ed-q-0-0', '1'); await page.fill('#ed-u-0-0', 'Btg');
+  await page.click('#editor [data-act="ed-save"]:has-text("draft")'); await page.waitForTimeout(1500);
+  const noDue = (await tab('spk')).find((s) => s.customer === 'Customer Tanpa Due');
+  ok('B-013 SPK tanpa due tersimpan (due null)', (await tab('spk')).length === n + 1 && !!noDue && noDue.due === null);
   await closeAll();
   await go('spk'); await rowOpen('1002'); await page.click('#drawer [data-act="prod"]'); await page.waitForTimeout(600);
   await page.click('#modal [data-act="prodall"]'); await page.click('#modal button:has-text("Simpan progres")'); await page.waitForTimeout(900);
@@ -155,9 +164,13 @@ export async function runRegression(page, base) {
   }
   ok('F-14 CSV 9 modul', Object.values(dl).every(Boolean), JSON.stringify(Object.entries(dl).filter(([, v]) => !v).map(([k]) => k)));
 
+  // Aktivitas tercatat di log (log tidak boleh gagal diam-diam)
+  ok('log aktivitas tercatat', (await tab('log')).length >= 10);
+
   // Persistensi dan galat
   await page.reload(); await page.waitForTimeout(3000);
   ok('persisten setelah reload', (await tab('spk')).length >= 4 && (await page.evaluate(() => document.querySelectorAll('#nav a').length)) > 5);
   ok('tanpa pageerror', errors.length === 0, errors.slice(0, 3).join(' | '));
+  ok('tanpa galat console', consoleErr.length === 0, consoleErr.slice(0, 2).join(' | '));
   return { pass: R.filter((x) => x.startsWith('PASS')).length, fail: R.filter((x) => x.startsWith('FAIL')).length, detail: R };
 }

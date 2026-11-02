@@ -5,7 +5,7 @@ description: Jalankan dan catat regresi UI penuh untuk pratinjau lokal mni-app (
 
 # Regresi E2E (mode mock)
 
-Tujuan: memastikan perubahan tidak merusak alur yang sudah lulus (33 PASS, 0 FAIL pada 2026-11-02).
+Tujuan: memastikan perubahan tidak merusak alur yang sudah lulus (36 PASS, 0 FAIL pada 2026-11-02).
 
 ## Menjalankan
 

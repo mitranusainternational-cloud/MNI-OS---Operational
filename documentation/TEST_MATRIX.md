@@ -85,6 +85,7 @@ Kriteria PASS: judul benar, isi tampil, tidak ada `pageerror`. Skrip: `tests/e2e
 | B-007 | Id dokumen app (mis. `spk-1003`) bukan UUID | Kolom `id` di schema UUID; app membuat id string | `toDbId()` memetakan id string ke UUID deterministik; mock kini menolak id non-UUID seperti Postgres | Selesai di adapter. **Perlu diverifikasi pada Postgres nyata (T-028)** |
 | B-008 | Edit SPK dianggap ganti nomor dan membuat baris ganda | `spk.no` TEXT di DB, app membandingkan angka dengan `!==` | Adapter mengubah `no` ke angka saat dibaca dan ke teks saat ditulis | Selesai di adapter; verifikasi nyata di T-028 |
 | B-009 | Dokumen `master/*` (pengaturan) tidak terbaca atau tertulis | Tabel master memakai kolom `key` + `value`, bukan `id` | Adapter memetakan dokumen master ke objek datar berbasis key | Selesai di adapter; verifikasi nyata di T-028 |
+| B-013 | Penulisan `log` ke Supabase gagal 16 dari sekitar 24 kali (HTTP 400, `invalid input syntax for type timestamp with time zone: ""`) | Dokumen app memakai `""` untuk "kosong"; Postgres menolak `""` di kolom DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID (mis. `log.tgl`, `spk.due`). Mock tidak menolaknya | `STRICT_COLS` di `schema-columns.js`; adapter menghilangkan nilai kosong saat insert (DEFAULT berlaku) dan mengubahnya ke NULL saat update/set; mock kini menolak `""` seperti Postgres | Selesai di mock (36/36); **perlu diuji ulang di Supabase** |
 | B-012 | Setelah permintaan kode OTP ditolak (HTTP 429), layar tetap menulis "Cek email Anda" | `signInWithOtp` mengembalikan `{ error }` (tidak melempar) dan tidak diperiksa | Pesan galat ditampilkan (batas email dijelaskan) dan layar kode tidak dibuka; ditambah opsi "Masuk dengan password" sebagai cadangan di Supabase | Selesai; terverifikasi di browser (mode mock menyembunyikan opsi password) |
 | B-011 | Di Supabase nyata, `master` dan `log` gagal dibaca (HTTP 400) | Adapter selalu mengurutkan menurut `created_at`; tabel `master` hanya punya `updated_at` dan `log` hanya `tgl`. Mock tidak menolak pengurutan kolom yang tidak ada | Adapter memilih kolom urut dari `TABLE_COLS`; mock kini menolak pengurutan kolom tak dikenal | Selesai; terverifikasi: muat halaman di Supabase dev tanpa respons 4xx |
 | B-010 | Setelah menerbitkan SPK muncul lembar kosong layar penuh yang memblokir seluruh UI | App membuka lembar memakai id buatannya ("spk-1003"), yang kini dipetakan ke UUID, jadi `byId` tidak menemukannya; `openSheet` tetap menampilkan overlay | `window.__idAlias` (diisi adapter) dipakai `byId`; `openSheet` menunggu snapshot dan tidak menampilkan lembar kosong | Selesai. Ditemukan lewat uji regresi; regresi dari perbaikan B-007 |
@@ -116,6 +117,30 @@ Satu skrip Playwright menjalankan login, 10 modul, dan 22 alur inti pada data be
 | viewer | tidak | tidak | tidak | tidak | tidak | tidak | **ya** | tidak | tidak |
 
 Catatan: ini hasil kebijakan RLS bawaan, belum diselaraskan dengan proses nyata. Kunci dokumen (`master`) tidak dapat ditulis gudang maupun produksi, sehingga penguncian pengeditan diam-diam tidak efektif bagi mereka; viewer masih dapat menulis `log`. Produksi tidak dapat mencatat mutasi, surat jalan, atau bongkar muat. Pencocokan role dengan alur kerja adalah bagian T-022 dan T-036.
+
+### Uji tulis nyata di Supabase dev oleh pemilik (2026-11-02, 15:42–15:56 UTC)
+
+Pemilik menjalankan alur di aplikasi; agen memverifikasi lewat log API dan isi tabel.
+
+| Area | Hasil | Bukti |
+|---|---|---|
+| Item bahan baku baru | PASS | `POST rm` 201; baris `rm` terisi (bidang `at`, `by` di `data`) |
+| Barang jadi baru dan opname FG | PASS | `POST fg`, `POST mutasi` 201; `mutasi.item_id` NULL karena app memakai `item` (di `data`) |
+| SPK baru | PASS | `POST spk?on_conflict=id` 201; `no = "1"` (B-008), id UUID hasil pemetaan (B-007), bidang `nomor`, `revisi`, `dist`, tanda tangan di `data` |
+| Update produksi SPK | PASS | `PATCH spk` 204 (progres tersimpan) |
+| Customer baru otomatis dari SPK | PASS | `POST mcustomer` 201 |
+| Master: work center, armada, vendor | PASS | `POST mwc`, `marmada`, `mvendor` 201 |
+| Kirim ke vendor dan terima kembali sampai Selesai | PASS | `POST vendor` 201, `PATCH vendor` 204; `riwayat`, `rework`, `target` di `data` |
+| Surat jalan sampai Diterima | PASS | `POST kirim` 201, `PATCH kirim` 204 |
+| Bongkar muat (termasuk otomatis dari SJ) | PASS | 3 baris `bongkar` berstatus Selesai; jenis/muatan/pihak/jam di `data` (B-009 skema) |
+| Pengaturan dan penghitung | PASS | `master`: `katalog`, `SJ-202611`, `SJV-202611` (counter) tersimpan (B-009) |
+| Kunci dokumen (`lock:*`) | PASS dengan catatan | Tertulis di `master` (kunci bertumpuk `lock:lock:…`, nilai JSON ganda, tidak pernah dilepas) |
+| Log aktivitas | GAGAL sebagian → B-013 | 8 tersimpan, 16 ditolak (HTTP 400) |
+| Lookup tanpa hasil | Noise | `GET … .single()` memberi 406; diganti `maybeSingle()` (tanpa galat) |
+
+Belum tercakup oleh sesi ini: terima material dan pakai produksi (hanya opname FG yang tercatat di `mutasi`), revisi dan duplikat SPK, ubah dan hapus master, dan opname bahan baku. Dijadwalkan pada skenario U-02, U-03, U-06 di [[UJI_SUPABASE_DEV]].
+
+Catatan data: di tabel dev ada baris dengan nama realistis (mis. nama vendor dan produk); semua tetap data uji dev. Baris SPK `UJI-9999` (batal) ikut dipakai sebagai SPK pada uji vendor; hapus permanen disarankan.
 
 ## Belum diuji (jadwal di tracking)
 

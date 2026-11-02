@@ -5,7 +5,7 @@ title: "Verifikasi adapter id, no SPK, dan master di Supabase"
 phase: P2
 epic: E-03
 release: v1.0
-status: todo
+status: doing
 priority: P0
 env: development
 effort_days: 1
@@ -32,6 +32,8 @@ Bergantung pada: T-012, T-021
 - Sebagian: Postgres nyata menolak id non-UUID (`22P02`), sehingga pemetaan UUID diperlukan (lihat [[TEST_MATRIX]]). Uji penuh lewat app menunggu login nyata (T-029).
 
 ## Catatan
+
+Terbukti di Postgres nyata lewat aplikasi: SPK baru memakai id UUID (B-007) dan `no = "1"` (B-008), dokumen `master/*` (katalog, counter) tersimpan (B-009). Sisa: revisi SPK tanpa baris ganda (U-06).
 
 Skenario U-05, U-06, dan U-11 di [[documentation/UJI_SUPABASE_DEV]] membuktikan id UUID, revisi SPK tanpa baris ganda, dan dokumen master pada Postgres nyata.
 

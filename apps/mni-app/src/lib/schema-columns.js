@@ -1,5 +1,6 @@
-// Dihasilkan dari supabase/migrations (init_schema + app_shape_compat). Daftar kolom nyata per tabel.
-// Bidang dokumen app yang tidak ada di sini disimpan di kolom JSONB "data" (lihat adapter).
+// Dihasilkan dari supabase/migrations (init_schema + app_shape_compat). Jangan edit manual.
+// TABLE_COLS: kolom nyata per tabel. Bidang dokumen app di luar daftar ini disimpan di kolom JSONB "data".
+// STRICT_COLS: kolom bertipe DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID yang menolak string kosong ("") di Postgres.
 // Dipakai bersama oleh adapter Supabase dan klien mock agar keduanya berperilaku sama.
 export const TABLE_COLS = {
   "mwc": [
@@ -315,4 +316,143 @@ export const TABLE_COLS = {
     "created_by",
     "data"
   ]
+};
+
+export const STRICT_COLS = {
+  "mwc": {
+    "id": "UUID",
+    "urutan": "INTEGER",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "mvendor": {
+    "id": "UUID",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "mcustomer": {
+    "id": "UUID",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "msupplier": {
+    "id": "UUID",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "marmada": {
+    "id": "UUID",
+    "kapasitas": "NUMERIC",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "muser": {
+    "id": "UUID",
+    "last_login": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "rm": {
+    "id": "UUID",
+    "tebal": "NUMERIC",
+    "lebar": "NUMERIC",
+    "panjang": "NUMERIC",
+    "stok_awal": "NUMERIC",
+    "tgl_stok_awal": "DATE",
+    "buffer": "NUMERIC",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "fg": {
+    "id": "UUID",
+    "panjang": "NUMERIC",
+    "tebal": "NUMERIC",
+    "stok_awal": "NUMERIC",
+    "tgl_stok_awal": "DATE",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "mutasi": {
+    "id": "UUID",
+    "item_id": "UUID",
+    "tgl": "DATE",
+    "delta": "NUMERIC",
+    "koreksi_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "rmhist": {
+    "id": "UUID",
+    "rm_id": "UUID",
+    "tgl": "DATE",
+    "qty": "NUMERIC",
+    "created_at": "TIMESTAMPTZ"
+  },
+  "opname": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "selesai_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "spk": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "due": "DATE",
+    "rev": "INTEGER",
+    "terbit_at": "TIMESTAMPTZ",
+    "upd_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "vendor": {
+    "id": "UUID",
+    "spk_id": "UUID",
+    "tgl": "DATE",
+    "upd_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "pr": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "approved_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "kirim": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "spk_id": "UUID",
+    "upd_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "bongkar": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "selesai_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "master": {
+    "id": "UUID",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "log": {
+    "id": "UUID",
+    "tgl": "TIMESTAMPTZ"
+  },
+  "ureq": {
+    "id": "UUID",
+    "tgl": "TIMESTAMPTZ",
+    "diproses_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ"
+  },
+  "uinv": {
+    "id": "UUID",
+    "expires_at": "TIMESTAMPTZ",
+    "used_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ"
+  }
 };

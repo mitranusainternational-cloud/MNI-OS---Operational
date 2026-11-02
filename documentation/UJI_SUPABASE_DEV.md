@@ -34,3 +34,9 @@ Catatan: bila langkah gagal, salin pesan yang tampil di layar; agen menelusuri l
 ## Pembersihan
 
 Baris uji dapat dihapus lewat SQL Editor setelah selesai (agen tidak dapat menjalankan `delete`): `delete from public.spk where customer like 'UJI%';` dan sejenisnya per tabel, atau biarkan sebagai data dev.
+
+## Hasil sesi pertama (2026-11-02 15:42–15:56 UTC)
+
+Lulus: U-01 (rm), U-04 (mvendor), U-05 (SPK baru), U-07 (progres), U-08 (vendor sampai Selesai), U-09 (kirim sampai Diterima), U-10 (bongkar muat), U-11 (pengaturan/counter). Ditemukan B-013 (log gagal untuk nilai kosong). **Belum dijalankan:** U-02, U-03 (terima/pakai material), U-06 (revisi SPK), dan U-12 setelah perbaikan B-013. Rincian: [[TEST_MATRIX]].
+
+**Ulangi setelah muat ulang halaman (F5) di `127.0.0.1:5174`** agar perbaikan B-013 aktif: U-02, U-03, U-06, dan satu SPK tanpa tanggal due; lalu agen memeriksa bahwa tidak ada lagi `POST log` 400.

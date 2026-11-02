@@ -9,11 +9,11 @@
  * (Docker) atau project dev (tugas T-011, T-020 sampai T-022).
  */
 
-import { TABLE_COLS } from './schema-columns.js';
+import { TABLE_COLS, STRICT_COLS } from './schema-columns.js';
 
 const STORE_KEY = 'mni-local-mock-db';
 const SESSION_KEY = 'mni-local-mock-session';
-const VERSION = 4; // naikkan bila bentuk data seed berubah agar browser memuat seed baru
+const VERSION = 5; // naikkan bila bentuk data seed berubah agar browser memuat seed baru
 // Kode masuk untuk pratinjau lokal. Bukan rahasia dan tidak berlaku di environment lain.
 export const LOCAL_OTP = '123456';
 
@@ -100,6 +100,7 @@ export function createLocalClient() {
     order(col, { ascending = true } = {}) { this.ord = { col, ascending }; return this; }
     eq(col, val) { this.filters.push([col, val]); return this; }
     single() { this.one = true; return this; }
+    maybeSingle() { this.one = true; this.maybe = true; return this; } // nol baris = data null tanpa galat
     insert(p) { this.op = 'insert'; this.payload = p; return this; }
     upsert(p, o = {}) { this.op = 'upsert'; this.payload = p; this.opts = o; return this; }
     update(p) { this.op = 'update'; this.payload = p; return this; }
@@ -125,6 +126,14 @@ export function createLocalClient() {
         for (const p of [].concat(this.payload)) {
           const unknown = Object.keys(p || {}).find((k) => !cols.includes(k));
           if (unknown) return { data: null, error: { code: 'PGRST204', message: `Could not find the '${unknown}' column of '${this.t}' in the schema cache` } };
+        }
+      }
+      // Meniru Postgres: string kosong ditolak pada kolom DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID (22007/22P02).
+      const strict = STRICT_COLS[this.t];
+      if (strict && this.payload && (this.op === 'insert' || this.op === 'upsert' || this.op === 'update')) {
+        for (const p of [].concat(this.payload)) {
+          const bad = Object.keys(p || {}).find((k) => strict[k] && p[k] === '');
+          if (bad) return { data: null, error: { code: '22007', message: `invalid input syntax for type ${strict[bad].toLowerCase()}: ""` } };
         }
       }
       const has = (c) => !cols || cols.includes(c);
@@ -159,7 +168,7 @@ export function createLocalClient() {
       if (this.op !== 'select') save(state);
       const copy = out.map((r) => JSON.parse(JSON.stringify(r)));
       if (this.one) {
-        if (!copy.length) return { data: null, error: { code: 'PGRST116', message: 'Tidak ada baris' } };
+        if (!copy.length) return this.maybe ? { data: null, error: null } : { data: null, error: { code: 'PGRST116', message: 'Tidak ada baris' } };
         return { data: copy[0], error: null };
       }
       return { data: this.op === 'select' || this.sel ? copy : null, error: null };

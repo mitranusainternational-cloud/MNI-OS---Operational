@@ -20,7 +20,7 @@
  */
 
 
-import { TABLE_COLS } from './schema-columns.js';
+import { TABLE_COLS, STRICT_COLS } from './schema-columns.js';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const SUPABASE_URL = window.__ENV?.SUPABASE_URL || '';
@@ -72,14 +72,17 @@ const textNo = (table, row) => {
 // ── Bidang tambahan ke JSONB "data" ───────────────────────────────────────────
 // Dokumen app memuat bidang di luar kolom tabel. Bidang itu disimpan di kolom JSONB "data"
 // dan digabung kembali saat dibaca (lihat rowToDoc). Kolom nyata ditentukan TABLE_COLS.
-function packRow(table, row) {
+function packRow(table, row, omitEmpty = false) {
   const cols = TABLE_COLS[table];
   if (!cols) return { row, extra: {} };
   const out = {};
   const extra = {};
+  const strict = STRICT_COLS[table] || {};
   for (const [k, v] of Object.entries(row)) {
     if (k === 'data') continue;
-    if (cols.includes(k)) out[k] = v;
+    // Dokumen app memakai "" untuk "kosong"; Postgres menolak "" pada kolom DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID
+    // (mis. log.tgl, spk.due). Ubah ke NULL (B-013).
+    if (cols.includes(k)) { if (v === '' && strict[k]) { if (!omitEmpty) out[k] = null; } else out[k] = v; } // insert: hilangkan agar DEFAULT kolom (mis. log.tgl) berlaku; update/set: NULL
     else if (v !== undefined) extra[k] = v;
   }
   return { row: out, extra };
@@ -154,7 +157,7 @@ function makeCollection(col) {
   return {
     // Firestore: collection(col).add(data) → INSERT
     async add(data) {
-      const packed = packRow(table, textNo(table, docToRow(null, data)));
+      const packed = packRow(table, textNo(table, docToRow(null, data)), true);
       const row = { ...packed.row, data: packed.extra };
       delete row.id; // let DB generate UUID
       const { data: result, error } = await supabase
@@ -228,10 +231,10 @@ function makeDoc(path) {
     // .get()
     async get() {
       if (keyed) {
-        const { data } = await supabase.from('master').select('*').eq('key', keyOf()).single();
+        const { data } = await supabase.from('master').select('*').eq('key', keyOf()).maybeSingle();
         return { exists: !!data, data: () => (data ? (isCounter ? { value: data.value } : masterToDoc(data)) : null) };
       }
-      const { data, error } = await supabase.from(table).select('*').eq('id', await idOf()).single();
+      const { data, error } = await supabase.from(table).select('*').eq('id', await idOf()).maybeSingle();
       if (error && error.code !== 'PGRST116') throw error;
       return { exists: !!data, data: () => (data ? rowToDoc(numericNo(table, data)) : null) };
     },
@@ -255,7 +258,7 @@ function makeDoc(path) {
     // .update(data) — pembaruan parsial
     async update(data) {
       if (keyed) {
-        const { data: cur } = await supabase.from('master').select('*').eq('key', keyOf()).single();
+        const { data: cur } = await supabase.from('master').select('*').eq('key', keyOf()).maybeSingle();
         const old = cur ? (isCounter ? { value: cur.value } : stripMeta(masterToDoc(cur))) : {};
         const value = isCounter ? (data.value ?? data) : { ...old, ...stripMeta(data) };
         const { error } = await supabase.from('master').upsert({ key: keyOf(), value }, { onConflict: 'key' });
@@ -268,7 +271,7 @@ function makeDoc(path) {
       delete row.id;
       if (Object.keys(packed.extra).length) {
         // Gabung dengan data lama (baca-ubah-tulis). Cukup untuk fase awal; ganti dengan RPC atomik bila ada penulisan serentak.
-        const { data: cur } = await supabase.from(table).select('data').eq('id', id).single();
+        const { data: cur } = await supabase.from(table).select('data').eq('id', id).maybeSingle();
         row.data = { ...((cur && cur.data) || {}), ...packed.extra };
       }
       const { error } = await supabase.from(table).update(row).eq('id', id);
@@ -299,7 +302,7 @@ function makeDoc(path) {
       const now = Date.now();
       const expires = now + (ttlMs || 30000);
 
-      const { data: existing } = await supabase.from('master').select('*').eq('key', lockKey).single();
+      const { data: existing } = await supabase.from('master').select('*').eq('key', lockKey).maybeSingle();
 
       if (existing?.value) {
         const lock = typeof existing.value === 'object' ? existing.value :
@@ -337,7 +340,7 @@ async function makeUserAdapter() {
     .from('muser')
     .select('*')
     .eq('email', user.email)
-    .single();
+    .maybeSingle();
 
   return {
     me: async () => ({
