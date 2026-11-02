@@ -19,7 +19,7 @@ updated: 2026-11-02
 | Aplikasi Gudang & Logistik | Fondasi tersedia | Kode terpisah dari file referensi; koneksi runtime/database belum terbukti aktif. |
 | Riset ERP | Berjalan | Best practice awal dicatat; Antlia dan Google Sheets belum diperiksa langsung. |
 | Integrasi dan otomasi | Menunggu akses | Perlu sesi browser yang diizinkan dan koneksi Composio yang selesai. |
-| GitHub | Tahap berikutnya | Struktur lokal disiapkan lebih dulu sesuai urutan kerja. |
+| GitHub | Branch awal tersusun | `main` dan `versi-awal` berisi baseline; `development` dan `docs` berisi dashboard workspace. |
 
 ## Versi kerja
 
