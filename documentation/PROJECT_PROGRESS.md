@@ -217,3 +217,8 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Bug diperbaiki: B-006 tombol "set semua selesai"; B-007 id dokumen non-UUID; B-008 `spk.no` teks vs angka (edit SPK membuat baris ganda); B-009 dokumen `master/*` memakai kolom key. B-007 sampai B-009 adalah ketidakcocokan app dengan schema Postgres yang disembunyikan oleh mock; mock kini meniru batasan UUID.
 - Bukti: verified in browser (mock, data sintetis), 0 pageerror. XLSX dan PDF diperiksa sebagai berkas valid.
 - Risiko: perbaikan adapter belum teruji pada Postgres nyata, dijadwalkan T-028 (P0). Sisa fitur di T-027.
+
+### 2026-11-02 — Agenda discovery disiapkan
+
+- Selesai: [[DISCOVERY_AGENDA]] berisi tujuan, peran peserta, aturan sesi, 5 sesi (sekitar 5,5 jam) dengan rincian menit, pertanyaan kunci per topik yang ditautkan ke isu data DQ-*, tabel keputusan D-01 sampai D-10, dan langkah 24 jam setelah sesi. Catatan di T-030, T-031, T-032, dan T-036 menautkannya.
+- Belum: tanggal, peserta, dan undangan (pemilik proyek). Sesi belum berlangsung; status tugas tetap todo.

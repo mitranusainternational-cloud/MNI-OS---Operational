@@ -35,6 +35,7 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 | Melihat langkah menuju go-live | [[GO_LIVE_PLAN]] |
 | Memperbarui status pekerjaan | [[PROGRESS_DASHBOARD#Cara memperbarui (rutin, 2 menit)]] |
 | Membaca keputusan dan alasannya | [[documentation/DECISIONS]] |
+| Menyiapkan sesi dengan tim Operasional | [[documentation/DISCOVERY_AGENDA]] |
 | Memahami tiga versi (Development, Main, Docs) | [[documentation/ENVIRONMENTS]] dan [[documentation/VERSION_STRATEGY]] |
 | Menjalankan dan mengembangkan aplikasi | [[apps/gudang-logistik/docs/DEVELOPMENT]] dan `apps/mni-app/README.md` |
 | Mempelajari cara memakai aplikasi | [[apps/gudang-logistik/docs/USER_GUIDE]] |

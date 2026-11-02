@@ -30,4 +30,6 @@ Fase: P3 Data dan proses
 
 ## Catatan
 
+Agenda, peserta, urutan sesi, dan pertanyaan kunci sudah disiapkan di [[DISCOVERY_AGENDA]] (2026-11-02). Belum dijadwalkan; pemilik proyek menetapkan tanggal dan mengirim undangan. Sesi 1 dan 2.
+
 Bisa jalan paralel sejak hari pertama; jalur kritis non-teknis.

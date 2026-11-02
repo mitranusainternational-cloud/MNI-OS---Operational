@@ -46,6 +46,7 @@ Halaman ini adalah indeks kerja untuk merancang MNI OS custom sesuai proses tim 
 
 ## Template dan tautan
 
+- [[DISCOVERY_AGENDA|Agenda sesi discovery dan daftar pertanyaan]] (usulan, belum dijadwalkan)
 - [[templates/PROCESS_DISCOVERY_TEMPLATE|Template walkthrough proses]]
 - [[templates/REQUIREMENT_TEMPLATE|Template requirement custom]]
 - [[DATA_SOURCE_CATALOG|Katalog workbook sumber Operasional]]

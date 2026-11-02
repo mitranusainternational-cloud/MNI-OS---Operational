@@ -42,7 +42,7 @@ Jalur C Cloud       T-040 → T-041 → T-042 → T-044 → T-045 → T-046/T-04
 Titik temu          T-050 (data UAT) → T-051 UAT → T-052 → T-053 → T-064 → T-065 go-live
 ```
 
-Jalur kritis sisa menurut skrip snapshot: T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065, sekitar 26,5 hari kerja. Karena itu **jalur proses/data (B) menentukan kecepatan**, bukan kode. Mulai T-030 dan T-032 sekarang.
+Jalur kritis sisa menurut skrip snapshot: T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065, sekitar 26,5 hari kerja. Karena itu **jalur proses/data (B) menentukan kecepatan**, bukan kode. Mulai T-030 dan T-032 sekarang; agenda sesi siap di [[DISCOVERY_AGENDA]].
 
 ## 4. Fase, hasil, dan kriteria keluar
 
