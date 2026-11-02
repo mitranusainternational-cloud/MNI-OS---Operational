@@ -47,3 +47,7 @@ Untuk riset ERP, gunakan `.agents/skills/erp-process-discovery/SKILL.md` dan age
 Pilih agent/skill berdasarkan tugas dari [[documentation/TEAM_AND_SKILLS|model tim]]. Untuk perubahan website, pastikan kebutuhan dan acceptance criteria jelas sebelum implementasi. QA memakai permukaan Playwright yang didukung; jangan mencari jalan alternatif jika permukaan tersebut tidak tersedia.
 
 Supabase scaffold pada `apps/gudang-logistik/supabase/` adalah lokal dan belum memiliki migration/source schema. Jangan menjalankan `supabase link`, `db push`, seed, atau perubahan hosted sampai target project dan migration lineage tercatat di [[documentation/FOUNDATION_BASELINE|baseline fondasi]]. Jangan pernah menaruh service-role key atau Composio API key di client/browser.
+
+## Claude Code
+
+Skill dan agen untuk Claude Code ada di `.claude/` (lihat `CLAUDE.md` dan [[documentation/TEAM_AND_SKILLS]]). Jalur rilis bertahap: [[documentation/INTEGRATION_PATH]].

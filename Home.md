@@ -33,6 +33,8 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 | Tahu apa yang dikerjakan berikutnya | [[PROGRESS_SNAPSHOT#Siap dikerjakan sekarang (dependensi terpenuhi)]] |
 | Melihat arah produk dan rilis | [[roadmap/PRODUCT_ROADMAP]] |
 | Melihat langkah menuju go-live | [[GO_LIVE_PLAN]] |
+| Melihat jalur integrasi lokal → Supabase → GitHub → Vercel → VPS | [[documentation/INTEGRATION_PATH]] |
+| Memilih agen atau skill kerja | [[documentation/TEAM_AND_SKILLS]] (`.claude/`) |
 | Memperbarui status pekerjaan | [[PROGRESS_DASHBOARD#Cara memperbarui (rutin, 2 menit)]] |
 | Membaca keputusan dan alasannya | [[documentation/DECISIONS]] |
 | Menyiapkan sesi dengan tim Operasional | [[documentation/DISCOVERY_AGENDA]] |
@@ -58,7 +60,8 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 | `websites/` | Situs lain dan situs Docs (rencana) | Tangan |
 | `data/` | Hanya README; workbook privat `data/private-sources/` diabaikan Git | Lokal |
 | `scripts/` | `sync-vault.mjs` (jalankan ini), `progress-report.mjs`, `check-vault.mjs` | Tangan |
-| `.agents/`, `.codex/` | Skill dan agent lokal | Tangan |
+| `.claude/`, `CLAUDE.md` | Skill dan agen proyek untuk Claude Code | Tangan |
+| `.agents/`, `.codex/` | Skill dan agen Codex (lama) | Tangan |
 
 Aturan kerja ada di `AGENTS.md`; cara memakai vault: [[documentation/WORKSPACE_GUIDE]].
 

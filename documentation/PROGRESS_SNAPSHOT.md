@@ -11,20 +11,20 @@ generated: 2026-11-02
 
 ## Ringkasan
 
-- Tugas selesai: **13 / 75** (17%)
-- Bobot effort selesai: **12 / 137 hari kerja** (9%)
-- Sisa effort: **125 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
-- Cakupan go-live (fase P0-P7): **13 / 55** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
-- Diblokir: **1**, sedang dikerjakan: **1**
+- Tugas selesai: **15 / 80** (19%)
+- Bobot effort selesai: **13.5 / 144 hari kerja** (9%)
+- Sisa effort: **130.5 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
+- Cakupan go-live (fase P0-P7): **15 / 58** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
+- Diblokir: **1**, sedang dikerjakan: **2**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
 ## Per fase
 
 | Fase | Selesai | Effort selesai | Status |
 |---|---|---|---|
-| P0 Workspace dan tracking | 5/5 | 3.5/3.5 hari (100%) | selesai |
+| P0 Workspace dan tracking | 7/7 | 5/5 hari (100%) | selesai |
 | P1 Fondasi lokal | 2/7 | 1.5/4.5 hari (33%) | ada blocker |
-| P2 Aplikasi siap uji | 3/11 | 5.5/20 hari (28%) | berjalan |
+| P2 Aplikasi siap uji | 3/12 | 5.5/21.5 hari (26%) | berjalan |
 | P3 Data dan proses | 0/7 | 0/13.5 hari (0%) | belum mulai |
 | P4 Environment cloud | 3/9 | 1.5/6 hari (25%) | berjalan |
 | P5 UAT pilot | 0/4 | 0/9.5 hari (0%) | belum mulai |
@@ -32,25 +32,25 @@ generated: 2026-11-02
 | P7 Operasi dan dokumentasi | 0/5 | 0/5.5 hari (0%) | belum mulai |
 | P8 v1.1 Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | belum mulai |
 | P9 v1.2 Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | belum mulai |
-| P10 v2.0 Modernisasi dan perluasan | 0/6 | 0/23 hari (0%) | belum mulai |
+| P10 v2.0 Modernisasi dan perluasan | 0/8 | 0/27 hari (0%) | belum mulai |
 
 ## Per rilis
 
 | Rilis | Tema | Tugas | Effort | Status |
 |---|---|---|---|---|
-| v0.9 | Fondasi | 9/14 | 6/9 hari (67%) | active |
-| v1.0 | Pilot go-live | 4/41 | 6/63 hari (10%) | active |
+| v0.9 | Fondasi | 11/16 | 7.5/10.5 hari (71%) | active |
+| v1.0 | Pilot go-live | 4/42 | 6/64.5 hari (9%) | active |
 | v1.1 | Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | planned |
 | v1.2 | Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | planned |
-| v2.0 | Modernisasi dan perluasan | 0/6 | 0/23 hari (0%) | planned |
+| v2.0 | Modernisasi dan perluasan | 0/8 | 0/27 hari (0%) | planned |
 
 ## Per epic
 
 | Epic | Rilis | Tugas | Progress | Status |
 |---|---|---|---|---|
-| [[roadmap/epics/E-01-fondasi-workspace-dan-repo\|E-01]] Fondasi workspace dan repo | v0.9 | 5/5 | 100% | done |
+| [[roadmap/epics/E-01-fondasi-workspace-dan-repo\|E-01]] Fondasi workspace dan repo | v0.9 | 7/7 | 100% | done |
 | [[roadmap/epics/E-02-aplikasi-berjalan-lokal\|E-02]] Aplikasi berjalan lokal | v0.9 | 4/9 | 45% | active |
-| [[roadmap/epics/E-03-kualitas-aplikasi-dan-keamanan-data\|E-03]] Kualitas aplikasi dan keamanan data | v1.0 | 3/10 | 29% | active |
+| [[roadmap/epics/E-03-kualitas-aplikasi-dan-keamanan-data\|E-03]] Kualitas aplikasi dan keamanan data | v1.0 | 3/11 | 27% | active |
 | [[roadmap/epics/E-04-proses-data-dan-pilot\|E-04]] Proses, data, dan pilot | v1.0 | 0/7 | 0% | planned |
 | [[roadmap/epics/E-05-environment-cloud-dan-ci-cd\|E-05]] Environment cloud dan CI/CD | v1.0 | 1/7 | 10% | active |
 | [[roadmap/epics/E-06-uat-hardening-dan-go-live\|E-06]] UAT, hardening, dan go-live | v1.0 | 0/11 | 0% | planned |
@@ -62,6 +62,7 @@ generated: 2026-11-02
 | [[roadmap/epics/E-12-pelaporan-notifikasi-dan-dokumen\|E-12]] Pelaporan, notifikasi, dan dokumen | v1.2 | 0/3 | 0% | planned |
 | [[roadmap/epics/E-13-modernisasi-frontend-dan-pengujian\|E-13]] Modernisasi frontend dan pengujian | v2.0 | 0/4 | 0% | planned |
 | [[roadmap/epics/E-14-multi-site-dan-mobile\|E-14]] Multi-site dan mobile | v2.0 | 0/2 | 0% | planned |
+| [[roadmap/epics/E-15-self-host-vps-dan-layanan-pendamping\|E-15]] Self-host VPS dan layanan pendamping | v2.0 | 0/2 | 0% | planned |
 
 ## Siap dikerjakan sekarang (dependensi terpenuhi)
 
@@ -78,6 +79,7 @@ generated: 2026-11-02
 ## Sedang dikerjakan
 
 - [[tasks/T-029-buat-admin-awal-dan-uji-login-otp-di-supabase-dev|T-029]] Buat admin awal dan uji login OTP di Supabase dev · dev + pemilik akun
+- [[tasks/T-077-jadikan-regresi-e2e-runner-mandiri-dan-bagian-ci|T-077]] Jadikan regresi E2E runner mandiri dan bagian CI · dev
 
 ## Diblokir
 

@@ -6,8 +6,8 @@ release: v1.0
 theme: Kualitas
 priority: P0
 status: active
-progress: 29
-tasks_total: 10
+progress: 27
+tasks_total: 11
 tasks_done: 3
 updated: 2026-11-02
 ---
@@ -37,5 +37,6 @@ Adapter meniru API Firestore di atas Postgres; perilaku realtime dan lock perlu 
 - [x] [[tasks/T-026-uji-lanjutan-ui-mock-fitur-yang-belum-tercakup|T-026]] Uji lanjutan UI mock: fitur yang belum tercakup · done · P1 · 3 hari
 - [ ] [[tasks/T-027-uji-sisa-ui-mock-void-koreksi-pr-dan-role|T-027]] Uji sisa UI mock: void, koreksi, PR, dan role · todo · P2 · 1.5 hari
 - [ ] [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]] Verifikasi adapter id, no SPK, dan master di Supabase · todo · P0 · 1 hari
+- [ ] [[tasks/T-077-jadikan-regresi-e2e-runner-mandiri-dan-bagian-ci|T-077]] Jadikan regresi E2E runner mandiri dan bagian CI · doing · P1 · 1.5 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

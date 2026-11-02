@@ -249,3 +249,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Temuan dari log Auth/REST: email yang diterima berisi tautan konfirmasi ke `localhost:3000` (bukan kode); permintaan kode ulang kena HTTP 429 (batas email); verifikasi kode 403; `last_sign_in_at` masih kosong dan baris uji `9999` belum terhapus. Seluruh pembacaan REST membalas 200.
 - Perbaikan: B-012 (UI tidak lagi mengaku mengirim kode ketika ditolak) dan opsi "Masuk dengan password" untuk Supabase sebagai cadangan; panduan konfigurasi Auth di [[documentation/ENVIRONMENTS]].
 - Berikutnya: pemilik mengatur password sendiri dan menghapus baris 9999 lewat SQL Editor, lalu uji alur lewat aplikasi (T-029, T-021, T-028).
+
+### 2026-11-02 — Jalur integrasi, agen, dan skill proyek
+
+- Selesai: [[INTEGRATION_PATH]] (tahap S0 sampai S6 dengan gerbang, aliran data, matriks environment, kriteria VPS), 7 skill dan 6 agen di `.claude/`, `CLAUDE.md`, regresi E2E tersimpan di `apps/mni-app/tests/e2e/`, epic E-15 (VPS) dan tugas T-075, T-076, T-077, T-160, T-161.
+- Rekomendasi: urutan lokal → Supabase dev → GitHub CI → Vercel preview → UAT → production dipakai; CI dipasang sebelum Vercel; VPS menjadi opsi S6 dengan kriteria terukur (mulai dari layanan pendamping), bukan langkah otomatis.
+- Bukti: source-level; agen dan skill belum dipanggil satu per satu. Regresi mock 33/33 (sebelumnya) tetap rujukan.
+- Berikutnya: login nyata dan uji Supabase (T-029), lalu CI (T-046, T-077) dan Vercel preview (T-044).

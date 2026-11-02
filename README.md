@@ -24,9 +24,11 @@ Rincian alur dan batas tiap environment ada di [`documentation/VERSION_STRATEGY.
 ├── websites/                       # Website lain dan situs dokumentasi
 ├── research/                       # Riset bertanggal dan penerapan ke data MNI
 ├── data/                           # README saja; workbook privat di data/private-sources/ (diabaikan Git)
-├── .agents/skills/                 # Skill lokal
+├── CLAUDE.md                       # Panduan untuk Claude Code
+├── .claude/                        # Skill dan agen proyek (Claude Code)
+├── .agents/skills/                 # Skill lokal (Codex)
 ├── scripts/                        # progress-report.mjs (snapshot progress)
-├── .codex/agents/                  # Definisi agent
+├── .codex/agents/                  # Definisi agen (Codex)t
 └── apps/
     ├── gudang-logistik/            # Prototipe HTML/CSS/JS + reference + docs
     └── mni-app/                    # Scaffold Vite + Supabase + Vercel/VPS (lihat documentation/ENVIRONMENTS.md)

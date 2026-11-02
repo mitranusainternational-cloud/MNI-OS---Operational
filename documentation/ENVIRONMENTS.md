@@ -6,7 +6,7 @@ updated: 2026-11-02
 
 # Tiga versi: Development, Main, Docs
 
-Pemetaan permintaan "3 environment" ke branch Git dan target deploy. Aturan branch lengkap ada di [[VERSION_STRATEGY]].
+Jalur tahap lengkap: [[INTEGRATION_PATH]]. Pemetaan permintaan "3 environment" ke branch Git dan target deploy. Aturan branch lengkap ada di [[VERSION_STRATEGY]].
 
 | Versi | Branch GitHub | Tujuan | Deploy | Status |
 |---|---|---|---|---|

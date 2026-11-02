@@ -8,6 +8,9 @@ updated: 2026-11-02
 
 Rencana ini menjawab: apa yang harus terjadi agar sistem dipakai tim Operasional dengan baik. Setiap langkah adalah catatan di `tasks/` (ID `T-xxx`); status hidup ada di [[PROGRESS_SNAPSHOT]] dan [[PROGRESS_DASHBOARD]]. Rencana ini usulan sampai pemilik proyek menyetujuinya.
 
+> [!info] Jalur tahap
+> Urutan tahap dan gerbang (S0 sampai S6) ada di [[INTEGRATION_PATH]]; plan ini merinci tugas menuju go-live (S0 sampai S5).
+
 ## 1. Definisi "siap dipakai"
 
 Go-live (T-065) hanya boleh terjadi bila semua ini benar dan ada buktinya:

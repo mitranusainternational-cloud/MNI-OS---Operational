@@ -51,3 +51,28 @@ Model ini membagi pekerjaan berdasarkan hasil yang dibutuhkan. Definisi agent ad
 - Skill QA tidak mengizinkan akses melalui cookies, token, browser profile, CDP, atau API tersembunyi.
 - Agent ERP tetap read-only. Penggunaan Composio Sheets menunggu koneksi aktif dan ruang lingkup yang ditentukan.
 - Untuk referensi dan alasan pemilihan peran, lihat [[research/2026-11-02-agent-team-and-skills-best-practice|riset tim dan skill]].
+
+## Agen dan skill Claude Code (2026-11-02)
+
+Dibuat untuk alur kerja yang sudah terbukti di proyek ini; berada di `.claude/` (skill Codex lama di `.agents/` dan `.codex/` tetap ada). Pemetaan tahap ke agen/skill ada di [[INTEGRATION_PATH]] bagian 6.
+
+| Skill (`.claude/skills/`) | Dipakai untuk |
+|---|---|
+| `vault-progress` | Memperbarui tugas, epic, snapshot, dan progress di Obsidian setiap langkah selesai |
+| `e2e-regression` | Regresi UI penuh pratinjau mock; wajib setelah mengubah adapter/UI |
+| `supabase-dev-ops` | Migration, uji RLS/rollback, log, advisor, dan konfigurasi Auth Supabase dev |
+| `adapter-contract` | Aturan kontrak `window.claude`, pemetaan Postgres (UUID, JSONB `data`), sumber UI |
+| `release-pipeline` | Tahap dan gerbang S0 sampai S6, CI, Vercel, PR ke `main` |
+| `vps-readiness` | Penilaian dan keputusan VPS sebelum menyentuh server |
+| `discovery-session` | Menyiapkan, menjalankan, dan mencatat sesi dengan tim Operasional |
+
+| Agen (`.claude/agents/`) | Peran | Skill utama |
+|---|---|---|
+| `progress-keeper` | Menjaga catatan Obsidian benar dan terkini | `vault-progress` |
+| `qa-regression` | Menjalankan dan menganalisis regresi | `e2e-regression` |
+| `supabase-engineer` | Database dan Auth Supabase dev | `supabase-dev-ops` |
+| `app-engineer` | Perubahan UI dan adapter yang kecil dan teruji | `adapter-contract` |
+| `release-manager` | CI, preview, PR, rilis, dan rollback | `release-pipeline` |
+| `ops-analyst` | Discovery, katalog data, pemetaan workbook (read-only terhadap sumber) | `discovery-session` |
+
+Aturan bersama: bukti sebelum klaim, mock bukan bukti Supabase, tanpa secret atau data nyata, tindakan akun hanya setelah persetujuan pemilik. Tugas: [[tasks/T-075-bangun-agen-dan-skill-proyek-di-claude|T-075]].

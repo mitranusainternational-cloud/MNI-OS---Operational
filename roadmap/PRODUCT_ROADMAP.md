@@ -22,6 +22,9 @@ Roadmap ini mengurutkan **hasil** (bukan tanggal) dari kondisi sekarang sampai s
 
 Terverifikasi di mode mock (bukan Supabase): 10 modul UI dan 30 fitur ([[documentation/TEST_MATRIX]]). Belum diverifikasi: login OTP nyata, baca/tulis database, realtime, dan RLS.
 
+> [!info] Jalur integrasi
+> Tahap S0 sampai S6 (lokal → Supabase dev → GitHub CI → Vercel preview → UAT → production → VPS opsional), gerbang tiap tahap, dan kriteria VPS ada di [[documentation/INTEGRATION_PATH]]. Agen dan skill proyek: [[documentation/TEAM_AND_SKILLS]].
+
 ## 2. Prinsip
 
 1. **Kebutuhan Operasional di atas fitur.** Sistem ini custom; fitur dan schema diturunkan dari proses aktual tim, bukan dari ERP lain.
@@ -65,7 +68,7 @@ v0.9 Fondasi ──► v1.0 Pilot go-live ──► v1.1 Stabilisasi ──► v
 
 ### v2.0 Modernisasi dan perluasan
 **Tujuan:** biaya perubahan turun dan jangkauan naik.
-**Epic:** [[roadmap/epics/E-13-modernisasi-frontend-dan-pengujian|E-13]] frontend dan pengujian, [[roadmap/epics/E-14-multi-site-dan-mobile|E-14]] multi-site dan mobile.
+**Epic:** [[roadmap/epics/E-13-modernisasi-frontend-dan-pengujian|E-13]] frontend dan pengujian, [[roadmap/epics/E-14-multi-site-dan-mobile|E-14]] multi-site dan mobile, [[roadmap/epics/E-15-self-host-vps-dan-layanan-pendamping|E-15]] self-host VPS dan layanan pendamping (hipotesis).
 **Hasil (hipotesis):** modul ES, uji unit untuk kalkulasi, aset lokal tanpa CDN, CSP ketat; PWA/offline dan multi-gudang hanya bila kebutuhan terbukti.
 **Syarat masuk:** keputusan T-144 (tetap vanilla JS atau migrasi) dan bukti kebutuhan T-151.
 
