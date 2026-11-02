@@ -221,6 +221,20 @@
     mni-gudang.html. During build, Vite will process it.
     See: scripts/extract-app.js to generate public/app.js from mni-gudang.html
   -->
-  <script src="/app.js" defer></script>
+  <script>
+    // Load order matters: CSS -> body markup -> app.js (it queries the DOM on load).
+    (async () => {
+      const css = document.createElement("link");
+      css.rel = "stylesheet";
+      css.href = "/app.css";
+      document.head.appendChild(css);
+      const res = await fetch("/app-body.html");
+      if (!res.ok) throw new Error("app-body.html missing; run npm run extract");
+      document.getElementById("app-root").innerHTML = await res.text();
+      const s = document.createElement("script");
+      s.src = "/app.js";
+      document.body.appendChild(s);
+    })().catch((e) => console.error("[mni-app] bootstrap failed:", e));
+  </script>
 </body>
 </html>

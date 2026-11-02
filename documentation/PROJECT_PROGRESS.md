@@ -146,3 +146,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Temuan: dev server memuat halaman login, tetapi `app.js` error saat load (lihat [[ENVIRONMENTS]]). Screenshot: [[screenshots/README]].
 - Hambatan: `mni-gudang.html` asli tidak ada; extract dicoba dari file reference.
 - Berikutnya: selidiki error `addEventListener`, putuskan target Supabase dev/prod, buat project Vercel dan situs docs.
+
+### 2026-11-02 — Perbaikan bootstrap mni-app
+
+- Selesai: `apps/mni-app/index.html` kini memuat `app.css`, menyisipkan `app-body.html`, lalu memuat `app.js`. Error `addEventListener` hilang.
+- Bukti: browser (Playwright) di `127.0.0.1:5175`; screenshot [[screenshots/README]]. Sisa error console hanyalah akses ke Supabase dummy.
+- Belum diverifikasi: login OTP, data nyata, RLS, tampilan setelah login. `public/app.*` dihasilkan `npm run extract` dan di-ignore Git.
