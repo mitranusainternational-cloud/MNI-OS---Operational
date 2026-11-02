@@ -23,4 +23,12 @@ Workspace ini memisahkan dokumentasi operasional, website, aplikasi, dan pengeta
 - `.codex/agents/`: definisi agent spesialis untuk workspace.
 - `Home.md`: indeks navigasi Obsidian.
 
+## Versi kerja
+
+- Kerjakan perubahan rutin pada branch `development` dan perbarui `documentation/PROJECT_PROGRESS.md` untuk perubahan yang berdampak.
+- Perlakukan `versi-awal` sebagai baseline referensi; jangan melakukan pekerjaan rutin di branch tersebut.
+- Jangan memperbarui `main` tanpa checklist rilis dan persetujuan pemilik rilis.
+- Simpan materi dokumentasi proyek pada `docs` sesuai strategi di `documentation/VERSION_STRATEGY.md`. Branch Git bukan environment deployment atau database tersendiri.
+- Jangan ikut stage atau commit preferensi lokal Obsidian (`.obsidian/`).
+
 Untuk riset ERP, gunakan `.agents/skills/erp-process-discovery/SKILL.md` dan agent `.codex/agents/erp-process-analyst.toml`. Agent tersebut bekerja read-only dan memakai sumber aktual yang dapat diakses.

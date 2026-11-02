@@ -1,22 +1,51 @@
 ---
 project: MNI OS Operational
-type: workspace-home
+type: project-dashboard
+status: active
+active-version: development
+updated: 2026-11-02
 ---
 
 # MNI OS Operational
 
-Workspace kerja Codex untuk mengembangkan sistem MNI, mengelola dokumentasi, website, aplikasi, dan pengetahuan dari riset proses.
+> [!summary] Dashboard proyek
+> Workspace Codex untuk merawat aplikasi operasional MNI, mendokumentasikan proses, dan menyimpan hasil riset yang bisa ditelusuri.
+
+## Status saat ini
+
+| Area | Status | Catatan |
+|---|---|---|
+| Workspace dan navigasi Obsidian | Selesai tahap awal | Dashboard, peta versi, dan log progress tersedia. |
+| Aplikasi Gudang & Logistik | Fondasi tersedia | Kode terpisah dari file referensi; koneksi runtime/database belum terbukti aktif. |
+| Riset ERP | Berjalan | Best practice awal dicatat; Antlia dan Google Sheets belum diperiksa langsung. |
+| Integrasi dan otomasi | Menunggu akses | Perlu sesi browser yang diizinkan dan koneksi Composio yang selesai. |
+| GitHub | Tahap berikutnya | Struktur lokal disiapkan lebih dulu sesuai urutan kerja. |
+
+## Versi kerja
+
+- **Development — aktif:** pengembangan dan pengujian lokal. Lihat [[documentation/VERSION_STRATEGY|strategi versi]].
+- **Main:** rilis stabil untuk akses pengguna setelah pemeriksaan dan persetujuan rilis.
+- **Docs:** dokumentasi pengembangan website dan panduan proyek.
+- **Versi Awal:** snapshot acuan kondisi sistem saat ini; jangan dipakai untuk pekerjaan harian.
+
+## Progress dan keputusan
+
+- [[documentation/PROJECT_PROGRESS|Progress proyek]] — status, bukti, hambatan, dan langkah selanjutnya.
+- [[documentation/RELEASE_CHECKLIST|Checklist promosi versi]] — syarat sebelum perubahan masuk ke `main`.
+- [[research/2026-11-02-erp-rationalization-best-practice|Riset best practice ERP]] — metode fit-to-standard, inventaris data, dan analisis fitur.
 
 ## Area kerja
 
-- [[documentation/README|Dokumentasi]] — SOP, panduan proses, dan referensi kerja.
-- [[websites/README|Website]] — situs, landing page, konten, dan catatan perubahan.
-- [[research/README|Riset]] — pertanyaan, sumber, temuan, batas keyakinan, dan implikasi proses.
-- [[research/2026-11-02-erp-rationalization-best-practice|Riset best practice ERP]] — riset awal fit-to-standard, data dan penyederhanaan fitur.
-- [[apps/gudang-logistik/README|Aplikasi Gudang & Logistik]] — aplikasi lokal, struktur teknis, dan inventaris fitur.
-- Skill Codex: `.agents/skills/erp-process-discovery/SKILL.md`.
-- Agent Codex: `.codex/agents/erp-process-analyst.toml`.
+- [[documentation/README|Dokumentasi]] — SOP, keputusan, proses, dan standar.
+- [[websites/README|Website]] — proyek website dan preview lokal.
+- [[websites/docs-site/README|Rencana website dokumentasi]] — status dan rencana publikasi dokumentasi.
+- [[research/README|Riset]] — sumber, temuan, ketidakpastian, dan implikasi.
+- [[apps/gudang-logistik/README|Aplikasi Gudang & Logistik]] — kode, panduan, dan inventaris fitur.
+- [[AGENTS|Panduan kerja Codex]] — aturan sumber dan struktur file.
 
-## Cara memakai vault
+## Rutinitas pembaruan
 
-Simpan catatan kerja di folder area terkait. Hubungkan halaman dengan `[[wikilink]]`, tambahkan tanggal pada riset, dan catat keputusan yang mengubah proses di bagian dokumentasi.
+1. Mulai pekerjaan pada branch `development` dan tulis perubahan yang berdampak di [[documentation/PROJECT_PROGRESS|log progress]].
+2. Simpan riset dengan tanggal dan sumber; bedakan observasi langsung dari interpretasi.
+3. Tautkan keputusan dan dokumen terkait menggunakan wikilink agar graph Obsidian membentuk konteks proyek.
+4. Promosikan perubahan ke `main` hanya melalui checklist rilis.
