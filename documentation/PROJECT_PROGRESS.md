@@ -301,3 +301,8 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - `playwright` terpasang sebagai devDependency di `apps/mni-app` (cara pasang diperiksa di dokumentasi resmi lewat Context7: `npm i playwright`, `npx playwright install chromium`, tambahkan `--with-deps` di CI Linux). `tests/e2e/run.mjs` kini menjalankan regresi dan uji role.
 - Hasil, dua kali berturut-turut: regresi 36 PASS, 0 FAIL; role 12 PASS, 0 FAIL. Satu kegagalan sementara pada R-05 (jeda tulis) diperbaiki dengan menambah waktu tunggu di `roles.mjs`; tiga ulangan lain bersih.
 - Belum: uji aplikasi di Supabase dengan akun per role (T-079, butuh akun dari pemilik) dan workflow CI (T-046).
+
+### 2026-11-03 — Vault `mni-os` didaftarkan di Obsidian dan dirapikan
+
+- Vault terdaftar dan terbuka. `.obsidian`: plugin inti (Bases, Properties, Templates, Bookmarks, Graph), folder template `documentation/templates`, lampiran ke `documentation/screenshots`, bookmark ke Home, Progress, Tugas, Epic, Roadmap, Log progres, Matriks uji, Keputusan, Kesehatan vault, graph berwarna per folder.
+- `Home.md` diperbarui sesuai kondisi nyata (Supabase dev, RLS per role, uji Playwright, langkah berikutnya CI).

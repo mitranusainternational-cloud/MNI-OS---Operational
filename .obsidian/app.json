@@ -1,1 +1,11 @@
-{}
+{
+  "useMarkdownLinks": false,
+  "newLinkFormat": "shortest",
+  "alwaysUpdateLinks": true,
+  "showFrontmatter": true,
+  "propertiesInDocument": "visible",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "documentation",
+  "attachmentFolderPath": "documentation/screenshots",
+  "userIgnoreFilters": ["node_modules/", "apps/mni-app/dist/", "apps/mni-app/test-results/", "apps/mni-app/public/"]
+}
