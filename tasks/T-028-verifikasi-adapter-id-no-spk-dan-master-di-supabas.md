@@ -33,4 +33,6 @@ Bergantung pada: T-012, T-021
 
 ## Catatan
 
+Skenario U-05, U-06, dan U-11 di [[documentation/UJI_SUPABASE_DEV]] membuktikan id UUID, revisi SPK tanpa baris ganda, dan dokumen master pada Postgres nyata.
+
 Prioritas P0 karena kegagalan ini baru muncul di Postgres sungguhan.

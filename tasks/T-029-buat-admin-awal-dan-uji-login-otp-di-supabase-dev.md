@@ -5,7 +5,7 @@ title: "Buat admin awal dan uji login OTP di Supabase dev"
 phase: P4
 epic: E-05
 release: v1.0
-status: review
+status: done
 priority: P0
 env: development
 effort_days: 0.5
@@ -24,9 +24,9 @@ Bergantung pada: T-042
 
 - [x] Email admin awal ditetapkan pemilik
 - [x] Pengguna auth dan baris muser (role admin) dibuat
-- [ ] Login OTP email nyata berhasil di app
+- [x] Login OTP email nyata berhasil di app
 - [x] Baris uji SPK 9999 dinetralkan; penomoran SPK mulai wajar (perintah hapus ditolak, lihat Catatan)
-- [ ] File .env.supabase-dev.local terisi dan app memuat data dari Supabase
+- [x] File .env.supabase-dev.local terisi dan app memuat data dari Supabase
 
 ## Bukti
 
@@ -34,7 +34,8 @@ Bergantung pada: T-042
 - Halaman login di Supabase dev (`http://127.0.0.1:5174/`) termuat tanpa respons 4xx; pembacaan anonim ke `spk` menghasilkan 0 baris (RLS bekerja).
 - 2026-11-02 (atas arahan pemilik): password sementara acak diatur untuk admin dan email dikonfirmasi lewat SQL (diverifikasi: terkonfirmasi, bcrypt, identitas email ada). Password **tidak** dicatat di vault atau Git; disampaikan sekali kepada pemilik lewat chat.
 - Baris uji `9999` dinetralkan: `no = UJI-9999`, status `Batal` (tidak lagi memengaruhi nomor berikutnya karena app memakai `+no || 0`). Perintah `delete` ditolak tiga kali oleh persetujuan SQL; hapus permanen: `delete from public.spk where no = 'UJI-9999';` oleh pemilik.
-- Sisa: pemilik login di `http://127.0.0.1:5174/` lewat "Masuk dengan password" dan mengganti password; agen lalu memeriksa `last_sign_in_at` dan log.
+- **Login nyata berhasil** (2026-11-02 15:38 UTC): `POST /auth/v1/token?grant_type=password` 200; `last_sign_in_at` terisi; pencarian `muser` per email 200. Setelah login aplikasi memuat 19 koleksi (semua `GET` 200) dan membuka realtime. Dua percobaan password sebelumnya gagal (400) lalu berhasil.
+- Sisa kecil: pemilik mengganti password sementara. Skenario tulis ada di [[documentation/UJI_SUPABASE_DEV]].
 
 ## Catatan
 

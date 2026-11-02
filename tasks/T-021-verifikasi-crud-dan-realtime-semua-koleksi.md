@@ -32,4 +32,6 @@ Bergantung pada: T-020
 
 ## Catatan
 
+Jalur baca terverifikasi pada Supabase nyata dengan sesi admin (19 koleksi, semua 200, 2026-11-02). Penulisan lewat aplikasi diuji dengan skenario U-01 sampai U-12 di [[documentation/UJI_SUPABASE_DEV]].
+
 -

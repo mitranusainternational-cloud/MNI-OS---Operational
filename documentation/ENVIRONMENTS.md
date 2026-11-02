@@ -65,7 +65,8 @@ Urutan setelah database ada: terapkan migration, uji login OTP dan adapter di Po
 | Kunci di aplikasi | hanya kunci anon/publishable (publik); kunci service-role tidak dipakai di mana pun |
 | Menjalankan app ke project ini | file lokal `apps/mni-app/.env.supabase-dev.local` (diabaikan Git), lalu `npx vite --mode supabase-dev` |
 | Perubahan akun | project `MNI OS - Operational` (kosong) dijeda agar muat di batas gratis; dapat dipulihkan dari dashboard |
-| Belum ada | user admin awal (T-029), data, Vercel, CI |
+| User admin awal | `mitranusainternational@gmail.com` (login password berhasil 2026-11-02; ganti password sementara) |
+| Belum ada | data, Vercel, CI |
 
 Temuan advisor keamanan (peringatan, bukan kritis): fungsi `get_user_role`, `is_authenticated`, `is_admin_or_manager` (SECURITY DEFINER) dapat dipanggil lewat RPC oleh anon dan authenticated; ekstensi `pg_trgm` di schema public. Dijadwalkan di T-060.
 

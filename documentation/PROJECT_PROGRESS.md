@@ -262,3 +262,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai (atas arahan pemilik): password sementara acak untuk `mitranusainternational@gmail.com` diatur dan email dikonfirmasi lewat SQL pada project dev; bcrypt dan identitas email diverifikasi. Password tidak disimpan di vault/Git dan harus diganti pemilik setelah login pertama.
 - Baris uji SPK `9999` dinetralkan menjadi `UJI-9999` berstatus `Batal` karena perintah hapus ditolak oleh persetujuan SQL (tiga kali); penomoran SPK pertama akan 1. Hapus permanen oleh pemilik bila diinginkan.
 - Belum: login pertama dan uji alur lewat aplikasi (T-029 → T-021, T-028, T-022). Agen tidak masuk sendiri dengan kredensial ini karena kredensial akan dikirim ke layanan cloud di luar pratinjau lokal.
+
+### 2026-11-02 — Login nyata ke Supabase dev berhasil (T-029 selesai)
+
+- Selesai: login password admin berhasil (15:38 UTC). Log API: token 200, `muser` per email 200, lalu 19 koleksi dimuat dengan semua respons 200 dan realtime tersambung (dua kali karena halaman dimuat ulang setelah login, sesuai B-002). RLS memberi admin akses baca.
+- Bukti: verified in database + log (bukan hanya source-level). Belum ada penulisan lewat aplikasi.
+- Berikutnya: pemilik menjalankan skenario U-01 sampai U-12 ([[UJI_SUPABASE_DEV]]); agen memverifikasi di database dan log, memperbaiki yang gagal, lalu T-021, T-028, T-022 diperbarui.

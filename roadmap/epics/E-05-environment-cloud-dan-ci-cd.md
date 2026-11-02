@@ -6,9 +6,9 @@ release: v1.0
 theme: Platform
 priority: P0
 status: active
-progress: 10
+progress: 20
 tasks_total: 7
-tasks_done: 1
+tasks_done: 2
 updated: 2026-11-02
 ---
 
@@ -27,7 +27,7 @@ Biaya dan manajemen secret; akun pemilik harus tersedia.
 
 ## Tugas
 
-- [ ] [[tasks/T-029-buat-admin-awal-dan-uji-login-otp-di-supabase-dev|T-029]] Buat admin awal dan uji login OTP di Supabase dev · review · P0 · 0.5 hari
+- [x] [[tasks/T-029-buat-admin-awal-dan-uji-login-otp-di-supabase-dev|T-029]] Buat admin awal dan uji login OTP di Supabase dev · done · P0 · 0.5 hari
 - [x] [[tasks/T-042-supabase-project-development|T-042]] Supabase project development · done · P0 · 0.5 hari
 - [ ] [[tasks/T-043-supabase-project-production-kosong|T-043]] Supabase project production (kosong) · todo · P1 · 0.5 hari
 - [ ] [[tasks/T-044-vercel-preview-dari-development-production-dari-ma|T-044]] Vercel: preview dari development, production dari main · todo · P0 · 1 hari
