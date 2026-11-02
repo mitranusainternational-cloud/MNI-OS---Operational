@@ -1,0 +1,20 @@
+# Operating system / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Dependencies and generated output
+node_modules/
+dist/
+coverage/
+
+# Local secrets and environment overrides
+.env
+.env.*
+!.env.example
+
+# Obsidian workspace state (keep vault notes and templates in Git)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.obsidian/graph.json

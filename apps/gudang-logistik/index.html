@@ -1,0 +1,36 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){try{if(localStorage.getItem('mni-rail')==='mini')document.documentElement.classList.add('rail-mini')}catch(e){}var t='light';try{t=localStorage.getItem('mni-theme')||'light'}catch(e){}if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t)})();</script>
+</head><body>
+<title>MNI Gudang &amp; Logistik</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand"><div class="mark">MNI</div><div><b>Gudang &amp; Logistik</b><small>PT Mitra Nusa Internasional</small></div></div>
+    <nav class="nav" id="nav"></nav>
+    <button type="button" class="rail-tg" id="railtg" data-act="railtg" aria-label="Kecilkan menu" title="Kecilkan menu ( [ )"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/><path d="M20 4v16" opacity=".5"/></svg><span>Kecilkan menu</span><kbd>[</kbd></button>
+    <div class="foot"><span id="who">Memeriksa akses…</span><span class="muted" style="color:inherit;opacity:.7">Data tersimpan bersama &amp; tersinkron ke semua pengguna.</span></div>
+  </aside>
+  <main class="main">
+    <div class="top"><div><h1 id="ttl">Dashboard</h1><div class="sub" id="sub"></div></div><div class="topr"><div class="seg theme" role="group" aria-label="Tema tampilan"><button type="button" data-theme-set="light" id="th-light" title="Mode terang">☀ Light</button><button type="button" data-theme-set="dark" id="th-dark" title="Mode gelap">☾ Dark</button><button type="button" data-theme-set="auto" id="th-auto" title="Ikuti pengaturan perangkat">Otomatis</button></div><div class="live" id="live"><i></i><span>Menghubungkan…</span></div><button type="button" class="mechip" id="mechip" data-act="meclick" aria-label="Akun saya"></button></div></div>
+    <div class="content">
+      <div id="ro" hidden></div>
+      <div class="tools" id="tools"></div>
+      <div id="body"></div>
+    </div>
+  </main>
+</div>
+<div id="drawer" hidden></div>
+<div id="modal" hidden></div>
+<div id="sheet" hidden></div>
+<div id="editor" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+
+
+<script src="assets/js/app.js" defer></script>
+</body></html>
