@@ -179,3 +179,8 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: `scripts/check-vault.mjs` dan [[VAULT_HEALTH]]; perbaiki 21 link rusak, 9 link ambigu, dan 9 catatan tanpa properti. Hasil akhir: 0 rusak, 0 ambigu, 0 properti hilang, 0 yatim (source-level).
 - Selesai: Home ditulis ulang sebagai hub (status, "Saya ingin…", peta vault, ritme kerja); WORKSPACE_GUIDE dan indeks dokumentasi diperbarui.
 - Belum diverifikasi: tampilan Bases dan embed `![[...#heading]]` di aplikasi Obsidian. Rilis v1.1 sampai v2.0 berisi hipotesis dan perlu ditinjau ulang di gerbang G5 setelah hypercare.
+
+### 2026-11-02 — Proteksi branch main (T-041)
+
+- Selesai: proteksi `main` di GitHub: PR wajib dengan 1 approval, dismiss stale review, percakapan harus selesai, force-push dan delete dilarang; `enforce_admins` mati. Terverifikasi lewat GitHub API.
+- Dampak: `main` hanya berubah lewat PR dari `development` sesuai [[RELEASE_CHECKLIST]]. Required status check ditambahkan setelah CI ada (T-046). Karena pemilik repo juga satu-satunya pengembang, approval perlu akun kedua atau bypass admin; putuskan saat PR pertama.

@@ -5,7 +5,7 @@ title: "Push empat branch dan proteksi main"
 phase: P4
 epic: E-01
 release: v0.9
-status: doing
+status: done
 priority: P0
 env: main
 effort_days: 0.5
@@ -23,8 +23,8 @@ Bergantung pada: T-040
 ## Kriteria selesai
 
 - [x] versi-awal, development, main, docs ada di GitHub
-- [ ] Default main; PR + review wajib
-- [ ] Jangan force-push ke riwayat yang berbeda
+- [x] Default main; PR + review wajib
+- [x] Jangan force-push ke riwayat yang berbeda
 
 ## Bukti
 

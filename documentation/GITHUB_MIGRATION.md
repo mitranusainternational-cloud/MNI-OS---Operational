@@ -6,7 +6,7 @@ updated: 2026-11-02
 
 # Migrasi ke GitHub
 
-> [!success] 2026-11-02: remote `origin` terpasang ke `mitranusainternational-cloud/MNI-OS---Operational`; `development` dan `docs` sudah di-push. Sisa: default branch dan proteksi `main` (T-041).
+> [!success] 2026-11-02: remote `origin` terpasang ke `mitranusainternational-cloud/MNI-OS---Operational`; `development` dan `docs` sudah di-push. Proteksi `main` aktif (PR + 1 approval, tanpa force-push). Promosi ke `main` hanya lewat PR dari `development`.
 
 Repo lokal ini (`mni-os`) menggantikan salinan kerja sebelumnya dan punya riwayat serta empat branch: `versi-awal`, `development`, `main`, `docs`. 
 

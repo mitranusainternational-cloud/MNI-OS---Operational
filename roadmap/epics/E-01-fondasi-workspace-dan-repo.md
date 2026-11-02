@@ -5,10 +5,10 @@ title: "Fondasi workspace dan repo"
 release: v0.9
 theme: Fondasi
 priority: P1
-status: active
-progress: 86
+status: done
+progress: 100
 tasks_total: 5
-tasks_done: 4
+tasks_done: 5
 updated: 2026-11-02
 ---
 
@@ -31,6 +31,6 @@ Proteksi branch main belum aktif (T-041).
 - [x] [[tasks/T-002-sistem-tracking-tugas-di-obsidian|T-002]] Sistem tracking tugas di Obsidian · done · P1 · 1 hari
 - [x] [[tasks/T-003-repo-lokal-bersih-mni-os|T-003]] Repo lokal bersih mni-os · done · P1 · 0.5 hari
 - [x] [[tasks/T-040-putuskan-akun-dan-repo-github-target|T-040]] Putuskan akun dan repo GitHub target · done · P0 · 0.5 hari
-- [ ] [[tasks/T-041-push-empat-branch-dan-proteksi-main|T-041]] Push empat branch dan proteksi main · doing · P0 · 0.5 hari
+- [x] [[tasks/T-041-push-empat-branch-dan-proteksi-main|T-041]] Push empat branch dan proteksi main · done · P0 · 0.5 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

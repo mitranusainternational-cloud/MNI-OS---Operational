@@ -11,11 +11,11 @@ generated: 2026-11-02
 
 ## Ringkasan
 
-- Tugas selesai: **7 / 67** (10%)
-- Bobot effort selesai: **4.5 / 127 hari kerja** (4%)
-- Sisa effort: **122.5 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
-- Cakupan go-live (fase P0-P7): **7 / 47** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
-- Diblokir: **0**, sedang dikerjakan: **1**
+- Tugas selesai: **8 / 67** (12%)
+- Bobot effort selesai: **5 / 127 hari kerja** (4%)
+- Sisa effort: **122 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
+- Cakupan go-live (fase P0-P7): **8 / 47** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
+- Diblokir: **0**, sedang dikerjakan: **0**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
 ## Per fase
@@ -26,7 +26,7 @@ generated: 2026-11-02
 | P1 Fondasi lokal | 1/5 | 0.5/3 hari (17%) | berjalan |
 | P2 Aplikasi siap uji | 0/6 | 0/12 hari (0%) | belum mulai |
 | P3 Data dan proses | 0/7 | 0/13.5 hari (0%) | belum mulai |
-| P4 Environment cloud | 1/8 | 0.5/5.5 hari (9%) | berjalan |
+| P4 Environment cloud | 2/8 | 1/5.5 hari (18%) | berjalan |
 | P5 UAT pilot | 0/4 | 0/9.5 hari (0%) | belum mulai |
 | P6 Hardening dan rilis | 0/7 | 0/9.5 hari (0%) | belum mulai |
 | P7 Operasi dan dokumentasi | 0/5 | 0/5.5 hari (0%) | belum mulai |
@@ -38,7 +38,7 @@ generated: 2026-11-02
 
 | Rilis | Tema | Tugas | Effort | Status |
 |---|---|---|---|---|
-| v0.9 | Fondasi | 7/12 | 4.5/7.5 hari (60%) | active |
+| v0.9 | Fondasi | 8/12 | 5/7.5 hari (67%) | active |
 | v1.0 | Pilot go-live | 0/35 | 0/54.5 hari (0%) | planned |
 | v1.1 | Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | planned |
 | v1.2 | Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | planned |
@@ -48,7 +48,7 @@ generated: 2026-11-02
 
 | Epic | Rilis | Tugas | Progress | Status |
 |---|---|---|---|---|
-| [[roadmap/epics/E-01-fondasi-workspace-dan-repo\|E-01]] Fondasi workspace dan repo | v0.9 | 4/5 | 86% | active |
+| [[roadmap/epics/E-01-fondasi-workspace-dan-repo\|E-01]] Fondasi workspace dan repo | v0.9 | 5/5 | 100% | done |
 | [[roadmap/epics/E-02-aplikasi-berjalan-lokal\|E-02]] Aplikasi berjalan lokal | v0.9 | 3/7 | 38% | active |
 | [[roadmap/epics/E-03-kualitas-aplikasi-dan-keamanan-data\|E-03]] Kualitas aplikasi dan keamanan data | v1.0 | 0/5 | 0% | planned |
 | [[roadmap/epics/E-04-proses-data-dan-pilot\|E-04]] Proses, data, dan pilot | v1.0 | 0/7 | 0% | planned |
@@ -72,7 +72,7 @@ generated: 2026-11-02
 
 ## Sedang dikerjakan
 
-- [[tasks/T-041-push-empat-branch-dan-proteksi-main|T-041]] Push empat branch dan proteksi main · pemilik repo
+- Tidak ada
 
 ## Diblokir
 
@@ -94,9 +94,8 @@ generated: 2026-11-02
 - [[tasks/T-031-pilih-pilot-pertama-dan-acceptance-criteria|T-031]] Pilih pilot pertama dan acceptance criteria · todo · menunggu T-030
 - [[tasks/T-032-konfirmasi-owner-dan-cut-off-enam-workbook|T-032]] Konfirmasi owner dan cut-off enam workbook · todo
 - [[tasks/T-035-rekonsiliasi-saldo-hasil-impor|T-035]] Rekonsiliasi saldo hasil impor · todo · menunggu T-034
-- [[tasks/T-041-push-empat-branch-dan-proteksi-main|T-041]] Push empat branch dan proteksi main · doing
 - [[tasks/T-042-supabase-project-development|T-042]] Supabase project development · todo · menunggu T-011
-- [[tasks/T-044-vercel-preview-dari-development-production-dari-ma|T-044]] Vercel: preview dari development, production dari main · todo · menunggu T-041, T-042
+- [[tasks/T-044-vercel-preview-dari-development-production-dari-ma|T-044]] Vercel: preview dari development, production dari main · todo · menunggu T-042
 - [[tasks/T-045-secrets-github-actions-dan-vercel|T-045]] Secrets GitHub Actions dan Vercel · todo · menunggu T-044
 - [[tasks/T-047-konfigurasi-auth-supabase-produksi|T-047]] Konfigurasi Auth Supabase produksi · todo · menunggu T-042
 - [[tasks/T-050-siapkan-data-dan-akun-uat-di-dev|T-050]] Siapkan data dan akun UAT di dev · todo · menunggu T-035, T-036, T-044
