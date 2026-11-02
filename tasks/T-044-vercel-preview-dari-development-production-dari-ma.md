@@ -3,6 +3,8 @@ type: task
 id: T-044
 title: "Vercel: preview dari development, production dari main"
 phase: P4
+epic: E-05
+release: v1.0
 status: todo
 priority: P0
 env: main
@@ -14,6 +16,7 @@ updated: 2026-11-02
 
 # T-044 Vercel: preview dari development, production dari main
 
+Epic: [[roadmap/epics/E-05-environment-cloud-dan-ci-cd|E-05]]  
 Fase: P4 Environment cloud  
 Bergantung pada: T-041, T-042
 

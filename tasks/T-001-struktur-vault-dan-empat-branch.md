@@ -3,6 +3,8 @@ type: task
 id: T-001
 title: "Struktur vault dan empat branch"
 phase: P0
+epic: E-01
+release: v0.9
 status: done
 priority: P1
 env: docs
@@ -14,6 +16,7 @@ updated: 2026-11-02
 
 # T-001 Struktur vault dan empat branch
 
+Epic: [[roadmap/epics/E-01-fondasi-workspace-dan-repo|E-01]]  
 Fase: P0 Workspace dan tracking
 
 ## Kriteria selesai

@@ -3,6 +3,8 @@ type: task
 id: T-010
 title: "Aktifkan Docker engine di Windows"
 phase: P1
+epic: E-02
+release: v0.9
 status: todo
 priority: P0
 env: development
@@ -14,6 +16,7 @@ updated: 2026-11-02
 
 # T-010 Aktifkan Docker engine di Windows
 
+Epic: [[roadmap/epics/E-02-aplikasi-berjalan-lokal|E-02]]  
 Fase: P1 Fondasi lokal
 
 ## Kriteria selesai

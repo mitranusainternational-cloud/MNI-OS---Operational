@@ -11,10 +11,11 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const PHASES = {
   P0: 'Workspace dan tracking', P1: 'Fondasi lokal', P2: 'Aplikasi siap uji', P3: 'Data dan proses',
   P4: 'Environment cloud', P5: 'UAT pilot', P6: 'Hardening dan rilis', P7: 'Operasi dan dokumentasi',
+  P8: 'v1.1 Stabilisasi, akses, kualitas data', P9: 'v1.2 Integrasi dan pelaporan', P10: 'v2.0 Modernisasi dan perluasan',
 };
 const STATUSES = ['todo', 'doing', 'blocked', 'review', 'done'];
 
-function parse(file) {
+function parse(file, kind = 'task') {
   const m = readFileSync(file, 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!m) return null;
   const o = {};
@@ -26,7 +27,7 @@ function parse(file) {
     else v = v.replace(/^"|"$/g, '');
     o[kv[1]] = v;
   }
-  return o.type === 'task' ? o : null;
+  return o.type === kind ? o : null;
 }
 
 const dir = resolve(ROOT, 'tasks');
@@ -75,18 +76,21 @@ const L = (t) => `[[tasks/${fileOf[t.id]}|${t.id}]] ${t.title}`;
 
 let out = `---
 type: progress-snapshot
+status: generated
+updated: ${new Date().toISOString().slice(0, 10)}
 generated: ${new Date().toISOString().slice(0, 10)}
 ---
 
 # Snapshot progress
 
-> Dibuat otomatis oleh \`node scripts/progress-report.mjs\` dari catatan di \`tasks/\`. Jangan edit manual; ubah status di catatan tugas lalu jalankan ulang. Tampilan interaktif: [[PROGRESS_DASHBOARD]]. Rencana: [[GO_LIVE_PLAN]].
+> Dibuat otomatis oleh \`node scripts/progress-report.mjs\` dari catatan di \`tasks/\`. Jangan edit manual; ubah status di catatan tugas lalu jalankan ulang. Tampilan interaktif: [[PROGRESS_DASHBOARD]]. Rencana: [[GO_LIVE_PLAN]] dan [[roadmap/PRODUCT_ROADMAP]].
 
 ## Ringkasan
 
 - Tugas selesai: **${done.length} / ${tasks.length}** (${pct(done.length, tasks.length)}%)
 - Bobot effort selesai: **${sum(done)} / ${sum(tasks)} hari kerja** (${pct(sum(done), sum(tasks))}%)
 - Sisa effort: **${sum(open)} hari kerja**; jalur kritis sisa menuju go-live (T-065): **${crit.days} hari kerja** (${crit.path.join(' → ') || '-'})
+- Cakupan go-live (fase P0-P7): **${tasks.filter((t) => /^P[0-7]$/.test(t.phase) && t.status === 'done').length} / ${tasks.filter((t) => /^P[0-7]$/.test(t.phase)).length}** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
 - Diblokir: **${tasks.filter((t) => t.status === 'blocked').length}**, sedang dikerjakan: **${tasks.filter((t) => t.status === 'doing').length}**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
@@ -99,6 +103,49 @@ for (const [k, name] of Object.entries(PHASES)) {
   const ts = tasks.filter((t) => t.phase === k);
   const d = ts.filter((t) => t.status === 'done');
   out += `| ${k} ${name} | ${d.length}/${ts.length} | ${sum(d)}/${sum(ts)} hari (${pct(sum(d), sum(ts))}%) | ${d.length === ts.length ? 'selesai' : ts.some((t) => t.status === 'blocked') ? 'ada blocker' : d.length ? 'berjalan' : 'belum mulai'} |\n`;
+}
+
+// ---- Per rilis dan per epic -------------------------------------------------
+const RELEASES = { 'v0.9': 'Fondasi', 'v1.0': 'Pilot go-live', 'v1.1': 'Stabilisasi, akses, kualitas data', 'v1.2': 'Integrasi dan pelaporan', 'v2.0': 'Modernisasi dan perluasan' };
+const epicDir = resolve(ROOT, 'roadmap', 'epics');
+const epics = [];
+try {
+  for (const f of readdirSync(epicDir).filter((x) => x.endsWith('.md'))) {
+    const e = parse(resolve(epicDir, f), 'epic');
+    if (e) epics.push({ ...e, file: f.replace(/\.md$/, '') });
+  }
+} catch { /* belum ada roadmap/epics */ }
+const epicIds = new Set(epics.map((e) => e.id));
+for (const t of tasks) {
+  if (!t.epic) problems.push(`${t.id}: tidak punya epic`);
+  else if (!epicIds.has(t.epic)) problems.push(`${t.id}: epic ${t.epic} tidak ada`);
+  else if (epics.find((e) => e.id === t.epic).release !== t.release) problems.push(`${t.id}: release ${t.release} berbeda dengan epic ${t.epic}`);
+}
+const state = (ts) => {
+  const d = ts.filter((t) => t.status === 'done').length;
+  return !ts.length ? 'planned' : d === ts.length ? 'done' : ts.some((t) => t.status !== 'todo') ? 'active' : 'planned';
+};
+out += `\n## Per rilis\n\n| Rilis | Tema | Tugas | Effort | Status |\n|---|---|---|---|---|\n`;
+for (const [rel, name] of Object.entries(RELEASES)) {
+  const ts = tasks.filter((t) => t.release === rel);
+  const d = ts.filter((t) => t.status === 'done');
+  out += `| ${rel} | ${name} | ${d.length}/${ts.length} | ${sum(d)}/${sum(ts)} hari (${pct(sum(d), sum(ts))}%) | ${state(ts)} |\n`;
+}
+out += `\n## Per epic\n\n| Epic | Rilis | Tugas | Progress | Status |\n|---|---|---|---|---|\n`;
+for (const e of epics.sort((a, b) => a.id.localeCompare(b.id))) {
+  const ts = tasks.filter((t) => t.epic === e.id);
+  const d = ts.filter((t) => t.status === 'done');
+  const p = pct(sum(d), sum(ts));
+  out += `| [[roadmap/epics/${e.file}\\|${e.id}]] ${e.title} | ${e.release} | ${d.length}/${ts.length} | ${p}% | ${state(ts)} |\n`;
+  // Tulis ulang properti turunan dan daftar tugas pada catatan epic.
+  const p2 = resolve(epicDir, e.file + '.md');
+  let txt = readFileSync(p2, 'utf8');
+  const set = (k, v) => { txt = txt.replace(new RegExp(`^${k}: .*$`, 'm'), `${k}: ${v}`); };
+  set('status', state(ts)); set('progress', p); set('tasks_total', ts.length); set('tasks_done', d.length);
+  set('updated', new Date().toISOString().slice(0, 10));
+  const list = ts.sort((a, b) => a.id.localeCompare(b.id)).map((t) => `- [${t.status === 'done' ? 'x' : ' '}] ${L(t)} · ${t.status} · ${t.priority} · ${t.effort_days} hari`).join('\n');
+  txt = txt.replace(/## Tugas[\s\S]*$/, `## Tugas\n\n${list}\n\n> Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh \`node scripts/progress-report.mjs\`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].\n`);
+  writeFileSync(p2, txt);
 }
 
 const next = open.filter((t) => t.status === 'todo' && ready(t)).sort((a, b) => (prioRank[a.priority] - prioRank[b.priority]) || a.id.localeCompare(b.id));

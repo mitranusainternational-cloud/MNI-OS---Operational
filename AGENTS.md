@@ -18,7 +18,7 @@ Workspace ini memisahkan dokumentasi operasional, website, aplikasi, dan pengeta
 - Simpan progress di [[documentation/PROJECT_PROGRESS]], urutan/acceptance di [[documentation/ROADMAP]], panduan pengguna/pengembang di folder docs aplikasi, dan sumber/fakta riset di `research/`.
 - MNI OS adalah produk custom untuk kebutuhan tim Operasional MNI. Jangan jadikan ERP eksternal blueprint fitur/proses/schema; mulai dari current-state, bukti, dan validasi process owner di [[documentation/OPERATIONAL_DISCOVERY]].
 - Workbook operasional mentah berada di `data/private-sources/` dan harus tetap diabaikan Git; catat struktur/definisi tanpa menyalin baris bisnis ke dokumentasi.
-- Status pekerjaan hidup di `tasks/` (satu catatan per tugas, properti baku). Ubah `status` dan tulis bukti di catatan tugas, jalankan `node scripts/progress-report.mjs`, lalu cek [[documentation/PROGRESS_DASHBOARD]]. Jangan tandai `done` tanpa bukti. Rencana: [[documentation/GO_LIVE_PLAN]].
+- Status pekerjaan hidup di `tasks/` (satu catatan per tugas, properti baku). Ubah `status` dan tulis bukti di catatan tugas, jalankan `node scripts/progress-report.mjs`, lalu cek [[documentation/PROGRESS_DASHBOARD]]. Setiap tugas punya `epic` dan `release` (lihat [[roadmap/PRODUCT_ROADMAP]]). Sebelum commit jalankan `node scripts/check-vault.mjs`: link rusak dan properti wajib yang hilang harus 0. Jangan tandai `done` tanpa bukti. Rencana: [[documentation/GO_LIVE_PLAN]].
 - Untuk setiap perubahan berdampak, catat tanggal, hasil, file/fitur, bukti verifikasi, hambatan, dan langkah berikutnya di [[documentation/PROJECT_PROGRESS]]; tautkan keputusan baru pada [[documentation/DECISIONS]].
 
 ## Struktur

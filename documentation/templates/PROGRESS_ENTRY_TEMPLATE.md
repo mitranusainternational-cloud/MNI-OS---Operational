@@ -3,6 +3,7 @@ type: progress-entry
 date: YYYY-MM-DD
 area:
 status: in-progress
+updated: YYYY-MM-DD
 ---
 
 ## Hasil

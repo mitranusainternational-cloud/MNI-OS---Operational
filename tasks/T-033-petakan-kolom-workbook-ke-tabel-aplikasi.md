@@ -3,6 +3,8 @@ type: task
 id: T-033
 title: "Petakan kolom workbook ke tabel aplikasi"
 phase: P3
+epic: E-04
+release: v1.0
 status: todo
 priority: P1
 env: docs
@@ -14,6 +16,7 @@ updated: 2026-11-02
 
 # T-033 Petakan kolom workbook ke tabel aplikasi
 
+Epic: [[roadmap/epics/E-04-proses-data-dan-pilot|E-04]]  
 Fase: P3 Data dan proses  
 Bergantung pada: T-032, T-030
 

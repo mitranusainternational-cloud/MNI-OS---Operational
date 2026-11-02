@@ -3,6 +3,8 @@ type: task
 id: T-031
 title: "Pilih pilot pertama dan acceptance criteria"
 phase: P3
+epic: E-04
+release: v1.0
 status: todo
 priority: P0
 env: docs
@@ -14,6 +16,7 @@ updated: 2026-11-02
 
 # T-031 Pilih pilot pertama dan acceptance criteria
 
+Epic: [[roadmap/epics/E-04-proses-data-dan-pilot|E-04]]  
 Fase: P3 Data dan proses  
 Bergantung pada: T-030
 

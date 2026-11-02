@@ -125,4 +125,4 @@ MNI OS adalah sistem custom untuk proses tim Operasional MNI. Antlia atau ERP ek
 - Composio Sheets/Drive/GitHub belum memiliki koneksi aktif di workflow yang diperiksa.
 - Browser runner tidak terhubung untuk E2E visual; HTTP status code saja bukan acceptance proof.
 
-Lihat [[../research/2026-11-02-local-supabase-vercel-composio-readiness|audit kesiapan awal]] dan [[ROADMAP|roadmap checklist]].
+Lihat [[research/2026-11-02-local-supabase-vercel-composio-readiness|audit kesiapan awal]] dan [[ROADMAP|roadmap checklist]].

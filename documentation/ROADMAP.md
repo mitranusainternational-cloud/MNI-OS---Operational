@@ -12,7 +12,7 @@ Roadmap ini menunjukkan urutan hasil yang perlu dibangun, bukan komitmen tanggal
 > Arah produk: **MNI OS custom untuk kebutuhan tim Operasional MNI**. ERP eksternal bukan blueprint. Sumber kebutuhan adalah proses tim, bukti kerja yang diizinkan, dan validasi pemilik proses. Aplikasi **belum terhubung** ke Supabase; blocker teknis dan catatan lengkap ada di [[FOUNDATION_BASELINE|baseline fondasi]].
 
 > [!info] Rencana detail
-> Langkah, dependensi, dan status per tugas ada di [[GO_LIVE_PLAN]] dan [[PROGRESS_DASHBOARD]]. Roadmap ini tetap menjadi urutan hasil tingkat tinggi.
+> Arah produk per rilis dan epic: [[roadmap/PRODUCT_ROADMAP]]. Langkah, dependensi, dan status per tugas ada di [[GO_LIVE_PLAN]] dan [[PROGRESS_DASHBOARD]]. Roadmap ini tetap menjadi urutan hasil tingkat tinggi.
 
 ## Now — fondasi dan bukti awal
 
@@ -37,7 +37,7 @@ Roadmap ini menunjukkan urutan hasil yang perlu dibangun, bukan komitmen tanggal
 - [x] Simpan brief saldo gudang lama sebagai hipotesis pada [[apps/gudang-logistik/docs/PILOT_BRIEF|brief pilot]]; belum dipilih sebagai pilot custom.
 - [x] Tinjau dan catat temuan security/performance advisor di [[FOUNDATION_BASELINE|baseline fondasi]]; perbaikan hosted belum dijalankan.
 - [ ] Setelah requirement custom dan kebutuhan environment disepakati, tentukan apakah project hosted `MNI - Operational` relevan; bila iya, verifikasi owner, lineage, dan kecocokan sebelum dipakai. Jangan menyalin schema/migration sibling secara otomatis.
-- [x] Tetapkan arah custom: tim Operasional adalah sumber kebutuhan utama; catat di [[DECISIONS|log keputusan]].
+- [x] Tetapkan arah custom: tim Operasional adalah sumber kebutuhan utama; catat di [[documentation/DECISIONS|log keputusan]].
 - [x] Buat register discovery dan template walkthrough/requirement di [[OPERATIONAL_DISCOVERY|register Operasional]].
 - [x] Inventaris struktural enam workbook yang diberikan dan buat [[DATA_SOURCE_CATALOG|katalog sumber data]]; salinan kerja dikecualikan dari Git.
 - [x] Audit read-only formula/cache, tipe nilai, candidate key, tanggal, dan contoh item SPK 438; temuan/batas ada di katalog.

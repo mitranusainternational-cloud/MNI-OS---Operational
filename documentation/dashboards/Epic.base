@@ -1,0 +1,63 @@
+filters:
+  and:
+    - file.inFolder("roadmap/epics")
+    - 'type == "epic"'
+properties:
+  id:
+    displayName: Epic
+  title:
+    displayName: Judul
+  release:
+    displayName: Rilis
+  theme:
+    displayName: Tema
+  priority:
+    displayName: Prioritas
+  status:
+    displayName: Status
+  progress:
+    displayName: Progress (%)
+  tasks_done:
+    displayName: Selesai
+  tasks_total:
+    displayName: Total
+views:
+  - type: table
+    name: Roadmap per rilis
+    groupBy:
+      property: release
+      direction: ASC
+    order:
+      - id
+      - title
+      - status
+      - progress
+      - tasks_done
+      - tasks_total
+      - priority
+      - theme
+    sort:
+      - property: id
+        direction: ASC
+  - type: table
+    name: Epic aktif
+    filters:
+      and:
+        - 'status == "active"'
+    order:
+      - id
+      - title
+      - release
+      - progress
+      - tasks_done
+      - tasks_total
+  - type: table
+    name: Belum dimulai
+    filters:
+      and:
+        - 'status == "planned"'
+    order:
+      - id
+      - title
+      - release
+      - priority

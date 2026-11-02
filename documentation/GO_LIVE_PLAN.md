@@ -29,7 +29,7 @@ Go-live (T-065) hanya boleh terjadi bila semua ini benar dan ada buktinya:
 | Rilis | PR `development` → `main`, review wajib | Mencegah perubahan langsung ke versi pengguna | Perlu disiplin proses |
 | Docs | Branch `docs`, situs statis dari vault, hanya materi non-sensitif | Dokumentasi terpisah dari aplikasi | Perlu klasifikasi internal/publik (T-070) |
 
-Keputusan yang masih terbuka dan perlu dicatat di [[DECISIONS]]: repo GitHub target (T-040), sumber kebenaran extract UI (T-014), pilot pertama (T-031).
+Keputusan yang masih terbuka dan perlu dicatat di [[documentation/DECISIONS]]: repo GitHub target (T-040), sumber kebenaran extract UI (T-014), pilot pertama (T-031).
 
 ## 3. Tiga jalur kerja paralel
 

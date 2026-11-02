@@ -3,6 +3,8 @@ type: task
 id: T-066
 title: "Domain kustom"
 phase: P6
+epic: E-06
+release: v1.0
 status: todo
 priority: P2
 env: main
@@ -14,6 +16,7 @@ updated: 2026-11-02
 
 # T-066 Domain kustom
 
+Epic: [[roadmap/epics/E-06-uat-hardening-dan-go-live|E-06]]  
 Fase: P6 Hardening dan rilis  
 Bergantung pada: T-065
 

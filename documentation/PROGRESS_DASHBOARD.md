@@ -12,9 +12,15 @@ Satu sumber kebenaran: **catatan tugas di `tasks/`**. Dashboard ini hanya menamp
 
 ![[PROGRESS_SNAPSHOT]]
 
-## Tampilan interaktif (Bases, fitur inti Obsidian)
+## Roadmap per rilis dan epic (Bases)
 
-Butuh Obsidian 1.9 atau lebih baru dengan core plugin **Bases** aktif (Settings → Core plugins → Bases). Tampilan: semua tugas per fase, belum selesai, P0 terbuka, diblokir/review.
+Status, progress, dan jumlah tugas epic dihitung otomatis. Ringkasan narasi: [[roadmap/PRODUCT_ROADMAP]].
+
+![[Epic.base]]
+
+## Tugas (Bases, fitur inti Obsidian)
+
+Butuh Obsidian 1.9 atau lebih baru dengan core plugin **Bases** aktif (Settings → Core plugins → Bases). Tampilan: semua tugas per fase, belum selesai, P0 terbuka, per rilis dan epic, diblokir/review.
 
 ![[Tugas.base]]
 
@@ -32,4 +38,5 @@ Butuh Obsidian 1.9 atau lebih baru dengan core plugin **Bases** aktif (Settings 
 - Prioritas: **P0** menahan go-live, **P1** penting, **P2** boleh ditunda.
 - Versi (`env`): `development`, `main`, atau `docs` menunjukkan branch tempat hasil kerja mendarat.
 - Tugas baru: salin [[documentation/templates/TASK_TEMPLATE|template tugas]] ke `tasks/`, beri ID berikutnya, tautkan dependensi.
-- Rencana lengkap: [[GO_LIVE_PLAN]]. Urutan hasil: [[ROADMAP]].
+- Tugas baru wajib punya `epic` dan `release` yang sama dengan epic-nya (skrip akan menandai bila tidak).
+- Rencana go-live: [[GO_LIVE_PLAN]]. Arah produk: [[roadmap/PRODUCT_ROADMAP]]. Checklist Now/Next/Later: [[ROADMAP]].

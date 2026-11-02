@@ -3,6 +3,8 @@ type: task
 id: T-000
 title: "Judul hasil yang dapat diverifikasi"
 phase: P1
+epic: E-00
+release: v1.0
 status: todo
 priority: P1
 env: development
@@ -14,6 +16,7 @@ updated: YYYY-MM-DD
 
 # T-000 Judul
 
+Epic: `[[roadmap/epics/E-xx-nama-epic|E-xx]]` (ganti dengan tautan epic yang benar)  
 Fase: P1  
 Bergantung pada: -
 

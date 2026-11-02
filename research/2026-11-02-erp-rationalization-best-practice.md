@@ -1,4 +1,5 @@
 ---
+type: research
 date: 2026-11-02
 topic: custom operational system discovery and design
 status: general-methods-only
@@ -61,9 +62,9 @@ Prinsip umum ini sejalan dengan panduan implementasi yang memulai dari proses bi
 
 ## Status pengetahuan saat catatan dibuat
 
-- **Keputusan produk:** custom untuk kebutuhan tim Operasional; dicatat pada [[../documentation/DECISIONS|log keputusan]].
+- **Keputusan produk:** custom untuk kebutuhan tim Operasional; dicatat pada [[documentation/DECISIONS|log keputusan]].
 - **Belum diketahui:** current-state tiap proses, role/otorisasi, definisi data, volume/quality, prioritas, dan proses pilot.
-- **Hipotesis yang perlu ditinjau:** [[../apps/gudang-logistik/docs/PILOT_BRIEF|brief saldo gudang]] dan [[../apps/gudang-logistik/docs/DATA_MAPPING|mapping source/schema]].
+- **Hipotesis yang perlu ditinjau:** [[apps/gudang-logistik/docs/PILOT_BRIEF|brief saldo gudang]] dan [[apps/gudang-logistik/docs/DATA_MAPPING|mapping source/schema]].
 - **Batas:** riset generik tidak memverifikasi proses MNI; hosted Supabase candidate bukan model data final.
 
 ## Sources

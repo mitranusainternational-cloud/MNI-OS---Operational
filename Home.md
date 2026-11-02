@@ -6,68 +6,63 @@ active-version: development
 updated: 2026-11-02
 ---
 
-# MNI OS Operational
+# MNI OS — Gudang & Logistik
 
-> [!summary] Dashboard workspace
-> Satu vault untuk source code aplikasi website, dokumentasi penggunaan dan pengembangan, riset, bukti visual, serta roadmap.
->
-> **Arah produk:** MNI OS custom berdasarkan proses dan kebutuhan tim Operasional MNI. Referensi eksternal memberi pola pembanding saja; tidak menentukan fitur atau model data.
+> [!summary] Satu vault untuk kode, rencana, progress, riset, dan bukti
+> Sistem custom untuk tim Operasional MNI. Arah, kebutuhan, dan prioritas berasal dari proses nyata tim; referensi eksternal hanya pembanding. Status di bawah dihitung dari catatan tugas, bukan ditulis tangan.
 
-## Ringkasan progress
+## 1. Status sekarang
 
-| Area | Status | Ringkasan |
+![[PROGRESS_SNAPSHOT#Ringkasan]]
+
+Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]]
+
+| Area | Kondisi | Detail |
 |---|---|---|
-| Workspace Obsidian | Fondasi tersusun | Vault memiliki dashboard, panduan workspace, progress, roadmap, riset, template, dan indeks screenshot. |
-| Aplikasi Gudang & Logistik | Preview lokal aktif | HTML/CSS/JS merespons; Supabase config scaffold tersedia, local DB belum hidup, dan browser visual belum diverifikasi. |
-| Dokumentasi | Draf awal tersedia | Panduan penggunaan source-level; SOP proses tetap perlu validasi. |
-| Discovery Operasional | Belum dimulai | Arah custom disepakati; proses aktual dan prioritas masih perlu digali bersama tim/pemilik proses. |
-| Fondasi database/integrasi | Audit + local scaffold | Hosted Supabase dibaca read-only, local config ada; target/lineage belum jelas dan Docker memblokir local stack. Composio OAuth/Vercel belum disiapkan. |
-| Screenshot aplikasi | Menunggu verifikasi browser | Preview `localhost:8002` dan aset merespons 200; render pascaperbaikan belum dapat diperiksa oleh runner, screenshot live belum ditambahkan. |
+| Aplikasi | Scaffold `apps/mni-app` build lolos; halaman login dan shell termuat di browser tanpa error JS. Login, database, dan RLS belum diuji | [[documentation/ENVIRONMENTS]] |
+| Database | Schema 20 tabel + RLS siap sebagai migration; Docker belum aktif sehingga belum pernah dijalankan | [[documentation/FOUNDATION_BASELINE]] |
+| Data | Enam workbook terprofil read-only; sumber resmi dan saldo belum direkonsiliasi | [[documentation/DATA_SOURCE_CATALOG]] |
+| Kebutuhan | Discovery bersama tim Operasional belum dimulai; pilot belum dipilih | [[documentation/OPERATIONAL_DISCOVERY]] |
+| GitHub | `development` dan `docs` ter-push; `main` dan `versi-awal` baseline; proteksi `main` belum aktif | [[documentation/GITHUB_MIGRATION]] |
+| Deploy | Belum ada Supabase dev/prod, Vercel, atau CI | [[GO_LIVE_PLAN]] |
 
-## Fokus sekarang
+## 2. Saya ingin…
 
-- [[documentation/PROGRESS_DASHBOARD|Dashboard progress]] — status semua tugas (sumber: folder `tasks/`), blocker, dan jalur kritis; snapshot di [[documentation/PROGRESS_SNAPSHOT]].
-- [[documentation/GO_LIVE_PLAN|Rencana go-live detail]] — 8 fase, 47 tugas, kriteria keluar, risiko, dan estimasi.
-- [[documentation/ENVIRONMENTS|Tiga versi: Development, Main, Docs]] dan [[documentation/GITHUB_MIGRATION|migrasi ke GitHub]].
-- [[documentation/ROADMAP|Roadmap dan checklist]] — urutan kerja Now / Next / Later serta checklist pemakaian Codex, Playwright, Composio, Obsidian, Git, dan GitHub.
-- [[documentation/IMPLEMENTATION_PLAN|Rencana implementasi local-first]] — urutan Supabase lokal → vertical slice → Composio → GitHub/Vercel → UAT/domain.
-- [[documentation/FOUNDATION_BASELINE|Baseline fondasi dan bukti]] — source, runtime, Supabase discovery, tool gap, serta blocker.
-- [[documentation/OPERATIONAL_DISCOVERY|Discovery dan requirement Operasional]] — register kosong untuk menggali, memvalidasi, dan menelusuri kebutuhan custom.
-- [[documentation/DATA_SOURCE_CATALOG|Katalog data Operasional]] — inventaris enam workbook, struktur awal, dan tahapan monitoring.
-- [[documentation/DATA_DICTIONARY|Kamus data draft]] — label sumber, candidate key, dan definisi yang perlu disahkan.
-- [[apps/gudang-logistik/docs/PILOT_BRIEF|Brief pilot lama (hipotesis)]] — inquiry saldo bahan baku belum disepakati; validasi kebutuhan dimulai dari tim Operasional.
-- [[documentation/PROJECT_PROGRESS|Progress dan hambatan]] — fakta, status, bukti, dan tindak lanjut.
-- [[apps/gudang-logistik/docs/USER_GUIDE|Panduan penggunaan aplikasi]] — orientasi UI dan batasan preview.
-- [[apps/gudang-logistik/docs/DEVELOPMENT|Panduan pengembangan]] — source, preview, dan perubahan kode.
-- [[apps/gudang-logistik/docs/DATA_MAPPING|Mapping prototype ke schema kandidat]] — semantic mapping provisional, bukan kontrak data.
-- [[documentation/screenshots/README|Screenshot dan bukti visual]] — aturan simpan, nama file, dan indeks bukti.
+| Tujuan | Buka |
+|---|---|
+| Tahu apa yang dikerjakan berikutnya | [[PROGRESS_SNAPSHOT#Siap dikerjakan sekarang (dependensi terpenuhi)]] |
+| Melihat arah produk dan rilis | [[roadmap/PRODUCT_ROADMAP]] |
+| Melihat langkah menuju go-live | [[GO_LIVE_PLAN]] |
+| Memperbarui status pekerjaan | [[PROGRESS_DASHBOARD#Cara memperbarui (rutin, 2 menit)]] |
+| Membaca keputusan dan alasannya | [[documentation/DECISIONS]] |
+| Memahami tiga versi (Development, Main, Docs) | [[documentation/ENVIRONMENTS]] dan [[documentation/VERSION_STRATEGY]] |
+| Menjalankan dan mengembangkan aplikasi | [[apps/gudang-logistik/docs/DEVELOPMENT]] dan `apps/mni-app/README.md` |
+| Mempelajari cara memakai aplikasi | [[apps/gudang-logistik/docs/USER_GUIDE]] |
+| Melihat bukti (screenshot) | [[documentation/screenshots/README]] |
+| Merilis ke pengguna | [[documentation/RELEASE_CHECKLIST]] |
+| Membaca riset | [[research/README]] |
+| Memahami data operasional | [[documentation/DATA_SOURCE_CATALOG]], [[documentation/DATA_DICTIONARY]] |
+| Memilih agent atau skill kerja | [[documentation/TEAM_AND_SKILLS]] |
 
-## Peta pengetahuan
+## 3. Peta vault
 
-- [[documentation/WORKSPACE_GUIDE|Cara memakai vault ini]] — aturan struktur dan pencatatan.
-- [[documentation/VERSION_STRATEGY|Strategi versi dan branch]] — `versi-awal`, `development`, `main`, dan `docs`.
-- [[documentation/RELEASE_CHECKLIST|Checklist promosi versi]] — gate sebelum perubahan masuk `main`.
-- [[documentation/DECISIONS|Log keputusan workspace]] — alasan struktur dan batas klaim.
-- [[documentation/TEAM_AND_SKILLS|Tim Codex dan skill lokal]] — peran kerja, alur koordinasi, dan batas QA.
-- [[documentation/templates/PROCESS_DISCOVERY_TEMPLATE|Template walkthrough proses Operasional]].
-- [[documentation/templates/REQUIREMENT_TEMPLATE|Template requirement custom]].
-- [[research/2026-11-02-obsidian-project-workspace-best-practice|Riset workflow Obsidian]].
-- [[research/2026-11-02-erp-rationalization-best-practice|Metode discovery umum untuk MNI OS custom]].
-- [[research/2026-11-02-agent-team-and-skills-best-practice|Riset tim agent dan skill pengembangan website]].
-- [[research/2026-11-02-local-supabase-vercel-composio-readiness|Audit awal kesiapan Supabase, Vercel, dan Composio]].
-- [[apps/gudang-logistik/docs/DATA_INVENTORY|Inventaris data indikatif dari source code]].
-- [[research/README|Indeks riset]].
+| Folder | Isi | Dikelola oleh |
+|---|---|---|
+| `roadmap/` | Roadmap produk dan catatan epic (E-01 sampai E-14) | Tangan (isi), skrip (status) |
+| `tasks/` | Satu catatan per tugas, sumber status progress | Tangan |
+| `documentation/` | Rencana, progress, keputusan, panduan, template, screenshot, dashboard | Tangan; `PROGRESS_SNAPSHOT` dan `VAULT_HEALTH` oleh skrip |
+| `research/` | Riset bertanggal dengan sumber | Tangan |
+| `apps/gudang-logistik/` | Sumber UI aktif (HTML/CSS/JS) dan dokumen aplikasi | Tangan |
+| `apps/mni-app/` | Scaffold Vite + Supabase + deploy | Tangan |
+| `websites/` | Situs lain dan situs Docs (rencana) | Tangan |
+| `data/` | Hanya README; workbook privat `data/private-sources/` diabaikan Git | Lokal |
+| `scripts/` | `progress-report.mjs`, `check-vault.mjs` | Tangan |
+| `.agents/`, `.codex/` | Skill dan agent lokal | Tangan |
 
-## Bagian workspace
+Aturan kerja ada di `AGENTS.md`; cara memakai vault: [[documentation/WORKSPACE_GUIDE]].
 
-- `apps/gudang-logistik/` — website aplikasi, asset source, panduan, dan file HTML referensi.
-- `websites/` — proyek website lain dan rencana situs dokumentasi.
-- `documentation/` — progress, roadmap, dokumentasi lintas aplikasi, screenshot, dan template.
-- `research/` — sumber, temuan, penerapan ke data MNI, ketidakpastian, dan keputusan berbasis bukti.
+## 4. Ritme kerja
 
-## Cara memperbarui status
-
-1. Perbarui checklist pada [[documentation/ROADMAP|roadmap]] saat sebuah keluaran benar-benar selesai.
-2. Tambahkan tanggal, hasil, bukti, dan hambatan di [[documentation/PROJECT_PROGRESS|progress]].
-3. Beri label `source`, `verified`, `inference`, atau `pending` pada data/temuan agar bukti tidak tercampur dengan dugaan.
-4. Simpan screenshot hanya jika tidak memuat kredensial atau data personal; hubungkan dengan halaman fitur yang didokumentasikan.
+- **Harian:** ubah status tugas yang disentuh, tulis bukti, jalankan `node scripts/progress-report.mjs`.
+- **Mingguan:** tinjau [[PROGRESS_SNAPSHOT]], blocker, dan estimasi; catat di [[documentation/PROJECT_PROGRESS]]; jalankan `node scripts/check-vault.mjs --write`.
+- **Per rilis:** [[documentation/RELEASE_CHECKLIST]] dan tinjau ulang [[roadmap/PRODUCT_ROADMAP]].

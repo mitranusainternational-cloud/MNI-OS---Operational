@@ -1,4 +1,5 @@
 ---
+type: research
 date: 2026-11-02
 topic: local-first-supabase-vercel-composio-readiness
 status: initial-audit

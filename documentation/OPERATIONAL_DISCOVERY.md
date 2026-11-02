@@ -50,7 +50,7 @@ Halaman ini adalah indeks kerja untuk merancang MNI OS custom sesuai proses tim 
 - [[templates/REQUIREMENT_TEMPLATE|Template requirement custom]]
 - [[DATA_SOURCE_CATALOG|Katalog workbook sumber Operasional]]
 - [[DATA_DICTIONARY|Draft kamus data Operasional]]
-- [[DECISIONS|Log keputusan]]
+- [[documentation/DECISIONS|Log keputusan]]
 - [[PROJECT_PROGRESS|Progress kerja]]
 - [[ROADMAP|Roadmap dan checklist]]
 - [[research/2026-11-02-erp-rationalization-best-practice|Metode discovery umum (bukan spesifikasi MNI)]]

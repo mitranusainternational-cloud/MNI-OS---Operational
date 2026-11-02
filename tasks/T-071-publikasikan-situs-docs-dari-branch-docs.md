@@ -3,6 +3,8 @@ type: task
 id: T-071
 title: "Publikasikan situs Docs dari branch docs"
 phase: P7
+epic: E-07
+release: v1.0
 status: todo
 priority: P2
 env: docs
@@ -14,6 +16,7 @@ updated: 2026-11-02
 
 # T-071 Publikasikan situs Docs dari branch docs
 
+Epic: [[roadmap/epics/E-07-dokumentasi-dan-situs-docs|E-07]]  
 Fase: P7 Operasi dan dokumentasi  
 Bergantung pada: T-070, T-041
 

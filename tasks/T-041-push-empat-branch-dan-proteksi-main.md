@@ -3,6 +3,8 @@ type: task
 id: T-041
 title: "Push empat branch dan proteksi main"
 phase: P4
+epic: E-01
+release: v0.9
 status: doing
 priority: P0
 env: main
@@ -14,6 +16,7 @@ updated: 2026-11-02
 
 # T-041 Push empat branch dan proteksi main
 
+Epic: [[roadmap/epics/E-01-fondasi-workspace-dan-repo|E-01]]  
 Fase: P4 Environment cloud  
 Bergantung pada: T-040
 

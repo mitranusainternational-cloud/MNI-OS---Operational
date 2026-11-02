@@ -27,7 +27,7 @@ Branch hanya memisahkan riwayat kode. Sebelum data nyata dipakai, setiap versi p
 Disalin dari `mni-app/` pada 2026-11-02. Isinya: Vite, `vercel.json`, workflow deploy, docker-compose VPS, dan 2 migration (20 tabel). Status verifikasi:
 
 - `npm ci` dan `vite build`: berhasil (source-level, env dummy).
-- `npm run extract` memakai sumber aktif `apps/gudang-logistik/` (keputusan T-014 di [[DECISIONS]]); tidak butuh file di luar repo. Terverifikasi: ekstrak, build, dan muat di browser tanpa error JS.
+- `npm run extract` memakai sumber aktif `apps/gudang-logistik/` (keputusan T-014 di [[documentation/DECISIONS]]); tidak butuh file di luar repo. Terverifikasi: ekstrak, build, dan muat di browser tanpa error JS.
 - Dev server: error `addEventListener` pada null sudah **diperbaiki** (2026-11-02). Penyebab: `index.html` tidak memuat `public/app.css` dan tidak menyisipkan `public/app-body.html` ke `#app-root`, sehingga `app.js` mencari elemen (`#editor`, `#toast`, dst.) yang belum ada. Kini `index.html` memuat CSS, menyisipkan body, lalu memuat `app.js`. Terverifikasi di browser: login tampil, tidak ada error JS; sisa error console hanya koneksi ke Supabase dummy (`example.invalid`).
 - Login OTP, RLS, dan persistence belum diuji; Supabase belum tersambung.
 - Migration scaffold tidak otomatis menjadi schema MNI OS; ikuti aturan di [[FOUNDATION_BASELINE]].

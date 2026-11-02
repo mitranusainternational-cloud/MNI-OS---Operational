@@ -1,17 +1,20 @@
 ---
 type: progress-snapshot
+status: generated
+updated: 2026-11-02
 generated: 2026-11-02
 ---
 
 # Snapshot progress
 
-> Dibuat otomatis oleh `node scripts/progress-report.mjs` dari catatan di `tasks/`. Jangan edit manual; ubah status di catatan tugas lalu jalankan ulang. Tampilan interaktif: [[PROGRESS_DASHBOARD]]. Rencana: [[GO_LIVE_PLAN]].
+> Dibuat otomatis oleh `node scripts/progress-report.mjs` dari catatan di `tasks/`. Jangan edit manual; ubah status di catatan tugas lalu jalankan ulang. Tampilan interaktif: [[PROGRESS_DASHBOARD]]. Rencana: [[GO_LIVE_PLAN]] dan [[roadmap/PRODUCT_ROADMAP]].
 
 ## Ringkasan
 
-- Tugas selesai: **7 / 47** (15%)
-- Bobot effort selesai: **4.5 / 62 hari kerja** (7%)
-- Sisa effort: **57.5 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
+- Tugas selesai: **7 / 67** (10%)
+- Bobot effort selesai: **4.5 / 127 hari kerja** (4%)
+- Sisa effort: **122.5 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
+- Cakupan go-live (fase P0-P7): **7 / 47** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
 - Diblokir: **0**, sedang dikerjakan: **1**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
@@ -27,6 +30,38 @@ generated: 2026-11-02
 | P5 UAT pilot | 0/4 | 0/9.5 hari (0%) | belum mulai |
 | P6 Hardening dan rilis | 0/7 | 0/9.5 hari (0%) | belum mulai |
 | P7 Operasi dan dokumentasi | 0/5 | 0/5.5 hari (0%) | belum mulai |
+| P8 v1.1 Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | belum mulai |
+| P9 v1.2 Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | belum mulai |
+| P10 v2.0 Modernisasi dan perluasan | 0/6 | 0/23 hari (0%) | belum mulai |
+
+## Per rilis
+
+| Rilis | Tema | Tugas | Effort | Status |
+|---|---|---|---|---|
+| v0.9 | Fondasi | 7/12 | 4.5/7.5 hari (60%) | active |
+| v1.0 | Pilot go-live | 0/35 | 0/54.5 hari (0%) | planned |
+| v1.1 | Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | planned |
+| v1.2 | Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | planned |
+| v2.0 | Modernisasi dan perluasan | 0/6 | 0/23 hari (0%) | planned |
+
+## Per epic
+
+| Epic | Rilis | Tugas | Progress | Status |
+|---|---|---|---|---|
+| [[roadmap/epics/E-01-fondasi-workspace-dan-repo\|E-01]] Fondasi workspace dan repo | v0.9 | 4/5 | 86% | active |
+| [[roadmap/epics/E-02-aplikasi-berjalan-lokal\|E-02]] Aplikasi berjalan lokal | v0.9 | 3/7 | 38% | active |
+| [[roadmap/epics/E-03-kualitas-aplikasi-dan-keamanan-data\|E-03]] Kualitas aplikasi dan keamanan data | v1.0 | 0/5 | 0% | planned |
+| [[roadmap/epics/E-04-proses-data-dan-pilot\|E-04]] Proses, data, dan pilot | v1.0 | 0/7 | 0% | planned |
+| [[roadmap/epics/E-05-environment-cloud-dan-ci-cd\|E-05]] Environment cloud dan CI/CD | v1.0 | 0/6 | 0% | planned |
+| [[roadmap/epics/E-06-uat-hardening-dan-go-live\|E-06]] UAT, hardening, dan go-live | v1.0 | 0/11 | 0% | planned |
+| [[roadmap/epics/E-07-dokumentasi-dan-situs-docs\|E-07]] Dokumentasi dan situs Docs | v1.0 | 0/4 | 0% | planned |
+| [[roadmap/epics/E-08-operasi-dan-dukungan\|E-08]] Operasi dan dukungan | v1.0 | 0/2 | 0% | planned |
+| [[roadmap/epics/E-09-akses-peran-dan-audit\|E-09]] Akses, peran, dan audit | v1.1 | 0/4 | 0% | planned |
+| [[roadmap/epics/E-10-kualitas-data-dan-kontrol-stok\|E-10]] Kualitas data dan kontrol stok | v1.1 | 0/4 | 0% | planned |
+| [[roadmap/epics/E-11-integrasi-sumber-data\|E-11]] Integrasi sumber data | v1.2 | 0/3 | 0% | planned |
+| [[roadmap/epics/E-12-pelaporan-notifikasi-dan-dokumen\|E-12]] Pelaporan, notifikasi, dan dokumen | v1.2 | 0/3 | 0% | planned |
+| [[roadmap/epics/E-13-modernisasi-frontend-dan-pengujian\|E-13]] Modernisasi frontend dan pengujian | v2.0 | 0/4 | 0% | planned |
+| [[roadmap/epics/E-14-multi-site-dan-mobile\|E-14]] Multi-site dan mobile | v2.0 | 0/2 | 0% | planned |
 
 ## Siap dikerjakan sekarang (dependensi terpenuhi)
 

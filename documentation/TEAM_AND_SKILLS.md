@@ -50,4 +50,4 @@ Model ini membagi pekerjaan berdasarkan hasil yang dibutuhkan. Definisi agent ad
 - Persistence/backend dan E2E browser belum diverifikasi; jangan menyatakan transaksi tersimpan atau alur browser berhasil tanpa bukti.
 - Skill QA tidak mengizinkan akses melalui cookies, token, browser profile, CDP, atau API tersembunyi.
 - Agent ERP tetap read-only. Penggunaan Composio Sheets menunggu koneksi aktif dan ruang lingkup yang ditentukan.
-- Untuk referensi dan alasan pemilihan peran, lihat [[../research/2026-11-02-agent-team-and-skills-best-practice|riset tim dan skill]].
+- Untuk referensi dan alasan pemilihan peran, lihat [[research/2026-11-02-agent-team-and-skills-best-practice|riset tim dan skill]].

@@ -9,6 +9,10 @@ properties:
     displayName: Tugas
   phase:
     displayName: Fase
+  epic:
+    displayName: Epic
+  release:
+    displayName: Rilis
   status:
     displayName: Status
   priority:
@@ -32,6 +36,8 @@ views:
       - title
       - status
       - priority
+      - epic
+      - release
       - env
       - effort_days
       - owner
@@ -72,6 +78,21 @@ views:
       - depends
     sort:
       - property: id
+        direction: ASC
+  - type: table
+    name: Per rilis dan epic
+    groupBy:
+      property: release
+      direction: ASC
+    order:
+      - id
+      - title
+      - epic
+      - status
+      - priority
+      - effort_days
+    sort:
+      - property: epic
         direction: ASC
   - type: table
     name: Diblokir atau menunggu review

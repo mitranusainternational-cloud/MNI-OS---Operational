@@ -3,6 +3,7 @@ type: research-note
 status: draft
 date: YYYY-MM-DD
 area:
+updated: YYYY-MM-DD
 ---
 
 # Pertanyaan riset

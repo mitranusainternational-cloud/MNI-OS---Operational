@@ -1,4 +1,5 @@
 ---
+type: research
 date: 2026-11-02
 topic: Obsidian workflow for a software project workspace
 status: researched

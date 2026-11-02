@@ -3,6 +3,8 @@ type: task
 id: T-074
 title: "Retrospektif dan roadmap v1.1"
 phase: P7
+epic: E-08
+release: v1.0
 status: todo
 priority: P2
 env: docs
@@ -14,6 +16,7 @@ updated: 2026-11-02
 
 # T-074 Retrospektif dan roadmap v1.1
 
+Epic: [[roadmap/epics/E-08-operasi-dan-dukungan|E-08]]  
 Fase: P7 Operasi dan dokumentasi  
 Bergantung pada: T-065
 

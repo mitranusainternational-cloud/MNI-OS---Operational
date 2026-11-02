@@ -164,7 +164,7 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 ### 2026-11-02 — T-014 sumber UI mni-app
 
 - Selesai: sumber kebenaran UI = `apps/gudang-logistik/` (reference hanya memakai 15 dari 20 koleksi). `extract-app.js` memakai sumber itu secara default dan reproducible dari klon bersih.
-- Bukti: extract + `vite build` + muat di browser tanpa error console (verified in browser, UI saja). Keputusan: [[DECISIONS]].
+- Bukti: extract + `vite build` + muat di browser tanpa error console (verified in browser, UI saja). Keputusan: [[documentation/DECISIONS]].
 - Dampak: T-021 kini menguji sumber yang benar-benar memakai 20 koleksi. Berikutnya: T-010 (Docker).
 
 ### 2026-11-02 — Terhubung ke GitHub
@@ -172,3 +172,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: `gh` login sebagai `mitranusainternational-cloud` (push: true). Remote `origin` dipasang di `mni-os`; `development` dan `docs` di-push (fast-forward, `be457dc` ke `dfbc7a3`). Terverifikasi lewat GitHub API.
 - Sisa T-041: default branch `main` dan branch protection. `main` belum berisi pekerjaan baru; promosi lewat [[RELEASE_CHECKLIST]].
 - Catatan: push memakai `-c credential.helper="!gh auth git-credential"` karena Git Credential Manager menyimpan akun lama.
+
+### 2026-11-02 — Roadmap produk dan perapian vault
+
+- Selesai: [[roadmap/PRODUCT_ROADMAP]] (rilis v0.9, v1.0, v1.1, v1.2, v2.0), 14 epic di `roadmap/epics/`, 20 tugas pasca go-live (T-101 sampai T-152), properti `epic` dan `release` pada semua 67 tugas, tampilan Bases `Epic.base`, dan skrip snapshot yang menghitung progress per rilis dan epic.
+- Selesai: `scripts/check-vault.mjs` dan [[VAULT_HEALTH]]; perbaiki 21 link rusak, 9 link ambigu, dan 9 catatan tanpa properti. Hasil akhir: 0 rusak, 0 ambigu, 0 properti hilang, 0 yatim (source-level).
+- Selesai: Home ditulis ulang sebagai hub (status, "Saya ingin…", peta vault, ritme kerja); WORKSPACE_GUIDE dan indeks dokumentasi diperbarui.
+- Belum diverifikasi: tampilan Bases dan embed `![[...#heading]]` di aplikasi Obsidian. Rilis v1.1 sampai v2.0 berisi hipotesis dan perlu ditinjau ulang di gerbang G5 setelah hypercare.

@@ -1,16 +1,26 @@
 ---
 type: documentation-index
 status: active
+updated: 2026-11-02
 ---
 
 # Indeks dokumentasi
+
+## Pantau dan rencanakan
+
+- [[PROGRESS_DASHBOARD|Dashboard progress]] · [[PROGRESS_SNAPSHOT|Snapshot]] · [[VAULT_HEALTH|Kesehatan vault]]
+- [[roadmap/PRODUCT_ROADMAP|Roadmap produk per rilis]] · [[GO_LIVE_PLAN|Rencana go-live]]
+- [[ENVIRONMENTS|Tiga versi]] · [[GITHUB_MIGRATION|Migrasi GitHub]]
+- [[templates/TASK_TEMPLATE|Template tugas]]
+
+## Dokumen lain
 
 - [[WORKSPACE_GUIDE|Panduan memakai vault proyek]]
 - [[PROJECT_PROGRESS|Progress dan hambatan aktual]]
 - [[ROADMAP|Roadmap checklist Now / Next / Later]]
 - [[VERSION_STRATEGY|Strategi versi dan branch]]
 - [[RELEASE_CHECKLIST|Checklist promosi ke Main]]
-- [[DECISIONS|Log keputusan workspace]]
+- [[documentation/DECISIONS|Log keputusan workspace]]
 - [[OPERATIONAL_DISCOVERY|Register discovery kebutuhan Operasional]]
 - [[DATA_SOURCE_CATALOG|Katalog workbook sumber data Operasional]]
 - [[DATA_DICTIONARY|Draft kamus data Operasional]]
