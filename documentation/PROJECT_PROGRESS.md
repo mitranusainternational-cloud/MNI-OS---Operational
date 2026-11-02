@@ -292,6 +292,12 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 ### 2026-11-02 — Penyimpangan role ditutup dan role ditegakkan di UI
 
 - Selesai (database): migration 6 `role_model_supersede` terpasang (ALTER POLICY, tanpa DROP). Uji rollback: viewer dan role lama tidak dapat menulis log atau tabel lain; ppic, gbb, gbj, logistik hanya menulis modulnya. Bukti: verified in database.
-- Selesai (UI): peran dari backend dipakai `guard()` tanpa `ROLE_ON`; adapter hanya menganggap admin, ppic, gbb, gbj, logistik sebagai penulis; akun mock memakai role aplikasi (seed v6). Uji `roles.mjs`: 11 PASS di mock.
+- Selesai (UI): peran dari backend dipakai `guard()` tanpa `ROLE_ON`; adapter hanya menganggap admin, ppic, gbb, gbj, logistik sebagai penulis; akun mock memakai role aplikasi (seed v6). Uji `roles.mjs`: 12 PASS di mock.
 - Sisa: uji role lewat aplikasi di Supabase dengan akun per role (T-079, butuh akun dari pemilik); regresi penuh 36 diulang saat runner terpasang (T-077); pengesahan peta role oleh tim (T-036).
 - Berikutnya: CI GitHub (T-046, T-077), lalu Vercel preview (T-044).
+
+### 2026-11-03 — Uji final di mock dengan Playwright (runner terpasang)
+
+- `playwright` terpasang sebagai devDependency di `apps/mni-app` (cara pasang diperiksa di dokumentasi resmi lewat Context7: `npm i playwright`, `npx playwright install chromium`, tambahkan `--with-deps` di CI Linux). `tests/e2e/run.mjs` kini menjalankan regresi dan uji role.
+- Hasil, dua kali berturut-turut: regresi 36 PASS, 0 FAIL; role 12 PASS, 0 FAIL. Satu kegagalan sementara pada R-05 (jeda tulis) diperbaiki dengan menambah waktu tunggu di `roles.mjs`; tiga ulangan lain bersih.
+- Belum: uji aplikasi di Supabase dengan akun per role (T-079, butuh akun dari pemilik) dan workflow CI (T-046).

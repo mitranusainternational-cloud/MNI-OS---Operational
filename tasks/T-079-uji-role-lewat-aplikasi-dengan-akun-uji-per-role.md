@@ -33,6 +33,6 @@ Bergantung pada: T-078
 
 ## Catatan
 
-Penegakan di UI sudah ada (peran dari `muser` lewat adapter; mock memiliki akun per role, uji `roles.mjs` 11 PASS). Sisa: akun per role di Supabase dev dibuat pemilik, lalu ulangi alur di aplikasi dan catat pesan galat.
+Penegakan di UI sudah ada (peran dari `muser` lewat adapter; mock memiliki akun per role, uji `roles.mjs` 12 PASS). Sisa: akun per role di Supabase dev dibuat pemilik, lalu ulangi alur di aplikasi dan catat pesan galat.
 
 UI aplikasi belum menegakkan role (`ROLE_ON=false`); penolakan datang dari database. Pertimbangkan mengaktifkan `ROLE_ON` agar pesan lebih ramah (T-101).

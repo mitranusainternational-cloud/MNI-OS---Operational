@@ -11,7 +11,7 @@ Tujuan: memastikan perubahan tidak merusak alur yang sudah lulus (36 PASS, 0 FAI
 
 1. Pastikan dependensi dan UI siap: `cd apps/mni-app && npm ci && npm run extract`.
 2. Jalankan dev server mock di terminal terpisah: `npx.cmd vite --host 127.0.0.1 --port 5173 --no-open` (di PowerShell yang memblokir skrip pakai `npx.cmd`). `.env.local` berisi `VITE_LOCAL_MOCK=1`.
-3. Pakai **satu tab** browser. Setelah itu jalankan `runRoles(page, base)` dari `tests/e2e/roles.mjs` (penegakan role, 11 pemeriksaan). Jalankan `runRegression(page, 'http://127.0.0.1:5173/')` dari `apps/mni-app/tests/e2e/regression.mjs` lewat Playwright MCP (`browser_run_code_unsafe`) atau `node tests/e2e/run.mjs` bila paket `playwright` terpasang (T-077).
+3. Pakai **satu tab** browser. Setelah itu jalankan `runRoles(page, base)` dari `tests/e2e/roles.mjs` (penegakan role, 12 pemeriksaan). Jalankan `runRegression(page, 'http://127.0.0.1:5173/')` dari `apps/mni-app/tests/e2e/regression.mjs` lewat Playwright MCP (`browser_run_code_unsafe`) atau `node tests/e2e/run.mjs` bila paket `playwright` terpasang (T-077).
 4. Hasil harus `fail: 0`. Satu kegagalan = berhenti, cari penyebab, perbaiki, ulangi dari awal.
 
 ## Setelah selesai

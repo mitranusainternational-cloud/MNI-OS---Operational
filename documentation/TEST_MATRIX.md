@@ -183,7 +183,7 @@ Status migration: 4 (`role_model_app_aligned`, tambahan) dan 6 (`role_model_supe
 
 ### Penegakan role di UI (mock, 2026-11-02)
 
-Skrip `apps/mni-app/tests/e2e/roles.mjs` (11 pemeriksaan): viewer tidak mencatat; gbb hanya bahan baku; gbj hanya barang jadi; logistik dan ppic tidak mencatat di gudang; admin mencatat di keduanya. Hasil: 11 PASS. Di mode Supabase peran berasal dari tabel `muser` lewat `me().role`; di platform asli (tanpa `role` dari adapter) perilaku lama tidak berubah.
+Skrip `apps/mni-app/tests/e2e/roles.mjs` (12 pemeriksaan): viewer tidak mencatat; gbb hanya bahan baku; gbj hanya barang jadi; logistik dan ppic tidak mencatat di gudang; admin mencatat di keduanya. Hasil: 12 PASS. Di mode Supabase peran berasal dari tabel `muser` lewat `me().role`; di platform asli (tanpa `role` dari adapter) perilaku lama tidak berubah.
 
 ## Belum diuji (jadwal di tracking)
 

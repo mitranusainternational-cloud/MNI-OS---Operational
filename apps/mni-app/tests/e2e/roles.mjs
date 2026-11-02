@@ -19,7 +19,7 @@ export async function runRoles(page, base) {
     await page.waitForTimeout(300);
   };
   const go = async (r) => { await closeAll(); await page.click(`#nav a[href="#${r}"]`); await page.waitForTimeout(550); };
-  const submit = async () => { await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(900); };
+  const submit = async () => { await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500); };
   const login = async (email) => {
     await page.evaluate(() => localStorage.removeItem('mni-local-mock-session'));
     await page.goto(base); await page.reload();
@@ -30,7 +30,7 @@ export async function runRoles(page, base) {
   };
   // percobaan mencatat: hasil = jumlah baris mutasi bertambah
   const tryMove = async (route, label, item, qty) => {
-    await go(route); const n = await count('mutasi');
+    await go(route); await page.waitForTimeout(500); const n = await count('mutasi');
     const btn = await page.$(`#tools [data-act="mv"]:has-text("${label}")`);
     if (!btn) return 'tombol-tersembunyi';
     await btn.click(); await page.waitForTimeout(400);
