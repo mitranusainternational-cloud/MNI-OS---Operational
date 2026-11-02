@@ -61,7 +61,7 @@ Urutan setelah database ada: terapkan migration, uji login OTP dan adapter di Po
 |---|---|
 | Project | `MNI Gudang - Dev`, ref `inldyqigewmziwazalun`, region ap-southeast-1 |
 | URL | `https://inldyqigewmziwazalun.supabase.co` (bukan rahasia) |
-| Migration terpasang | init_schema, rls_policies, app_shape_compat, role_model_app_aligned (tabel `role_modules`, fungsi `can_mod`/`can_any`/`is_admin`, policy `_v2`). Menunggu: role_model_cleanup (DROP policy lama, T-078) |
+| Migration terpasang | init_schema, rls_policies, app_shape_compat, role_model_app_aligned (tabel `role_modules`, fungsi `can_mod`/`can_any`/`is_admin`, policy `_v2`). role_model_supersede (ALTER POLICY: policy lama = model baru). role_model_cleanup (DROP) opsional, tidak dipasang |
 | Kunci di aplikasi | hanya kunci anon/publishable (publik); kunci service-role tidak dipakai di mana pun |
 | Menjalankan app ke project ini | file lokal `apps/mni-app/.env.supabase-dev.local` (diabaikan Git), lalu `npx vite --mode supabase-dev` |
 | Perubahan akun | project `MNI OS - Operational` (kosong) dijeda agar muat di batas gratis; dapat dipulihkan dari dashboard |
@@ -78,3 +78,7 @@ Diamati dari log Auth saat percobaan login pertama:
 2. **URL situs salah.** `site_url` masih bawaan `http://localhost:3000`. Atur Authentication → URL Configuration: Site URL `http://127.0.0.1:5174` dan tambahkan `http://127.0.0.1:5174/**` ke Redirect URLs.
 3. **Batas pengiriman email.** SMTP bawaan Supabase sangat terbatas per jam; permintaan kode kedua dan ketiga mendapat HTTP 429. Untuk pemakaian nyata pasang SMTP sendiri (T-047).
 4. **Cadangan tanpa email.** Aplikasi kini menyediakan "Masuk dengan password" (hanya Supabase nyata). Password diatur sendiri oleh pemilik akun (lihat T-029); password tidak pernah dikirim ke saya atau disimpan di repo.
+
+### Advisor keamanan Supabase dev (2026-11-02, setelah migration 6 dan 7)
+
+Migration 7 (`revoke_anon_helpers`) mencabut hak `anon` atas `get_user_role`, `is_admin_or_manager`, `is_authenticated`. Sisa peringatan (WARN, bukan ERROR): `pg_trgm` di schema public; fungsi `can_any/can_mod/is_admin` dapat dipanggil `authenticated` (hanya menjawab hak pemanggil sendiri; disengaja); proteksi kata sandi bocor (leaked password) nonaktif, aktifkan di dashboard Auth bila memakai login password (tindakan pemilik).

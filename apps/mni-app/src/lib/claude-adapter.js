@@ -330,6 +330,9 @@ const DB_ADAPTER = {
 };
 
 // ── User adapter (replaces window.claude.use('user')) ────────────────────────
+// Role model aplikasi (ROLES di app.js); sama dengan role_modules di database. viewer tidak menulis.
+const WRITE_ROLES = ['admin', 'ppic', 'gbb', 'gbj', 'logistik'];
+
 async function makeUserAdapter() {
   const { data: { session } } = await supabase.auth.getSession();
   const user = session?.user;
@@ -349,13 +352,13 @@ async function makeUserAdapter() {
       name: muser?.nama || user.email, // dipakai app untuk nama tampilan
       nama: muser?.nama || user.email,
       role: muser?.role || 'viewer',
-      isOwner: muser?.role === 'admin',
-      canEdit: ['admin', 'manager', 'produksi', 'gudang'].includes(muser?.role),
+      isOwner: muser?.role === 'admin' && muser?.aktif !== false,
+      canEdit: WRITE_ROLES.includes(muser?.role) && muser?.aktif !== false,
     }),
     can: async (permission) => {
-      const role = muser?.role || 'viewer';
+      const role = muser?.aktif === false ? 'viewer' : (muser?.role || 'viewer');
       if (permission === 'data.write') {
-        return ['admin', 'manager', 'produksi', 'gudang'].includes(role);
+        return WRITE_ROLES.includes(role);
       }
       return role !== 'viewer';
     },

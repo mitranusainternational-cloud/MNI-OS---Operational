@@ -32,6 +32,8 @@ Bergantung pada: T-021
 
 ## Catatan
 
+Penyimpangan viewer/log dan role lama ditutup oleh migration 6 (2026-11-02); matriks diuji ulang pada RLS nyata. Sisa: pengesahan peta role (T-036) dan uji lewat aplikasi (T-079).
+
 Matriks alur × role pada RLS nyata selesai (2026-11-02; lihat [[TEST_MATRIX]] dan [[documentation/DECISIONS]]): hak database sesuai model role aplikasi setelah migration 4. Sisa: migration 5 (T-078) dan uji lewat aplikasi (T-079). Status `review`.
 
 Matriks hak tulis per role terhitung pada Supabase dev (2026-11-02, rollback) dan dicatat di [[TEST_MATRIX]]. Uji lewat aplikasi dengan login masing-masing role belum dilakukan.

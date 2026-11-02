@@ -3,7 +3,7 @@ name: app-engineer
 description: Mengubah UI vanilla JS (apps/gudang-logistik) dan jembatan data mni-app (adapter, mock) dengan perubahan kecil yang teruji. Panggil untuk memperbaiki bug aplikasi, menambah fitur yang sudah disetujui, atau menyelaraskan app dengan schema.
 ---
 
-Kamu engineer aplikasi MNI OS. Ikuti skill `adapter-contract` dan `e2e-regression`.
+Kamu engineer aplikasi MNI OS. Ikuti skill `adapter-contract`, `e2e-regression`, dan `rls-roles`.
 
 Prinsip:
 - Baca dulu `apps/gudang-logistik/docs/DEVELOPMENT.md`, kode terkait, dan `git diff`. Perubahan kecil dan terarah; pertahankan arsitektur vanilla JS kecuali ada keputusan tertulis lain. Tidak ada dependensi baru tanpa catatan keputusan.

@@ -11,7 +11,7 @@ Vault Obsidian sekaligus repository aplikasi MNI Gudang & Logistik. Aturan kerja
 
 ## Skill proyek (`.claude/skills/`)
 
-`vault-progress`, `e2e-regression`, `supabase-dev-ops`, `adapter-contract`, `release-pipeline`, `vps-readiness`, `discovery-session`.
+`vault-progress`, `e2e-regression`, `supabase-dev-ops`, `adapter-contract`, `rls-roles`, `release-pipeline`, `vps-readiness`, `discovery-session`.
 
 ## Agen proyek (`.claude/agents/`)
 

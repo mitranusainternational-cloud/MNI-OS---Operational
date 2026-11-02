@@ -15,7 +15,7 @@ generated: 2026-11-02
 - Bobot effort selesai: **14 / 145.5 hari kerja** (10%)
 - Sisa effort: **131.5 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
 - Cakupan go-live (fase P0-P7): **16 / 60** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
-- Diblokir: **2**, sedang dikerjakan: **1**
+- Diblokir: **1**, sedang dikerjakan: **1**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
 ## Per fase
@@ -24,7 +24,7 @@ generated: 2026-11-02
 |---|---|---|---|
 | P0 Workspace dan tracking | 7/7 | 5/5 hari (100%) | selesai |
 | P1 Fondasi lokal | 2/7 | 1.5/4.5 hari (33%) | ada blocker |
-| P2 Aplikasi siap uji | 3/14 | 5.5/23 hari (24%) | ada blocker |
+| P2 Aplikasi siap uji | 3/14 | 5.5/23 hari (24%) | berjalan |
 | P3 Data dan proses | 0/7 | 0/13.5 hari (0%) | belum mulai |
 | P4 Environment cloud | 4/9 | 2/6 hari (33%) | berjalan |
 | P5 UAT pilot | 0/4 | 0/9.5 hari (0%) | belum mulai |
@@ -83,13 +83,13 @@ generated: 2026-11-02
 ## Diblokir
 
 - [[tasks/T-010-aktifkan-docker-engine-di-windows|T-010]] Aktifkan Docker engine di Windows · pemilik mesin (BIOS + admin Windows)
-- [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · pemilik akun Supabase
 
 ## Menunggu review
 
 - [[tasks/T-021-verifikasi-crud-dan-realtime-semua-koleksi|T-021]] Verifikasi CRUD dan realtime semua koleksi · dev
 - [[tasks/T-022-uji-rls-per-role-dengan-skenario-negatif|T-022]] Uji RLS per role dengan skenario negatif · dev
 - [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]] Verifikasi adapter id, no SPK, dan master di Supabase · dev
+- [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · pemilik akun Supabase
 
 ## Tugas P0 yang belum selesai
 
@@ -116,4 +116,4 @@ generated: 2026-11-02
 - [[tasks/T-063-impor-data-awal-ke-production-dan-rekonsiliasi|T-063]] Impor data awal ke production dan rekonsiliasi · todo · menunggu T-053, T-043
 - [[tasks/T-064-checklist-rilis-dan-merge-development-ke-main|T-064]] Checklist rilis dan merge development ke main · todo · menunggu T-053, T-060, T-061, T-062
 - [[tasks/T-065-go-live-dan-hypercare-lima-hari|T-065]] Go-live dan hypercare lima hari · todo · menunggu T-064, T-063, T-047
-- [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · blocked · menunggu T-022
+- [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · review · menunggu T-022

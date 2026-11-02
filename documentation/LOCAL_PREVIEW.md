@@ -26,9 +26,10 @@ Masukkan salah satu email di bawah, klik **Kirim Kode Masuk**, lalu isi kode **1
 | Email | Role |
 |---|---|
 | `admin@mni.local` | admin |
-| `manager@mni.local` | manager |
-| `gudang@mni.local` | gudang |
-| `produksi@mni.local` | produksi |
+| `ppic@mni.local` | ppic (SPK, vendor) |
+| `gbb@mni.local` | gbb (bahan baku, bongkar muat) |
+| `gbj@mni.local` | gbj (barang jadi, vendor, pengiriman, bongkar muat) |
+| `logistik@mni.local` | logistik (pengiriman, bongkar muat) |
 | `viewer@mni.local` | viewer |
 
 ## Data contoh

@@ -2814,6 +2814,7 @@ function myAcc(){
  if(!ME)return {st:'anon',role:null};
  const mu=byId('muser',ME);
  if(IS_OWNER)return {st:'ok',role:'admin',mu};
+ if(!ROLE_ON&&ME_P&&ME_P.role)return {st:'ok',role:ROLES[ME_P.role]&&ME_P.canEdit!==false?ME_P.role:'viewer',mu}; /* backend dengan peran bawaan (Supabase): peran dari tabel pengguna */
  if(mu&&mu.aktif===false)return {st:'off',role:'viewer',mu};
  if(mu&&ROLES[mu.role])return {st:'ok',role:mu.role,mu};
  if(IS_EDITOR)return {st:'ok',role:'admin',mu,implicit:true};
@@ -2833,7 +2834,7 @@ function modOf(c,data,id,op){
  return '*any';
 }
 function guard(c,data,id,op){
- if(!ROLE_ON)return;
+ if(!ROLE_ON&&!(ME_P&&ME_P.role))return;
  const a=myAcc();
  if(a.st==='new')throw new Error('Akun Anda belum terdaftar. Buka menu Pengguna & Akses lalu klik "Ajukan akses".');
  if(a.st==='req')throw new Error('Permintaan akses Anda masih menunggu persetujuan admin.');

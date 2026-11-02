@@ -6,6 +6,13 @@ updated: 2026-11-02
 
 # Log keputusan workspace
 
+## 2026-11-02 — Policy lama diganti isinya (ALTER), role ditegakkan di UI lewat peran dari backend
+
+- **Konteks:** migration 5 (DROP POLICY) ditolak persetujuan SQL, sedangkan policy lama masih memberi hak pada role lama dan viewer dapat menulis log.
+- **Keputusan:** migration 6 memakai `ALTER POLICY` (tanpa DROP) sehingga isi policy lama sama dengan padanan `_v2`. Migration 5 menjadi opsional. UI: bila adapter menyediakan `me().role` (mode Supabase dan mock), `myAcc()` memakai peran itu dan `guard()` aktif tanpa `ROLE_ON`; `ROLE_ON` (fitur menu Pengguna, undangan, klaim) tetap nonaktif sampai T-101 lanjutan. Akun mock diganti ke role aplikasi (ppic, gbb, gbj, logistik, viewer, admin).
+- **Alasan:** satu model hak di UI dan database tanpa operasi destruktif; platform asli tidak terpengaruh.
+- **Konsekuensi:** pengguna dengan role lama (manager/gudang/produksi) menjadi viewer di UI dan database; pindahkan akun ke role aplikasi. Seed mock naik ke versi 6.
+
 ## 2026-11-02 — Model role RLS mengikuti model role aplikasi (sementara)
 
 - **Konteks:** policy awal memakai role admin/manager/gudang/produksi/viewer, sedangkan aplikasi mendefinisikan admin, ppic, gbb, gbj, logistik, viewer dengan hak per modul (`ROLES`, `modOf`; belum aktif karena `ROLE_ON=false`). Uji pada RLS nyata menunjukkan alur lintas peran gagal (mis. produksi tidak dapat mencatat mutasi atau surat jalan; kunci dokumen di tabel `master` tidak dapat ditulis non-admin; viewer dapat menulis log).

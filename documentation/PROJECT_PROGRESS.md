@@ -288,3 +288,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: migration 4 (`role_modules`, `can_mod`/`can_any`/`is_admin`, policy `_v2` untuk semua tabel) terpasang. Matriks 16 baris × 6 role sesuai model aplikasi ([[TEST_MATRIX]]). Keputusan di [[documentation/DECISIONS]]. Peta role sementara sampai disahkan tim (T-036).
 - Hambatan: migration 5 (DROP policy lama) ditolak oleh persetujuan SQL; viewer masih dapat menulis log sampai itu dijalankan (T-078, blocked, pemilik).
 - Berikutnya: T-078 (pemilik), T-079 (akun uji per role), lalu CI GitHub (T-046, T-077).
+
+### 2026-11-02 — Penyimpangan role ditutup dan role ditegakkan di UI
+
+- Selesai (database): migration 6 `role_model_supersede` terpasang (ALTER POLICY, tanpa DROP). Uji rollback: viewer dan role lama tidak dapat menulis log atau tabel lain; ppic, gbb, gbj, logistik hanya menulis modulnya. Bukti: verified in database.
+- Selesai (UI): peran dari backend dipakai `guard()` tanpa `ROLE_ON`; adapter hanya menganggap admin, ppic, gbb, gbj, logistik sebagai penulis; akun mock memakai role aplikasi (seed v6). Uji `roles.mjs`: 11 PASS di mock.
+- Sisa: uji role lewat aplikasi di Supabase dengan akun per role (T-079, butuh akun dari pemilik); regresi penuh 36 diulang saat runner terpasang (T-077); pengesahan peta role oleh tim (T-036).
+- Berikutnya: CI GitHub (T-046, T-077), lalu Vercel preview (T-044).

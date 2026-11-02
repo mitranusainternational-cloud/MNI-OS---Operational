@@ -175,11 +175,15 @@ Model role yang diuji = model aplikasi (`ROLES`/`modOf` di `apps/gudang-logistik
 | Master: hapus | ya | tidak | tidak | tidak | tidak | tidak |
 | Baca SPK | ya | ya | ya | ya | ya | ya |
 | Baca seluruh `muser` | ya | tidak | tidak | tidak | tidak | tidak |
-| Tulis log saja | ya | ya | ya | ya | ya | **ya (seharusnya tidak)** |
+| Tulis log saja | ya | ya | ya | ya | ya | tidak (setelah migration 6) |
 
-Hasilnya sama dengan hak per modul di aplikasi. Satu penyimpangan: **viewer masih dapat menulis log** karena policy lama `log_write` (semua pengguna terautentikasi) belum dihapus; hilang setelah migration 5 (pembersihan, berisi `DROP POLICY`). Pemeriksaan UPDATE/DELETE memakai jumlah baris terdampak karena RLS menyaring baris tanpa galat.
+Hasilnya sama dengan hak per modul di aplikasi. Penyimpangan awal (viewer dapat menulis log; role lama manager/gudang/produksi masih punya hak lewat policy lama) **sudah ditutup** oleh migration 6 (`role_model_supersede`): isi policy lama diganti dengan `ALTER POLICY` tanpa `DROP`. Uji ulang di rollback (2026-11-02): viewer, gudang, manager, produksi (role lama) tidak dapat menulis log, bahan baku, barang jadi, maupun SPK; ppic menulis log dan SPK; gbb menulis log dan bahan baku (tidak barang jadi); gbj menulis log dan barang jadi (tidak bahan baku); logistik menulis log saja dari tiga tabel itu. Pemeriksaan UPDATE/DELETE memakai jumlah baris terdampak karena RLS menyaring baris tanpa galat.
 
-Status migration: 4 (`role_model_app_aligned`, hanya tambahan) **terpasang**; 5 (`role_model_cleanup`, DROP) **belum**: perintah ditolak oleh persetujuan SQL. Jalankan `apps/mni-app/supabase/migrations/20240101000005_role_model_cleanup.sql` di SQL Editor (tugas T-078).
+Status migration: 4 (`role_model_app_aligned`, tambahan) dan 6 (`role_model_supersede`, ALTER POLICY) **terpasang**. Migration 5 (`role_model_cleanup`, DROP) tidak dipasang: ditolak persetujuan SQL dan tidak lagi perlu; hanya pembersihan kosmetik opsional (policy ganda dengan isi sama).
+
+### Penegakan role di UI (mock, 2026-11-02)
+
+Skrip `apps/mni-app/tests/e2e/roles.mjs` (11 pemeriksaan): viewer tidak mencatat; gbb hanya bahan baku; gbj hanya barang jadi; logistik dan ppic tidak mencatat di gudang; admin mencatat di keduanya. Hasil: 11 PASS. Di mode Supabase peran berasal dari tabel `muser` lewat `me().role`; di platform asli (tanpa `role` dari adapter) perilaku lama tidak berubah.
 
 ## Belum diuji (jadwal di tracking)
 

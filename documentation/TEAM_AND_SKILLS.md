@@ -62,6 +62,7 @@ Dibuat untuk alur kerja yang sudah terbukti di proyek ini; berada di `.claude/` 
 | `e2e-regression` | Regresi UI penuh pratinjau mock; wajib setelah mengubah adapter/UI |
 | `supabase-dev-ops` | Migration, uji RLS/rollback, log, advisor, dan konfigurasi Auth Supabase dev |
 | `adapter-contract` | Aturan kontrak `window.claude`, pemetaan Postgres (UUID, JSONB `data`), sumber UI |
+| `rls-roles` | Model role (role_modules, can_mod, ROLES), aturan ALTER tanpa DROP, cara uji hak per role |
 | `release-pipeline` | Tahap dan gerbang S0 sampai S6, CI, Vercel, PR ke `main` |
 | `vps-readiness` | Penilaian dan keputusan VPS sebelum menyentuh server |
 | `discovery-session` | Menyiapkan, menjalankan, dan mencatat sesi dengan tim Operasional |

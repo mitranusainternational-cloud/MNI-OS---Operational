@@ -13,7 +13,7 @@ import { TABLE_COLS, STRICT_COLS } from './schema-columns.js';
 
 const STORE_KEY = 'mni-local-mock-db';
 const SESSION_KEY = 'mni-local-mock-session';
-const VERSION = 5; // naikkan bila bentuk data seed berubah agar browser memuat seed baru
+const VERSION = 6; // naikkan bila bentuk data seed berubah agar browser memuat seed baru
 // Kode masuk untuk pratinjau lokal. Bukan rahasia dan tidak berlaku di environment lain.
 export const LOCAL_OTP = '123456';
 
@@ -27,9 +27,10 @@ function seed() {
   const db = {};
   db.muser = [
     ['admin@mni.local', 'Admin Lokal', 'admin'],
-    ['manager@mni.local', 'Manager Lokal', 'manager'],
-    ['gudang@mni.local', 'Staf Gudang Lokal', 'gudang'],
-    ['produksi@mni.local', 'Staf Produksi Lokal', 'produksi'],
+    ['ppic@mni.local', 'PPIC Lokal', 'ppic'],
+    ['gbb@mni.local', 'Gudang Bahan Baku Lokal', 'gbb'],
+    ['gbj@mni.local', 'Gudang Barang Jadi Lokal', 'gbj'],
+    ['logistik@mni.local', 'Logistik Lokal', 'logistik'],
     ['viewer@mni.local', 'Viewer Lokal', 'viewer'],
   ].map(([email, nama, role]) => base({ email, nama, role, aktif: true }));
   db.mwc = [['CNC', 'CNC Cutting', 'Internal', 1], ['BENDING', 'Bending', 'Internal', 2], ['WELDING', 'Welding', 'Internal', 3],

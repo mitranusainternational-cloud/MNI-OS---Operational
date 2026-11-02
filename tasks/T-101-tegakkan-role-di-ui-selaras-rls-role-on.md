@@ -21,8 +21,8 @@ Bergantung pada: T-065
 
 ## Kriteria selesai
 
-- [ ] Menu dan aksi UI mengikuti role admin, manager, produksi, gudang, viewer
-- [ ] Percobaan aksi terlarang ditolak UI dan database
+- [ ] Menu dan aksi UI mengikuti role admin, ppic, gbb, gbj, logistik, viewer
+- [x] Percobaan aksi terlarang ditolak UI dan database (mock dan RLS; lihat TEST_MATRIX)
 - [ ] Matriks role disetujui pemilik proses
 
 ## Bukti
@@ -30,5 +30,7 @@ Bergantung pada: T-065
 - Belum ada.
 
 ## Catatan
+
+Sebagian dikerjakan lebih awal (2026-11-02): `guard()` aktif berdasarkan peran dari backend tanpa `ROLE_ON`; model role mengikuti `ROLES` aplikasi (bukan manager/produksi/gudang). Sisa: menu Pengguna & Akses, undangan, klaim (`ROLE_ON`), menyembunyikan tombol per modul, pesan galat database yang ramah.
 
 - Tugas pasca go-live: lingkup dan prioritas ditinjau ulang setelah hypercare (T-065) dan temuan UAT.
