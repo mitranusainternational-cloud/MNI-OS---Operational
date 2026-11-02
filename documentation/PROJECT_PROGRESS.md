@@ -210,3 +210,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Bug diperbaiki: `USER.profiles` hilang, identitas pengguna tidak muncul setelah login, seed tidak sesuai bentuk data app, ekspor CSV/XLSX/PDF gagal karena `DLS.save` belum ada. B-001, B-002, dan B-005 berada di kode produksi.
 - Bukti: verified in browser (mock, data sintetis), 0 pageerror. Skrip: `apps/mni-app/tests/e2e/modules.mjs`, `flows.mjs` (flows belum dijalankan sebagai berkas mandiri).
 - Belum: Supabase nyata, login OTP nyata, RLS, realtime, XLSX/PDF, opname, edit/hapus. Menunggu Docker (T-010) dan T-026.
+
+### 2026-11-02 — T-026 selesai: 30 fitur diuji, 4 bug tambahan
+
+- Selesai: uji lanjutan UI mock (kartu stok, opname barang jadi, ubah item, master ubah/hapus, update produksi, revisi dan duplikat SPK, terima kembali dari vendor dengan reject, status surat jalan, siklus bongkar muat, ekspor Excel dan PDF, pencarian/filter, tema gelap, Back, mobile). Matriks: [[TEST_MATRIX]].
+- Bug diperbaiki: B-006 tombol "set semua selesai"; B-007 id dokumen non-UUID; B-008 `spk.no` teks vs angka (edit SPK membuat baris ganda); B-009 dokumen `master/*` memakai kolom key. B-007 sampai B-009 adalah ketidakcocokan app dengan schema Postgres yang disembunyikan oleh mock; mock kini meniru batasan UUID.
+- Bukti: verified in browser (mock, data sintetis), 0 pageerror. XLSX dan PDF diperiksa sebagai berkas valid.
+- Risiko: perbaikan adapter belum teruji pada Postgres nyata, dijadwalkan T-028 (P0). Sisa fitur di T-027.

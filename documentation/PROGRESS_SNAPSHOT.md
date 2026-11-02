@@ -11,10 +11,10 @@ generated: 2026-11-02
 
 ## Ringkasan
 
-- Tugas selesai: **11 / 72** (15%)
-- Bobot effort selesai: **8.5 / 134 hari kerja** (6%)
-- Sisa effort: **125.5 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
-- Cakupan go-live (fase P0-P7): **11 / 52** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
+- Tugas selesai: **12 / 74** (16%)
+- Bobot effort selesai: **11.5 / 136.5 hari kerja** (8%)
+- Sisa effort: **125 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
+- Cakupan go-live (fase P0-P7): **12 / 54** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
 - Diblokir: **1**, sedang dikerjakan: **0**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
@@ -24,7 +24,7 @@ generated: 2026-11-02
 |---|---|---|---|
 | P0 Workspace dan tracking | 5/5 | 3.5/3.5 hari (100%) | selesai |
 | P1 Fondasi lokal | 2/7 | 1.5/4.5 hari (33%) | ada blocker |
-| P2 Aplikasi siap uji | 2/9 | 2.5/17.5 hari (14%) | berjalan |
+| P2 Aplikasi siap uji | 3/11 | 5.5/20 hari (28%) | berjalan |
 | P3 Data dan proses | 0/7 | 0/13.5 hari (0%) | belum mulai |
 | P4 Environment cloud | 2/8 | 1/5.5 hari (18%) | berjalan |
 | P5 UAT pilot | 0/4 | 0/9.5 hari (0%) | belum mulai |
@@ -39,7 +39,7 @@ generated: 2026-11-02
 | Rilis | Tema | Tugas | Effort | Status |
 |---|---|---|---|---|
 | v0.9 | Fondasi | 9/14 | 6/9 hari (67%) | active |
-| v1.0 | Pilot go-live | 2/38 | 2.5/60 hari (4%) | active |
+| v1.0 | Pilot go-live | 3/40 | 5.5/62.5 hari (9%) | active |
 | v1.1 | Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | planned |
 | v1.2 | Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | planned |
 | v2.0 | Modernisasi dan perluasan | 0/6 | 0/23 hari (0%) | planned |
@@ -50,7 +50,7 @@ generated: 2026-11-02
 |---|---|---|---|---|
 | [[roadmap/epics/E-01-fondasi-workspace-dan-repo\|E-01]] Fondasi workspace dan repo | v0.9 | 5/5 | 100% | done |
 | [[roadmap/epics/E-02-aplikasi-berjalan-lokal\|E-02]] Aplikasi berjalan lokal | v0.9 | 4/9 | 45% | active |
-| [[roadmap/epics/E-03-kualitas-aplikasi-dan-keamanan-data\|E-03]] Kualitas aplikasi dan keamanan data | v1.0 | 2/8 | 15% | active |
+| [[roadmap/epics/E-03-kualitas-aplikasi-dan-keamanan-data\|E-03]] Kualitas aplikasi dan keamanan data | v1.0 | 3/10 | 29% | active |
 | [[roadmap/epics/E-04-proses-data-dan-pilot\|E-04]] Proses, data, dan pilot | v1.0 | 0/7 | 0% | planned |
 | [[roadmap/epics/E-05-environment-cloud-dan-ci-cd\|E-05]] Environment cloud dan CI/CD | v1.0 | 0/6 | 0% | planned |
 | [[roadmap/epics/E-06-uat-hardening-dan-go-live\|E-06]] UAT, hardening, dan go-live | v1.0 | 0/11 | 0% | planned |
@@ -67,8 +67,8 @@ generated: 2026-11-02
 
 - P0 · [[tasks/T-030-walkthrough-proses-dengan-process-owner|T-030]] Walkthrough proses dengan process owner · 3 hari · tim Operasional
 - P0 · [[tasks/T-032-konfirmasi-owner-dan-cut-off-enam-workbook|T-032]] Konfirmasi owner dan cut-off enam workbook · 1 hari · tim Operasional
-- P1 · [[tasks/T-026-uji-lanjutan-ui-mock-fitur-yang-belum-tercakup|T-026]] Uji lanjutan UI mock: fitur yang belum tercakup · 3 hari · dev
 - P2 · [[tasks/T-017-rapikan-identitas-pengguna-dan-teks-backend-di-mni|T-017]] Rapikan identitas pengguna dan teks backend di mni-app · 0.5 hari · dev
+- P2 · [[tasks/T-027-uji-sisa-ui-mock-void-koreksi-pr-dan-role|T-027]] Uji sisa UI mock: void, koreksi, PR, dan role · 1.5 hari · dev
 - P2 · [[tasks/T-070-pilih-generator-situs-docs-dan-klasifikasi-materi|T-070]] Pilih generator situs docs dan klasifikasi materi · 1 hari · dev
 
 ## Sedang dikerjakan
@@ -91,6 +91,7 @@ generated: 2026-11-02
 - [[tasks/T-020-verifikasi-login-otp-end-to-end-lokal|T-020]] Verifikasi login OTP end-to-end (lokal) · todo · menunggu T-012, T-013
 - [[tasks/T-021-verifikasi-crud-dan-realtime-semua-koleksi|T-021]] Verifikasi CRUD dan realtime semua koleksi · todo · menunggu T-020
 - [[tasks/T-022-uji-rls-per-role-dengan-skenario-negatif|T-022]] Uji RLS per role dengan skenario negatif · todo · menunggu T-021
+- [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]] Verifikasi adapter id, no SPK, dan master di Supabase · todo · menunggu T-012, T-021
 - [[tasks/T-030-walkthrough-proses-dengan-process-owner|T-030]] Walkthrough proses dengan process owner · todo
 - [[tasks/T-031-pilih-pilot-pertama-dan-acceptance-criteria|T-031]] Pilih pilot pertama dan acceptance criteria · todo · menunggu T-030
 - [[tasks/T-032-konfirmasi-owner-dan-cut-off-enam-workbook|T-032]] Konfirmasi owner dan cut-off enam workbook · todo

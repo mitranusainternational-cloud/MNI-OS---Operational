@@ -110,6 +110,13 @@ export function createLocalClient() {
       const pk = pkOf(this.t);
       const stamp = iso();
       let out = [];
+      // Meniru Postgres: kolom id bertipe UUID menolak teks lain (error 22P02).
+      if (pk === 'id') {
+        const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const given = [...this.filters.filter(([c]) => c === 'id').map(([, v]) => v), ...[].concat(this.payload || []).map((p) => p && p.id).filter((v) => v !== undefined)];
+        const bad = given.find((v) => !UUID.test(String(v)));
+        if (bad !== undefined) return { data: null, error: { code: '22P02', message: `invalid input syntax for type uuid: "${bad}"` } };
+      }
       if (this.op === 'select') {
         out = rows.filter((r) => this.match(r));
         if (this.ord) {

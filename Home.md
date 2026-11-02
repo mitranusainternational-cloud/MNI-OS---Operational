@@ -19,7 +19,7 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 
 | Area | Kondisi | Detail |
 |---|---|---|
-| Aplikasi | `apps/mni-app` berjalan sebagai pratinjau lokal mode mock (login 5 role, data sintetis); 10 modul dan 14 fitur inti lulus uji UI; Supabase, Auth nyata, dan RLS belum diuji | [[documentation/TEST_MATRIX]] |
+| Aplikasi | `apps/mni-app` berjalan sebagai pratinjau lokal mode mock (login 5 role, data sintetis); 10 modul dan 30 fitur lulus uji UI; Supabase, Auth nyata, dan RLS belum diuji | [[documentation/TEST_MATRIX]] |
 | Database | Schema 20 tabel + RLS siap sebagai migration; Docker belum bisa start karena virtualisasi BIOS nonaktif, jadi belum pernah dijalankan | [[documentation/DOCKER_SETUP]] |
 | Data | Enam workbook terprofil read-only; sumber resmi dan saldo belum direkonsiliasi | [[documentation/DATA_SOURCE_CATALOG]] |
 | Kebutuhan | Discovery bersama tim Operasional belum dimulai; pilot belum dipilih | [[documentation/OPERATIONAL_DISCOVERY]] |

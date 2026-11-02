@@ -34,4 +34,4 @@ Bergantung pada: T-018
 
 ## Catatan
 
-Setiap bug punya ID di TEST_MATRIX agar terlacak. Uji ulang akan dijalankan pada Supabase nyata di T-021.
+Setiap bug punya ID di TEST_MATRIX agar terlacak. B-006 sampai B-009 menyusul di T-026. Uji ulang akan dijalankan pada Supabase nyata di T-021.

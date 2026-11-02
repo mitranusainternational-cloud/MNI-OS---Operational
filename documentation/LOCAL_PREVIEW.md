@@ -37,6 +37,7 @@ Enam bahan baku, tiga barang jadi, dua SPK (satu sengaja lewat jatuh tempo), mas
 
 ## Batasan yang diketahui
 
+- Mock meniru batasan UUID Postgres untuk kolom id agar ketidakcocokan id terdeteksi lebih awal.
 - Hak akses per role belum ditegakkan (di aplikasi `ROLE_ON=false`; mock tidak meniru RLS).
 - Realtime hanya dalam satu tab, bukan antar pengguna.
 - Nama pengguna kini tampil setelah login (B-002). Teks "Backend belum terhubung" bawaan prototipe masih ada di sidebar; lihat [[tasks/T-017-rapikan-identitas-pengguna-dan-teks-backend-di-mni|T-017]].

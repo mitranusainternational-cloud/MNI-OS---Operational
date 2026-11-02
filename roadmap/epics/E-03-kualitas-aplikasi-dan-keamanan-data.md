@@ -6,9 +6,9 @@ release: v1.0
 theme: Kualitas
 priority: P0
 status: active
-progress: 15
-tasks_total: 8
-tasks_done: 2
+progress: 29
+tasks_total: 10
+tasks_done: 3
 updated: 2026-11-02
 ---
 
@@ -34,6 +34,8 @@ Adapter meniru API Firestore di atas Postgres; perilaku realtime dan lock perlu 
 - [ ] [[tasks/T-022-uji-rls-per-role-dengan-skenario-negatif|T-022]] Uji RLS per role dengan skenario negatif · todo · P0 · 2 hari
 - [ ] [[tasks/T-023-smoke-test-playwright|T-023]] Smoke test Playwright · todo · P1 · 2 hari
 - [ ] [[tasks/T-024-perbaikan-bug-hasil-verifikasi-buffer|T-024]] Perbaikan bug hasil verifikasi (buffer) · todo · P1 · 3 hari
-- [ ] [[tasks/T-026-uji-lanjutan-ui-mock-fitur-yang-belum-tercakup|T-026]] Uji lanjutan UI mock: fitur yang belum tercakup · todo · P1 · 3 hari
+- [x] [[tasks/T-026-uji-lanjutan-ui-mock-fitur-yang-belum-tercakup|T-026]] Uji lanjutan UI mock: fitur yang belum tercakup · done · P1 · 3 hari
+- [ ] [[tasks/T-027-uji-sisa-ui-mock-void-koreksi-pr-dan-role|T-027]] Uji sisa UI mock: void, koreksi, PR, dan role · todo · P2 · 1.5 hari
+- [ ] [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]] Verifikasi adapter id, no SPK, dan master di Supabase · todo · P0 · 1 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

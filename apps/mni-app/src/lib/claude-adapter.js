@@ -38,6 +38,31 @@ if (LOCAL_MOCK) {
   });
 }
 
+// ── ID dokumen ───────────────────────────────────────────────────────────────
+// App membuat id dokumen berbentuk string (mis. "spk-1003"), sedangkan kolom id di
+// schema bertipe UUID. Id non-UUID dipetakan ke UUID deterministik (mirip UUID v5), jadi
+// id yang sama selalu menghasilkan UUID yang sama dan pengecekan "sudah dipakai" tetap benar.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+async function toDbId(id) {
+  if (UUID_RE.test(String(id))) return id;
+  const bytes = new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode('mni:' + id))).slice(0, 16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x50;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const h = [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`;
+}
+
+// Kolom spk.no bertipe TEXT di database, tetapi app memperlakukannya sebagai angka
+// (parseInt, perbandingan !==). Tanpa konversi, mengedit SPK dianggap "ganti nomor".
+const numericNo = (table, row) => {
+  if (table === 'spk' && row && row.no !== undefined && row.no !== null && /^\d+$/.test(String(row.no))) row.no = Number(row.no);
+  return row;
+};
+const textNo = (table, row) => {
+  if (table === 'spk' && row && row.no !== undefined && row.no !== null) row.no = String(row.no);
+  return row;
+};
+
 // ── Field name helpers ────────────────────────────────────────────────────────
 // The original app stores _id as the Firestore document ID.
 // Supabase uses `id` (UUID). We expose _id = id for compatibility.
@@ -101,7 +126,7 @@ function makeCollection(col) {
   return {
     // Firestore: collection(col).add(data) → INSERT
     async add(data) {
-      const row = docToRow(null, data);
+      const row = textNo(table, docToRow(null, data));
       delete row.id; // let DB generate UUID
       const { data: result, error } = await supabase
         .from(table)
@@ -109,7 +134,7 @@ function makeCollection(col) {
         .select()
         .single();
       if (error) throw new Error(`[add:${table}] ${error.message}`);
-      return { id: result.id, ...result };
+      return { id: result.id, ...numericNo(table, result) };
     },
 
     // Firestore: collection(col).onSnapshot(cb) → Realtime subscription
@@ -121,9 +146,9 @@ function makeCollection(col) {
           .select('*')
           .order('created_at', { ascending: false });
         if (error) { errCb && errCb(error); return; }
-        const docs = (data || []).map(rowToDoc);
+        const docs = (data || []).map((r) => (table === 'master' ? masterToDoc(r) : rowToDoc(numericNo(table, r))));
         // Emulate Firestore snapshot shape
-        cb({ docs: docs.map(d => ({ data: () => d, id: d.id })) });
+        cb({ docs: docs.map(d => ({ data: () => d, id: d._id })) });
       };
 
       load();
@@ -147,81 +172,97 @@ function makeCollection(col) {
 }
 
 // ── DB Doc Proxy ──────────────────────────────────────────────────────────────
+// Tabel master dan koleksi counter memakai kolom key (teks) dengan nilai JSON, bukan id UUID.
+// Dokumen master dipetakan ke objek datar { ...value, _id: key } seperti yang dibaca app.
+const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
+function masterToDoc(row) {
+  if (!row) return null;
+  let v = row.value;
+  if (typeof v === 'string') { try { v = JSON.parse(v); } catch { /* biarkan string */ } }
+  return { ...(isObj(v) ? v : { value: v }), _id: row.key, key: row.key, updAt: row.updated_at, at: row.created_at };
+}
+const stripMeta = (d) => { const o = { ...d }; delete o._id; delete o.key; return o; };
+
 function makeDoc(path) {
-  // path = "collection/docId" OR "collection/docId" for nested (we flatten)
+  // path = "collection/docId" (struktur bertingkat diratakan)
   const parts = path.split('/');
   const col = parts[0];
-  const docId = parts[1];
+  const rawId = parts[1];
   const table = tableName(col);
-
-  // For counters (counter/spk-202412) — stored in master table
   const isCounter = col === 'counter';
+  const keyed = isCounter || table === 'master';
+  const keyOf = () => rawId;
+  const idOf = () => toDbId(rawId);
 
   return {
     // .get()
     async get() {
-      if (isCounter) {
-        const { data } = await supabase.from('master').select('*').eq('key', docId).single();
-        return { exists: !!data, data: () => data ? { value: data.value } : null };
+      if (keyed) {
+        const { data } = await supabase.from('master').select('*').eq('key', keyOf()).single();
+        return { exists: !!data, data: () => (data ? (isCounter ? { value: data.value } : masterToDoc(data)) : null) };
       }
-      const { data, error } = await supabase.from(table).select('*').eq('id', docId).single();
+      const { data, error } = await supabase.from(table).select('*').eq('id', await idOf()).single();
       if (error && error.code !== 'PGRST116') throw error;
-      return { exists: !!data, data: () => data ? rowToDoc(data) : null };
+      return { exists: !!data, data: () => (data ? rowToDoc(numericNo(table, data)) : null) };
     },
 
     // .set(data) — upsert
     async set(data) {
-      if (isCounter) {
-        const { error } = await supabase.from('master')
-          .upsert({ key: docId, value: data.value ?? data }, { onConflict: 'key' });
-        if (error) throw new Error(`[set:master:${docId}] ${error.message}`);
+      if (keyed) {
+        const value = isCounter ? (data.value ?? data) : stripMeta(data);
+        const { error } = await supabase.from('master').upsert({ key: keyOf(), value }, { onConflict: 'key' });
+        if (error) throw new Error(`[set:master:${keyOf()}] ${error.message}`);
         return;
       }
-      const row = docToRow(path, data);
-      row.id = docId;
-      const { error } = await supabase.from(table)
-        .upsert(row, { onConflict: 'id' });
-      if (error) throw new Error(`[set:${table}:${docId}] ${error.message}`);
+      const id = await idOf();
+      const row = textNo(table, docToRow(path, data));
+      row.id = id;
+      const { error } = await supabase.from(table).upsert(row, { onConflict: 'id' });
+      if (error) throw new Error(`[set:${table}:${id}] ${error.message}`);
     },
 
-    // .update(data) — partial update
+    // .update(data) — pembaruan parsial
     async update(data) {
-      if (isCounter) {
-        await supabase.from('master').update({ value: data.value ?? data }).eq('key', docId);
+      if (keyed) {
+        const { data: cur } = await supabase.from('master').select('*').eq('key', keyOf()).single();
+        const old = cur ? (isCounter ? { value: cur.value } : stripMeta(masterToDoc(cur))) : {};
+        const value = isCounter ? (data.value ?? data) : { ...old, ...stripMeta(data) };
+        const { error } = await supabase.from('master').upsert({ key: keyOf(), value }, { onConflict: 'key' });
+        if (error) throw new Error(`[update:master:${keyOf()}] ${error.message}`);
         return;
       }
-      const row = docToRow(path, data);
+      const id = await idOf();
+      const row = textNo(table, docToRow(path, data));
       delete row.id;
-      const { error } = await supabase.from(table).update(row).eq('id', docId);
-      if (error) throw new Error(`[update:${table}:${docId}] ${error.message}`);
+      const { error } = await supabase.from(table).update(row).eq('id', id);
+      if (error) throw new Error(`[update:${table}:${id}] ${error.message}`);
     },
 
     // .delete()
     async delete() {
-      if (isCounter) {
-        await supabase.from('master').delete().eq('key', docId);
+      if (keyed) {
+        await supabase.from('master').delete().eq('key', keyOf());
         return;
       }
-      // Soft delete for business records
-      const SOFT = new Set(['spk','kirim','vendor','pr','bongkar']);
+      const id = await idOf();
+      // Hapus lunak untuk catatan bisnis
+      const SOFT = new Set(['spk', 'kirim', 'vendor', 'pr', 'bongkar']);
       if (SOFT.has(table)) {
-        const { error } = await supabase.from(table).update({ status: 'Batal' }).eq('id', docId);
-        if (error) throw new Error(`[softDel:${table}:${docId}] ${error.message}`);
+        const { error } = await supabase.from(table).update({ status: 'Batal' }).eq('id', id);
+        if (error) throw new Error(`[softDel:${table}:${id}] ${error.message}`);
       } else {
-        const { error } = await supabase.from(table).delete().eq('id', docId);
-        if (error) throw new Error(`[delete:${table}:${docId}] ${error.message}`);
+        const { error } = await supabase.from(table).delete().eq('id', id);
+        if (error) throw new Error(`[delete:${table}:${id}] ${error.message}`);
       }
     },
 
-    // .acquire(opts) — optimistic lock (simplified: just check updated_at)
+    // .acquire(opts) — kunci optimistis sederhana, disimpan di tabel master dengan key "lock:col:id"
     async acquire({ holder, ttlMs } = {}) {
-      // Store lock in master table key = "lock:docId"
-      const lockKey = `lock:${col}:${docId}`;
+      const lockKey = `lock:${col}:${rawId}`;
       const now = Date.now();
       const expires = now + (ttlMs || 30000);
 
-      const { data: existing } = await supabase
-        .from('master').select('*').eq('key', lockKey).single();
+      const { data: existing } = await supabase.from('master').select('*').eq('key', lockKey).single();
 
       if (existing?.value) {
         const lock = typeof existing.value === 'object' ? existing.value :

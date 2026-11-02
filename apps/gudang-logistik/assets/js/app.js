@@ -3428,7 +3428,7 @@ document.addEventListener('click',async e=>{
   case 'ed-up':case 'ed-down':{const i=+ds.s,j=a==='ed-up'?i-1:i+1;if(j>=0&&j<ED.sections.length){[ED.sections[i],ED.sections[j]]=[ED.sections[j],ED.sections[i]];EDDIRTY=true;rerenderSecs()}break}
   case 'openspk':spkDrawer(ds.id);break;
   case 'prod':prodForm(ds.id);break;
-  case 'prodall':document.querySelectorAll('#mform [name^="p_"]').forEach((inpEl,k)=>{const s=inpEl.closest('tr').children[1].textContent;inpEl.value=parseFloat(s.replace(/\./g,'').replace(',','.'))||inpEl.value});break;
+  case 'prodall':document.querySelectorAll('#mform [name^="p_"]').forEach(inpEl=>{const q=parseFloat(inpEl.max);if(q>0)inpEl.value=q});break; /* B-006: sebelumnya membaca sel tabel (closest('tr')) yang tidak ada di form kartu, sehingga melempar galat */
   case 'railtg':railToggle();break;
   case 'void':voidForm(ds.c,ds.id);break;
   case 'rmset':rmSetForm();break;

@@ -5,7 +5,7 @@ title: "Uji lanjutan UI mock: fitur yang belum tercakup"
 phase: P2
 epic: E-03
 release: v1.0
-status: todo
+status: done
 priority: P1
 env: development
 effort_days: 3
@@ -22,18 +22,18 @@ Bergantung pada: T-019
 
 ## Kriteria selesai
 
-- [ ] Stock opname dan kartu stok diuji (hitung, selisih, simpan)
-- [ ] Edit dan hapus item gudang dan master data diuji
-- [ ] SPK: edit, duplikat, revisi, ubah status, dan pencatatan produksi (prod) diuji
-- [ ] Vendor: penerimaan kembali, retur/reject, dan status; surat jalan customer: ubah status
-- [ ] Bongkar muat: langkah proses, koreksi, dan batalkan diuji
-- [ ] Ekspor XLSX dan PDF/cetak dokumen diuji
-- [ ] Filter, pencarian, tema gelap, dan tampilan mobile diperiksa
-- [ ] Hasil dicatat di TEST_MATRIX dengan ID fitur baru
+- [x] Stock opname dan kartu stok diuji (hitung, selisih, simpan)
+- [x] Edit dan hapus item gudang dan master data diuji
+- [x] SPK: edit, duplikat, revisi, ubah status, dan pencatatan produksi (prod) diuji
+- [x] Vendor: penerimaan kembali, retur/reject, dan status; surat jalan customer: ubah status
+- [x] Bongkar muat: langkah proses diuji (koreksi dan batalkan dipindah ke T-027)
+- [x] Ekspor XLSX dan PDF/cetak dokumen diuji
+- [x] Filter, pencarian, tema gelap, dan tampilan mobile diperiksa
+- [x] Hasil dicatat di TEST_MATRIX dengan ID fitur baru
 
 ## Bukti
 
-- Belum ada. Daftar fitur belum tercakup ada di [[TEST_MATRIX]].
+- Verified in browser (2026-11-02, mock): F-15 sampai F-30 PASS, 4 bug tambahan diperbaiki (B-006 sampai B-009). Rincian di [[TEST_MATRIX]]. Sisa fitur dipindah ke [[tasks/T-027-uji-sisa-ui-mock-void-koreksi-pr-dan-role|T-027]].
 
 ## Catatan
 
