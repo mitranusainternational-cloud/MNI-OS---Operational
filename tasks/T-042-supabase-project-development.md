@@ -32,4 +32,6 @@ Bergantung pada: T-011
 
 ## Catatan
 
+Inventaris dan opsi (A: project baru, B: Docker lokal, C: project ERP yang ada) ada di [[documentation/ENVIRONMENTS]]. Dua project Supabase aktif yang ada berskema ERP berbeda dan tidak dipakai. Keputusan dan biaya menunggu pemilik akun (2026-11-02).
+
 -

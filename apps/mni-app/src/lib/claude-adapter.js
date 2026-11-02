@@ -43,13 +43,17 @@ if (LOCAL_MOCK) {
 // schema bertipe UUID. Id non-UUID dipetakan ke UUID deterministik (mirip UUID v5), jadi
 // id yang sama selalu menghasilkan UUID yang sama dan pengecekan "sudah dipakai" tetap benar.
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+// Alias id app -> UUID dibagikan ke app lewat window.__idAlias (dipakai byId), karena app memakai
+// id buatannya sendiri sesaat setelah menyimpan (mis. membuka lembar SPK "spk-1003").
+const ID_ALIAS = (window.__idAlias = window.__idAlias || {});
 async function toDbId(id) {
   if (UUID_RE.test(String(id))) return id;
+  if (ID_ALIAS[id]) return ID_ALIAS[id];
   const bytes = new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode('mni:' + id))).slice(0, 16);
   bytes[6] = (bytes[6] & 0x0f) | 0x50;
   bytes[8] = (bytes[8] & 0x3f) | 0x80;
   const h = [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('');
-  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`;
+  return (ID_ALIAS[id] = `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`);
 }
 
 // Kolom spk.no bertipe TEXT di database, tetapi app memperlakukannya sebagai angka

@@ -222,3 +222,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 - Selesai: [[DISCOVERY_AGENDA]] berisi tujuan, peran peserta, aturan sesi, 5 sesi (sekitar 5,5 jam) dengan rincian menit, pertanyaan kunci per topik yang ditautkan ke isu data DQ-*, tabel keputusan D-01 sampai D-10, dan langkah 24 jam setelah sesi. Catatan di T-030, T-031, T-032, dan T-036 menautkannya.
 - Belum: tanggal, peserta, dan undangan (pemilik proyek). Sesi belum berlangsung; status tugas tetap todo.
+
+### 2026-11-02 — Regresi penuh 33/33 dan peta koneksi berikutnya
+
+- Selesai: regresi penuh pada pratinjau mock (login, 10 modul, 22 alur inti): 33 PASS, 0 FAIL, 0 pageerror. Regresi menemukan B-010 (lembar SPK kosong yang memblokir layar setelah menerbitkan SPK, akibat pemetaan id B-007); diperbaiki dengan alias id dan penjaga `openSheet`.
+- Selesai: inventaris akun cloud hanya-baca: 3 project Supabase (dua aktif berskema ERP berbeda), Vercel team NIJ tanpa project. Opsi koneksi A/B/C tercatat di [[documentation/ENVIRONMENTS]].
+- Berikutnya: keputusan pemilik akun atas opsi A (project Supabase baru) atau B (Docker lokal); lalu T-042, T-011, T-020, T-028, T-044.

@@ -34,3 +34,23 @@ Disalin dari `mni-app/` pada 2026-11-02. Isinya: Vite, `vercel.json`, workflow d
 - Workflow `deploy.yml` men-deploy dari `main` dan PR ke Vercel. Belum ada secret terpasang, jadi belum berjalan.
 
 Bukti: [[screenshots/README]].
+
+## Inventaris akun cloud (dibaca 2026-11-02, hanya metadata)
+
+| Layanan | Temuan | Arti untuk mni-app |
+|---|---|---|
+| GitHub | Repo organisasi `mitranusainternational-cloud/MNI-OS---Operational`, `main` terproteksi | Siap menerima kode |
+| Supabase (org `nurilhamj@gmail.com`) | 3 project: "MNI OS" (aktif, 1 tenant, tabel ERP multi-tenant: tenants, items, BOM, routings), "MNI OS - Operational" (aktif, 80 tabel ERP, 0 baris), "Marketing OS - NIJ" (nonaktif) | Dua project aktif berskema ERP **berbeda** dari schema mni-app (20 tabel `rm`, `fg`, `spk`, …). Jangan dipakai tanpa keputusan |
+| Vercel (team NIJ) | 0 project | Belum ada deployment |
+
+Biaya project Supabase baru tidak bisa saya baca (izin konektor ditolak); periksa di dashboard sebelum membuat. Batas paket gratis biasanya dua project aktif.
+
+### Opsi koneksi berikutnya
+
+| Opsi | Langkah | Kelebihan | Kekurangan |
+|---|---|---|---|
+| A. Project Supabase baru khusus mni-app (dev) | Buat project, terapkan 2 migration, isi `.env.local`, uji T-020/T-028, lalu Vercel preview | Tercepat menuju sistem yang dipakai; tidak butuh Docker; terpisah dari project ERP | Mungkin berbiaya; data dev di cloud |
+| B. Docker lokal | Aktifkan virtualisasi BIOS lalu `supabase start` | Gratis, terkendali | Menunggu tindakan di BIOS; hanya di satu mesin |
+| C. Pakai project yang ada | Terapkan migration ke project ERP | Tanpa project baru | Skema berbeda, risiko merusak; tidak direkomendasikan |
+
+Urutan setelah database ada: terapkan migration, uji login OTP dan adapter di Postgres (T-020, T-021, T-028), sambungkan Vercel ke GitHub (butuh izin aplikasi Vercel pada organisasi GitHub), preview dari `development`, lalu UAT.

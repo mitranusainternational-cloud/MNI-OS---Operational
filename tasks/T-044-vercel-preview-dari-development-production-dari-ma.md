@@ -32,4 +32,6 @@ Bergantung pada: T-041, T-042
 
 ## Catatan
 
+Team Vercel NIJ sudah ada dengan 0 project (2026-11-02). Menghubungkan repo organisasi GitHub butuh izin aplikasi Vercel pada organisasi tersebut; dilakukan pemilik akun.
+
 -

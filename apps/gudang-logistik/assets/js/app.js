@@ -83,7 +83,8 @@ const issues=()=>{const c=calc();return c._iss||(c._iss=dataIssues())};
 const rmLabel=r=>r?`${r.item} ${r.ukuran}`:'(item terhapus)';
 const fgLabel=f=>f?`${f.kategori}${f.type?' '+f.type:''} ${f.ukuran} L${f.panjang} · ${f.finishing} ${f.tebal}`:'(item terhapus)';
 const grade=r=>{const s=(r.item||'').toUpperCase();if(s.includes('SPHC'))return 'SPHC';if(s.includes('SPCC'))return 'SPCC';if(s.includes('304'))return 'SS304';if(s.includes('316'))return 'SS316';if(s.includes('ALU')||s.includes('ALM'))return 'Aluminium';return 'Lainnya'};
-const byId=(c,id)=>S[c].find(x=>x._id===id);
+/* window.__idAlias (opsional, diisi adapter Supabase) memetakan id buatan app ("spk-1003") ke id database (UUID). */
+const byId=(c,id)=>{const k=(window.__idAlias&&window.__idAlias[id])||id;return S[c].find(x=>x._id===k)};
 const spkName=id=>{const s=byId('spk',id);return s?`SPK ${s.no}`:(id||'–')};
 
 /* ---------- derived numbers (recomputed after each change) ---------- */
@@ -2685,7 +2686,7 @@ function sheetCtx(s){
  const lines={};(calc().spk[s._id]?.lines||[]).forEach(l=>{if(!lines[l.d])lines[l.d]=l});const ret=[],rej={};vs.filter(v=>v.status!=='Batal').forEach(v=>{(v.items||[]).forEach(i=>rej[i.d]=(rej[i.d]||0)+(+i.reject||0));vReturns(v).forEach(r=>ret.push({name:v.vendor,date:r.tgl?fdS(r.tgl)+(r.est?'*':''):'-',sort:r.tgl||'9',map:r.items||{}}))});ret.sort((a,b)=>a.sort.localeCompare(b.sort));
  return {lines,ret,rej,vend:vs.filter(v=>v.status!=='Batal').map(v=>({name:v.vendor,date:fdS(v.tgl),map:sum(v.items)})),cust:ks.map(k=>({name:k.noSJ||'',date:fdS(k.tgl),map:sum(k.items)})),tglLong:tglLong(s.tgl),logoB64:LOGO_B64,issued:s.terbitAt?`Diterbitkan via MNI Gudang & Logistik · ${tglLong(s.terbitAt)}`:''};
 }
-function openSheet(id){SHEET=id;closeDrawer();renderSheet();$('#sheet').hidden=false;document.body.style.overflow='hidden'}
+function openSheet(id,tries=0){if(!byId('spk',id)){if(tries<25)setTimeout(()=>openSheet(id,tries+1),120);return} /* B-010: tunggu snapshot SPK baru (maks ±3 dtk); jangan tampilkan lembar kosong yang menutup layar */SHEET=id;closeDrawer();renderSheet();$('#sheet').hidden=false;document.body.style.overflow='hidden'}
 function closeSheet(){SHEET=null;$('#sheet').hidden=true;$('#sheet').innerHTML='';if(!ED)document.body.style.overflow=''}
 function renderSheet(){
  const s0=byId('spk',SHEET);if(!s0){closeSheet();return}const s=spkFull(s0);
