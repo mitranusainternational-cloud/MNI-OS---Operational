@@ -128,6 +128,10 @@ export function createLocalClient() {
         }
       }
       const has = (c) => !cols || cols.includes(c);
+      // Meniru PostgREST: mengurutkan menurut kolom yang tidak ada ditolak (HTTP 400).
+      if (this.ord && cols && !cols.includes(this.ord.col)) {
+        return { data: null, error: { code: '42703', message: `column ${this.t}.${this.ord.col} does not exist` } };
+      }
       if (this.op === 'select') {
         out = rows.filter((r) => this.match(r));
         if (this.ord) {

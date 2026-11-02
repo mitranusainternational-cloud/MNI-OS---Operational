@@ -85,6 +85,7 @@ Kriteria PASS: judul benar, isi tampil, tidak ada `pageerror`. Skrip: `tests/e2e
 | B-007 | Id dokumen app (mis. `spk-1003`) bukan UUID | Kolom `id` di schema UUID; app membuat id string | `toDbId()` memetakan id string ke UUID deterministik; mock kini menolak id non-UUID seperti Postgres | Selesai di adapter. **Perlu diverifikasi pada Postgres nyata (T-028)** |
 | B-008 | Edit SPK dianggap ganti nomor dan membuat baris ganda | `spk.no` TEXT di DB, app membandingkan angka dengan `!==` | Adapter mengubah `no` ke angka saat dibaca dan ke teks saat ditulis | Selesai di adapter; verifikasi nyata di T-028 |
 | B-009 | Dokumen `master/*` (pengaturan) tidak terbaca atau tertulis | Tabel master memakai kolom `key` + `value`, bukan `id` | Adapter memetakan dokumen master ke objek datar berbasis key | Selesai di adapter; verifikasi nyata di T-028 |
+| B-011 | Di Supabase nyata, `master` dan `log` gagal dibaca (HTTP 400) | Adapter selalu mengurutkan menurut `created_at`; tabel `master` hanya punya `updated_at` dan `log` hanya `tgl`. Mock tidak menolak pengurutan kolom yang tidak ada | Adapter memilih kolom urut dari `TABLE_COLS`; mock kini menolak pengurutan kolom tak dikenal | Selesai; terverifikasi: muat halaman di Supabase dev tanpa respons 4xx |
 | B-010 | Setelah menerbitkan SPK muncul lembar kosong layar penuh yang memblokir seluruh UI | App membuka lembar memakai id buatannya ("spk-1003"), yang kini dipetakan ke UUID, jadi `byId` tidak menemukannya; `openSheet` tetap menampilkan overlay | `window.__idAlias` (diisi adapter) dipakai `byId`; `openSheet` menunggu snapshot dan tidak menampilkan lembar kosong | Selesai. Ditemukan lewat uji regresi; regresi dari perbaikan B-007 |
 
 B-001, B-002, dan B-005 berada di kode adapter produksi, bukan hanya mock, sehingga manfaatnya juga berlaku saat memakai Supabase. Pelajaran: kontrak `window.claude` harus dicocokkan dengan pemakaian app (`USER.profiles`, `DLS.save`, bentuk `me()`), bukan dengan dugaan.
@@ -100,6 +101,20 @@ Satu skrip Playwright menjalankan login, 10 modul, dan 22 alur inti pada data be
 - Sisipan SPK dengan `data` JSONB berhasil dibaca balik. Baris uji bernomor `9999` sempat tertinggal karena perintah hapus ditolak; harus dibersihkan sebelum penomoran SPK dipakai (lihat T-029).
 - Regresi mock diperketat: mock kini menolak kolom yang tidak ada (seperti PostgREST) dan id non-UUID; **33 PASS, 0 FAIL** setelah adapter memecah bidang tambahan ke `data`.
 - Belum: uji aplikasi terhadap Supabase dev dengan login OTP nyata (T-029, lalu T-021, T-022, T-028).
+
+### Uji tingkat database pada Supabase dev (meniru JWT, semua di-rollback)
+
+1. **Penulisan bentuk dokumen app** sebagai admin terautentikasi: SPK, mutasi, kirim, vendor, bongkar, master (termasuk kunci `lock:*`), log, rm, fg, mcustomer, marmada, dan opname **12 dari 12 berhasil**; pengguna tidak terdaftar ditolak RLS.
+2. **Matriks hak tulis per role** (role = baris `muser`):
+
+| Role | spk | mutasi | kirim | vendor | bongkar | master (lock/pengaturan) | log | rm | mcustomer |
+|---|---|---|---|---|---|---|---|---|---|
+| admin/manager | ya | ya | ya | ya | ya | ya | ya | ya | ya |
+| gudang | tidak | ya | ya | tidak | ya | **tidak** | ya | ya | tidak |
+| produksi | ya | **tidak** | **tidak** | ya | **tidak** | **tidak** | ya | tidak | tidak |
+| viewer | tidak | tidak | tidak | tidak | tidak | tidak | **ya** | tidak | tidak |
+
+Catatan: ini hasil kebijakan RLS bawaan, belum diselaraskan dengan proses nyata. Kunci dokumen (`master`) tidak dapat ditulis gudang maupun produksi, sehingga penguncian pengeditan diam-diam tidak efektif bagi mereka; viewer masih dapat menulis `log`. Produksi tidak dapat mencatat mutasi, surat jalan, atau bongkar muat. Pencocokan role dengan alur kerja adalah bagian T-022 dan T-036.
 
 ## Belum diuji (jadwal di tracking)
 

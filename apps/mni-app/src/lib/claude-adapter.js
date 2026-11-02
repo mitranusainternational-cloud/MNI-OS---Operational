@@ -170,10 +170,11 @@ function makeCollection(col) {
     onSnapshot(cb, errCb) {
       // Initial load
       const load = async () => {
-        const { data, error } = await supabase
-          .from(table)
-          .select('*')
-          .order('created_at', { ascending: false });
+        // Kolom pengurut berbeda per tabel: master hanya punya updated_at, log hanya punya tgl.
+        const orderCol = ['created_at', 'updated_at', 'tgl'].find((c) => (TABLE_COLS[table] || ['created_at']).includes(c));
+        let q = supabase.from(table).select('*');
+        if (orderCol) q = q.order(orderCol, { ascending: false });
+        const { data, error } = await q;
         if (error) { errCb && errCb(error); return; }
         const docs = (data || []).map((r) => (table === 'master' ? masterToDoc(r) : rowToDoc(numericNo(table, r))));
         // Emulate Firestore snapshot shape

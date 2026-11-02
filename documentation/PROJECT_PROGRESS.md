@@ -236,3 +236,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Bukti: Postgres nyata menolak id non-UUID; sisipan SPK dengan JSONB berhasil. Belum: login OTP nyata dan uji app terhadap Supabase dev (T-029).
 - Risiko: baris uji SPK `9999` tertinggal karena perintah hapus ditolak; harus dibersihkan sebelum SPK dibuat. Temuan RLS vs alur app dicatat di T-022.
 - Berikutnya: email admin awal dari pemilik (T-029), lalu T-021, T-022, T-028, dan Vercel (T-044).
+
+### 2026-11-02 — Admin awal dibuat; uji tingkat database di Supabase dev
+
+- Selesai: admin awal `mitranusainternational@gmail.com` (muser admin + pengguna auth). Server dev ke Supabase berjalan di `http://127.0.0.1:5174/` (`npx vite --mode supabase-dev`). Halaman termuat tanpa respons 4xx setelah perbaikan B-011 (`master`/`log` tidak punya `created_at`).
+- Bukti (database nyata, semua di-rollback): 12/12 penulisan bentuk dokumen app berhasil sebagai admin; pengguna tak terdaftar ditolak; matriks hak tulis per role terhitung ([[TEST_MATRIX]]). Pembacaan anonim ke tabel SPK = 0 baris.
+- Belum: login OTP oleh pemilik (kode di email), hapus baris uji `9999`, dan uji alur lewat aplikasi pada Supabase (T-029, T-021, T-028).
+- Temuan: matriks RLS belum selaras dengan alur app (produksi tidak dapat mencatat mutasi/surat jalan/bongkar; gudang dan produksi tidak dapat menulis kunci di `master`; viewer dapat menulis `log`) — bahan T-022 dan T-036.
