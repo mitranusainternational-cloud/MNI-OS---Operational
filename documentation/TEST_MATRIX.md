@@ -85,7 +85,7 @@ Kriteria PASS: judul benar, isi tampil, tidak ada `pageerror`. Skrip: `tests/e2e
 | B-007 | Id dokumen app (mis. `spk-1003`) bukan UUID | Kolom `id` di schema UUID; app membuat id string | `toDbId()` memetakan id string ke UUID deterministik; mock kini menolak id non-UUID seperti Postgres | Selesai di adapter. **Perlu diverifikasi pada Postgres nyata (T-028)** |
 | B-008 | Edit SPK dianggap ganti nomor dan membuat baris ganda | `spk.no` TEXT di DB, app membandingkan angka dengan `!==` | Adapter mengubah `no` ke angka saat dibaca dan ke teks saat ditulis | Selesai di adapter; verifikasi nyata di T-028 |
 | B-009 | Dokumen `master/*` (pengaturan) tidak terbaca atau tertulis | Tabel master memakai kolom `key` + `value`, bukan `id` | Adapter memetakan dokumen master ke objek datar berbasis key | Selesai di adapter; verifikasi nyata di T-028 |
-| B-013 | Penulisan `log` ke Supabase gagal 16 dari sekitar 24 kali (HTTP 400, `invalid input syntax for type timestamp with time zone: ""`) | Dokumen app memakai `""` untuk "kosong"; Postgres menolak `""` di kolom DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID (mis. `log.tgl`, `spk.due`). Mock tidak menolaknya | `STRICT_COLS` di `schema-columns.js`; adapter menghilangkan nilai kosong saat insert (DEFAULT berlaku) dan mengubahnya ke NULL saat update/set; mock kini menolak `""` seperti Postgres | Selesai di mock (36/36); **perlu diuji ulang di Supabase** |
+| B-013 | Penulisan `log` ke Supabase gagal 16 dari sekitar 24 kali (HTTP 400, `invalid input syntax for type timestamp with time zone: ""`) | Dokumen app memakai `""` untuk "kosong"; Postgres menolak `""` di kolom DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID (mis. `log.tgl`, `spk.due`). Mock tidak menolaknya | `STRICT_COLS` di `schema-columns.js`; adapter menghilangkan nilai kosong saat insert (DEFAULT berlaku) dan mengubahnya ke NULL saat update/set; mock kini menolak `""` seperti Postgres | Selesai; **terverifikasi di Supabase** (2026-11-02 16:05–16:13 UTC): semua `POST log` 201, 34 baris log, 0 `tgl` NULL, tanpa galat Postgres |
 | B-012 | Setelah permintaan kode OTP ditolak (HTTP 429), layar tetap menulis "Cek email Anda" | `signInWithOtp` mengembalikan `{ error }` (tidak melempar) dan tidak diperiksa | Pesan galat ditampilkan (batas email dijelaskan) dan layar kode tidak dibuka; ditambah opsi "Masuk dengan password" sebagai cadangan di Supabase | Selesai; terverifikasi di browser (mode mock menyembunyikan opsi password) |
 | B-011 | Di Supabase nyata, `master` dan `log` gagal dibaca (HTTP 400) | Adapter selalu mengurutkan menurut `created_at`; tabel `master` hanya punya `updated_at` dan `log` hanya `tgl`. Mock tidak menolak pengurutan kolom yang tidak ada | Adapter memilih kolom urut dari `TABLE_COLS`; mock kini menolak pengurutan kolom tak dikenal | Selesai; terverifikasi: muat halaman di Supabase dev tanpa respons 4xx |
 | B-010 | Setelah menerbitkan SPK muncul lembar kosong layar penuh yang memblokir seluruh UI | App membuka lembar memakai id buatannya ("spk-1003"), yang kini dipetakan ke UUID, jadi `byId` tidak menemukannya; `openSheet` tetap menampilkan overlay | `window.__idAlias` (diisi adapter) dipakai `byId`; `openSheet` menunggu snapshot dan tidak menampilkan lembar kosong | Selesai. Ditemukan lewat uji regresi; regresi dari perbaikan B-007 |
@@ -141,6 +141,18 @@ Pemilik menjalankan alur di aplikasi; agen memverifikasi lewat log API dan isi t
 Belum tercakup oleh sesi ini: terima material dan pakai produksi (hanya opname FG yang tercatat di `mutasi`), revisi dan duplikat SPK, ubah dan hapus master, dan opname bahan baku. Dijadwalkan pada skenario U-02, U-03, U-06 di [[UJI_SUPABASE_DEV]].
 
 Catatan data: di tabel dev ada baris dengan nama realistis (mis. nama vendor dan produk); semua tetap data uji dev. Baris SPK `UJI-9999` (batal) ikut dipakai sebagai SPK pada uji vendor; hapus permanen disarankan.
+
+### Ulangan di Supabase dev setelah perbaikan (2026-11-02 16:03–16:13 UTC)
+
+| Skenario | Hasil | Bukti |
+|---|---|---|
+| U-02 terima material | PASS | `mutasi` masuk +7, nomor `RCV/2026/11/001`; supplier baru otomatis di `msupplier`; counter `RCV-202611` |
+| U-03 pakai produksi | PASS | `mutasi` keluar -3 dan -1 (`PK/2026/11/001`) terkait SPK; counter `PK-202611`; pemakaian melebihi stok tidak tercatat di database |
+| U-06 revisi SPK | PASS | Satu baris SPK `1` dengan `rev = 1`, `revisi` berisi alasan "Tambah QTY" (B-008 terbukti di Postgres) |
+| Log aktivitas | PASS (B-013) | Semua `POST log` 201; tidak ada respons 400/406 dan tidak ada galat di log Postgres |
+| Alur lain (produksi, bongkar muat, vendor, surat jalan) | PASS | `PATCH`/`POST` 2xx |
+
+Masih belum dicoba di Supabase: duplikat SPK, SPK tanpa due, ubah/hapus master, opname bahan baku, dan semua alur sebagai role selain admin (hak tulis per role baru terbukti di tingkat SQL).
 
 ## Belum diuji (jadwal di tracking)
 

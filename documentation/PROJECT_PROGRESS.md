@@ -275,3 +275,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Temuan: B-013 — 16 dari sekitar 24 penulisan `log` ditolak karena string kosong pada kolom timestamp; kelas masalah yang sama mengancam `spk.due` kosong dan kolom numerik. Diperbaiki di adapter (`STRICT_COLS`), mock diperketat, regresi mock **36/36**; perlu uji ulang di Supabase. Noise 406 dari `.single()` diganti `maybeSingle()`.
 - Catatan desain: `mutasi.item_id` NULL (item di `data`), kunci lock bertumpuk dan tidak dilepas; dicatat untuk normalisasi data setelah discovery (T-033).
 - Berikutnya: pemilik memuat ulang aplikasi dan mengulang U-02, U-03, U-06 ([[UJI_SUPABASE_DEV]]); agen memverifikasi dan menutup T-021 dan T-028.
+
+### 2026-11-02 — B-013 terverifikasi; terima/pakai material dan revisi SPK lulus di Supabase
+
+- Selesai: ulangan pemilik di aplikasi (16:03–16:13 UTC). Semua `POST log` 201 (34 log, 0 `tgl` NULL), tanpa 400/406 dan tanpa galat Postgres; terima material (+7, `RCV/2026/11/001`), pakai produksi (-3, -1, `PK/2026/11/001`), revisi SPK (`rev = 1`, satu baris, alasan tersimpan), supplier dan counter otomatis tersimpan.
+- Bukti: verified in database + log. T-021 dan T-028 berstatus `review` (sisa: duplikat SPK, pengaturan RM, delete, realtime, role selain admin).
+- Berikutnya (tahap S2): CI GitHub (build + regresi, T-046, T-077), RLS per role vs alur (T-022, T-036), lalu Vercel preview (T-044). Jalur: [[INTEGRATION_PATH]].
