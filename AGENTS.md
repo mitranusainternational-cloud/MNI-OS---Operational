@@ -19,4 +19,8 @@ Workspace ini memisahkan dokumentasi operasional, website, aplikasi, dan pengeta
 - `websites/`: proyek website; buat subfolder terpisah per situs.
 - `research/`: catatan riset yang memiliki sumber dan waktu.
 - `apps/`: kode aplikasi; buat subfolder per aplikasi.
+- `.agents/skills/`: skill lokal yang menjelaskan workflow berulang.
+- `.codex/agents/`: definisi agent spesialis untuk workspace.
 - `Home.md`: indeks navigasi Obsidian.
+
+Untuk riset ERP, gunakan `.agents/skills/erp-process-discovery/SKILL.md` dan agent `.codex/agents/erp-process-analyst.toml`. Agent tersebut bekerja read-only dan memakai sumber aktual yang dapat diakses.
