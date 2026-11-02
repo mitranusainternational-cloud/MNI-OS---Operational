@@ -12,7 +12,7 @@ Roadmap ini mengurutkan **hasil** (bukan tanggal) dari kondisi sekarang sampai s
 
 | Aspek | Kondisi | Bukti |
 |---|---|---|
-| Kode aplikasi | Prototipe vanilla JS (sekitar 3.500 baris `app.js`) memakai 20 koleksi; scaffold `apps/mni-app` (Vite + Supabase + Vercel) memuatnya dan build lolos | [[documentation/ENVIRONMENTS]], [[documentation/DECISIONS]] |
+| Kode aplikasi | Prototipe vanilla JS (sekitar 3.500 baris `app.js`) memakai 20 koleksi; scaffold `apps/platform` (Vite + Supabase + Vercel) memuatnya dan build lolos | [[documentation/ENVIRONMENTS]], [[documentation/DECISIONS]] |
 | Browser | Halaman login dan shell aplikasi termuat tanpa error JS dengan environment dummy | [[documentation/screenshots/README]] |
 | Database | Schema 20 tabel + RLS per role ada sebagai migration; belum pernah dijalankan; Docker belum bisa start (virtualisasi BIOS nonaktif); pratinjau lokal berjalan di mode mock | [[documentation/FOUNDATION_BASELINE]] |
 | Data | Enam workbook operasional dibaca read-only; saldo antar file belum direkonsiliasi | [[documentation/DATA_SOURCE_CATALOG]] |
@@ -86,7 +86,7 @@ v0.9 Fondasi ──► v1.0 Pilot go-live ──► v1.1 Stabilisasi ──► v
 
 | Gerbang | Pertanyaan | Pemilik | Tugas | Dicatat di |
 |---|---|---|---|---|
-| G1 Basis aplikasi | Apakah `apps/mni-app` jalur produksi? | Pemilik proyek | T-031, T-033 | [[documentation/DECISIONS]] |
+| G1 Basis aplikasi | Apakah `apps/platform` jalur produksi? | Pemilik proyek | T-031, T-033 | [[documentation/DECISIONS]] |
 | G2 Pilot | Alur mana, kriteria terima apa? | Process owner | T-031 | [[documentation/OPERATIONAL_DISCOVERY]] |
 | G3 Data | Sumber resmi, cut-off, siapa pemiliknya? | Owner data | T-032, T-035 | [[documentation/DATA_SOURCE_CATALOG]] |
 | G4 Rilis | Siap ke production? | Pemilik proyek | T-064 | [[documentation/RELEASE_CHECKLIST]] |
@@ -96,7 +96,7 @@ v0.9 Fondasi ──► v1.0 Pilot go-live ──► v1.1 Stabilisasi ──► v
 ## 6. Asumsi dan hipotesis (belum terbukti)
 
 - Schema `mni-app` cukup untuk pilot (diturunkan dari kode prototipe, belum dari proses nyata).
-- Vercel cocok sebagai hosting; alternatif VPS Docker tersedia di `apps/mni-app`.
+- Vercel cocok sebagai hosting; alternatif VPS Docker tersedia di `apps/platform`.
 - Integrasi workbook perlu otomatis (E-11) dan lewat Composio (T-121); bisa berubah.
 - Multi-site dan offline (E-14) dibutuhkan; belum ada bukti.
 - Estimasi effort indikatif; belum ada kecepatan historis.

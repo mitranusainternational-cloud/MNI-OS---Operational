@@ -27,7 +27,7 @@ Fase: P1 Fondasi lokal
 
 ## Bukti
 
-- Keputusan di [[documentation/DECISIONS]] (2026-11-02). Skrip: `apps/mni-app/scripts/extract-app.js`.
+- Keputusan di [[documentation/DECISIONS]] (2026-11-02). Skrip: `apps/platform/scripts/extract-app.js`.
 - Verified in browser: `npm run extract`, `vite build`, muat di `127.0.0.1:5176` tanpa error console; `window.claude` ada, nav 15 item. Auth/DB belum diuji.
 
 ## Catatan

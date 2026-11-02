@@ -34,4 +34,4 @@ Bergantung pada: T-022
 
 **Selesai dengan jalur lain (2026-11-02):** migration 6 (`20240101000006_role_model_supersede.sql`, ALTER POLICY tanpa DROP) dipasang lewat konektor dan menutup tujuan tugas. Migration 5 (DROP) tidak perlu dijalankan; opsional hanya untuk merapikan policy ganda.
 
-**Blocked:** butuh persetujuan/eksekusi pemilik. Tempel isi `apps/mni-app/supabase/migrations/20240101000005_role_model_cleanup.sql` ke SQL Editor project "MNI Gudang - Dev" lalu Run. Sebelum itu pastikan semua akun yang dipakai memiliki role aplikasi (admin, ppic, gbb, gbj, logistik, viewer).
+**Blocked:** butuh persetujuan/eksekusi pemilik. Tempel isi `apps/platform/supabase/migrations/20240101000005_role_model_cleanup.sql` ke SQL Editor project "MNI Gudang - Dev" lalu Run. Sebelum itu pastikan semua akun yang dipakai memiliki role aplikasi (admin, ppic, gbb, gbj, logistik, viewer).

@@ -26,7 +26,7 @@ Go-live (T-065) hanya boleh terjadi bila semua ini benar dan ada buktinya:
 
 | Topik | Usulan | Alasan | Risiko |
 |---|---|---|---|
-| Basis aplikasi | Pakai `apps/mni-app` (Vite + Supabase) sebagai jalur menuju produksi; `apps/gudang-logistik` tetap prototipe dan reference | mni-app sudah punya 20 tabel, RLS per role, Auth OTP, adapter, dan alur deploy | Schema berasal dari kode prototipe, bukan dari discovery. Tetap perlu validasi pilot (T-030, T-031) sebelum data nyata |
+| Basis aplikasi | Pakai `apps/platform` (Vite + Supabase) sebagai jalur menuju produksi; `apps/gudang-logistik` tetap prototipe dan reference | mni-app sudah punya 20 tabel, RLS per role, Auth OTP, adapter, dan alur deploy | Schema berasal dari kode prototipe, bukan dari discovery. Tetap perlu validasi pilot (T-030, T-031) sebelum data nyata |
 | Hosting | Vercel (preview dari `development`, production dari `main`) | Sudah ada `vercel.json` dan workflow | Alternatif VPS Docker tersedia di mni-app bila Vercel tidak cocok |
 | Database | Dua project Supabase terpisah (dev dan prod) | Branch Git tidak memisahkan data | Biaya dan manajemen secret |
 | Rilis | PR `development` → `main`, review wajib | Mencegah perubahan langsung ke versi pengguna | Perlu disiplin proses |

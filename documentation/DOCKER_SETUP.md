@@ -84,7 +84,7 @@ lalu `wsl --shutdown` dan buka Docker Desktop lagi.
 
 ## Langkah 4 — Jalankan Supabase lokal (bisa dikerjakan agent setelah Docker hidup)
 
-Dari `apps/mni-app` (di PowerShell yang memblokir skrip, pakai `npx.cmd`):
+Dari `apps/platform` (di PowerShell yang memblokir skrip, pakai `npx.cmd`):
 
 ```powershell
 npx.cmd supabase start

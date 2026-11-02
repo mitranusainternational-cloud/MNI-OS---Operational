@@ -22,7 +22,7 @@ Branch hanya memisahkan riwayat kode. Sebelum data nyata dipakai, setiap versi p
 2. Secret per environment di Vercel/GitHub (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`). Service-role key tidak boleh masuk client.
 3. Promosi `development` -> `main` lewat PR dan [[RELEASE_CHECKLIST]].
 
-## Aplikasi `apps/mni-app` (scaffold Vite + Supabase)
+## Aplikasi `apps/platform` (scaffold Vite + Supabase)
 
 Disalin dari `mni-app/` pada 2026-11-02. Isinya: Vite, `vercel.json`, workflow deploy, docker-compose VPS, dan 2 migration (20 tabel). Status verifikasi:
 
@@ -63,7 +63,7 @@ Urutan setelah database ada: terapkan migration, uji login OTP dan adapter di Po
 | URL | `https://inldyqigewmziwazalun.supabase.co` (bukan rahasia) |
 | Migration terpasang | init_schema, rls_policies, app_shape_compat, role_model_app_aligned (tabel `role_modules`, fungsi `can_mod`/`can_any`/`is_admin`, policy `_v2`). role_model_supersede (ALTER POLICY: policy lama = model baru). role_model_cleanup (DROP) opsional, tidak dipasang |
 | Kunci di aplikasi | hanya kunci anon/publishable (publik); kunci service-role tidak dipakai di mana pun |
-| Menjalankan app ke project ini | file lokal `apps/mni-app/.env.supabase-dev.local` (diabaikan Git), lalu `npx vite --mode supabase-dev` |
+| Menjalankan app ke project ini | file lokal `apps/platform/.env.supabase-dev.local` (diabaikan Git), lalu `npx vite --mode supabase-dev` |
 | Perubahan akun | project `MNI OS - Operational` (kosong) dijeda agar muat di batas gratis; dapat dipulihkan dari dashboard |
 | User admin awal | `mitranusainternational@gmail.com` (login password berhasil 2026-11-02; ganti password sementara) |
 | Belum ada | data, Vercel, CI |

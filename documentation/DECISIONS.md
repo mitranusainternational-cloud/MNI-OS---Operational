@@ -6,6 +6,12 @@ updated: 2026-11-02
 
 # Log keputusan workspace
 
+## 2026-11-03 — Struktur folder dibersihkan: satu kanonik, sisanya arsip
+
+- **Konteks:** tiga folder bernama mirip (`mni-app`, `MNI OS - Dept. Operasional`, `MNI OS - Dept. Operational`) dan `apps/mni-app` di dalam repo membuat rancu mana yang aktif; Obsidian sempat membuka folder yang salah.
+- **Keputusan:** `mni-os/` satu-satunya folder kerja (repo + vault). `apps/mni-app` diganti nama menjadi `apps/platform` (semua rujukan diperbarui). Folder lama dipindah ke `_Arsip/` di induk, tanpa dihapus.
+- **Konsekuensi:** perintah dan dokumen memakai `apps/platform`; dev server dijalankan dari sana. Regresi 36 dan role 12 lulus dari lokasi baru.
+
 ## 2026-11-02 — Policy lama diganti isinya (ALTER), role ditegakkan di UI lewat peran dari backend
 
 - **Konteks:** migration 5 (DROP POLICY) ditolak persetujuan SQL, sedangkan policy lama masih memberi hak pada role lama dan viewer dapat menulis log.
@@ -29,7 +35,7 @@ updated: 2026-11-02
 
 ## 2026-11-02 — Sumber kebenaran UI untuk build mni-app (T-014)
 
-- **Konteks:** `apps/mni-app` mengekstrak UI ke `public/app.*` dan semula meminta `mni-gudang.html` yang tidak ada. Dua kandidat sumber: `apps/gudang-logistik/reference/*.html` (salinan HTML lama) dan `apps/gudang-logistik/{index.html,assets/}` (sumber aktif).
+- **Konteks:** `apps/platform` mengekstrak UI ke `public/app.*` dan semula meminta `mni-gudang.html` yang tidak ada. Dua kandidat sumber: `apps/gudang-logistik/reference/*.html` (salinan HTML lama) dan `apps/gudang-logistik/{index.html,assets/}` (sumber aktif).
 - **Bukti (source-level):** setelah whitespace dinormalisasi, JS reference 224.784 karakter vs sumber aktif 369.415; reference hanya memakai 15 dari 20 koleksi di schema `mni-app` (tidak ada `mwc`, `log`, `uinv`, `muser`, `ureq`), sumber aktif memakai ke-20-nya.
 - **Keputusan:** sumber kebenaran UI = `apps/gudang-logistik/` (index.html, assets/css/app.css, assets/js/app.js). `reference/` hanya arsip pembanding dan tidak dipakai build. `scripts/extract-app.js` memakai sumber itu secara default; `--source` dan `--input` tetap tersedia.
 - **Alasan:** hanya sumber aktif yang sesuai dengan schema 20 tabel; perubahan UI dikerjakan di satu tempat; extract reproducible tanpa file di luar repo.

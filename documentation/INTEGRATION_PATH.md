@@ -40,7 +40,7 @@ Prinsip: satu skrip impor yang sama untuk dev dan prod, selalu dry-run dulu, lap
 ## 3. Penyesuaian dari urutan awal dan alasannya
 
 1. **CI sebelum Vercel.** GitHub bukan sekadar tempat kode: pasang CI (build + regresi) dan jadikan syarat merge sebelum Vercel menayangkan apa pun. Dengan begitu preview dan production hanya berasal dari kode yang lulus uji.
-2. **VPS bukan langkah otomatis setelah Vercel.** Untuk 5 sampai 20 pengguna awal, Supabase cloud + Vercel lebih cepat dan lebih murah dirawat. VPS dipertimbangkan setelah stabil dan hanya bila ada alasan terukur (bagian 4). Docker-compose self-host yang ada di `apps/mni-app` belum lengkap (tanpa backup, monitoring, SMTP, Studio) sehingga akan menambah beban perawatan bila dimajukan.
+2. **VPS bukan langkah otomatis setelah Vercel.** Untuk 5 sampai 20 pengguna awal, Supabase cloud + Vercel lebih cepat dan lebih murah dirawat. VPS dipertimbangkan setelah stabil dan hanya bila ada alasan terukur (bagian 4). Docker-compose self-host yang ada di `apps/platform` belum lengkap (tanpa backup, monitoring, SMTP, Studio) sehingga akan menambah beban perawatan bila dimajukan.
 3. **Supabase prod terpisah sejak awal** dan migration lewat berkas di repo, bukan perubahan manual, agar dev dan prod dapat direproduksi.
 
 ## 4. Kapan VPS (S6) dipakai

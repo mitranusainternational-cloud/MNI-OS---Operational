@@ -10,8 +10,8 @@ Project dev: `MNI Gudang - Dev`, ref `inldyqigewmziwazalun`, region ap-southeast
 ## Aturan keras
 
 - Hanya kunci anon/publishable di aplikasi. **Jangan** meminta, mencetak, atau menyimpan kunci service-role atau password.
-- Perubahan schema = file migration baru di `apps/mni-app/supabase/migrations/` **lalu** `apply_migration`. Jangan mengubah migration yang sudah terpasang. Satu migration per panggilan (panggilan bersamaan bertabrakan versi).
-- Setelah mengubah kolom tabel, buat ulang `apps/mni-app/src/lib/schema-columns.js` (daftar kolom dipakai adapter dan mock) dan jalankan skill `e2e-regression`.
+- Perubahan schema = file migration baru di `apps/platform/supabase/migrations/` **lalu** `apply_migration`. Jangan mengubah migration yang sudah terpasang. Satu migration per panggilan (panggilan bersamaan bertabrakan versi).
+- Setelah mengubah kolom tabel, buat ulang `apps/platform/src/lib/schema-columns.js` (daftar kolom dipakai adapter dan mock) dan jalankan skill `e2e-regression`.
 - Pernyataan merusak (`delete`, `drop`, `truncate`) dapat ditolak oleh persetujuan SQL; jangan mengakalinya. Minta pemilik menjalankannya di SQL Editor dan beri SQL persisnya.
 - Jangan mengirim email ke alamat pihak ketiga. Login OTP hanya untuk pemilik akun; kodenya tidak dapat dibaca agen.
 

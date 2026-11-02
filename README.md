@@ -28,10 +28,10 @@ Rincian alur dan batas tiap environment ada di [`documentation/VERSION_STRATEGY.
 ├── .claude/                        # Skill dan agen proyek (Claude Code)
 ├── .agents/skills/                 # Skill lokal (Codex)
 ├── scripts/                        # progress-report.mjs (snapshot progress)
-├── .codex/agents/                  # Definisi agen (Codex)t
+├── .codex/agents/                  # Definisi agen (Codex)
 └── apps/
     ├── gudang-logistik/            # Prototipe HTML/CSS/JS + reference + docs
-    └── mni-app/                    # Scaffold Vite + Supabase + Vercel/VPS (lihat documentation/ENVIRONMENTS.md)
+    └── platform/                   # Platform: Vite + adapter Supabase + migration + tes E2E + Vercel/VPS
 ```
 
 ## Mulai bekerja

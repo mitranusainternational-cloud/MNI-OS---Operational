@@ -9,7 +9,7 @@ VPS **bukan tahap berikutnya otomatis**. Production awal memakai Supabase cloud 
 
 ## Yang sudah ada
 
-`apps/mni-app/docker-compose.yml` menjalankan Nginx + Kong + GoTrue (auth) + PostgREST + Realtime + Postgres + Storage; `nginx/nginx.conf` melayani SPA dan proxy `/api/`. Belum ada: Studio, pg-meta, edge functions, backup terjadwal, monitoring, SMTP, pembaruan keamanan, dan `.env.vps.example` (tidak ter-commit karena aturan `.gitignore`).
+`apps/platform/docker-compose.yml` menjalankan Nginx + Kong + GoTrue (auth) + PostgREST + Realtime + Postgres + Storage; `nginx/nginx.conf` melayani SPA dan proxy `/api/`. Belum ada: Studio, pg-meta, edge functions, backup terjadwal, monitoring, SMTP, pembaruan keamanan, dan `.env.vps.example` (tidak ter-commit karena aturan `.gitignore`).
 
 ## Kapan VPS masuk akal (butuh minimal satu alasan terukur)
 

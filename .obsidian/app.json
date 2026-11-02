@@ -7,5 +7,10 @@
   "newFileLocation": "folder",
   "newFileFolderPath": "documentation",
   "attachmentFolderPath": "documentation/screenshots",
-  "userIgnoreFilters": ["node_modules/", "apps/mni-app/dist/", "apps/mni-app/test-results/", "apps/mni-app/public/"]
+  "userIgnoreFilters": [
+    "node_modules/",
+    "apps/platform/dist/",
+    "apps/platform/test-results/",
+    "apps/platform/public/"
+  ]
 }

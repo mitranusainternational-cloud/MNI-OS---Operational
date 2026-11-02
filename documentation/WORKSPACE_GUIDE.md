@@ -23,7 +23,7 @@ Buka folder repository ini sebagai Obsidian vault. Gunakan [[Home|Home]] untuk m
 | Roadmap produk dan epic | `roadmap/` |
 | Dashboard dan tampilan Bases | `documentation/dashboards/` |
 | Skrip pemeliharaan vault | `scripts/` (`progress-report.mjs`, `check-vault.mjs`) |
-| Scaffold aplikasi berbasis Supabase/Vercel | `apps/mni-app/` |
+| Scaffold aplikasi berbasis Supabase/Vercel | `apps/platform/` |
 | Progress, rencana, keputusan, dan template | `documentation/` |
 | Riset bertanggal dan sumber | `research/` |
 | Website selain aplikasi gudang/logistik | Satu folder per situs di `websites/` |

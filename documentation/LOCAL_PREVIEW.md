@@ -11,13 +11,13 @@ Cara menjalankan dan mencoba aplikasi di mesin sendiri **tanpa Docker dan tanpa 
 ## Menjalankan
 
 ```bash
-cd apps/mni-app
+cd apps/platform
 npm ci
 npm run extract
 npx vite --host 127.0.0.1 --port 5173 --no-open
 ```
 
-Di PowerShell yang memblokir skrip (`npx.ps1 cannot be loaded`), pakai `npx.cmd` sebagai ganti `npx`. Buka `http://127.0.0.1:5173/`. File `apps/mni-app/.env.local` (diabaikan Git) berisi `VITE_LOCAL_MOCK=1`; salin dari `.env.example` bila belum ada.
+Di PowerShell yang memblokir skrip (`npx.ps1 cannot be loaded`), pakai `npx.cmd` sebagai ganti `npx`. Buka `http://127.0.0.1:5173/`. File `apps/platform/.env.local` (diabaikan Git) berisi `VITE_LOCAL_MOCK=1`; salin dari `.env.example` bila belum ada.
 
 ## Login lokal
 

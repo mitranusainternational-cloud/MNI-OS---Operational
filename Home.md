@@ -40,7 +40,7 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 | Membaca keputusan dan alasannya | [[documentation/DECISIONS]] |
 | Menyiapkan sesi dengan tim Operasional | [[documentation/DISCOVERY_AGENDA]] |
 | Memahami tiga versi (Development, Main, Docs) | [[documentation/ENVIRONMENTS]] dan [[documentation/VERSION_STRATEGY]] |
-| Menjalankan dan mengembangkan aplikasi | [[apps/gudang-logistik/docs/DEVELOPMENT]] dan `apps/mni-app/README.md` |
+| Menjalankan dan mengembangkan aplikasi | [[apps/gudang-logistik/docs/DEVELOPMENT]] dan `apps/platform/README.md` |
 | Mempelajari cara memakai aplikasi | [[apps/gudang-logistik/docs/USER_GUIDE]] |
 | Melihat bukti (screenshot) | [[documentation/screenshots/README]] |
 | Merilis ke pengguna | [[documentation/RELEASE_CHECKLIST]] |
@@ -56,7 +56,7 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 | `documentation/` | Rencana, progress, keputusan, panduan, template, screenshot, dashboard | Tangan; `PROGRESS_SNAPSHOT` dan `VAULT_HEALTH` oleh skrip |
 | `research/` | Riset bertanggal dengan sumber | Tangan |
 | `apps/gudang-logistik/` | Sumber UI aktif (HTML/CSS/JS) dan dokumen aplikasi | Tangan |
-| `apps/mni-app/` | Scaffold Vite + Supabase + deploy | Tangan |
+| `apps/platform/` | Scaffold Vite + Supabase + deploy | Tangan |
 | `websites/` | Situs lain dan situs Docs (rencana) | Tangan |
 | `data/` | Hanya README; workbook privat `data/private-sources/` diabaikan Git | Lokal |
 | `scripts/` | `sync-vault.mjs` (jalankan ini), `progress-report.mjs`, `check-vault.mjs` | Tangan |

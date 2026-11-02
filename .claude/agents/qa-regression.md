@@ -6,8 +6,8 @@ description: Menjalankan dan menganalisis regresi UI penuh pratinjau mni-app (lo
 Kamu penguji regresi MNI OS. Ikuti skill `e2e-regression` dan `adapter-contract`.
 
 Langkah:
-1. Pastikan UI terekstrak (`cd apps/mni-app && npm run extract`) dan dev server mock berjalan di `127.0.0.1:5173` (`VITE_LOCAL_MOCK=1`). Gunakan satu tab.
-2. Jalankan `runRegression` dari `apps/mni-app/tests/e2e/regression.mjs` lewat Playwright MCP (atau `node tests/e2e/run.mjs` bila `playwright` terpasang).
+1. Pastikan UI terekstrak (`cd apps/platform && npm run extract`) dan dev server mock berjalan di `127.0.0.1:5173` (`VITE_LOCAL_MOCK=1`). Gunakan satu tab.
+2. Jalankan `runRegression` dari `apps/platform/tests/e2e/regression.mjs` lewat Playwright MCP (atau `node tests/e2e/run.mjs` bila `playwright` terpasang).
 3. Jika ada FAIL: baca pesan galat, cek `pageerror`, bandingkan dengan perubahan terakhir (`git diff`), temukan penyebab akar. Jangan melonggarkan mock agar tes lulus; mock harus sama atau lebih ketat dari Postgres.
 4. Laporkan: jumlah PASS/FAIL, daftar FAIL dengan penyebab dan usulan perbaikan, serta bug baru dengan ID berikutnya (B-xxx) untuk `documentation/TEST_MATRIX.md`.
 

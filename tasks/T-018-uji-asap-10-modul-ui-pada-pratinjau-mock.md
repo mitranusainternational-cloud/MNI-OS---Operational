@@ -28,7 +28,7 @@ Bergantung pada: T-016
 
 ## Bukti
 
-- Verified in browser (2026-11-02): 10/10 PASS, 0 pageerror. Rincian: [[TEST_MATRIX]]. Skrip: `apps/mni-app/tests/e2e/modules.mjs`.
+- Verified in browser (2026-11-02): 10/10 PASS, 0 pageerror. Rincian: [[TEST_MATRIX]]. Skrip: `apps/platform/tests/e2e/modules.mjs`.
 
 ## Catatan
 

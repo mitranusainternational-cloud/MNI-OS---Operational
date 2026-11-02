@@ -74,9 +74,9 @@ Checklist ini menjelaskan urutan kerja antar-tools. Status hanya dicentang jika 
 ## Versi dan deploy
 
 - [x] Branch `versi-awal`, `development`, `main`, `docs` ada di GitHub; panduan di [[ENVIRONMENTS]].
-- [x] Scaffold `apps/mni-app` masuk vault; build berhasil.
-- [x] Perbaiki error runtime `app.js` pada `apps/mni-app` (bootstrap CSS/body/JS di `index.html`).
-- [ ] Uji login OTP dan alur data `apps/mni-app` terhadap Supabase dev nyata.
+- [x] Scaffold `apps/platform` masuk vault; build berhasil.
+- [x] Perbaiki error runtime `app.js` pada `apps/platform` (bootstrap CSS/body/JS di `index.html`).
+- [ ] Uji login OTP dan alur data `apps/platform` terhadap Supabase dev nyata.
 - [ ] Buat Supabase dev dan prod terpisah; pasang secret per environment.
 - [ ] Buat project Vercel (preview dari development, production dari main).
 - [ ] Pilih generator situs docs dan publikasikan dari branch `docs`.

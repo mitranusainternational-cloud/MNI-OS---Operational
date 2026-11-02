@@ -28,7 +28,7 @@ Bergantung pada: T-023
 
 ## Bukti
 
-- Berkas `apps/mni-app/tests/e2e/regression.mjs` dan `run.mjs` dibuat dari skenario yang lolos 33/33 lewat Playwright MCP (2026-11-02). Belum dijalankan sebagai runner mandiri dan belum ada devDependency.
+- Berkas `apps/platform/tests/e2e/regression.mjs` dan `run.mjs` dibuat dari skenario yang lolos 33/33 lewat Playwright MCP (2026-11-02). Belum dijalankan sebagai runner mandiri dan belum ada devDependency.
 
 ## Catatan
 

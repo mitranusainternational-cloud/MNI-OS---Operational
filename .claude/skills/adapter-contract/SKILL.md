@@ -1,6 +1,6 @@
 ---
 name: adapter-contract
-description: Aturan untuk mengubah jembatan data app (apps/mni-app/src/lib/claude-adapter.js, local-supabase.js, schema-columns.js) dan UI aktif apps/gudang-logistik. Gunakan sebelum mengedit file tersebut atau saat menambah tabel/kolom.
+description: Aturan untuk mengubah jembatan data app (apps/platform/src/lib/claude-adapter.js, local-supabase.js, schema-columns.js) dan UI aktif apps/gudang-logistik. Gunakan sebelum mengedit file tersebut atau saat menambah tabel/kolom.
 ---
 
 # Kontrak adapter dan sumber UI
@@ -8,7 +8,7 @@ description: Aturan untuk mengubah jembatan data app (apps/mni-app/src/lib/claud
 ## Sumber kebenaran
 
 - UI aktif: `apps/gudang-logistik/` (`index.html`, `assets/css/app.css`, `assets/js/app.js`). `apps/gudang-logistik/reference/` hanya arsip.
-- `apps/mni-app` memuat UI itu lewat `npm run extract` (menulis `public/app.*`, diabaikan Git). Mengubah `gudang-logistik` berarti mengubah mni-app: uji keduanya.
+- `apps/platform` memuat UI itu lewat `npm run extract` (menulis `public/app.*`, diabaikan Git). Mengubah `gudang-logistik` berarti mengubah mni-app: uji keduanya.
 - Keputusan: `documentation/DECISIONS.md` (2026-11-02).
 
 ## Kontrak `window.claude` yang dipakai app (jangan ditebak)

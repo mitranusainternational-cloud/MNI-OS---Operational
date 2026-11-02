@@ -92,7 +92,7 @@ for (const note of notes) {
   }
 }
 
-const skipOrphan = (n) => /(^|\/)README\.md$/.test(n) || n.startsWith('tasks/') || n.startsWith('.agents/') || n.startsWith('.claude/') || n === 'CLAUDE.md' || n.startsWith('apps/mni-app/') || n.startsWith('documentation/templates/') || n === 'Home.md' || n === 'AGENTS.md';
+const skipOrphan = (n) => /(^|\/)README\.md$/.test(n) || n.startsWith('tasks/') || n.startsWith('.agents/') || n.startsWith('.claude/') || n === 'CLAUDE.md' || n.startsWith('apps/platform/') || n.startsWith('documentation/templates/') || n === 'Home.md' || n === 'AGENTS.md';
 const orphans = [...inbound].filter(([n, c]) => c === 0 && !skipOrphan(n)).map(([n]) => n);
 
 const section = (title, list) => `## ${title} (${list.length})\n\n${list.length ? list.map((x) => `- ${x}`).join('\n') : '- Tidak ada'}\n`;

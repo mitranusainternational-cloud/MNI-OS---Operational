@@ -141,7 +141,7 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ### 2026-11-02 — Integrasi scaffold mni-app dan tiga versi
 
-- Selesai: salin `mni-app` ke `apps/mni-app` (tanpa `node_modules`/`.env`); `npm ci` dan `vite build` berhasil.
+- Selesai: salin `mni-app` ke `apps/platform` (tanpa `node_modules`/`.env`); `npm ci` dan `vite build` berhasil.
 - Selesai: [[ENVIRONMENTS|panduan tiga versi]] (Development, Main, Docs). Branch sudah ada di GitHub; deploy dan database terpisah belum dibuat.
 - Temuan: dev server memuat halaman login, tetapi `app.js` error saat load (lihat [[ENVIRONMENTS]]). Screenshot: [[screenshots/README]].
 - Hambatan: `mni-gudang.html` asli tidak ada; extract dicoba dari file reference.
@@ -149,7 +149,7 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ### 2026-11-02 — Perbaikan bootstrap mni-app
 
-- Selesai: `apps/mni-app/index.html` kini memuat `app.css`, menyisipkan `app-body.html`, lalu memuat `app.js`. Error `addEventListener` hilang.
+- Selesai: `apps/platform/index.html` kini memuat `app.css`, menyisipkan `app-body.html`, lalu memuat `app.js`. Error `addEventListener` hilang.
 - Bukti: browser (Playwright) di `127.0.0.1:5175`; screenshot [[screenshots/README]]. Sisa error console hanyalah akses ke Supabase dummy.
 - Belum diverifikasi: login OTP, data nyata, RLS, tampilan setelah login. `public/app.*` dihasilkan `npm run extract` dan di-ignore Git.
 
@@ -208,7 +208,7 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 - Selesai: uji asap 10 modul (10/10 PASS) dan 14 fitur inti (CRUD bahan baku/barang jadi/SPK/vendor/surat jalan/bongkar muat/master, validasi stok, ekspor CSV 9 modul). Matriks, bug, dan bukti: [[TEST_MATRIX]]. Tugas: T-018, T-019 selesai; T-026 (fitur belum tercakup) dijadwalkan.
 - Bug diperbaiki: `USER.profiles` hilang, identitas pengguna tidak muncul setelah login, seed tidak sesuai bentuk data app, ekspor CSV/XLSX/PDF gagal karena `DLS.save` belum ada. B-001, B-002, dan B-005 berada di kode produksi.
-- Bukti: verified in browser (mock, data sintetis), 0 pageerror. Skrip: `apps/mni-app/tests/e2e/modules.mjs`, `flows.mjs` (flows belum dijalankan sebagai berkas mandiri).
+- Bukti: verified in browser (mock, data sintetis), 0 pageerror. Skrip: `apps/platform/tests/e2e/modules.mjs`, `flows.mjs` (flows belum dijalankan sebagai berkas mandiri).
 - Belum: Supabase nyata, login OTP nyata, RLS, realtime, XLSX/PDF, opname, edit/hapus. Menunggu Docker (T-010) dan T-026.
 
 ### 2026-11-02 — T-026 selesai: 30 fitur diuji, 4 bug tambahan
@@ -252,7 +252,7 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ### 2026-11-02 — Jalur integrasi, agen, dan skill proyek
 
-- Selesai: [[INTEGRATION_PATH]] (tahap S0 sampai S6 dengan gerbang, aliran data, matriks environment, kriteria VPS), 7 skill dan 6 agen di `.claude/`, `CLAUDE.md`, regresi E2E tersimpan di `apps/mni-app/tests/e2e/`, epic E-15 (VPS) dan tugas T-075, T-076, T-077, T-160, T-161.
+- Selesai: [[INTEGRATION_PATH]] (tahap S0 sampai S6 dengan gerbang, aliran data, matriks environment, kriteria VPS), 7 skill dan 6 agen di `.claude/`, `CLAUDE.md`, regresi E2E tersimpan di `apps/platform/tests/e2e/`, epic E-15 (VPS) dan tugas T-075, T-076, T-077, T-160, T-161.
 - Rekomendasi: urutan lokal → Supabase dev → GitHub CI → Vercel preview → UAT → production dipakai; CI dipasang sebelum Vercel; VPS menjadi opsi S6 dengan kriteria terukur (mulai dari layanan pendamping), bukan langkah otomatis.
 - Bukti: source-level; agen dan skill belum dipanggil satu per satu. Regresi mock 33/33 (sebelumnya) tetap rujukan.
 - Berikutnya: login nyata dan uji Supabase (T-029), lalu CI (T-046, T-077) dan Vercel preview (T-044).
@@ -298,7 +298,7 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ### 2026-11-03 — Uji final di mock dengan Playwright (runner terpasang)
 
-- `playwright` terpasang sebagai devDependency di `apps/mni-app` (cara pasang diperiksa di dokumentasi resmi lewat Context7: `npm i playwright`, `npx playwright install chromium`, tambahkan `--with-deps` di CI Linux). `tests/e2e/run.mjs` kini menjalankan regresi dan uji role.
+- `playwright` terpasang sebagai devDependency di `apps/platform` (cara pasang diperiksa di dokumentasi resmi lewat Context7: `npm i playwright`, `npx playwright install chromium`, tambahkan `--with-deps` di CI Linux). `tests/e2e/run.mjs` kini menjalankan regresi dan uji role.
 - Hasil, dua kali berturut-turut: regresi 36 PASS, 0 FAIL; role 12 PASS, 0 FAIL. Satu kegagalan sementara pada R-05 (jeda tulis) diperbaiki dengan menambah waktu tunggu di `roles.mjs`; tiga ulangan lain bersih.
 - Belum: uji aplikasi di Supabase dengan akun per role (T-079, butuh akun dari pemilik) dan workflow CI (T-046).
 
@@ -306,3 +306,8 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 - Vault terdaftar dan terbuka. `.obsidian`: plugin inti (Bases, Properties, Templates, Bookmarks, Graph), folder template `documentation/templates`, lampiran ke `documentation/screenshots`, bookmark ke Home, Progress, Tugas, Epic, Roadmap, Log progres, Matriks uji, Keputusan, Kesehatan vault, graph berwarna per folder.
 - `Home.md` diperbarui sesuai kondisi nyata (Supabase dev, RLS per role, uji Playwright, langkah berikutnya CI).
+
+### 2026-11-03 — Rapikan struktur project
+
+- `apps/mni-app` menjadi `apps/platform`; 55 rujukan di 30 berkas diperbarui; peta folder induk ditulis ulang. Folder lama dipindah ke `_Arsip/`.
+- Uji dari lokasi baru: sync vault OK (0 tautan rusak), regresi 36 PASS, role 12 PASS, server Supabase dev 200.
