@@ -19,11 +19,13 @@ Rincian alur dan batas tiap environment ada di [`documentation/VERSION_STRATEGY.
 .
 ├── Home.md                         # Halaman awal vault Obsidian
 ├── AGENTS.md                       # Cara Codex bekerja di workspace ini
+├── tasks/                          # Satu catatan per tugas (sumber status progress)
 ├── documentation/                  # Progress, roadmap, panduan, screenshot, template
 ├── websites/                       # Website lain dan situs dokumentasi
 ├── research/                       # Riset bertanggal dan penerapan ke data MNI
 ├── data/                           # README saja; workbook privat di data/private-sources/ (diabaikan Git)
 ├── .agents/skills/                 # Skill lokal
+├── scripts/                        # progress-report.mjs (snapshot progress)
 ├── .codex/agents/                  # Definisi agent
 └── apps/
     ├── gudang-logistik/            # Prototipe HTML/CSS/JS + reference + docs

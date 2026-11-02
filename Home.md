@@ -26,6 +26,9 @@ updated: 2026-11-02
 
 ## Fokus sekarang
 
+- [[documentation/PROGRESS_DASHBOARD|Dashboard progress]] — status semua tugas (sumber: folder `tasks/`), blocker, dan jalur kritis; snapshot di [[documentation/PROGRESS_SNAPSHOT]].
+- [[documentation/GO_LIVE_PLAN|Rencana go-live detail]] — 8 fase, 47 tugas, kriteria keluar, risiko, dan estimasi.
+- [[documentation/ENVIRONMENTS|Tiga versi: Development, Main, Docs]] dan [[documentation/GITHUB_MIGRATION|migrasi ke GitHub]].
 - [[documentation/ROADMAP|Roadmap dan checklist]] — urutan kerja Now / Next / Later serta checklist pemakaian Codex, Playwright, Composio, Obsidian, Git, dan GitHub.
 - [[documentation/IMPLEMENTATION_PLAN|Rencana implementasi local-first]] — urutan Supabase lokal → vertical slice → Composio → GitHub/Vercel → UAT/domain.
 - [[documentation/FOUNDATION_BASELINE|Baseline fondasi dan bukti]] — source, runtime, Supabase discovery, tool gap, serta blocker.

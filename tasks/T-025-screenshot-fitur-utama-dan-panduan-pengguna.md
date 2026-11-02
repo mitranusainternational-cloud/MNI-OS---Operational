@@ -1,0 +1,31 @@
+---
+type: task
+id: T-025
+title: "Screenshot fitur utama dan panduan pengguna"
+phase: P2
+status: todo
+priority: P2
+env: docs
+effort_days: 1
+depends: [T-021]
+owner: "dev"
+updated: 2026-11-02
+---
+
+# T-025 Screenshot fitur utama dan panduan pengguna
+
+Fase: P2 Aplikasi siap uji  
+Bergantung pada: T-021
+
+## Kriteria selesai
+
+- [ ] Dashboard, gudang, SPK, logistik, master ter-screenshot dengan data sintetis
+- [ ] USER_GUIDE merujuk gambar dan indeks screenshot diperbarui
+
+## Bukti
+
+- Belum ada.
+
+## Catatan
+
+-

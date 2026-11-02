@@ -11,6 +11,9 @@ Roadmap ini menunjukkan urutan hasil yang perlu dibangun, bukan komitmen tanggal
 > [!summary] Status Now — diperbarui 2026-11-02
 > Arah produk: **MNI OS custom untuk kebutuhan tim Operasional MNI**. ERP eksternal bukan blueprint. Sumber kebutuhan adalah proses tim, bukti kerja yang diizinkan, dan validasi pemilik proses. Aplikasi **belum terhubung** ke Supabase; blocker teknis dan catatan lengkap ada di [[FOUNDATION_BASELINE|baseline fondasi]].
 
+> [!info] Rencana detail
+> Langkah, dependensi, dan status per tugas ada di [[GO_LIVE_PLAN]] dan [[PROGRESS_DASHBOARD]]. Roadmap ini tetap menjadi urutan hasil tingkat tinggi.
+
 ## Now — fondasi dan bukti awal
 
 - [x] Pertahankan salinan HTML sumber dan pisahkan implementasi aktif menjadi HTML, CSS, dan JavaScript.

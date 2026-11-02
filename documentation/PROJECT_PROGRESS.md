@@ -152,3 +152,11 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: `apps/mni-app/index.html` kini memuat `app.css`, menyisipkan `app-body.html`, lalu memuat `app.js`. Error `addEventListener` hilang.
 - Bukti: browser (Playwright) di `127.0.0.1:5175`; screenshot [[screenshots/README]]. Sisa error console hanyalah akses ke Supabase dummy.
 - Belum diverifikasi: login OTP, data nyata, RLS, tampilan setelah login. `public/app.*` dihasilkan `npm run extract` dan di-ignore Git.
+
+### 2026-11-02 — Sistem tracking dan rencana go-live
+
+- Selesai: 47 catatan tugas di `tasks/` (T-001 sampai T-074; 5 selesai), `scripts/progress-report.mjs`, [[PROGRESS_SNAPSHOT]], [[PROGRESS_DASHBOARD]] dengan Bases `documentation/dashboards/Tugas.base`, [[templates/TASK_TEMPLATE]], dan [[GO_LIVE_PLAN]].
+- Hasil: jalur kritis sisa menuju go-live sekitar 26,5 hari kerja; jalur proses/data menentukan kecepatan.
+- Bukti: skrip snapshot berjalan tanpa masalah data (source-level).
+- Belum diverifikasi: tampilan Bases di Obsidian (butuh versi 1.9+ dengan core plugin Bases); estimasi effort belum divalidasi.
+- Berikutnya: mulai T-010, T-030, T-032, T-040 yang sudah siap dikerjakan.
