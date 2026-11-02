@@ -6,6 +6,13 @@ updated: 2026-11-02
 
 # Log keputusan workspace
 
+## 2026-11-02 — Model role RLS mengikuti model role aplikasi (sementara)
+
+- **Konteks:** policy awal memakai role admin/manager/gudang/produksi/viewer, sedangkan aplikasi mendefinisikan admin, ppic, gbb, gbj, logistik, viewer dengan hak per modul (`ROLES`, `modOf`; belum aktif karena `ROLE_ON=false`). Uji pada RLS nyata menunjukkan alur lintas peran gagal (mis. produksi tidak dapat mencatat mutasi atau surat jalan; kunci dokumen di tabel `master` tidak dapat ditulis non-admin; viewer dapat menulis log).
+- **Keputusan:** hak tulis di database ditentukan tabel `role_modules` (role → modul) dan fungsi `can_mod(modul)`/`can_any()`/`is_admin()`; peta modul → tabel mengikuti `modOf`. Peta role ke modul adalah **model aplikasi apa adanya** dan **sementara** sampai disahkan tim Operasional (T-036). Migration 4 menambah (tanpa DROP); migration 5 menghapus policy lama dan menunggu persetujuan eksplisit.
+- **Alasan:** satu model hak yang sama di UI dan database; mengubah hak cukup dengan mengisi `role_modules`, tanpa mengubah policy.
+- **Konsekuensi:** role lama (manager, gudang, produksi) tidak lagi bermakna setelah migration 5; akun harus memakai role aplikasi. Pengguna tidak terdaftar tidak dapat membuat permintaan akses (login dibatasi ke `muser`).
+
 ## 2026-11-02 — Database dev: project Supabase baru dan model "kolom inti + JSONB data" (T-042)
 
 - **Konteks:** akun Supabase sudah memiliki dua project aktif berskema ERP berbeda dan batas paket gratis (2 project aktif) penuh. Schema migration awal `mni-app` juga tidak cocok dengan bentuk dokumen yang ditulis app: mis. `bongkar` memakai jenis/muatan/pihak, `mutasi` memakai `item` (bukan `item_id` wajib), `log` memakai c/d/k/op, `vendor`/`kirim` memuat kendaraan, riwayat, dan referensi SPK.

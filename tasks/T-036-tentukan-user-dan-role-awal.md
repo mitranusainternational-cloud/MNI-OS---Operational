@@ -31,6 +31,8 @@ Bergantung pada: T-031
 
 ## Catatan
 
+Peta role → modul sementara mengikuti model aplikasi dan tersimpan di tabel `role_modules` (mengubahnya cukup mengisi tabel). Tim Operasional perlu mengesahkan: siapa mendapat modul apa, termasuk apakah produksi boleh mencatat mutasi, dan peran manajer (tidak ada di model aplikasi).
+
 Agenda, peserta, urutan sesi, dan pertanyaan kunci sudah disiapkan di [[DISCOVERY_AGENDA]] (2026-11-02). Belum dijadwalkan; pemilik proyek menetapkan tanggal dan mengirim undangan. Sesi 5.
 
 -

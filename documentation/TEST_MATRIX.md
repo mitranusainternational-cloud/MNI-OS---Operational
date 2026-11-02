@@ -154,6 +154,33 @@ Catatan data: di tabel dev ada baris dengan nama realistis (mis. nama vendor dan
 
 Masih belum dicoba di Supabase: duplikat SPK, SPK tanpa due, ubah/hapus master, opname bahan baku, dan semua alur sebagai role selain admin (hak tulis per role baru terbukti di tingkat SQL).
 
+### Matriks alur × role pada RLS nyata (Supabase dev, 2026-11-02, di-rollback)
+
+Model role yang diuji = model aplikasi (`ROLES`/`modOf` di `apps/gudang-logistik`): admin, ppic (SPK, vendor), gbb (bahan baku, bongkar muat), gbj (barang jadi, vendor, pengiriman, bongkar muat), logistik (pengiriman, bongkar muat), viewer. Diuji setelah migration 4 (policy baru ditambahkan; policy lama belum dihapus). Hak baru ditulis sebagai fungsi `can_mod()`/`can_any()` dan tabel `role_modules`.
+
+| Alur (urutan tulis seperti di aplikasi) | admin | ppic | gbb | gbj | logistik | viewer |
+|---|---|---|---|---|---|---|
+| Buat SPK (kunci, SPK, counter, customer, log) | ya | ya | tidak | tidak | tidak | tidak |
+| Update produksi SPK | ya | ya | tidak | tidak | tidak | tidak |
+| Terima material | ya | tidak | ya | tidak | tidak | tidak |
+| Pakai produksi | ya | tidak | ya | tidak | tidak | tidak |
+| Item bahan baku baru | ya | tidak | ya | tidak | tidak | tidak |
+| Opname / item barang jadi | ya | tidak | tidak | ya | tidak | tidak |
+| Kirim ke vendor (+ antrean bongkar otomatis) | ya | ya | tidak | ya | tidak | tidak |
+| Terima kembali dari vendor | ya | ya | tidak | ya | tidak | tidak |
+| Surat jalan (+ antrean bongkar otomatis) | ya | tidak | tidak | ya | ya | tidak |
+| Ubah status surat jalan | ya | tidak | tidak | ya | ya | tidak |
+| Bongkar muat manual dan proses | ya | tidak | ya | ya | ya | tidak |
+| Master: tambah / ubah | ya | ya | ya | ya | ya | tidak |
+| Master: hapus | ya | tidak | tidak | tidak | tidak | tidak |
+| Baca SPK | ya | ya | ya | ya | ya | ya |
+| Baca seluruh `muser` | ya | tidak | tidak | tidak | tidak | tidak |
+| Tulis log saja | ya | ya | ya | ya | ya | **ya (seharusnya tidak)** |
+
+Hasilnya sama dengan hak per modul di aplikasi. Satu penyimpangan: **viewer masih dapat menulis log** karena policy lama `log_write` (semua pengguna terautentikasi) belum dihapus; hilang setelah migration 5 (pembersihan, berisi `DROP POLICY`). Pemeriksaan UPDATE/DELETE memakai jumlah baris terdampak karena RLS menyaring baris tanpa galat.
+
+Status migration: 4 (`role_model_app_aligned`, hanya tambahan) **terpasang**; 5 (`role_model_cleanup`, DROP) **belum**: perintah ditolak oleh persetujuan SQL. Jalankan `apps/mni-app/supabase/migrations/20240101000005_role_model_cleanup.sql` di SQL Editor (tugas T-078).
+
 ## Belum diuji (jadwal di tracking)
 
 Tercatat di [[tasks/T-027-uji-sisa-ui-mock-void-koreksi-pr-dan-role|T-027]]: batalkan dan koreksi bongkar muat, modul PR/usulan pembelian, tab KPI & Analisa, ekspor XLSX modul gudang, opname bahan baku, tampilan per role, dan menu mobile penuh.

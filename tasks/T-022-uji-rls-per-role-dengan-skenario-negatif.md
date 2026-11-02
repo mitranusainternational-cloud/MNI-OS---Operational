@@ -5,7 +5,7 @@ title: "Uji RLS per role dengan skenario negatif"
 phase: P2
 epic: E-03
 release: v1.0
-status: todo
+status: review
 priority: P0
 env: development
 effort_days: 2
@@ -31,6 +31,8 @@ Bergantung pada: T-021
 - Belum ada.
 
 ## Catatan
+
+Matriks alur × role pada RLS nyata selesai (2026-11-02; lihat [[TEST_MATRIX]] dan [[documentation/DECISIONS]]): hak database sesuai model role aplikasi setelah migration 4. Sisa: migration 5 (T-078) dan uji lewat aplikasi (T-079). Status `review`.
 
 Matriks hak tulis per role terhitung pada Supabase dev (2026-11-02, rollback) dan dicatat di [[TEST_MATRIX]]. Uji lewat aplikasi dengan login masing-masing role belum dilakukan.
 

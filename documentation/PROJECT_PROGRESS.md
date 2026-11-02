@@ -281,3 +281,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Selesai: ulangan pemilik di aplikasi (16:03–16:13 UTC). Semua `POST log` 201 (34 log, 0 `tgl` NULL), tanpa 400/406 dan tanpa galat Postgres; terima material (+7, `RCV/2026/11/001`), pakai produksi (-3, -1, `PK/2026/11/001`), revisi SPK (`rev = 1`, satu baris, alasan tersimpan), supplier dan counter otomatis tersimpan.
 - Bukti: verified in database + log. T-021 dan T-028 berstatus `review` (sisa: duplikat SPK, pengaturan RM, delete, realtime, role selain admin).
 - Berikutnya (tahap S2): CI GitHub (build + regresi, T-046, T-077), RLS per role vs alur (T-022, T-036), lalu Vercel preview (T-044). Jalur: [[INTEGRATION_PATH]].
+
+### 2026-11-02 — Uji role pada RLS nyata dan model role selaras aplikasi
+
+- Temuan: aplikasi sudah memuat model role sendiri (admin, ppic, gbb, gbj, logistik, viewer; hak per modul) yang tidak dipakai policy database. Uji alur × role pada RLS nyata (di-rollback) menunjukkan alur lintas peran gagal untuk role selain admin.
+- Selesai: migration 4 (`role_modules`, `can_mod`/`can_any`/`is_admin`, policy `_v2` untuk semua tabel) terpasang. Matriks 16 baris × 6 role sesuai model aplikasi ([[TEST_MATRIX]]). Keputusan di [[documentation/DECISIONS]]. Peta role sementara sampai disahkan tim (T-036).
+- Hambatan: migration 5 (DROP policy lama) ditolak oleh persetujuan SQL; viewer masih dapat menulis log sampai itu dijalankan (T-078, blocked, pemilik).
+- Berikutnya: T-078 (pemilik), T-079 (akun uji per role), lalu CI GitHub (T-046, T-077).

@@ -61,7 +61,7 @@ Urutan setelah database ada: terapkan migration, uji login OTP dan adapter di Po
 |---|---|
 | Project | `MNI Gudang - Dev`, ref `inldyqigewmziwazalun`, region ap-southeast-1 |
 | URL | `https://inldyqigewmziwazalun.supabase.co` (bukan rahasia) |
-| Migration terpasang | init_schema, rls_policies, app_shape_compat (20 tabel, 19 dengan kolom `data`, 39 policy, 17 tabel realtime) |
+| Migration terpasang | init_schema, rls_policies, app_shape_compat, role_model_app_aligned (tabel `role_modules`, fungsi `can_mod`/`can_any`/`is_admin`, policy `_v2`). Menunggu: role_model_cleanup (DROP policy lama, T-078) |
 | Kunci di aplikasi | hanya kunci anon/publishable (publik); kunci service-role tidak dipakai di mana pun |
 | Menjalankan app ke project ini | file lokal `apps/mni-app/.env.supabase-dev.local` (diabaikan Git), lalu `npx vite --mode supabase-dev` |
 | Perubahan akun | project `MNI OS - Operational` (kosong) dijeda agar muat di batas gratis; dapat dipulihkan dari dashboard |
