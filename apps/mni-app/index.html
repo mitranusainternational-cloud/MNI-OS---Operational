@@ -78,6 +78,32 @@
             font-size:14px;font-weight:600;cursor:pointer;
           "
         >Kirim Kode Masuk</button>
+        <!-- Cadangan bila email OTP bermasalah (batas kirim email atau SMTP). Disembunyikan di mode mock. -->
+        <div id="auth-pw-block" style="margin-top:14px">
+          <a href="#" onclick="document.getElementById('auth-pw-fields').style.display='block';this.style.display='none';return false"
+            style="font-size:13px;color:#1F5FD6;text-decoration:none">Masuk dengan password</a>
+          <div id="auth-pw-fields" style="display:none;margin-top:10px">
+            <input id="auth-password" type="password" placeholder="Password"
+              autocomplete="current-password"
+              style="
+                width:100%;box-sizing:border-box;
+                padding:10px 14px;border:1.5px solid #DCE3EE;
+                border-radius:8px;font-size:14px;
+                font-family:'IBM Plex Sans',sans-serif;
+                outline:none;margin-bottom:12px;
+              "
+              onkeydown="if(event.key==='Enter') authPasswordLogin()"
+            >
+            <button id="auth-pw-btn" onclick="authPasswordLogin()"
+              style="
+                width:100%;padding:11px;
+                background:#fff;color:#1F5FD6;
+                border:1.5px solid #1F5FD6;border-radius:8px;
+                font-size:14px;font-weight:600;cursor:pointer;
+              "
+            >Masuk</button>
+          </div>
+        </div>
       </div>
 
       <div id="auth-otp-step" style="display:none">
@@ -151,10 +177,19 @@
       msgEl.textContent = '';
 
       try {
-        await window.__supabase.auth.signInWithOtp({
+        // supabase-js mengembalikan { error } (tidak melempar). Tanpa pemeriksaan ini, UI tetap
+        // mengatakan "cek email" walau pengiriman ditolak (mis. HTTP 429 batas email).
+        const { error } = await window.__supabase.auth.signInWithOtp({
           email,
           options: { shouldCreateUser: false }
         });
+        if (error) {
+          const limited = error.status === 429 || /rate limit|too many|over_email/i.test(error.code || error.message || '');
+          msgEl.textContent = limited
+            ? 'Batas pengiriman email tercapai. Tunggu beberapa menit, atau masuk dengan password.'
+            : (error.message || 'Gagal mengirim kode.');
+          return;
+        }
         document.getElementById('auth-email-step').style.display = 'none';
         document.getElementById('auth-otp-step').style.display = 'block';
       } catch (e) {
@@ -164,6 +199,36 @@
         btn.textContent = 'Kirim Kode Masuk';
       }
     }
+
+    async function authPasswordLogin() {
+      const email = document.getElementById('auth-email').value.trim().toLowerCase();
+      const password = document.getElementById('auth-password').value;
+      const msgEl = document.getElementById('auth-msg');
+      if (!email || !email.includes('@')) { msgEl.textContent = 'Masukkan email yang valid.'; return; }
+      if (!password) { msgEl.textContent = 'Masukkan password.'; return; }
+      const btn = document.getElementById('auth-pw-btn');
+      btn.disabled = true;
+      btn.textContent = 'Masuk...';
+      msgEl.textContent = '';
+      try {
+        const { error } = await window.__supabase.auth.signInWithPassword({ email, password });
+        if (error) msgEl.textContent = 'Email atau password salah, atau akun belum dikonfirmasi.';
+        // Bila berhasil, perubahan status auth memuat ulang halaman (lihat onAuthStateChange).
+      } catch (e) {
+        msgEl.textContent = e.message || 'Gagal masuk.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Masuk';
+      }
+    }
+
+    // Login password hanya untuk Supabase sungguhan; mock lokal memakai kode lokal.
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.__ENV && window.__ENV.LOCAL_MOCK === '1') {
+        const b = document.getElementById('auth-pw-block');
+        if (b) b.style.display = 'none';
+      }
+    });
 
     async function authVerifyOTP() {
       const otp = document.getElementById('auth-otp').value.trim();

@@ -36,6 +36,8 @@ Bergantung pada: T-042
 
 ## Catatan
 
+Log Auth menunjukkan percobaan 2026-11-02: email yang diterima adalah tautan konfirmasi (bukan kode), tautan mengarah ke localhost:3000, lalu permintaan kode berikutnya mendapat HTTP 429 dan verifikasi kode 403. Perbaikan: B-012 (pesan galat + login password cadangan), konfigurasi Auth di [[documentation/ENVIRONMENTS]]. Pemilik mengatur password sendiri lewat SQL Editor Supabase.
+
 Perintah hapus baris uji ditolak dua kali oleh persetujuan SQL, jadi tidak dipaksakan. Jalankan di SQL Editor Supabase (project MNI Gudang - Dev): `delete from public.spk where no = '9999';` Setelah itu penomoran SPK mulai dari 1.
 
 Menunggu email admin dari pemilik. SMTP bawaan Supabase dibatasi jumlah email per jam; untuk UAT pasang SMTP sendiri (T-047).

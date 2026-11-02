@@ -243,3 +243,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Bukti (database nyata, semua di-rollback): 12/12 penulisan bentuk dokumen app berhasil sebagai admin; pengguna tak terdaftar ditolak; matriks hak tulis per role terhitung ([[TEST_MATRIX]]). Pembacaan anonim ke tabel SPK = 0 baris.
 - Belum: login OTP oleh pemilik (kode di email), hapus baris uji `9999`, dan uji alur lewat aplikasi pada Supabase (T-029, T-021, T-028).
 - Temuan: matriks RLS belum selaras dengan alur app (produksi tidak dapat mencatat mutasi/surat jalan/bongkar; gudang dan produksi tidak dapat menulis kunci di `master`; viewer dapat menulis `log`) — bahan T-022 dan T-036.
+
+### 2026-11-02 — Diagnosis login pertama di Supabase dev
+
+- Temuan dari log Auth/REST: email yang diterima berisi tautan konfirmasi ke `localhost:3000` (bukan kode); permintaan kode ulang kena HTTP 429 (batas email); verifikasi kode 403; `last_sign_in_at` masih kosong dan baris uji `9999` belum terhapus. Seluruh pembacaan REST membalas 200.
+- Perbaikan: B-012 (UI tidak lagi mengaku mengirim kode ketika ditolak) dan opsi "Masuk dengan password" untuk Supabase sebagai cadangan; panduan konfigurasi Auth di [[documentation/ENVIRONMENTS]].
+- Berikutnya: pemilik mengatur password sendiri dan menghapus baris 9999 lewat SQL Editor, lalu uji alur lewat aplikasi (T-029, T-021, T-028).

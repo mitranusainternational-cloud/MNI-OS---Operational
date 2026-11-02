@@ -31,4 +31,6 @@ Bergantung pada: T-042
 
 ## Catatan
 
+Prioritas naik: tanpa SMTP sendiri login OTP terkena batas email (HTTP 429) setelah beberapa permintaan, dan templat email perlu memuat {{ .Token }}. Lihat [[documentation/ENVIRONMENTS]].
+
 -

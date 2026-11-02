@@ -68,3 +68,12 @@ Urutan setelah database ada: terapkan migration, uji login OTP dan adapter di Po
 | Belum ada | user admin awal (T-029), data, Vercel, CI |
 
 Temuan advisor keamanan (peringatan, bukan kritis): fungsi `get_user_role`, `is_authenticated`, `is_admin_or_manager` (SECURITY DEFINER) dapat dipanggil lewat RPC oleh anon dan authenticated; ekstensi `pg_trgm` di schema public. Dijadwalkan di T-060.
+
+### Konfigurasi Auth Supabase dev yang perlu disesuaikan (temuan 2026-11-02)
+
+Diamati dari log Auth saat percobaan login pertama:
+
+1. **Email berisi tautan, bukan kode 6 digit.** Akun admin dibuat lewat endpoint OTP sehingga memakai templat "Confirm signup" (tautan `type=signup` dengan `redirect_to=http://localhost:3000`). Aplikasi meminta kode 6 digit. Templat "Magic Link" dan "Confirm signup" perlu menyertakan `{{ .Token }}`.
+2. **URL situs salah.** `site_url` masih bawaan `http://localhost:3000`. Atur Authentication → URL Configuration: Site URL `http://127.0.0.1:5174` dan tambahkan `http://127.0.0.1:5174/**` ke Redirect URLs.
+3. **Batas pengiriman email.** SMTP bawaan Supabase sangat terbatas per jam; permintaan kode kedua dan ketiga mendapat HTTP 429. Untuk pemakaian nyata pasang SMTP sendiri (T-047).
+4. **Cadangan tanpa email.** Aplikasi kini menyediakan "Masuk dengan password" (hanya Supabase nyata). Password diatur sendiri oleh pemilik akun (lihat T-029); password tidak pernah dikirim ke saya atau disimpan di repo.
