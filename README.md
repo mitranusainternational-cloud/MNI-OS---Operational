@@ -1,4 +1,4 @@
-# MNI OS Operational — Codex Workspace
+# MNI OS — Workspace Operasional
 
 Repository ini sekaligus menjadi Obsidian vault untuk mengembangkan website/aplikasi MNI dan menelusuri progress proyek. Dashboard proyek ada di [`Home.md`](Home.md); cara mengelola vault ada di [`documentation/WORKSPACE_GUIDE.md`](documentation/WORKSPACE_GUIDE.md).
 
@@ -22,13 +22,12 @@ Rincian alur dan batas tiap environment ada di [`documentation/VERSION_STRATEGY.
 ├── documentation/                  # Progress, roadmap, panduan, screenshot, template
 ├── websites/                       # Website lain dan situs dokumentasi
 ├── research/                       # Riset bertanggal dan penerapan ke data MNI
+├── data/                           # README saja; workbook privat di data/private-sources/ (diabaikan Git)
+├── .agents/skills/                 # Skill lokal
+├── .codex/agents/                  # Definisi agent
 └── apps/
-    └── gudang-logistik/             # Aplikasi MNI Gudang & Logistik
-        ├── index.html
-        ├── assets/css/app.css
-        ├── assets/js/app.js
-        ├── reference/                # Salinan sumber untuk pembandingan
-        └── docs/                    # Panduan serta inventaris aplikasi
+    ├── gudang-logistik/            # Prototipe HTML/CSS/JS + reference + docs
+    └── mni-app/                    # Scaffold Vite + Supabase + Vercel/VPS (lihat documentation/ENVIRONMENTS.md)
 ```
 
 ## Mulai bekerja
@@ -45,7 +44,6 @@ Mulai dari [`apps/gudang-logistik/README.md`](apps/gudang-logistik/README.md), [
 
 ## GitHub
 
-Repo: [mitranusainternational-cloud/MNI-OS---Operational](https://github.com/mitranusainternational-cloud/MNI-OS---Operational)  
-Branch snapshot awal: `versi-awal`. Kerja lokal berlanjut pada `development`; lihat `documentation/VERSION_STRATEGY.md` sebelum melakukan rilis atau sinkronisasi.
+Repo ini masih **lokal** (belum ada remote). Migrasi ke GitHub mengikuti [`documentation/GITHUB_MIGRATION.md`](documentation/GITHUB_MIGRATION.md). Branch: `versi-awal` (baseline beku), `development` (kerja), `main` (rilis), `docs` (dokumentasi). Lihat `documentation/VERSION_STRATEGY.md` dan `documentation/ENVIRONMENTS.md`.
 
 Jangan menyimpan kredensial, data operasional personal, atau ekspor transaksi ke repository. Detail historis dan sumber riset harus diberi tanggal serta tautan sumber.
