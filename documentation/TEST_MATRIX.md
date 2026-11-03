@@ -244,3 +244,12 @@ Di luar mock: login OTP nyata, RLS per role, realtime antar pengguna, dan konfli
 | Mock lokal | regresi 38 PASS, role 12 PASS |
 | Supabase dev lewat aplikasi | login admin, 10 modul terbuka, label "Terhubung ke database"; alur CRUD dan 4 role lulus (lihat bagian sebelumnya) |
 | Supabase dev lewat SQL | RLS 21 tabel aktif; hak per role setelah migration 9 benar; advisor keamanan tinggal 2 WARN yang disengaja/aksi pemilik |
+
+## Audit kesiapan (2026-11-03)
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Kunci penomoran atomik (`try_lock`, migration 10) | PASS: SQL (ambil, ditolak saat dipegang, diambil setelah kedaluwarsa, baris kunci lama berbentuk teks ditimpa); aplikasi Supabase: RCV 005 dan 006 beruntun berbeda, kunci tersimpan sebagai objek; mock dan regresi 38 PASS |
+| CSP dan pustaka ekspor | PASS dengan kebijakan yang sama: jsPDF, autotable, html2canvas, ExcelJS dari cdnjs dimuat; PDF (3155 B) dan Excel (6084 B) dibuat; fallback jsdelivr terblokir sesuai desain (hanya cadangan) |
+| Pemindaian rahasia dan email | tidak ada kunci rahasia; alamat email pribadi pemilik dihapus dari dokumen |
+| Hasil lengkap dan risiko | [[AUDIT_KESIAPAN]] |

@@ -40,7 +40,7 @@ Bukti: [[screenshots/README]].
 | Layanan | Temuan | Arti untuk mni-app |
 |---|---|---|
 | GitHub | Repo organisasi `mitranusainternational-cloud/MNI-OS---Operational`, `main` terproteksi | Siap menerima kode |
-| Supabase (org `nurilhamj@gmail.com`) | 3 project: "MNI OS" (aktif, 1 tenant, tabel ERP multi-tenant: tenants, items, BOM, routings), "MNI OS - Operational" (aktif, 80 tabel ERP, 0 baris), "Marketing OS - NIJ" (nonaktif) | Dua project aktif berskema ERP **berbeda** dari schema mni-app (20 tabel `rm`, `fg`, `spk`, …). Jangan dipakai tanpa keputusan |
+| Supabase (org pribadi pemilik) | 3 project: "MNI OS" (aktif, 1 tenant, tabel ERP multi-tenant: tenants, items, BOM, routings), "MNI OS - Operational" (aktif, 80 tabel ERP, 0 baris), "Marketing OS - NIJ" (nonaktif) | Dua project aktif berskema ERP **berbeda** dari schema mni-app (20 tabel `rm`, `fg`, `spk`, …). Jangan dipakai tanpa keputusan |
 | Vercel (team NIJ) | 0 project | Belum ada deployment |
 
 Biaya project Supabase baru tidak bisa saya baca (izin konektor ditolak); periksa di dashboard sebelum membuat. Batas paket gratis biasanya dua project aktif.

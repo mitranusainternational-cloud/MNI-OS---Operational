@@ -356,3 +356,8 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 - main = development (3b86bb0). Production https://mni-os-operational.vercel.app diperiksa dengan Playwright: host hanya Vercel dan Google Fonts sebelum login, 0 permintaan Supabase pra-login, 0 error konsol, CSP aktif, X-Frame-Options DENY, kunci `sb_publishable_d9B…`, mock kosong, versi 1.0.0. HSTS tidak tampak di domain `*.vercel.app` (Vercel mengelolanya; berlaku di domain sendiri).
 - Sisa: login pemilik di situs Vercel untuk menguji CSP bersama sesi, modul, dan ekspor PDF/Excel; Site URL dan Redirect URL Supabase Auth untuk domain Vercel (bila memakai tautan email).
+
+### 2026-11-03 — Audit kesiapan lokal, GitHub, Supabase, Vercel
+
+- Hasil dan 12 risiko berurutan ada di [[AUDIT_KESIAPAN]]. Diperbaiki: penguncian nomor dokumen kini atomik (migration 10, `try_lock`); email pribadi dihapus dari dokumen publik; ekspor PDF/Excel terbukti jalan di bawah CSP.
+- Penghalang sebelum data nyata: satu database dev berisi data uji, tanpa backup terverifikasi, Site URL Auth masih localhost, pendaftaran bebas aktif, hanya satu akun.

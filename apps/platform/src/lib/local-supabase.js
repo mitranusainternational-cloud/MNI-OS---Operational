@@ -206,6 +206,22 @@ export function createLocalClient() {
       ch.subscribe = (cb) => { ch._l.forEach((l) => listeners.add(l)); cb && cb('SUBSCRIBED'); return ch; };
       return ch;
     },
+    // Meniru fungsi SQL try_lock (kunci atomik; JS satu utas sehingga tanpa celah).
+    async rpc(name, args = {}) {
+      if (name !== 'try_lock') return { data: null, error: { code: 'PGRST202', message: `Could not find the function public.${name}` } };
+      const rows = (state.tables.master ||= []);
+      const now = Date.now();
+      const { p_key: key, p_holder: holder, p_ttl_ms: ttl = 30000 } = args;
+      const row = rows.find((r) => r.key === key);
+      const v = row && row.value && typeof row.value === 'object' ? row.value : null;
+      if (!row || !v || (Number(v.expires) || 0) <= now || v.holder === holder) {
+        const value = { holder, expires: now + ttl };
+        if (row) { row.value = value; row.updated_at = iso(); } else rows.push({ key, value, created_at: iso(), updated_at: iso() });
+        save(state);
+        return { data: { acquired: true }, error: null };
+      }
+      return { data: { acquired: false, holder: v.holder, expires: v.expires }, error: null };
+    },
     removeChannel(ch) { ch._l.forEach((l) => listeners.delete(l)); return Promise.resolve('ok'); },
     auth,
     __reset() { localStorage.removeItem(STORE_KEY); localStorage.removeItem(SESSION_KEY); location.reload(); },

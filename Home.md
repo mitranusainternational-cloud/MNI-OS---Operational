@@ -43,6 +43,7 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 | Menjalankan dan mengembangkan aplikasi | [[apps/gudang-logistik/docs/DEVELOPMENT]] dan `apps/platform/README.md` |
 | Mempelajari cara memakai aplikasi | [[apps/gudang-logistik/docs/USER_GUIDE]] |
 | Melihat bukti (screenshot) | [[documentation/screenshots/README]] |
+| Memeriksa kesiapan dipakai tim | [[documentation/AUDIT_KESIAPAN]] |
 | Merilis ke pengguna | [[documentation/RELEASE_CHECKLIST]] |
 | Membaca riset | [[research/README]] |
 | Memahami data operasional | [[documentation/DATA_SOURCE_CATALOG]], [[documentation/DATA_DICTIONARY]] |
