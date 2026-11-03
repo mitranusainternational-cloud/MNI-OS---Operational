@@ -192,9 +192,11 @@ a.chip{text-decoration:none}
 .drawer>*{pointer-events:auto}
 aside.drawer-panel{position:relative;background:var(--surface);border-radius:16px;width:min(820px,100%);max-height:calc(100dvh - 40px);display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.35);animation:drawerIn .18s ease}
 @keyframes drawerIn{from{opacity:0;transform:scale(.97) translateY(10px)}to{opacity:1;transform:none}}
-.drawer>header,.modal>header{display:flex;align-items:flex-start;gap:12px;padding:20px 24px 16px;border-bottom:1px solid var(--line)}
-.drawer>header h3,.modal>header h3{margin:0;font-family:var(--f-display);font-size:21px;line-height:1.15}
-.drawer>header p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.drawer>header,.drawer-panel>header,.modal>header{display:flex;align-items:flex-start;gap:12px;padding:20px 24px 16px;border-bottom:1px solid var(--line)}
+.drawer>header h3,.drawer-panel>header h3,.modal>header h3{margin:0;font-family:var(--f-display);font-size:21px;line-height:1.15}
+.drawer>header p,.drawer-panel>header p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.drawer-panel>header>div:first-child{flex:1;min-width:0}
+.drawer-panel>header p{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
 .x{margin-left:auto;border:0;background:var(--surface-2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;flex:none}
 .dbody{overflow:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
 .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
@@ -624,3 +626,7 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .funnel .fleg span{color:var(--muted);font-size:12px}
 .funnel .fleg .zero b{color:var(--line-2)}
 @media (max-width:1100px){.dash-cols,.dash-pair{grid-template-columns:minmax(0,1fr)}.funnel .fleg{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* KPI baris (Dashboard Produksi, KPI lain): kartu berjajar, bukan menumpuk satu per baris */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.kpi-row+*{margin-top:0}

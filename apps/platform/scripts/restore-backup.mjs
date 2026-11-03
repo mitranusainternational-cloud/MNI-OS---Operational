@@ -23,7 +23,7 @@ if (backup.format !== 'mni-gudang-backup' || !backup.data) { console.error('Berk
 const ORDER = [
   ['muser', 'id'], ['role_modules', 'role,module'], ['master', 'key'], ['mwc', 'id'], ['mvendor', 'id'], ['mcustomer', 'id'],
   ['msupplier', 'id'], ['marmada', 'id'], ['rm', 'id'], ['fg', 'id'], ['spk', 'id'], ['rmhist', 'id'], ['pr', 'id'],
-  ['opname', 'id'], ['mutasi', 'id'], ['vendor', 'id'], ['kirim', 'id'], ['bongkar', 'id'], ['log', 'id'],
+  ['opname', 'id'], ['mutasi', 'id'], ['vendor', 'id'], ['kirim', 'id'], ['bongkar', 'id'], ['log', 'id'], ['audit_log', 'id'],
 ];
 
 console.log(`Cadangan dibuat ${backup.dibuat} oleh ${backup.oleh || '-'}`);
