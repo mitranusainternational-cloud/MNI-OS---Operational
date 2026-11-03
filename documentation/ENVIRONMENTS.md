@@ -121,3 +121,10 @@ Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewa
 | Preview | per branch/PR, mis. `...-git-development-mitranusainternational-8337.vercel.app` (dilindungi login Vercel) |
 | Env | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable, Production dan Preview) mengarah ke Supabase **dev**: production Vercel saat ini = staging |
 | Keamanan | X-Frame-Options DENY, nosniff, Referrer-Policy, CSP (hanya self, cdnjs, Google Fonts, `*.supabase.co`), HSTS, Permissions-Policy |
+
+### Akar masalah salah koneksi: dua akun Supabase (2026-11-03)
+
+- Project **MNI Gudang - Dev** (`inldyqigewmziwazalun`) berada di organisasi Supabase pribadi pemilik (id `wjebogebnwlxghsjbbdg`), yaitu akun yang dipakai konektor Supabase Claude.
+- Chrome pemilik untuk Supabase masuk sebagai akun lain (organisasi "Software Development", 2 project, termasuk `lggqigmvtefkquqjrjsb` "MNI-OS - Operational"). Di akun itu project dev tidak terlihat: membuka dashboard `inldyqigewmziwazalun` mengarah ke daftar organisasi. Inilah sebab kunci project yang salah tertempel ke Vercel dua kali (terdeteksi sebelum deploy).
+- Akibat: pengaturan Auth (Site URL, Redirect URL, template email, leaked password) dan SQL Editor project dev hanya bisa dibuka dengan login Supabase akun pemilik project itu, atau setelah akun lain diundang sebagai anggota organisasinya. Sampai Site URL diubah, tautan masuk email mengarah ke `http://localhost:3000` dan sesi harus dipindahkan manual ke domain Vercel.
+- Aturan: jangan menulis alamat email akun pribadi di repositori publik; sebut "akun pemilik".
