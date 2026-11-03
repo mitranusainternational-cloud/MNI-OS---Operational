@@ -590,4 +590,35 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
   .sign-line{height:44px}.sign-lbl{font-weight:600;font-size:10px;color:#333}
   .note{font-size:10px;color:#777;margin-top:6px;font-style:italic}
   @media print{body{padding:12px 16px}@page{size:A4;margin:12mm 14mm}}
- 
+
+/* ---------- Dashboard: ringkasan, KPI bertingkat, funnel, kolom ---------- */
+.brief{display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-bottom:14px;flex-wrap:wrap}
+.brief .dot{width:12px;height:12px;border-radius:50%;background:var(--ok);flex:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 20%,transparent)}
+.brief.warn .dot{background:var(--warn);box-shadow:0 0 0 4px color-mix(in srgb,var(--warn) 22%,transparent)}
+.brief.crit .dot{background:var(--crit);box-shadow:0 0 0 4px color-mix(in srgb,var(--crit) 22%,transparent)}
+.brief .bt{display:flex;flex-direction:column;gap:2px;min-width:200px;flex:1}
+.brief .bt b{font-family:var(--f-display);font-size:18px}
+.brief .bt span{color:var(--muted);font-size:13px}
+.brief .qa{display:flex;gap:8px;flex-wrap:wrap}
+.brief time{color:var(--muted);font-size:12px;white-space:nowrap}
+.sect-t{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:6px 2px 8px}
+.kpis.sm{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:16px}
+.kpis.sm .kpi{padding:10px 14px}
+.kpis.sm .kpi .v{font-size:clamp(20px,1.8vw,26px)}
+.kpis+.sect-t{margin-top:16px}
+.dash-cols{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}
+.dash-cols .stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.dash-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.dash-pair:empty{display:none}
+.dash-pair:has(> .panel:only-child){grid-template-columns:minmax(0,1fr)}
+.dash-cols .empty{padding:22px 16px}
+.funnel{margin-top:6px}
+.funnel .fbar{display:flex;gap:3px;height:16px;border-radius:8px;overflow:hidden;background:var(--line)}
+.funnel .fbar i{display:block;min-width:8px;background:var(--accent)}
+.funnel .fbar i.warn{background:var(--warn)}.funnel .fbar i.ok{background:var(--ok)}
+.funnel .fleg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+.funnel .fleg div{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.funnel .fleg b{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}
+.funnel .fleg span{color:var(--muted);font-size:12px}
+.funnel .fleg .zero b{color:var(--line-2)}
+@media (max-width:1100px){.dash-cols,.dash-pair{grid-template-columns:minmax(0,1fr)}.funnel .fleg{grid-template-columns:repeat(3,minmax(0,1fr))}}

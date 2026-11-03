@@ -245,26 +245,44 @@ B.dashboard=()=>{
  const topV=K90.byV.slice(0,5);
  const SPKT_v=SPKT();
 
+ // === Hak lihat: tile dan panel hanya untuk modul yang boleh dilihat pengguna ===
+ const vis=m=>!ME_P||!!myLevel(m);
+ const isAdm=!ME_P||myRole()==='admin';
+
  // === KPI tiles ===
  const kpi=(href,cls,lb,v,unit,s)=>`<a class="kpi ${cls}" href="#${href}"><span class="lb">${lb}</span><span class="v">${v}${unit?`<small>${unit}</small>`:''}</span><span class="s">${s}</span></a>`;
  const kpiD=(cls,lb,v,unit,s)=>`<div class="kpi ${cls}" style="cursor:default"><span class="lb">${lb}</span><span class="v">${v}${unit?`<small>${unit}</small>`:''}</span><span class="s">${s}</span></div>`;
  const otdPct=otdRate==null?'–':Math.round(otdRate*100)+'%';
  const otdCls=otdRate==null?'':otdRate>=0.9?'ok':otdRate>=0.75?'warn':'crit';
  const rmTon=ton(Object.values(rmCalc().info).reduce((a,x)=>a+x.kg,0));
- let h=`<section class="kpis">
-  ${kpi('bahan-baku',rmLow.length?'crit':'ok','Bahan baku kritis',rmLow.length,'item',`habis / di bawah buffer · ${rmTon} ton di gudang`)}
-  ${kpi('spk',spLate?'crit':'ok','SPK berjalan',spAct,'',spLate?`<b style="color:var(--crit)">${spLate} terlambat</b> dari due date`:'semua sesuai jadwal')}
-  ${kpiD(otdCls,'OTD 90 hari',otdPct,'',`${K90.otd.length} dari ${K90.kir.length} SPK terkirim tepat waktu`)}
-  ${kpiD(K90.avgCycle!=null?(K90.avgCycle<=SPKT_v.prod+SPKT_v.kirim?'ok':'warn'):'','Avg siklus SPK',r1(K90.avgCycle),'hk',`produksi ${r1(K90.avgProd)} · vendor ${r1(K90.avgTurn)} · kirim ${r1(K90.avgKirim)} hk`)}
-  ${kpi('vendor',vOld>14?'crit':vOld>7?'warn':'ok','Di vendor finishing',n(vQty),'btg/pcs',`${vOpen.length} SJ aktif · <b>${ton(vTonKg)} ton</b> · tertua ${vOld} hari`)}
-  ${kpi('pengiriman','info','Terkirim bulan ini',kMonth,'SJ',`<b>${ton(kTonKgMonth)} ton</b> · ${kTrip} dalam perjalanan · avg transit ${r1(K90.avgTransit)||'–'} hk`)}
-  ${kpi('cek-data',DI.some(i=>i.sev>=3)?'crit':DI.length?'warn':'ok','Temuan cek data',DI.filter(i=>i.sev>=2).length,'perlu aksi',`${DI.filter(i=>i.sev>=3).length} kritis · ${DI.filter(i=>i.sev===1).length} info`)}
- </section>`;
+ const crit=DI.filter(i=>i.sev>=3).length;
+ const need=[];
+ if(vis('spk')&&spLate)need.push(`${spLate} SPK terlambat`);
+ if(vis('bahan-baku')&&rmLow.length)need.push(`${rmLow.length} bahan baku kritis`);
+ if(vis('vendor')&&vOld>14)need.push('barang di vendor lebih dari 14 hari');
+ if(isAdm&&crit)need.push(`${crit} temuan data kritis`);
+ const bcls=!need.length?'ok':(spLate||crit)?'crit':'warn';
+ const qa=[['spk','spk','SPK baru'],['bahan-baku','bahan-baku','Terima material'],['pengiriman','pengiriman','Surat jalan'],['bongkar-muat','bongkar-muat','Catat kendaraan']].filter(([m])=>ME_P?myLevel(m)==='ubah':CAN).map(([m,h,l])=>`<a class="btn sm" href="#${h}">${l}</a>`).join('');
+ let h=`<section class="brief ${bcls}"><span class="dot"></span><div class="bt"><b>${need.length?need.length+' hal perlu perhatian':'Semua terkendali'}</b><span>${need.length?need.join(' · '):'Stok aman, SPK sesuai jadwal, barang di vendor dalam batas.'}</span></div><div class="qa">${qa}</div><time>${fd(t)}</time></section>
+ <div class="sect-t">Operasional hari ini</div>
+ <section class="kpis">
+  ${vis('bahan-baku')?kpi('bahan-baku',rmLow.length?'crit':'ok','Bahan baku kritis',rmLow.length,'item',S.rm.length?`habis / di bawah buffer · ${rmTon} ton di gudang`:'belum ada item bahan baku'):''}
+  ${vis('spk')?kpi('spk',spLate?'crit':'ok','SPK berjalan',spAct,'',spLate?`<b style="color:var(--crit)">${spLate} terlambat</b> dari due date`:spAct?'semua sesuai jadwal':'belum ada SPK aktif'):''}
+  ${vis('vendor')?kpi('vendor',vOld>14?'crit':vOld>7?'warn':'ok','Di vendor finishing',n(vQty),'btg/pcs',vOpen.length?`${vOpen.length} SJ aktif · <b>${ton(vTonKg)} ton</b> · tertua ${vOld} hari`:'tidak ada barang di vendor'):''}
+  ${vis('pengiriman')?kpi('pengiriman','info','Terkirim bulan ini',kMonth,'SJ',kMonth||kTrip?`<b>${ton(kTonKgMonth)} ton</b> · ${kTrip} dalam perjalanan`:'belum ada pengiriman bulan ini'):''}
+ </section>
+ ${vis('spk')||isAdm?`<div class="sect-t">Kinerja 90 hari terakhir</div>
+ <section class="kpis sm">
+  ${vis('spk')?kpiD(otdCls,'Ketepatan kirim (OTD)',otdPct,'',K90.kir.length?`${K90.otd.length} dari ${K90.kir.length} SPK terkirim tepat waktu`:'muncul setelah ada SPK terkirim'):''}
+  ${vis('spk')?kpiD(K90.avgCycle!=null?(K90.avgCycle<=SPKT_v.prod+SPKT_v.kirim?'ok':'warn'):'','Rata-rata siklus SPK',r1(K90.avgCycle),'hk',K90.avgCycle!=null?`produksi ${r1(K90.avgProd)} · vendor ${r1(K90.avgTurn)} · kirim ${r1(K90.avgKirim)} hk`:'muncul setelah ada SPK terkirim'):''}
+  ${isAdm?kpi('cek-data',crit?'crit':DI.length?'warn':'ok','Temuan cek data',DI.filter(i=>i.sev>=2).length,'perlu aksi',`${crit} kritis · ${DI.filter(i=>i.sev===1).length} info`):''}
+ </section>`:''}`;
 
  // === Pipeline SPK per stage ===
  const pipeStages=[{k:'Produksi',cls:'info'},{k:'Di vendor',cls:'warn'},{k:'Siap kirim',cls:'info'},{k:'Kirim sebagian',cls:'info'},{k:'Terkirim',cls:'ok'}];
  const pipeTotal=pipeStages.reduce((a,s)=>a+(stageCnt[s.k]||0),0)||1;
- const pipeH=`<div class="pipeline">${pipeStages.map(s=>{const cnt=stageCnt[s.k]||0;const pct2=cnt/pipeTotal;return `<div class="pipe-step" title="${s.k}: ${cnt} SPK"><div class="pipe-bar"><i class="${s.cls}" style="height:${Math.max(4,pct2*80)}px"></i></div><span class="pipe-cnt ${cnt?'':'muted'}">${cnt||'–'}</span><span class="pipe-lbl">${s.k}</span></div>`}).join('')}</div>`;
+ const pipeReal=pipeStages.reduce((a,s)=>a+(stageCnt[s.k]||0),0);
+ const pipeH=pipeReal?`<div class="funnel"><div class="fbar">${pipeStages.filter(s=>stageCnt[s.k]).map(s=>`<i class="${s.cls}" style="flex:${stageCnt[s.k]}" title="${s.k}: ${stageCnt[s.k]} SPK"></i>`).join('')}</div><div class="fleg">${pipeStages.map(s=>`<div class="${stageCnt[s.k]?'':'zero'}"><b>${stageCnt[s.k]||0}</b><span>${s.k}</span></div>`).join('')}</div></div>`:empty('Belum ada SPK dalam 90 hari','SPK yang diterbitkan akan tampil per tahap: produksi, vendor, siap kirim, terkirim.');
 
  // === Throughput chart: SPK selesai per bulan (bar chart) ===
  const thrBars=moKeys.length>=2?barChart({title:'SPK terkirim per bulan (90 hari)',bars:moKeys.map(m=>({label:BLN3(m+'-01'),v:moBuckets[m],tip:`<b>${BLN3(m+'-01')}</b><div>${moBuckets[m]} SPK terkirim</div>`})),fmt:v=>n(Math.round(v))}):null;
@@ -280,10 +298,11 @@ B.dashboard=()=>{
  // === Alerts ===
  const al=[];
  rmLow.sort((a,b)=>c.stock.rm[a._id]-c.stock.rm[b._id]).forEach(r=>{const x=RMI(r._id);const s=x.stok;al.push({sev:s<=0?3:x.st==='Kritis'?2.6:2,cls:s<=0||x.st==='Kritis'?'crit':'',href:'bahan-baku',t:`<b>${esc(rmLabel(r))}</b> ${x.st.toLowerCase()}`,m:`Stok ${n(s)} lbr${x.sug?` → usulan order ${n(x.sug)} lbr (${ton(x.sug*x.kg1)} t)`:''}`})});
- S.spk.map(s=>[s,c.spk[s._id]]).filter(([s,x])=>x.st==='Terlambat').sort((a,b)=>b[1].late-a[1].late).slice(0,8).forEach(([s,x])=>al.push({sev:2.5,cls:'crit',href:'spk',open:'spk:'+s._id,t:`<b>SPK ${s.no}</b> ${esc(s.customer)} telat ${x.late} hari`,m:`Due ${fd(s.due)} · produksi ${Math.round(x.pP*100)}% · terkirim ${Math.round(x.pK*100)}%`}));
+ const lateSeen=new Set();
+ S.spk.map(s=>[s,c.spk[s._id]]).filter(([s,x])=>x.st==='Terlambat').sort((a,b)=>b[1].late-a[1].late).slice(0,8).forEach(([s,x])=>lateSeen.add(s._id)||al.push({sev:2.5,cls:'crit',href:'spk',open:'spk:'+s._id,t:`<b>SPK ${s.no}</b> ${esc(s.customer)} telat ${x.late} hari`,m:`Due ${fd(s.due)} · produksi ${Math.round(x.pP*100)}% · terkirim ${Math.round(x.pK*100)}%`}));
  vOpen.filter(x=>x.age>7).sort((a,b)=>b.age-a.age).slice(0,6).forEach(x=>al.push({sev:x.age>14?2.4:1.5,cls:x.age>14?'crit':'',href:'vendor',open:'vendor:'+x.v._id,t:`<b>${n(x.sisa)} ${esc(x.v.items?.[0]?.u||'')}</b> masih di ${esc(x.v.vendor)} ${x.age} hari`,m:`${esc(spkName(x.v.spk))} · ${esc(x.v.proses||'')} · dikirim ${fd(x.v.tgl)}`}));
  // Late open SPK (past due, belum selesai)
- K90.lateOpen.slice(0,4).forEach(f=>al.push({sev:2.3,cls:'crit',href:'spk',open:'spk:'+f.s._id,t:`<b>SPK ${f.s.no}</b> ${esc(f.s.customer)} lewat due date, belum terkirim`,m:`Due ${fd(f.s.due)} · stage: ${flow(f.s._id)?.stage||'–'} · produksi ${Math.round(f.x.pP*100)}%`}));
+ K90.lateOpen.filter(f=>!lateSeen.has(f.s._id)).slice(0,4).forEach(f=>al.push({sev:2.3,cls:'crit',href:'spk',open:'spk:'+f.s._id,t:`<b>SPK ${f.s.no}</b> ${esc(f.s.customer)} lewat due date, belum terkirim`,m:`Due ${fd(f.s.due)} · stage: ${flow(f.s._id)?.stage||'–'} · produksi ${Math.round(f.x.pP*100)}%`}));
  al.sort((a,b)=>b.sev-a.sev);
  const alH=al.length?`<div class="alerts">${al.slice(0,12).map(a=>`<div class="alert ${a.cls}" data-act="go" data-href="${a.href}" ${a.open?`data-open="${a.open}"`:''}><span class="st"></span><div><div>${a.t}</div><div class="meta">${a.m}</div></div><span class="muted">›</span></div>`).join('')}</div>${al.length>12?`<div class="pbody note">+${al.length-12} peringatan lain</div>`:''}`:empty('Tidak ada yang perlu ditindak','Stok aman, SPK sesuai jadwal, barang di vendor masih dalam batas.');
 
@@ -316,15 +335,19 @@ B.dashboard=()=>{
   ${thrBars?`<div style="margin-top:12px">${thrBars}</div>`:K90.kir.length<2?`<div class="note" style="padding:12px 0">Grafik tersedia setelah ada 2+ bulan data pengiriman.</div>`:''}
  </div></section>`;
 
- h+=`<div class="grid3eq">
- ${pipePanel}
- <section class="panel"><header><h2>Perlu tindakan</h2><span class="hint">${al.length} peringatan</span></header>${alH}</section>
- <section class="panel"><header><h2>Aktivitas terbaru</h2><span class="hint">semua pengguna</span></header>${feH}</section></div>
- <div class="grid3eq">
- <section class="panel"><header><h2>Stok bahan baku vs buffer</h2><span class="hint">lembar</span></header><div class="pbody">${rmBars}<div class="legend" style="margin-top:12px"><span><i></i>Stok aman</span><span><i class="low"></i>Di bawah buffer</span><span><i class="tick"></i>Buffer stok</span></div></div></section>
- <section class="panel"><header><h2>Performa vendor finishing</h2><span class="hint">rata-rata TAT vs target · 90 hari</span></header><div class="pbody">${vTATbars}</div></section>
- <section class="panel"><header><h2>Top customer · qty terkirim</h2><span class="hint">90 hari terakhir</span></header><div class="pbody">${custBars}</div></section>
- </div>`;
+ const stokPanel=`<section class="panel"><header><h2>Stok bahan baku vs buffer</h2><span class="hint">lembar</span></header><div class="pbody">${rmShow.length?rmBars+'<div class="legend" style="margin-top:12px"><span><i></i>Stok aman</span><span><i class="low"></i>Di bawah buffer</span><span><i class="tick"></i>Buffer stok</span></div>':empty('Belum ada stok bahan baku','Tambahkan item di Gudang Bahan Baku agar stok dan buffer tampil di sini.')}</div></section>`;
+ const vendPanel=`<section class="panel"><header><h2>Performa vendor finishing</h2><span class="hint">rata-rata TAT vs target · 90 hari</span></header><div class="pbody">${vTATbars}</div></section>`;
+ const custPanel=`<section class="panel"><header><h2>Top customer · qty terkirim</h2><span class="hint">90 hari terakhir</span></header><div class="pbody">${custBars}</div></section>`;
+ h+=`<div class="dash-cols">
+ <div class="stack">
+  ${vis('spk')?pipePanel:''}
+  ${vis('bahan-baku')?stokPanel:''}
+  <div class="dash-pair">${vis('vendor')?vendPanel:''}${vis('pengiriman')?custPanel:''}</div>
+ </div>
+ <div class="stack">
+  <section class="panel"><header><h2>Perlu tindakan</h2><span class="hint">${al.length} peringatan</span></header>${alH}</section>
+  <section class="panel"><header><h2>Aktivitas terbaru</h2><span class="hint">semua pengguna</span></header>${feH}</section>
+ </div></div>`;
  return h;
 };
 
