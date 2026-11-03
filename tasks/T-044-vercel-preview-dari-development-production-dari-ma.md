@@ -5,13 +5,13 @@ title: "Vercel: preview dari development, production dari main"
 phase: P4
 epic: E-05
 release: v1.0
-status: todo
+status: doing
 priority: P0
 env: main
 effort_days: 1
 depends: [T-041, T-042]
 owner: "dev"
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # T-044 Vercel: preview dari development, production dari main
@@ -28,6 +28,7 @@ Bergantung pada: T-041, T-042
 
 ## Bukti
 
+- Production dari `main` aktif di `mni-gudang.vercel.app`. Sisa: variabel Vercel untuk Preview.
 - Belum ada.
 
 ## Catatan

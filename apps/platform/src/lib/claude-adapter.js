@@ -471,6 +471,11 @@ async function makeUserAdapter() {
       for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) % 360;
       return [id, { color: `hsl(${h} 55% 45%)`, avatarUrl: null }];
     })),
+    // Ganti password sendiri (pengguna yang sedang login).
+    changePassword: async (password) => {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw new Error(/same|different/i.test(error.message) ? 'Password baru harus berbeda dari password lama.' : error.message);
+    },
     signIn: async (email) => {
       const { error } = await supabase.auth.signInWithOtp({ email });
       if (error) throw error;

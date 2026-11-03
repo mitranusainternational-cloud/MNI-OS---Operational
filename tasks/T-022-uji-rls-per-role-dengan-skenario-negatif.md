@@ -5,13 +5,13 @@ title: "Uji RLS per role dengan skenario negatif"
 phase: P2
 epic: E-03
 release: v1.0
-status: review
+status: done
 priority: P0
 env: development
 effort_days: 2
 depends: [T-021]
 owner: "dev"
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # T-022 Uji RLS per role dengan skenario negatif
@@ -22,12 +22,13 @@ Bergantung pada: T-021
 
 ## Kriteria selesai
 
-- [ ] Matriks role x tabel (baca/tulis) diuji
-- [ ] viewer tidak bisa menulis; gudang/produksi hanya tabel sesuai peran
-- [ ] Hasil disimpan di dokumentasi
+- [x] Matriks role x tabel (baca/tulis) diuji
+- [x] viewer tidak bisa menulis; gudang/produksi hanya tabel sesuai peran
+- [x] Hasil disimpan di dokumentasi
 
 ## Bukti
 
+- Uji RLS dengan transaksi rollback di production: peran, hak per modul, nonaktif, anon, admin terakhir; lihat [[TEST_MATRIX]].
 - Belum ada.
 
 ## Catatan

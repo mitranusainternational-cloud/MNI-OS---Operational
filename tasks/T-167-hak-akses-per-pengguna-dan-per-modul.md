@@ -5,7 +5,7 @@ title: "Hak akses per pengguna dan per modul, kelola pengguna dari aplikasi"
 phase: P5
 epic: E-09
 release: v1.1
-status: doing
+status: review
 priority: P0
 env: production
 effort_days: 2
@@ -38,9 +38,12 @@ Bergantung pada: T-163
 
 ## Bukti
 
+- Terpasang dan teruji di production (RLS rollback, buat akun lewat menu, dua sesi sekitar 1 detik). Reset password lewat menu belum dicoba; diuji saat UAT.
 - Mock: 38 + 12 + 15 PASS (verified in browser, mock; bukan bukti Supabase).
 - Production: migration 11 dan 12 terpasang; uji RLS rollback lulus (verified in database); lihat [[TEST_MATRIX]].
 
 ## Catatan
+
+Tugas ini ditarik maju dari rilis v1.1 karena pemilik membutuhkan pengaturan modul per pengguna sebelum tim memakai sistem. Tidak ada fitur baru lain yang ditarik maju: lihat aturan pengendalian lingkup di [[PROJECT_PROGRESS]].
 
 Pemasangan di production adalah perubahan skema dan fungsi pada sumber daya bersama, dikerjakan setelah persetujuan pemilik. Rencana lengkap: [[RENCANA_ADOPSI]].

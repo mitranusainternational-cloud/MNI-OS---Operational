@@ -5,7 +5,7 @@ title: "Aktifkan Supabase production dan arahkan Vercel"
 phase: P5
 epic: E-05
 release: v1.0
-status: doing
+status: done
 priority: P0
 env: production
 effort_days: 1
@@ -23,13 +23,14 @@ Bergantung pada: T-162
 ## Kriteria selesai
 
 - [x] Pengguna auth admin dibuat di project MNI Gudang - Production dan login berhasil
-- [ ] Auth: Site URL, Redirect URL, sign-up dimatikan, leaked password protection aktif
-- [ ] Env Vercel (Production dan Preview) mengarah ke project production
+- [x] Auth: Site URL, Redirect URL, sign-up dimatikan, leaked password protection aktif
+- [x] Env Vercel (Production dan Preview) mengarah ke project production
 - [x] Uji penuh dari fondasi ke output (RLS, alur aplikasi) di production; ekspor PDF/Excel dan login di Vercel menyusul
-- [ ] Catat di ENVIRONMENTS, SISTEM_MAP, TEST_MATRIX
+- [x] Catat di ENVIRONMENTS, SISTEM_MAP, TEST_MATRIX
 
 ## Bukti
 
+- Production aktif: Auth admin, Site URL, sign-up mati, env Vercel Production mengarah ke production, uji baca/tulis/login di Vercel lulus. Sisa kecil dipindah ke T-044 dan T-047.
 - Uji tulis production lulus 2026-11-03 (nomor dokumen, kolom relasi, kunci atomik; simpan 0,6 sampai 1,5 detik); lihat [[TEST_MATRIX]]. Pembersih data uji: `apps/platform/supabase/ops/bersihkan_data_uji.sql`.
 - Login admin dan uji baca production lulus 2026-11-03 (10 modul, 21 tabel, latensi median 233 ms); lihat [[TEST_MATRIX]].
 - Migration 1–10 terpasang berurutan pada project kosong, matriks role dan advisor diperiksa (2026-11-03); lihat [[ENVIRONMENTS]].

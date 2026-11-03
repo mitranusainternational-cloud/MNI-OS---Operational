@@ -102,8 +102,22 @@
                 font-size:14px;font-weight:600;cursor:pointer;
               "
             >Masuk</button>
+            <a href="#" onclick="authForgot();return false"
+              style="display:inline-block;margin-top:10px;font-size:13px;color:#5B6B85;text-decoration:none">Lupa password?</a>
           </div>
         </div>
+      </div>
+
+      <div id="auth-newpw-step" style="display:none">
+        <p style="color:#5B6B85;font-size:13px;margin:0 0 12px">Buat password baru (minimal 8 karakter)</p>
+        <input id="auth-newpw" type="password" placeholder="Password baru" autocomplete="new-password"
+          style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #DCE3EE;border-radius:8px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;outline:none;margin-bottom:10px"
+          onkeydown="if(event.key==='Enter') authSetNewPassword()">
+        <input id="auth-newpw2" type="password" placeholder="Ulangi password baru" autocomplete="new-password"
+          style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #DCE3EE;border-radius:8px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;outline:none;margin-bottom:12px"
+          onkeydown="if(event.key==='Enter') authSetNewPassword()">
+        <button id="auth-newpw-btn" onclick="authSetNewPassword()"
+          style="width:100%;padding:11px;background:#1F5FD6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Simpan password</button>
       </div>
 
       <div id="auth-otp-step" style="display:none">
@@ -229,6 +243,40 @@
       }
     }
 
+    // Lupa password: kirim tautan pemulihan ke email. Tautan membuka halaman ini dengan #type=recovery.
+    async function authForgot() {
+      const email = document.getElementById('auth-email').value.trim().toLowerCase();
+      const msgEl = document.getElementById('auth-msg');
+      if (!email || !email.includes('@')) { msgEl.style.color = '#C2302B'; msgEl.textContent = 'Isi email Anda di kolom atas, lalu klik Lupa password.'; return; }
+      msgEl.style.color = '#5B6B85'; msgEl.textContent = 'Mengirim...';
+      try {
+        const { error } = await window.__supabase.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/' });
+        if (error) {
+          const limited = error.status === 429 || /rate limit|too many|over_email/i.test(error.code || error.message || '');
+          msgEl.style.color = '#C2302B';
+          msgEl.textContent = limited ? 'Batas pengiriman email tercapai. Minta super admin mengatur ulang password Anda.' : 'Gagal mengirim. Minta super admin mengatur ulang password Anda.';
+        } else {
+          msgEl.textContent = 'Jika email terdaftar, tautan pembuatan password baru sudah dikirim. Belum masuk? Minta super admin mengatur ulang password Anda.';
+        }
+      } catch (e) { msgEl.style.color = '#C2302B'; msgEl.textContent = e.message || 'Gagal mengirim.'; }
+    }
+
+    // Tampil setelah pengguna membuka tautan pemulihan: buat password baru lalu masuk.
+    async function authSetNewPassword() {
+      const p1 = document.getElementById('auth-newpw').value, p2 = document.getElementById('auth-newpw2').value;
+      const msgEl = document.getElementById('auth-msg');
+      msgEl.style.color = '#C2302B';
+      if (p1.length < 8) { msgEl.textContent = 'Password minimal 8 karakter.'; return; }
+      if (p1 !== p2) { msgEl.textContent = 'Kedua password tidak sama.'; return; }
+      const btn = document.getElementById('auth-newpw-btn');
+      btn.disabled = true; btn.textContent = 'Menyimpan...';
+      const { error } = await window.__supabase.auth.updateUser({ password: p1 });
+      btn.disabled = false; btn.textContent = 'Simpan password';
+      if (error) { msgEl.textContent = /same|different/i.test(error.message) ? 'Password baru harus berbeda dari password lama.' : 'Gagal menyimpan password: ' + error.message; return; }
+      history.replaceState(null, '', location.pathname);
+      reloadOnce();
+    }
+
     // Login password hanya untuk Supabase sungguhan; mock lokal memakai kode lokal.
     document.addEventListener('DOMContentLoaded', () => {
       if (window.__ENV && window.__ENV.LOCAL_MOCK === '1') {
@@ -265,6 +313,7 @@
     }
 
     // Listen for auth state from the adapter
+    const _recovery = /type=recovery/.test(location.hash);
     document.addEventListener('DOMContentLoaded', () => {
       // Wait for supabase to be available
       const waitSupabase = setInterval(() => {
@@ -275,8 +324,17 @@
           // halaman agar identitas, role, dan data dibaca ulang dari sesi yang benar.
           window.__supabase.auth.getSession().then(({ data: { session } }) => {
             let hadSession = !!session;
-            gate.style.display = session ? 'none' : 'flex';
+            gate.style.display = session && !_recovery ? 'none' : 'flex';
+            const showNewPw = () => {
+              gate.style.display = 'flex';
+              ['auth-email-step', 'auth-otp-step'].forEach((id) => { document.getElementById(id).style.display = 'none'; });
+              document.getElementById('auth-newpw-step').style.display = 'block';
+              document.getElementById('auth-msg').textContent = '';
+            };
+            if (_recovery) showNewPw();
             window.__supabase.auth.onAuthStateChange((event, s) => {
+              if (event === 'PASSWORD_RECOVERY') { hadSession = true; showNewPw(); return; }
+              if (_recovery && event === 'SIGNED_IN') { hadSession = true; showNewPw(); return; }
               if (event === 'SIGNED_IN' && !hadSession && s) { hadSession = true; reloadOnce(); return; }
               if (event === 'SIGNED_OUT' && hadSession) { hadSession = false; reloadOnce(); return; }
               gate.style.display = s ? 'none' : 'flex';

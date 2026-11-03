@@ -213,6 +213,7 @@ export function createLocalClient() {
       notify('SIGNED_IN', session);
       return { data: { session, user: session.user }, error: null };
     },
+    async updateUser() { return { data: {}, error: null }; },
     async signOut() { try { localStorage.removeItem(SESSION_KEY); } catch { /* abaikan */ } notify('SIGNED_OUT', null); return { error: null }; },
     onAuthStateChange(cb) { authSubs.add(cb); return { data: { subscription: { unsubscribe: () => authSubs.delete(cb) } } }; },
   };

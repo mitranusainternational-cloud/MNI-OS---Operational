@@ -390,3 +390,22 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 - Pemeriksaan langsung: Site URL production masih `http://localhost:3000` tanpa Redirect URL; `disable_signup=false`; env Vercel tidak berubah dan situs publik masih memakai database dev lama. Status rinci di [[ENVIRONMENTS]] (tabel "Status go-live production") dan tugas T-163.
 - Langkah-langkah itu adalah pengaturan keamanan dan kunci yang hanya dapat dilakukan pemilik; halaman yang diperlukan dibuka di Chrome pemilik (grup tab Claude) agar tinggal menyimpan.
+
+### 2026-11-03 — Posisi terhadap rencana go-live
+
+**Tahap sekarang:** jalur teknis hampir tuntas; jalur proses dan data belum dimulai. Itu penentu go-live.
+
+| Jalur ([[GO_LIVE_PLAN]]) | Posisi | Catatan |
+|---|---|---|
+| A Teknis (aplikasi, login, RLS, CRUD) | Hampir selesai | Aplikasi live di production, hak per modul, sinkron dua sesi sekitar 1 detik, 38 regresi + 12 role + 15 akses lulus di mock |
+| C Cloud (repo, Supabase, Vercel, CI) | Hampir selesai | Sisa kecil: variabel Preview (T-044), Redirect URL (T-047), backup (T-061) |
+| B Proses dan data | **Belum mulai** | T-030 walkthrough, T-031 pilot, T-032 sumber data, T-036 user awal; ini jalur kritis (sekitar 26 hari kerja) |
+
+**Hasil sesi ini:** production Supabase baru (skema migration 1–12), nama baku `mni-gudang`, Auth dan env Vercel diarahkan, uji baca/tulis/login, data uji dibersihkan, rencana adopsi, hak akses per pengguna dan per modul, menu Pengguna & Akses, sinkron berbasis sidik.
+
+**Aturan pengendalian lingkup mulai sekarang:** tidak ada fitur baru sebelum pilot berjalan. Hanya tiga jenis pekerjaan yang diterima: (1) syarat go-live di [[RENCANA_ADOPSI]], (2) perbaikan bug dari pilot, (3) hal yang diminta process owner. Permintaan lain dicatat sebagai tugas di rilis v1.1 atau v1.2 dan tidak dikerjakan lebih dulu. T-167 adalah satu-satunya penarikan maju dari v1.1.
+
+**Tiga langkah berikutnya, berurutan:**
+1. Sesi walkthrough dengan process owner (T-030, T-031): tentukan alur pilot dan kriteria terima. Agenda siap di [[DISCOVERY_AGENDA]].
+2. Konfirmasi sumber data dan user awal (T-032, T-036): workbook mana yang resmi, siapa saja yang masuk pilot dan modul apa untuk tiap orang.
+3. Sambil menunggu: tutup sisa teknis kecil (T-044, T-047, backup T-061) dan bersihkan data uji production.

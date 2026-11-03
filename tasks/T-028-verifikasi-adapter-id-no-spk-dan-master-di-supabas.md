@@ -5,13 +5,13 @@ title: "Verifikasi adapter id, no SPK, dan master di Supabase"
 phase: P2
 epic: E-03
 release: v1.0
-status: review
+status: done
 priority: P0
 env: development
 effort_days: 1
 depends: [T-012, T-021]
 owner: "dev"
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # T-028 Verifikasi adapter id, no SPK, dan master di Supabase
@@ -22,13 +22,14 @@ Bergantung pada: T-012, T-021
 
 ## Kriteria selesai
 
-- [ ] Buat, ubah (revisi), dan duplikat SPK berjalan di Postgres tanpa baris ganda
-- [ ] Id non-UUID (mis. spk-1003) tersimpan lewat pemetaan UUID
-- [ ] Dokumen master/setting dan pengaturan RM tersimpan dan terbaca
-- [ ] Hasil dicatat di TEST_MATRIX
+- [x] Buat, ubah (revisi), dan duplikat SPK berjalan di Postgres tanpa baris ganda
+- [x] Id non-UUID (mis. spk-1003) tersimpan lewat pemetaan UUID
+- [x] Dokumen master/setting dan pengaturan RM tersimpan dan terbaca
+- [x] Hasil dicatat di TEST_MATRIX
 
 ## Bukti
 
+- Adapter id, nomor SPK, dan master terverifikasi di dev dan production; lihat [[TEST_MATRIX]].
 - Sebagian: Postgres nyata menolak id non-UUID (`22P02`), sehingga pemetaan UUID diperlukan (lihat [[TEST_MATRIX]]). Uji penuh lewat app menunggu login nyata (T-029).
 
 ## Catatan
