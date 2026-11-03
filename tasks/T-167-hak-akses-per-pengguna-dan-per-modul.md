@@ -4,7 +4,7 @@ id: T-167
 title: "Hak akses per pengguna dan per modul, kelola pengguna dari aplikasi"
 phase: P5
 epic: E-09
-release: v1.0
+release: v1.1
 status: doing
 priority: P0
 env: production

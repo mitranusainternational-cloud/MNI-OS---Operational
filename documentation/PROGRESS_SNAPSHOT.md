@@ -39,8 +39,8 @@ generated: 2026-11-03
 | Rilis | Tema | Tugas | Effort | Status |
 |---|---|---|---|---|
 | v0.9 | Fondasi | 11/17 | 7.5/10.7 hari (70%) | active |
-| v1.0 | Pilot go-live | 7/49 | 9/69.9 hari (13%) | active |
-| v1.1 | Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | planned |
+| v1.0 | Pilot go-live | 7/48 | 9/67.9 hari (13%) | active |
+| v1.1 | Stabilisasi, akses, kualitas data | 0/9 | 0/23 hari (0%) | active |
 | v1.2 | Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | planned |
 | v2.0 | Modernisasi dan perluasan | 0/8 | 0/27 hari (0%) | planned |
 
@@ -123,7 +123,3 @@ generated: 2026-11-03
 - [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · review · menunggu T-022
 - [[tasks/T-163-aktifkan-supabase-production-dan-arahkan-vercel|T-163]] Aktifkan Supabase production dan arahkan Vercel · doing · menunggu T-162
 - [[tasks/T-167-hak-akses-per-pengguna-dan-per-modul|T-167]] Hak akses per pengguna dan per modul, kelola pengguna dari aplikasi · doing · menunggu T-163
-
-## Masalah data tugas
-
-- T-167: release v1.0 berbeda dengan epic E-09
