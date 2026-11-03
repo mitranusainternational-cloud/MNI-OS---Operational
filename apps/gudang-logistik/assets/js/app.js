@@ -130,7 +130,7 @@ async function boot(){
  cl.use('user').then(async u=>{USER=u;if(!u){renderMe();renderAccess();return}
    const me=await u.me();ME=me.id;ME_P=me;IS_OWNER=!!me.isOwner;IS_EDITOR=!!me.canEdit;const cw=await u.can('data.write');
    if(cw===false)CAN=false;
-   render()}).catch(()=>{});
+   route()}).catch(()=>{}); /* route(): tautan langsung seperti #pengguna baru valid setelah hak pengguna diketahui */
  cl.use('downloads').then(d=>{DLS=d}).catch(()=>{});
  for(const c of COLS){
   DB.collection(c).onSnapshot(snap=>{

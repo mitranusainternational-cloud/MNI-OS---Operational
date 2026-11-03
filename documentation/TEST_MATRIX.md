@@ -330,3 +330,21 @@ Belum diuji di Vercel: tombol ekspor PDF/Excel per modul (hanya pustakanya), tul
 Advisor: hanya peringatan yang sudah dikenal (fungsi pembantu RLS dapat dipanggil pengguna login, sengaja; leaked password protection menunggu paket berbayar).
 
 **Belum:** buat akun dan reset password sungguhan lewat menu (dikerjakan pemilik membuat anggota pertama), uji dua sesi untuk sinkron antar pengguna.
+
+**Menu Pengguna & Akses di situs live (2026-11-03, verified in browser dan database):** admin membuka menu, membuat anggota pertama lewat Edge Function; akun Auth terkonfirmasi dan baris `muser` dengan hak modul tersimpan benar. Dengan identitas anggota itu (transaksi rollback): membaca SPK (hak lihat), tidak membaca log dan pengguna lain, tulis SPK dan bahan baku (lihat) ditolak, tulis bongkar muat (ubah) diterima. Perbaikan bug tautan langsung `#pengguna` ada di `development` (c8717dc).
+
+**Belum:** reset password sungguhan dan uji dua sesi dengan dua orang yang login bersamaan.
+
+## Sinkron dua sesi di production (2026-11-03, verified in browser dan database)
+
+Sesi A: admin (pemantau waktu pada koleksi data). Sesi B: anggota berperan Logistik login dengan password sementara dan mencatat satu kendaraan di Bongkar Muat, lalu mengubah statusnya dua kali.
+
+| Peristiwa di sesi B | Terlihat di sesi A setelah |
+|---|---|
+| Catat kendaraan | 0,9 detik |
+| Mulai bongkar muat | sekitar 1 detik |
+| Selesai bongkar muat | 1,4 detik |
+
+Hasil: perubahan satu pengguna tampil di pengguna lain dalam sekitar 1 detik, lebih cepat dari batas 4 detik cek sidik. Baris tercatat atas nama anggota itu (created_by dan updBy benar). Login anggota dengan password sementara dari menu berfungsi.
+
+**Data uji tertinggal:** 1 baris bongkar muat dan 1 SPK yang tidak berpenanda UJI-PROD; skrip pembersih menolak berjalan sampai dicek (pengaman sengaja).
