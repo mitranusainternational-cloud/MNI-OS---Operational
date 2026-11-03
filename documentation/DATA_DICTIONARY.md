@@ -12,26 +12,26 @@ Kamus ini mencatat label dan bentuk data yang **terlihat pada workbook**, bukan 
 
 Sumber: tiga workbook dashboard PPIC bulanan. Header berada di baris 8 pada Agustus/September dan baris 9 pada Oktober.
 
-| Label sumber | Makna kandidat | Validasi yang diperlukan |
-|---|---|---|
-| `No` | Nomor urut pada tabel | Apakah nomor tampilan atau identitas? |
-| `Date` | Tanggal terkait order/SPK | Definisi tanggal dan timezone/cut-off. |
-| `Customer Name` | Nama customer | Master dan relasi ke customer/order. |
-| `No PO` | Nomor purchase/order customer | Definisi PO dan keunikan per customer. |
-| `No SPK` | Nomor perintah kerja | Format kanonis, revisi, serta relasi ke PO. |
-| `Jenis Material/ Finishing` | Material atau finishing | Apakah satu field gabungan atau dua atribut? |
-| `Thickness Material (mm)` | Ketebalan material | Sumber nilai, satuan, toleransi, dan tipe. |
-| `Type` | Jenis produk | Relasi ke master SKU/produk. |
-| `Estimasi Kebutuhan Plat (Lbr)` | Estimasi kebutuhan lembar plat | Definisi rumus, pembulatan, dan status estimasi/final. |
-| `Pengadaan Material` | Status/keterangan pengadaan | Nilai yang diperbolehkan dan arti tiap status. |
-| `Lead Time` | Lead time rencana | Titik awal/akhir dan unit hari kerja/kalender. |
-| `Actual kirim` | Tanggal atau realisasi pengiriman | Tipe data dan apakah satu/tahap pengiriman. |
-| `Actual leadtime` | Lead time aktual | Rumus dan batas tanggal yang digunakan. |
-| `telat kirim (berjalan)` | Keterlambatan yang masih berjalan | Definisi, tanda angka, dan kapan berhenti dihitung. |
-| `telat kirim (days)` | Hari keterlambatan | Aturan hari kerja/kalender dan nilai nol/kosong. |
-| `status` | Status order/SPK | Daftar status, transisi, owner update. |
-| `Progress` | Persentase/progres | Grain, basis perhitungan, tahap, dan skala. |
-| `Alasan keterlambatan Pengiriman` | Alasan keterlambatan | Taksonomi versus catatan bebas, pemilik, dan histori perubahan. |
+| Label sumber                      | Makna kandidat                    | Validasi yang diperlukan                                        |
+| --------------------------------- | --------------------------------- | --------------------------------------------------------------- |
+| `No`                              | Nomor urut pada tabel             | Apakah nomor tampilan atau identitas?                           |
+| `Date`                            | Tanggal terkait order/SPK         | Definisi tanggal dan timezone/cut-off.                          |
+| `Customer Name`                   | Nama customer                     | Master dan relasi ke customer/order.                            |
+| `No PO`                           | Nomor purchase/order customer     | Definisi PO dan keunikan per customer.                          |
+| `No SPK`                          | Nomor perintah kerja              | Format kanonis, revisi, serta relasi ke PO.                     |
+| `Jenis Material/ Finishing`       | Material atau finishing           | Apakah satu field gabungan atau dua atribut?                    |
+| `Thickness Material (mm)`         | Ketebalan material                | Sumber nilai, satuan, toleransi, dan tipe.                      |
+| `Type`                            | Jenis produk                      | Relasi ke master SKU/produk.                                    |
+| `Estimasi Kebutuhan Plat (Lbr)`   | Estimasi kebutuhan lembar plat    | Definisi rumus, pembulatan, dan status estimasi/final.          |
+| `Pengadaan Material`              | Status/keterangan pengadaan       | Nilai yang diperbolehkan dan arti tiap status.                  |
+| `Lead Time`                       | Lead time rencana                 | Titik awal/akhir dan unit hari kerja/kalender.                  |
+| `Actual kirim`                    | Tanggal atau realisasi pengiriman | Tipe data dan apakah satu/tahap pengiriman.                     |
+| `Actual leadtime`                 | Lead time aktual                  | Rumus dan batas tanggal yang digunakan.                         |
+| `telat kirim (berjalan)`          | Keterlambatan yang masih berjalan | Definisi, tanda angka, dan kapan berhenti dihitung.             |
+| `telat kirim (days)`              | Hari keterlambatan                | Aturan hari kerja/kalender dan nilai nol/kosong.                |
+| `status`                          | Status order/SPK                  | Daftar status, transisi, owner update.                          |
+| `Progress`                        | Persentase/progres                | Grain, basis perhitungan, tahap, dan skala.                     |
+| `Alasan keterlambatan Pengiriman` | Alasan keterlambatan              | Taksonomi versus catatan bebas, pemilik, dan histori perubahan. |
 
 ## Detail SPK
 
