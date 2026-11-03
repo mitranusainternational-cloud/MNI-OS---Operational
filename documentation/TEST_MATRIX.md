@@ -378,3 +378,15 @@ Transaksi di-rollback, data produksi tidak tersentuh.
 **Tampilan (mock):** sapu otomatis 12 halaman pada desktop, tablet, dan ponsel; uji kontras tema gelap dan terang; total tampilan 62 lulus. Penyebab teks gelap di tema gelap: aturan CSS cetak checklist bocor ke stylesheet global.
 
 **Verifikasi di situs live setelah PR #12 (verified in browser):** stylesheet live tidak lagi memuat aturan cetak yang bocor; di tema gelap warna judul, tabel, dan tombol terang (230,236,247) dan terbaca. Catatan: tab yang sudah terbuka sebelum deploy masih memakai CSS lama sampai dimuat ulang (header cache `must-revalidate`, jadi muat ulang biasa cukup).
+
+## Berat otomatis pada SPK di production (2026-11-03, verified in browser, hanya baca)
+
+Setelah PR #13 digabung (b7f661f) dan deploy berhasil, dengan sesi super admin setelah muat ulang:
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Mesin berat termuat (`window.MNIBerat`) dan tombol Katalog berat tampil di Master Data | PASS |
+| Berkas situs publik (JavaScript, CSS) tidak memuat rumus atau katalog; `/catalog.json` hanya mengembalikan halaman aplikasi | PASS |
+| Katalog asli belum dipasang (`siap` = false), berat tetap diisi manual sampai dipasang | sesuai rencana |
+
+**Belum:** pasang katalog asli lewat Master Data lalu bandingkan beberapa SPK nyata dengan hitungan Excel.
