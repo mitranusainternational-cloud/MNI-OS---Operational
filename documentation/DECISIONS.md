@@ -6,6 +6,12 @@ updated: 2026-11-02
 
 # Log keputusan workspace
 
+## 2026-11-03 — Pembaruan data antar sesi memakai polling, bukan push Realtime
+
+- **Konteks:** di Supabase dev channel Realtime SUBSCRIBED tetapi tidak ada event yang tiba (B-017). Diagnostik yang butuh melonggarkan hak fungsi untuk anon ditolak karena melemahkan keamanan.
+- **Keputusan (pemilik):** pakai polling. Adapter memuat ulang tiap 15 detik saat tab terlihat dan saat tab kembali fokus (`POLL_MS` mengatur interval); render dilewati bila data sama.
+- **Konsekuensi:** perubahan sesi lain tampil dalam sekitar 15 detik; beban sekitar 20 permintaan per tab tiap 15 detik. T-162 menjadi opsional (P2).
+
 ## 2026-11-03 — Struktur folder dibersihkan: satu kanonik, sisanya arsip
 
 - **Konteks:** tiga folder bernama mirip (`mni-app`, `MNI OS - Dept. Operasional`, `MNI OS - Dept. Operational`) dan `apps/mni-app` di dalam repo membuat rancu mana yang aktif; Obsidian sempat membuka folder yang salah.
