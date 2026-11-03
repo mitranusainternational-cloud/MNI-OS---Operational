@@ -101,7 +101,19 @@ export async function runAccess(page, base) {
   await page.waitForTimeout(2500);
   ok('A-18 Keluar: kembali ke halaman masuk', await page.evaluate(() => { const g = document.getElementById('auth-gate'); return !!g && getComputedStyle(g).display !== 'none'; }));
 
-  ok('A-19 tanpa pageerror', errs.length === 0, errs.join(' | '));
+  // Cadangan data: admin mengunduh JSON berisi semua tabel; bukan admin tidak melihat tombolnya
+  await login('admin@mni.local');
+  const bnOk = await page.evaluate(() => !!document.querySelector('.brief [data-act="backup"]'));
+  const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 15000 }), page.evaluate(() => document.querySelector('[data-act="backup"]').click())]);
+  const bkPath = await dl.path();
+  const bk = JSON.parse((await import('node:fs')).readFileSync(bkPath, 'utf8'));
+  ok('A-19 admin: unduh cadangan berisi semua tabel', bnOk && bk.format === 'mni-gudang-backup' && bk.jumlah.spk > 0 && bk.jumlah.muser >= 7 && 'role_modules' in bk.data && /^MNI-cadangan-[0-9]{4}-[0-9]{2}-[0-9]{2}\.json$/.test(dl.suggestedFilename()), JSON.stringify(bk.jumlah).slice(0, 90));
+  await page.waitForTimeout(1200);
+  ok('A-20 penanda cadangan tersimpan (peringatan hilang)', !(await page.evaluate(() => /belum ada cadangan/i.test((document.querySelector('.brief .bt') || {}).innerText || ''))));
+  await login('gbb@mni.local');
+  ok('A-21 bukan admin: tombol cadangan tidak ada', !(await page.evaluate(() => !!document.querySelector('[data-act="backup"]'))));
+
+  ok('A-22 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;
   return { pass: R.length - fail, fail, detail: R };
 }

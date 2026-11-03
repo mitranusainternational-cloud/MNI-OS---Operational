@@ -261,8 +261,11 @@ B.dashboard=()=>{
  if(vis('bahan-baku')&&rmLow.length)need.push(`${rmLow.length} bahan baku kritis`);
  if(vis('vendor')&&vOld>14)need.push('barang di vendor lebih dari 14 hari');
  if(isAdm&&crit)need.push(`${crit} temuan data kritis`);
+ if(isAdm&&ME_P&&USER&&USER.exportAll){const bk=byId('master','backup');const bd=bk&&bk.ts?Math.floor((Date.now()-new Date(bk.ts).getTime())/864e5):null;if(bd==null)need.push('belum ada cadangan data');else if(bd>7)need.push(`cadangan terakhir ${bd} hari lalu`)}
  const bcls=!need.length?'ok':(spLate||crit)?'crit':'warn';
- const qa=[['spk','spk','SPK baru'],['bahan-baku','bahan-baku','Terima material'],['pengiriman','pengiriman','Surat jalan'],['bongkar-muat','bongkar-muat','Catat kendaraan']].filter(([m])=>ME_P?myLevel(m)==='ubah':CAN).map(([m,h,l])=>`<a class="btn sm" href="#${h}">${l}</a>`).join('');
+ const qaBk=(isAdm&&ME_P&&USER&&USER.exportAll)?'<button type="button" class="btn sm" data-act="backup">Unduh cadangan</button>':'';
+ const qa0=[['spk','spk','SPK baru'],['bahan-baku','bahan-baku','Terima material'],['pengiriman','pengiriman','Surat jalan'],['bongkar-muat','bongkar-muat','Catat kendaraan']].filter(([m])=>ME_P?myLevel(m)==='ubah':CAN).map(([m,h,l])=>`<a class="btn sm" href="#${h}">${l}</a>`).join('');
+ const qa=qa0+qaBk;
  let h=`<section class="brief ${bcls}"><span class="dot"></span><div class="bt"><b>${need.length?need.length+' hal perlu perhatian':'Semua terkendali'}</b><span>${need.length?need.join(' · '):'Stok aman, SPK sesuai jadwal, barang di vendor dalam batas.'}</span></div><div class="qa">${qa}</div><time>${fd(t)}</time></section>
  <div class="sect-t">Operasional hari ini</div>
  <section class="kpis">
@@ -3039,7 +3042,7 @@ const LVL_OPT=[['','Tidak ada akses'],['lihat','Lihat saja'],['ubah','Lihat dan 
 const modulEff=m=>m.role==='admin'?null:(m.modul&&typeof m.modul==='object'?m.modul:presetModul(m.role));
 const modulChips=m=>{const o=modulEff(m);if(o===null)return '<span class="wchip">Semua modul</span>';const k=Object.keys(o);
  return k.length?k.map(x=>`<span class="wchip" style="${o[x]==='lihat'?'opacity:.6':''}" title="${o[x]==='ubah'?'Lihat dan ubah':'Lihat saja'}">${MODL[x]||x}${o[x]==='lihat'?' (lihat)':''}</span>`).join(''):'<span class="muted">tidak ada akses</span>'};
-T.pengguna=()=>canManage()?`<span class="grow"></span><button class="btn primary" data-act="uinvite">${ic('plus')}Tambah anggota tim</button>`:'';
+T.pengguna=()=>canManage()?`<span class="grow"></span><button class="btn" data-act="backup">${ic('dl')}Unduh cadangan</button><button class="btn primary" data-act="uinvite">${ic('plus')}Tambah anggota tim</button>`:'';
 B.pengguna=()=>{
  if(!canManage())return `<section class="panel"><div class="pbody"><div class="ro">Hanya super admin yang bisa mengatur pengguna dan akses.</div></div></section>`;
  const K=kpiAgg('30');const us=S.muser.slice().sort((x,y)=>(x.role==='admin'?0:1)-(y.role==='admin'?0:1)||String(x.nama||'').localeCompare(String(y.nama||'')));
@@ -3104,8 +3107,22 @@ function accountModal(){
  const mods=mo===null?'Semua modul':Object.entries(mo).map(([m,l])=>(MODL[m]||m)+(l==='lihat'?' (lihat)':'')).join(', ')||'Tidak ada';
  openModal('Akun saya',`<div class="full"><div class="ucell">${av(ME,'xl')}<div><b>${esc(ME_P.name||'')}</b><div class="note">${esc(ME_P.email||'')}${ME_P.jabatan?' · '+esc(ME_P.jabatan):''}</div></div></div></div>
   <div class="full note"><b>Peran:</b> ${esc(roleL(a.role))}<br><b>Akses modul:</b> ${esc(mods)}</div>
-  <div class="full" style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" data-act="pwself">Ganti password</button>${canManage()?'<a class="btn" href="#pengguna" data-act="closemodal">Kelola pengguna</a>':''}<button type="button" class="btn ghost danger" data-act="logout">Keluar</button></div>`,
+  <div class="full" style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" data-act="pwself">Ganti password</button>${canManage()?'<a class="btn" href="#pengguna" data-act="closemodal">Kelola pengguna</a><button type="button" class="btn" data-act="backup">Unduh cadangan</button>':''}<button type="button" class="btn ghost danger" data-act="logout">Keluar</button></div>`,
   async()=>{},{submit:'Tutup',done:' '});
+}
+/* ---- Cadangan data (super admin): unduh semua tabel sebagai satu berkas JSON ---- */
+async function backupData(){
+ if(!canManage()){toast('Hanya super admin yang bisa mengunduh cadangan.');return}
+ if(!USER||!USER.exportAll){toast('Cadangan hanya tersedia di backend Supabase.');return}
+ toast('Menyiapkan cadangan…');
+ try{
+  const data=await USER.exportAll();
+  const jumlah=Object.fromEntries(Object.entries(data).map(([k,v])=>[k,v.length]));
+  const file={format:'mni-gudang-backup',versi:1,dibuat:new Date().toISOString(),oleh:ME,jumlah,data};
+  await DLS.save({filename:`MNI-cadangan-${today()}.json`,data:new Blob([JSON.stringify(file)],{type:'application/json'})});
+  await DB.doc('master/backup').set({ts:file.dibuat,by:ME,jumlah}); /* bidang 'ts': 'at' ditimpa created_at oleh adapter */
+  toast('Cadangan diunduh · simpan di tempat aman, bukan di folder repo');
+ }catch(e){if(e.code!=='declined')toast('Gagal membuat cadangan: '+(e.message||e.code))}
 }
 function pwSelf(){
  openModal('Ganti password',fld('Password baru (minimal 8 karakter)',inp('pw1','','password','required minlength="8" autocomplete="new-password"'),true)+fld('Ulangi password baru',inp('pw2','','password','required autocomplete="new-password"'),true),
@@ -3519,6 +3536,7 @@ document.addEventListener('click',async e=>{
   case 'kpicsv':await kpiCsv();break;
   case 'mepage':case 'meclick':accountModal();break;
   case 'pwself':pwSelf();break;
+  case 'backup':closeModal();await backupData();break;
   case 'logout':closeModal();if(USER&&USER.signOut)await USER.signOut();break;
   case 'uedit':userForm(ds.uid);break;
   case 'upw':pwForm(ds.uid);break;
