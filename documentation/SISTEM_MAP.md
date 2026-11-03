@@ -99,7 +99,7 @@ Migration: file di `apps/platform/supabase/migrations/` (Git) lalu dipasang ke S
 |---|---|
 | Apa yang sedang dikerjakan dan sisanya? | [[PROGRESS_SNAPSHOT]], [[PROGRESS_DASHBOARD]], `tasks/` |
 | Apa yang sudah diuji dan hasilnya? | [[TEST_MATRIX]] |
-| Apakah siap dipakai tim? | [[AUDIT_KESIAPAN]] |
+| Apakah siap dipakai tim? | [[AUDIT_KESIAPAN]]; rencana pemakaian: [[RENCANA_ADOPSI]] |
 | Kode terakhir yang masuk dan CI-nya? | GitHub: tab Actions; `gh run list --repo mitranusainternational-cloud/mni-gudang` |
 | Versi mana yang live? | Vercel: Deployments; `git log origin/main -1` harus sama dengan commit deploy Production |
 | Skema, RLS, dan kesehatan database? | Supabase: Advisors, Migrations; cek jumlah migration sama dengan file repo |

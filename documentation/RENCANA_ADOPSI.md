@@ -25,7 +25,7 @@ Tujuan: tim gudang, PPIC, dan logistik memakai MNI Gudang & Logistik setiap hari
 | G3 | Cadangan: paket Supabase berbayar (backup harian) atau ekspor terjadwal; uji pulih sekali | pemilik | tanggal uji pulih tercatat |
 | G4 | Akun tim dibuat lewat Auth + `muser` dengan role yang benar; tidak ada pendaftaran bebas | pemilik | daftar akun dan role |
 | G5 | Redirect URL Auth dan variabel Preview dirapikan | pemilik | [[ENVIRONMENTS]] |
-| G6 | Keputusan repo publik atau privat (T-166) | pemilik | [[DECISIONS]] |
+| G6 | Keputusan repo publik atau privat (T-166) | pemilik | [[documentation/DECISIONS|DECISIONS]] |
 | G7 | PR `development` ke `main` digabung, deploy Production hijau | pemilik (persetujuan) | commit sama di GitHub dan Vercel |
 
 ## Tahap
