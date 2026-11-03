@@ -6,9 +6,9 @@ release: v1.0
 theme: Kualitas
 priority: P0
 status: active
-progress: 24
+progress: 31
 tasks_total: 14
-tasks_done: 3
+tasks_done: 4
 updated: 2026-11-03
 ---
 
@@ -37,7 +37,7 @@ Adapter meniru API Firestore di atas Postgres; perilaku realtime dan lock perlu 
 - [x] [[tasks/T-026-uji-lanjutan-ui-mock-fitur-yang-belum-tercakup|T-026]] Uji lanjutan UI mock: fitur yang belum tercakup · done · P1 · 3 hari
 - [ ] [[tasks/T-027-uji-sisa-ui-mock-void-koreksi-pr-dan-role|T-027]] Uji sisa UI mock: void, koreksi, PR, dan role · todo · P2 · 1.5 hari
 - [ ] [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]] Verifikasi adapter id, no SPK, dan master di Supabase · review · P0 · 1 hari
-- [ ] [[tasks/T-077-jadikan-regresi-e2e-runner-mandiri-dan-bagian-ci|T-077]] Jadikan regresi E2E runner mandiri dan bagian CI · review · P1 · 1.5 hari
+- [x] [[tasks/T-077-jadikan-regresi-e2e-runner-mandiri-dan-bagian-ci|T-077]] Jadikan regresi E2E runner mandiri dan bagian CI · done · P1 · 1.5 hari
 - [ ] [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · review · P0 · 0.5 hari
 - [ ] [[tasks/T-079-uji-role-lewat-aplikasi-dengan-akun-uji-per-role|T-079]] Uji role lewat aplikasi dengan akun uji per role · review · P1 · 1 hari
 - [ ] [[tasks/T-162-selidiki-event-realtime-supabase-tidak-tiba|T-162]] Selidiki event Realtime Supabase yang tidak tiba · todo · P2 · 0.5 hari

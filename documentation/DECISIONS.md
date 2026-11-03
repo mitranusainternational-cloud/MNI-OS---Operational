@@ -6,6 +6,11 @@ updated: 2026-11-02
 
 # Log keputusan workspace
 
+## 2026-11-03 — CI wajib lulus sebelum merge ke main
+
+- **Keputusan (pemilik):** job CI "Vault (tautan dan properti)" dan "Aplikasi (build dan regresi mock)" menjadi required status check pada `main`; strict (branch harus up to date) dimatikan; admin tidak dikecualikan secara berbeda dari sebelumnya.
+- **Konsekuensi:** PR dari `development` ke `main` hanya bisa digabung bila kedua job hijau dan 1 approval ada. Mengubah nama job berarti memperbarui aturan ini.
+
 ## 2026-11-03 — Pembaruan data antar sesi memakai polling, bukan push Realtime
 
 - **Konteks:** di Supabase dev channel Realtime SUBSCRIBED tetapi tidak ada event yang tiba (B-017). Diagnostik yang butuh melonggarkan hak fungsi untuk anon ditolak karena melemahkan keamanan.

@@ -5,7 +5,7 @@ title: "Jadikan regresi E2E runner mandiri dan bagian CI"
 phase: P2
 epic: E-03
 release: v1.0
-status: review
+status: done
 priority: P1
 env: development
 effort_days: 1.5
@@ -31,6 +31,8 @@ Bergantung pada: T-023
 - Berkas `apps/platform/tests/e2e/regression.mjs` dan `run.mjs` dibuat dari skenario yang lolos 33/33 lewat Playwright MCP (2026-11-02). Belum dijalankan sebagai runner mandiri dan belum ada devDependency.
 
 ## Catatan
+
+**Selesai 2026-11-03:** job "Vault (tautan dan properti)" dan "Aplikasi (build dan regresi mock)" kini required status check pada `main` (disetujui pemilik); aturan lama (1 approval, dismiss stale, resolusi percakapan, tanpa force push/hapus) dipertahankan.
 
 CI hijau 2026-11-03 (run 41558796125): vault, build, regresi 38 PASS, role 12 PASS di GitHub Actions. `npm run test:e2e` berjalan lokal dan di CI.
 

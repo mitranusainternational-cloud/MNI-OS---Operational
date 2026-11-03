@@ -328,3 +328,7 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 - Workflow `.github/workflows/ci.yml`: job Vault dan job Aplikasi (build, regresi mock 38, uji role 12). Dicoba dulu di clone bersih lokal, lalu di GitHub: run pertama merah karena uji role, penyebabnya bug aplikasi nyata B-018 (login sangat cepat sebelum pendengar auth terpasang tidak memuat ulang halaman sehingga identitas "Tamu"). Diperbaiki di `index.html`; run berikutnya hijau (41558796125).
 - Sisa S2: jadikan dua job itu required check pada `main` (pengaturan repo, butuh persetujuan pemilik). Berikutnya S3: Vercel preview (akun, butuh persetujuan).
+
+### 2026-11-03 — Required check CI aktif pada main
+
+- Atas persetujuan pemilik, proteksi `main` kini mewajibkan job "Vault (tautan dan properti)" dan "Aplikasi (build dan regresi mock)" lulus, selain aturan lama. Diverifikasi lewat API GitHub. T-046 dan T-077 selesai; tahap S2 selesai. Berikutnya S3: Vercel preview (akun, butuh persetujuan).
