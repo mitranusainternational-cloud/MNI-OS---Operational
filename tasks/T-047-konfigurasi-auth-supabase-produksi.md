@@ -5,13 +5,13 @@ title: "Konfigurasi Auth Supabase produksi"
 phase: P4
 epic: E-05
 release: v1.0
-status: todo
+status: doing
 priority: P0
 env: main
 effort_days: 1
 depends: [T-042]
 owner: "dev"
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # T-047 Konfigurasi Auth Supabase produksi
@@ -27,6 +27,7 @@ Bergantung pada: T-042
 
 ## Bukti
 
+- Site URL benar dan pendaftaran bebas mati (diverifikasi 2026-11-03). Sisa: periksa tanda `*` pada Redirect URL; leaked password protection menunggu paket berbayar.
 - Belum ada.
 
 ## Catatan

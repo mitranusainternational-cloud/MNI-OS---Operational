@@ -5,13 +5,13 @@ title: "Jalankan migration pembersihan policy role lama"
 phase: P2
 epic: E-03
 release: v1.0
-status: review
+status: done
 priority: P0
 env: development
 effort_days: 0.5
 depends: [T-022]
 owner: "pemilik akun Supabase"
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # T-078 Jalankan migration pembersihan policy role lama
@@ -24,10 +24,11 @@ Bergantung pada: T-022
 
 - [x] Policy lama diperketat (migration 6 ALTER POLICY, menggantikan migration 5)
 - [x] Uji ulang: viewer tidak dapat menulis log; role lama tidak lagi berlaku
-- [ ] Advisor keamanan dijalankan dan dicatat
+- [x] Advisor keamanan dijalankan dan dicatat
 
 ## Bukti
 
+- Migration 5 sampai 7 diputar berurutan pada project production kosong tanpa galat; lihat [[ENVIRONMENTS]].
 - Migration 6 terpasang; uji rollback: viewer dan role lama ditolak (lihat [[TEST_MATRIX]]). Advisor keamanan: lihat catatan.
 
 ## Catatan

@@ -5,7 +5,7 @@ title: "Verifikasi CRUD dan realtime semua koleksi"
 phase: P2
 epic: E-03
 release: v1.0
-status: review
+status: done
 priority: P0
 env: development
 effort_days: 3
@@ -22,12 +22,13 @@ Bergantung pada: T-020
 
 ## Kriteria selesai
 
-- [ ] 20 koleksi: add, get, set, update, delete lewat claude-adapter
-- [ ] Realtime onSnapshot memperbarui UI
-- [ ] Daftar bug tercatat
+- [x] 20 koleksi: add, get, set, update, delete lewat claude-adapter
+- [x] Realtime onSnapshot memperbarui UI
+- [x] Daftar bug tercatat
 
 ## Bukti
 
+- Uji tulis penuh di production (item, terima, pakai, opname, master, SPK, kirim, surat jalan, bongkar) dan sinkron dua sesi sekitar 1 detik; lihat [[TEST_MATRIX]].
 - Sebagian lewat mock (bukan Supabase): CRUD add/update/delete dan validasi diuji pada bahan baku, barang jadi, SPK, vendor, surat jalan, bongkar muat, dan master (14 fitur PASS, lihat [[TEST_MATRIX]]). Realtime dan konflik belum diuji. Tugas tetap `todo` sampai diuji pada Supabase.
 
 ## Catatan

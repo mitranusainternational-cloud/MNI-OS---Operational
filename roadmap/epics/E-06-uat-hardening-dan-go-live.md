@@ -5,10 +5,10 @@ title: "UAT, hardening, dan go-live"
 release: v1.0
 theme: Rilis
 priority: P0
-status: planned
-progress: 0
+status: active
+progress: 3
 tasks_total: 11
-tasks_done: 0
+tasks_done: 1
 updated: 2026-11-03
 ---
 
@@ -33,7 +33,7 @@ Waktu perbaikan setelah UAT sulit diprediksi.
 - [ ] [[tasks/T-053-sign-off-uat|T-053]] Sign-off UAT · todo · P0 · 0.5 hari
 - [ ] [[tasks/T-060-review-security-dan-performance-advisor|T-060]] Review security dan performance advisor · todo · P0 · 1 hari
 - [ ] [[tasks/T-061-backup-restore-drill-dan-rencana-rollback|T-061]] Backup, restore drill, dan rencana rollback · todo · P0 · 1 hari
-- [ ] [[tasks/T-062-header-keamanan-dan-https|T-062]] Header keamanan dan HTTPS · todo · P1 · 0.5 hari
+- [x] [[tasks/T-062-header-keamanan-dan-https|T-062]] Header keamanan dan HTTPS · done · P1 · 0.5 hari
 - [ ] [[tasks/T-063-impor-data-awal-ke-production-dan-rekonsiliasi|T-063]] Impor data awal ke production dan rekonsiliasi · todo · P0 · 1 hari
 - [ ] [[tasks/T-064-checklist-rilis-dan-merge-development-ke-main|T-064]] Checklist rilis dan merge development ke main · todo · P0 · 0.5 hari
 - [ ] [[tasks/T-065-go-live-dan-hypercare-lima-hari|T-065]] Go-live dan hypercare lima hari · todo · P0 · 5 hari
