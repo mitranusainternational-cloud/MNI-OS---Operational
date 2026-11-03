@@ -267,3 +267,27 @@ Login admin lewat browser pane pada server lokal mode production (`vite --mode s
 | Sebelum login | tidak ada permintaan data ke Supabase |
 
 Putaran tulis (alur catat dengan data berawalan `UJI-PROD`) belum dijalankan: menunggu keputusan pemilik karena data uji harus dibersihkan sebelum dipakai tim. Skrip uji ulang: `apps/platform/tests/e2e/prod-check.mjs` (tanpa `--tulis` hanya membaca).
+
+## Production: putaran tulis lewat aplikasi (2026-11-03, project MNI Gudang - Production)
+
+Admin login, server lokal mode production (port 5175), UI dijalankan lewat browser pane; hasil diverifikasi lewat REST dengan token sesi dan SQL. Data uji bertanda `UJI-PROD`.
+
+| Skenario | Hasil | Bukti |
+|---|---|---|
+| Item bahan baku baru | PASS | baris `rm`; simpan terasa instan |
+| Terima material, dua kali beruntun (supplier baru terdaftar otomatis) | PASS | RCV/2026/11/001 dan 002 (berbeda, naik) |
+| Pakai melebihi stok ditolak; pakai wajar (non-SPK) tercatat | PASS | tanpa baris untuk 999; PK/2026/11/001 |
+| `mutasi.item_id` terisi | PASS | semua baris mutasi |
+| Opname bahan baku (tab) | PASS | OPN/2026/11/001; tersimpan setelah 1215 ms |
+| Master vendor tambah, ubah, hapus permanen | PASS | 1240 ms, 1240 ms, 589 ms |
+| SPK terbit, draft tanpa due (due NULL), duplikat | PASS | 949, 851, 938 ms; nomor SPK 1, 2, 3 unik |
+| Kirim ke vendor | PASS | SJ-V/2026/11/001, `vendor.spk_id` terisi (kunci asing lolos) |
+| Surat jalan customer ×2 | PASS | SJ/2026/11/001 dan 002, `kirim.spk_id` terisi |
+| Antrean bongkar muat otomatis dari surat jalan | PASS | 1 baris, auto, status Antri |
+| Kunci penomoran atomik | PASS | semua baris `lock:*` bertipe objek; penghitung RCV 2, SJ 2, SJV 1, PK 1, OPN 1 |
+
+**Kecepatan** (komputer ini ke Frankfurt, median 233 ms per permintaan): menyimpan satu dokumen 0,6 sampai 1,5 detik (master 0,6 sampai 1,2; SPK 0,85 sampai 0,95; kirim vendor 1,5; opname 1,2). Dapat diterima untuk tim kecil; project baru di Singapura hanya perlu bila terasa lambat.
+
+**Hak per role:** diuji dengan transaksi yang di-rollback pada database production (lihat [[ENVIRONMENTS]]); mengganti role akun admin sungguhan di production untuk uji UI ditolak sebagai perubahan atas sumber daya bersama, jadi penegakan UI per role di production mengandalkan kode yang sama dengan dev (regresi role 12 PASS di mock, 4 role diuji di dev).
+
+**Data uji di production:** 4 SPK, 1 item bahan baku, 4 mutasi, 1 vendor kirim, 2 surat jalan, 1 bongkar, 1 opname, master vendor/supplier/customer uji, 23 log, 15 baris `master` (katalog, penghitung, kunci). Pembersihan: `apps/platform/supabase/ops/bersihkan_data_uji.sql` (dijalankan pemilik di SQL Editor; berhenti sendiri bila ada data tidak bertanda uji).

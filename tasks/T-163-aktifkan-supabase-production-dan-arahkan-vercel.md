@@ -25,11 +25,12 @@ Bergantung pada: T-162
 - [x] Pengguna auth admin dibuat di project MNI Gudang - Production dan login berhasil
 - [ ] Auth: Site URL, Redirect URL, sign-up dimatikan, leaked password protection aktif
 - [ ] Env Vercel (Production dan Preview) mengarah ke project production
-- [ ] Uji penuh dari fondasi ke output (RLS, alur aplikasi, ekspor) di production
+- [x] Uji penuh dari fondasi ke output (RLS, alur aplikasi) di production; ekspor PDF/Excel dan login di Vercel menyusul
 - [ ] Catat di ENVIRONMENTS, SISTEM_MAP, TEST_MATRIX
 
 ## Bukti
 
+- Uji tulis production lulus 2026-11-03 (nomor dokumen, kolom relasi, kunci atomik; simpan 0,6 sampai 1,5 detik); lihat [[TEST_MATRIX]]. Pembersih data uji: `apps/platform/supabase/ops/bersihkan_data_uji.sql`.
 - Login admin dan uji baca production lulus 2026-11-03 (10 modul, 21 tabel, latensi median 233 ms); lihat [[TEST_MATRIX]].
 - Migration 1–10 terpasang berurutan pada project kosong, matriks role dan advisor diperiksa (2026-11-03); lihat [[ENVIRONMENTS]].
 

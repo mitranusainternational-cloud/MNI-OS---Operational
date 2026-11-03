@@ -379,3 +379,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Pengguna admin dibuat pemilik di project MNI Gudang - Production (terkonfirmasi, berpasangan dengan `muser` admin). Login berhasil di server lokal mode production; 10 modul dan 21 tabel dibaca dengan benar; latensi median 233 ms ke Frankfurt. Lihat [[TEST_MATRIX]].
 - Skrip baru `apps/platform/tests/e2e/prod-check.mjs` (login manual pemilik; opsi `--tulis` untuk data uji `UJI-PROD`). Chromium berjendela tidak dapat dijalankan dari proses asisten (spawn UNKNOWN), jadi uji putaran ini lewat browser pane.
 - Sisa T-163: uji tulis di production (menunggu keputusan data uji), pengaturan Auth (Site URL, Redirect URL, sign-up, leaked password), env Vercel ke project production.
+
+### 2026-11-03 — Uji tulis di Supabase Production
+
+- Alur catat lengkap lulus di production (item, terima dua kali, pakai, opname, master tambah/ubah/hapus, tiga jenis SPK, kirim vendor, dua surat jalan, antrean bongkar otomatis); nomor dokumen, kolom relasi, dan kunci atomik benar; waktu simpan 0,6 sampai 1,5 detik. Detail di [[TEST_MATRIX]].
+- Data uji `UJI-PROD` tertinggal; skrip pembersih bersyarat tersedia di `apps/platform/supabase/ops/bersihkan_data_uji.sql` (pemilik menjalankan sebelum go-live).
+- Uji ganti role pada akun admin di production ditolak sebagai perubahan atas sumber daya bersama; tidak diulang.
