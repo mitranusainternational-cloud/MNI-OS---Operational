@@ -26,3 +26,9 @@ description: Model role dan RLS MNI OS (role_modules, can_mod/can_any/is_admin, 
 - UI mock: `apps/platform/tests/e2e/roles.mjs` (`runRoles(page, base)`, 12 pemeriksaan) di satu tab. Setelah `extract`.
 - Jalankan advisor keamanan setelah setiap migration (`get_advisors`) dan catat di `documentation/ENVIRONMENTS.md`.
 - Catat hasil di `documentation/TEST_MATRIX.md` (matriks alur × role) dan tugas T-022, T-079.
+
+## Urutan migration untuk lingkungan baru (2026-11-03)
+
+- 1–4 buat schema, policy awal, kompatibilitas, dan model role; **5 menghapus policy lama** (DROP); 6 dan 9 meng-ALTER hanya bila policy-nya ada; 7 mencabut hak anon; 8 backfill kolom relasi.
+- Di dev, 5 tidak dijalankan (DROP ditolak konektor): policy lama dan `_v2` berdampingan dengan isi identik.
+- Lingkungan baru wajib diuji penuh (matriks role dengan rollback, advisor) sebelum dipakai; urutan 1–9 belum dijalankan penuh di project kosong.

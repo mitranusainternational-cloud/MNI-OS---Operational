@@ -1,44 +1,48 @@
 -- ============================================================
--- MNI Gudang - Policy lama diganti isinya (ALTER, tanpa DROP) — 2026-11-02
+-- MNI Gudang - Policy lama diganti isinya (ALTER, tanpa DROP) — 2026-11-02, dibuat tahan-urutan 2026-11-03
 -- ============================================================
 -- Tujuan sama dengan 20240101000005 (menghapus hak role lama manager/gudang/produksi dan hak tulis log
--- untuk viewer) tetapi memakai ALTER POLICY sehingga tidak ada pernyataan DROP. Setelah ini setiap
--- policy lama memiliki aturan yang sama dengan padanan _v2-nya (duplikat tidak berbahaya). Migration 5
--- (DROP) menjadi pembersihan kosmetik opsional untuk menghapus duplikat.
+-- untuk viewer) tetapi memakai ALTER POLICY sehingga tidak ada pernyataan DROP. Setiap ALTER hanya dijalankan
+-- bila policy-nya ada: di lingkungan baru migration 5 (DROP policy lama) berjalan lebih dulu sehingga ALTER ini
+-- dilewati dan hasil akhirnya tetap satu set policy; di Supabase dev (migration 5 tidak pernah dijalankan)
+-- policy lama diubah isinya sama dengan padanan _v2.
+-- Isi ALTER di bawah identik dengan versi terpasang di dev (2026-11-02); hanya dibungkus pemeriksaan keberadaan.
 
--- Master data
-ALTER POLICY "mwc_write"       ON public.mwc TO authenticated       USING (public.can_any()) WITH CHECK (public.can_any());
-ALTER POLICY "mvendor_write"   ON public.mvendor TO authenticated   USING (public.can_any()) WITH CHECK (public.can_any());
-ALTER POLICY "mcustomer_write" ON public.mcustomer TO authenticated USING (public.can_any()) WITH CHECK (public.can_any());
-ALTER POLICY "msupplier_write" ON public.msupplier TO authenticated USING (public.can_any()) WITH CHECK (public.can_any());
-ALTER POLICY "marmada_write"   ON public.marmada TO authenticated   USING (public.can_any()) WITH CHECK (public.can_any());
-ALTER POLICY "master_write"    ON public.master TO authenticated    USING (public.can_any()) WITH CHECK (public.can_any());
-
--- Gudang
-ALTER POLICY "rm_write"     ON public.rm TO authenticated     USING (public.can_mod('bahan-baku')) WITH CHECK (public.can_mod('bahan-baku'));
-ALTER POLICY "rmhist_write" ON public.rmhist TO authenticated USING (public.can_mod('bahan-baku')) WITH CHECK (public.can_mod('bahan-baku'));
-ALTER POLICY "pr_write"     ON public.pr TO authenticated     USING (public.can_mod('bahan-baku')) WITH CHECK (public.can_mod('bahan-baku'));
-ALTER POLICY "opname_write" ON public.opname TO authenticated USING (public.can_mod('bahan-baku')) WITH CHECK (public.can_mod('bahan-baku'));
-ALTER POLICY "fg_write"     ON public.fg TO authenticated     USING (public.can_mod('barang-jadi')) WITH CHECK (public.can_mod('barang-jadi'));
-ALTER POLICY "mutasi_write" ON public.mutasi TO authenticated
-  USING      (public.can_mod(CASE WHEN gudang = 'rm' THEN 'bahan-baku' ELSE 'barang-jadi' END))
-  WITH CHECK (public.can_mod(CASE WHEN gudang = 'rm' THEN 'bahan-baku' ELSE 'barang-jadi' END));
-
--- Produksi dan logistik
-ALTER POLICY "spk_write"    ON public.spk TO authenticated    USING (public.can_mod('spk')) WITH CHECK (public.can_mod('spk'));
-ALTER POLICY "vendor_write" ON public.vendor TO authenticated USING (public.can_mod('vendor')) WITH CHECK (public.can_mod('vendor'));
-ALTER POLICY "kirim_write"  ON public.kirim TO authenticated  USING (public.can_mod('pengiriman')) WITH CHECK (public.can_mod('pengiriman'));
-ALTER POLICY "bongkar_write" ON public.bongkar TO authenticated
-  USING      (public.can_mod('bongkar-muat') OR (COALESCE((data ->> 'auto')::boolean, false) AND public.can_any()))
-  WITH CHECK (public.can_mod('bongkar-muat') OR (COALESCE((data ->> 'auto')::boolean, false) AND public.can_any()));
-
--- Pengguna, undangan, log, permintaan akses
-ALTER POLICY "muser_read_self" ON public.muser TO authenticated USING (public.is_authenticated() AND (email = auth.email() OR public.is_admin()));
-ALTER POLICY "muser_write"     ON public.muser TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());
-ALTER POLICY "uinv_admin"      ON public.uinv TO authenticated  USING (public.is_admin()) WITH CHECK (public.is_admin());
-ALTER POLICY "log_read"        ON public.log TO authenticated   USING (public.is_admin());
-ALTER POLICY "log_write"       ON public.log TO authenticated   WITH CHECK (public.can_any());
-ALTER POLICY "ureq_read"       ON public.ureq TO authenticated  USING (public.is_authenticated() AND (from_user = auth.email() OR public.is_admin()));
-ALTER POLICY "ureq_write"      ON public.ureq TO authenticated
-  USING      (public.is_authenticated() AND (from_user = auth.email() OR public.is_admin()))
-  WITH CHECK (public.is_authenticated() AND (from_user = auth.email() OR public.is_admin()));
+DO $$
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN SELECT * FROM (VALUES
+    ('mwc_write', 'mwc', 'public.can_any()', 'public.can_any()'),
+    ('mvendor_write', 'mvendor', 'public.can_any()', 'public.can_any()'),
+    ('mcustomer_write', 'mcustomer', 'public.can_any()', 'public.can_any()'),
+    ('msupplier_write', 'msupplier', 'public.can_any()', 'public.can_any()'),
+    ('marmada_write', 'marmada', 'public.can_any()', 'public.can_any()'),
+    ('master_write', 'master', 'public.can_any()', 'public.can_any()'),
+    ('rm_write', 'rm', 'public.can_mod(''bahan-baku'')', 'public.can_mod(''bahan-baku'')'),
+    ('rmhist_write', 'rmhist', 'public.can_mod(''bahan-baku'')', 'public.can_mod(''bahan-baku'')'),
+    ('pr_write', 'pr', 'public.can_mod(''bahan-baku'')', 'public.can_mod(''bahan-baku'')'),
+    ('opname_write', 'opname', 'public.can_mod(''bahan-baku'')', 'public.can_mod(''bahan-baku'')'),
+    ('fg_write', 'fg', 'public.can_mod(''barang-jadi'')', 'public.can_mod(''barang-jadi'')'),
+    ('mutasi_write', 'mutasi', 'public.can_mod(CASE WHEN gudang = ''rm'' THEN ''bahan-baku'' ELSE ''barang-jadi'' END)', 'public.can_mod(CASE WHEN gudang = ''rm'' THEN ''bahan-baku'' ELSE ''barang-jadi'' END)'),
+    ('spk_write', 'spk', 'public.can_mod(''spk'')', 'public.can_mod(''spk'')'),
+    ('vendor_write', 'vendor', 'public.can_mod(''vendor'')', 'public.can_mod(''vendor'')'),
+    ('kirim_write', 'kirim', 'public.can_mod(''pengiriman'')', 'public.can_mod(''pengiriman'')'),
+    ('bongkar_write', 'bongkar', 'public.can_mod(''bongkar-muat'') OR (COALESCE((data ->> ''auto'')::boolean, false) AND public.can_any())', 'public.can_mod(''bongkar-muat'') OR (COALESCE((data ->> ''auto'')::boolean, false) AND public.can_any())'),
+    ('muser_read_self', 'muser', 'public.is_authenticated() AND (email = auth.email() OR public.is_admin())', NULL),
+    ('muser_write', 'muser', 'public.is_admin()', 'public.is_admin()'),
+    ('uinv_admin', 'uinv', 'public.is_admin()', 'public.is_admin()'),
+    ('log_read', 'log', 'public.is_admin()', NULL),
+    ('log_write', 'log', NULL, 'public.can_any()'),
+    ('ureq_read', 'ureq', 'public.is_authenticated() AND (from_user = auth.email() OR public.is_admin())', NULL),
+    ('ureq_write', 'ureq', 'public.is_authenticated() AND (from_user = auth.email() OR public.is_admin())', 'public.is_authenticated() AND (from_user = auth.email() OR public.is_admin())')
+  ) AS v(pol, tbl, u, c)
+  LOOP
+    IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = r.tbl AND policyname = r.pol) THEN
+      EXECUTE format('ALTER POLICY %I ON public.%I TO authenticated%s%s', r.pol, r.tbl,
+        CASE WHEN r.u IS NULL THEN '' ELSE ' USING (' || r.u || ')' END,
+        CASE WHEN r.c IS NULL THEN '' ELSE ' WITH CHECK (' || r.c || ')' END);
+    END IF;
+  END LOOP;
+END;
+$$;

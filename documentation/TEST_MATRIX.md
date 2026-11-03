@@ -234,3 +234,13 @@ Tercatat di [[tasks/T-027-uji-sisa-ui-mock-void-koreksi-pr-dan-role|T-027]]: bat
 **Catatan penting:** B-007, B-008, dan B-009 diperbaiki di adapter dan divalidasi pada mock yang meniru batasan Postgres (id UUID). Perilaku pada Postgres/Supabase sungguhan belum terbukti dan dijadwalkan di [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]]. Ekspor Excel/PDF memuat pustaka dari CDN sehingga butuh internet (lihat T-143).
 
 Di luar mock: login OTP nyata, RLS per role, realtime antar pengguna, dan konflik penulisan tetap menunggu Docker (T-011, T-020 sampai T-022).
+
+## Uji menyeluruh sebelum Vercel (2026-11-03)
+
+| Area | Hasil |
+|---|---|
+| main di GitHub | = development (PR #1, merge 11a2d40; 233 berkas; pemindaian rahasia bersih) |
+| CI | hijau di development dan PR (vault, build, regresi 38, role 12) |
+| Mock lokal | regresi 38 PASS, role 12 PASS |
+| Supabase dev lewat aplikasi | login admin, 10 modul terbuka, label "Terhubung ke database"; alur CRUD dan 4 role lulus (lihat bagian sebelumnya) |
+| Supabase dev lewat SQL | RLS 21 tabel aktif; hak per role setelah migration 9 benar; advisor keamanan tinggal 2 WARN yang disengaja/aksi pemilik |
