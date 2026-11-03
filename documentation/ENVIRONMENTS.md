@@ -128,3 +128,17 @@ Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewa
 - Chrome pemilik untuk Supabase masuk sebagai akun lain (organisasi "Software Development", 2 project, termasuk `lggqigmvtefkquqjrjsb` "MNI-OS - Operational"). Di akun itu project dev tidak terlihat: membuka dashboard `inldyqigewmziwazalun` mengarah ke daftar organisasi. Inilah sebab kunci project yang salah tertempel ke Vercel dua kali (terdeteksi sebelum deploy).
 - Akibat: pengaturan Auth (Site URL, Redirect URL, template email, leaked password) dan SQL Editor project dev hanya bisa dibuka dengan login Supabase akun pemilik project itu, atau setelah akun lain diundang sebagai anggota organisasinya. Sampai Site URL diubah, tautan masuk email mengarah ke `http://localhost:3000` dan sesi harus dipindahkan manual ke domain Vercel.
 - Aturan: jangan menulis alamat email akun pribadi di repositori publik; sebut "akun pemilik".
+
+## Project Supabase production di akun mitranusainternational (2026-11-03)
+
+| Item | Nilai |
+|---|---|
+| Project | **MNI Gudang - Production** (nama awal "MNI-OS - Operational"), ref `lggqigmvtefkquqjrjsb`, URL `https://lggqigmvtefkquqjrjsb.supabase.co` |
+| Akun / organisasi | akun mitranusainternational, organisasi "Software Devellopment" (paket gratis), pemilik = akun itu |
+| Region | eu-central-1 (Frankfurt); tidak bisa dipindah. Jarak ke Indonesia menambah latensi tiap permintaan; dicatat sebagai risiko |
+| Konektor Claude | konektor Supabase kedua (id `72053749-…`) terhubung ke akun ini; konektor `plugin_supabase` terhubung ke akun pribadi pemilik (project dev lama `inldyqigewmziwazalun`) |
+| Migration | 1–10 dijalankan berurutan pada project **kosong** (uji lingkungan baru): hasilnya 21 tabel, RLS aktif semua, satu set policy bersih (tanpa duplikat), `role_modules`, `try_lock`; migration 5 (DROP policy lama) diterima konektor di project baru |
+| Matriks role (rollback) | admin semua; viewer, gudang, manager ditolak semua; ppic: log, SPK, master; gbb: log, bahan baku, master; gbj: log, barang jadi, master; logistik: log, master; kunci `try_lock` hanya untuk role yang boleh mencatat |
+| Advisor | keamanan: hanya 6 fungsi pembantu yang dapat dipanggil authenticated (disengaja); performa: 3 `multiple_permissive_policies` (policy ALL berdampingan dengan SELECT) dan indeks belum terpakai; tidak ada temuan anon, extension, atau initplan |
+| Data | **tidak ada data uji dipindahkan.** Isi dev lama hanya data uji (SPK 1–6, item/supplier/customer UJI, counter, katalog berisi customer uji). Production dimulai bersih; satu baris `muser` admin dibuat |
+| Env lokal | `apps/platform/.env.supabase-prod.local` (tidak di Git), server `vite --mode supabase-prod --port 5175` |
