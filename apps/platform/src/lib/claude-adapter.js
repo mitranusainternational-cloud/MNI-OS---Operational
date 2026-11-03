@@ -180,6 +180,22 @@ function makeCollection(col) {
       return { id: result.id, ...numericNo(table, result) };
     },
 
+    // Impor massal: satu permintaan per 200 baris (hemat waktu dibanding add() satu per satu).
+    async addMany(list) {
+      const rows = [];
+      for (const data of list) {
+        const packed = packRow(table, textNo(table, await linkIds(table, docToRow(null, data))), true);
+        const row = { ...packed.row, data: packed.extra };
+        delete row.id;
+        rows.push(row);
+      }
+      for (let i = 0; i < rows.length; i += 200) {
+        const { error } = await supabase.from(table).insert(rows.slice(i, i + 200));
+        if (error) throw new Error(`[addMany:${table}] ${error.message}`);
+      }
+      notifyWrite(table);
+    },
+
     // Firestore: collection(col).onSnapshot(cb) → Realtime subscription
     onSnapshot(cb, errCb) {
       // Initial load

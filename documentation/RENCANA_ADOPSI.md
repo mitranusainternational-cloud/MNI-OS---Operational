@@ -22,7 +22,7 @@ Tujuan: tim gudang, PPIC, dan logistik memakai MNI Gudang & Logistik setiap hari
 |---|---|---|---|
 | G1 | Login admin di situs Vercel, 10 modul, ekspor PDF/Excel, CSP bersih | dev + pemilik | catatan di [[TEST_MATRIX]] |
 | G2 | Data uji production dibersihkan (`bersihkan_data_uji.sql`): **selesai 2026-11-03** | pemilik | hitungan tabel nol kecuali `muser` dan `role_modules` |
-| G3 | Cadangan: paket Supabase berbayar (backup harian) atau ekspor terjadwal; uji pulih sekali | pemilik | tanggal uji pulih tercatat |
+| G3 | Cadangan: alat unduh cadangan dan skrip pulih **siap** ([[BACKUP_RESTORE]]); tinggal jadwal harian dan satu latihan pulih; paket berbayar bila memungkinkan | pemilik | tanggal uji pulih tercatat |
 | G4 | Akun tim dibuat lewat Auth + `muser` dengan role yang benar; tidak ada pendaftaran bebas | pemilik | daftar akun dan role |
 | G5 | Redirect URL Auth dan variabel Preview dirapikan | pemilik | [[ENVIRONMENTS]] |
 | G6 | Keputusan repo publik atau privat (T-166) | pemilik | [[documentation/DECISIONS|DECISIONS]] |
@@ -71,3 +71,16 @@ Urutan modul pilot yang disarankan: terima material, pakai material, SPK, surat 
 ## Rutinitas setelah berjalan
 
 Ikuti tabel rutinitas di [[SISTEM_MAP]]. Tambahan: tinjauan pemakaian tiap bulan bersama tim (apa yang masih merepotkan), lalu masukkan ke roadmap sebagai tugas.
+
+## Status gerbang (2026-11-03)
+
+| Gerbang | Status |
+|---|---|
+| G1 login admin, modul, ekspor, CSP | selesai |
+| G2 data uji dibersihkan | selesai (uji tersisa dibersihkan lagi sebelum pilot bila ada) |
+| G3 cadangan | alat siap; jadwal dan latihan pulih menunggu pemilik |
+| G4 akun tim dengan hak per modul | menu siap dan teruji; akun tim menunggu daftar dari walkthrough |
+| G5 Redirect URL dan variabel Preview | menunggu pemilik |
+| G6 repo publik atau privat | menunggu keputusan pemilik |
+| G7 PR ke main | berjalan per fitur |
+| Impor data awal ([[IMPOR_DATA_AWAL]]) | alat siap; isi menunggu sumber resmi dari walkthrough |

@@ -11,10 +11,10 @@ generated: 2026-11-03
 
 ## Ringkasan
 
-- Tugas selesai: **25 / 90** (28%)
-- Bobot effort selesai: **25 / 150.59999999999997 hari kerja** (17%)
-- Sisa effort: **125.60000000000001 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
-- Cakupan go-live (fase P0-P7): **25 / 68** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
+- Tugas selesai: **25 / 91** (27%)
+- Bobot effort selesai: **25 / 151.59999999999997 hari kerja** (16%)
+- Sisa effort: **126.60000000000001 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
+- Cakupan go-live (fase P0-P7): **25 / 69** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
 - Diblokir: **1**, sedang dikerjakan: **2**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
@@ -27,7 +27,7 @@ generated: 2026-11-03
 | P2 Aplikasi siap uji | 8/16 | 13.5/24 hari (56%) | berjalan |
 | P3 Data dan proses | 0/7 | 0/13.5 hari (0%) | belum mulai |
 | P4 Environment cloud | 6/9 | 3.5/6 hari (58%) | berjalan |
-| P5 UAT pilot | 1/9 | 1/13.399999999999999 hari (7%) | berjalan |
+| P5 UAT pilot | 1/10 | 1/14.399999999999999 hari (7%) | berjalan |
 | P6 Hardening dan rilis | 1/7 | 0.5/9.5 hari (5%) | berjalan |
 | P7 Operasi dan dokumentasi | 0/5 | 0/5.5 hari (0%) | belum mulai |
 | P8 v1.1 Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | belum mulai |
@@ -39,7 +39,7 @@ generated: 2026-11-03
 | Rilis | Tema | Tugas | Effort | Status |
 |---|---|---|---|---|
 | v0.9 | Fondasi | 11/18 | 7.5/11.2 hari (67%) | active |
-| v1.0 | Pilot go-live | 14/48 | 17.5/67.9 hari (26%) | active |
+| v1.0 | Pilot go-live | 14/49 | 17.5/68.9 hari (25%) | active |
 | v1.1 | Stabilisasi, akses, kualitas data | 0/10 | 0/23.5 hari (0%) | active |
 | v1.2 | Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | planned |
 | v2.0 | Modernisasi dan perluasan | 0/8 | 0/27 hari (0%) | planned |
@@ -53,7 +53,7 @@ generated: 2026-11-03
 | [[roadmap/epics/E-03-kualitas-aplikasi-dan-keamanan-data\|E-03]] Kualitas aplikasi dan keamanan data | v1.0 | 8/14 | 60% | active |
 | [[roadmap/epics/E-04-proses-data-dan-pilot\|E-04]] Proses, data, dan pilot | v1.0 | 0/7 | 0% | planned |
 | [[roadmap/epics/E-05-environment-cloud-dan-ci-cd\|E-05]] Environment cloud dan CI/CD | v1.0 | 5/10 | 55% | active |
-| [[roadmap/epics/E-06-uat-hardening-dan-go-live\|E-06]] UAT, hardening, dan go-live | v1.0 | 1/11 | 3% | active |
+| [[roadmap/epics/E-06-uat-hardening-dan-go-live\|E-06]] UAT, hardening, dan go-live | v1.0 | 1/12 | 3% | active |
 | [[roadmap/epics/E-07-dokumentasi-dan-situs-docs\|E-07]] Dokumentasi dan situs Docs | v1.0 | 0/4 | 0% | planned |
 | [[roadmap/epics/E-08-operasi-dan-dukungan\|E-08]] Operasi dan dukungan | v1.0 | 0/2 | 0% | planned |
 | [[roadmap/epics/E-09-akses-peran-dan-audit\|E-09]] Akses, peran, dan audit | v1.1 | 0/6 | 0% | active |
@@ -96,6 +96,7 @@ generated: 2026-11-03
 - [[tasks/T-167-hak-akses-per-pengguna-dan-per-modul|T-167]] Hak akses per pengguna dan per modul, kelola pengguna dari aplikasi · dev + pemilik
 - [[tasks/T-168-rapikan-dashboard-ringkasan-kpi-dan-analisis|T-168]] Rapikan dashboard: ringkasan kondisi, KPI bertingkat, funnel SPK · dev
 - [[tasks/T-169-akun-saya-ganti-dan-lupa-password-dan-keluar|T-169]] Akun saya: ganti password, lupa password, dan tombol keluar · dev
+- [[tasks/T-170-kesiapan-pilot-cadangan-dan-impor-csv|T-170]] Kesiapan pilot: cadangan data dan impor CSV master dan stok awal · dev + pemilik
 
 ## Tugas P0 yang belum selesai
 
@@ -121,3 +122,4 @@ generated: 2026-11-03
 - [[tasks/T-065-go-live-dan-hypercare-lima-hari|T-065]] Go-live dan hypercare lima hari · todo · menunggu T-064, T-063, T-047
 - [[tasks/T-167-hak-akses-per-pengguna-dan-per-modul|T-167]] Hak akses per pengguna dan per modul, kelola pengguna dari aplikasi · review
 - [[tasks/T-169-akun-saya-ganti-dan-lupa-password-dan-keluar|T-169]] Akun saya: ganti password, lupa password, dan tombol keluar · review · menunggu T-167
+- [[tasks/T-170-kesiapan-pilot-cadangan-dan-impor-csv|T-170]] Kesiapan pilot: cadangan data dan impor CSV master dan stok awal · review · menunggu T-167

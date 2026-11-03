@@ -409,3 +409,7 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 1. Sesi walkthrough dengan process owner (T-030, T-031): tentukan alur pilot dan kriteria terima. Agenda siap di [[DISCOVERY_AGENDA]].
 2. Konfirmasi sumber data dan user awal (T-032, T-036): workbook mana yang resmi, siapa saja yang masuk pilot dan modul apa untuk tiap orang.
 3. Sambil menunggu: tutup sisa teknis kecil (T-044, T-047, backup T-061) dan bersihkan data uji production.
+
+### 2026-11-03 — Kesiapan pilot (T-170)
+
+Menjawab penilaian kesiapan: data uji dibersihkan, cadangan dan pemulihan (unduh JSON, peringatan dashboard, skrip pulih, runbook), impor CSV master dan stok awal (templat, pratinjau, tanpa menimpa), akun saya dan ganti password, dashboard baru. Sisa tugas pemilik: SMTP kustom, admin kedua, jadwal cadangan dan latihan pulih, keputusan repo. Sisa yang butuh tim: walkthrough, sumber data resmi, peserta pilot. Lihat [[RENCANA_ADOPSI]] bagian status gerbang.

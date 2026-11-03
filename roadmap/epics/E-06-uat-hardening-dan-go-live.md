@@ -7,7 +7,7 @@ theme: Rilis
 priority: P0
 status: active
 progress: 3
-tasks_total: 11
+tasks_total: 12
 tasks_done: 1
 updated: 2026-11-03
 ---
@@ -38,5 +38,6 @@ Waktu perbaikan setelah UAT sulit diprediksi.
 - [ ] [[tasks/T-064-checklist-rilis-dan-merge-development-ke-main|T-064]] Checklist rilis dan merge development ke main · todo · P0 · 0.5 hari
 - [ ] [[tasks/T-065-go-live-dan-hypercare-lima-hari|T-065]] Go-live dan hypercare lima hari · todo · P0 · 5 hari
 - [ ] [[tasks/T-066-domain-kustom|T-066]] Domain kustom · todo · P2 · 0.5 hari
+- [ ] [[tasks/T-170-kesiapan-pilot-cadangan-dan-impor-csv|T-170]] Kesiapan pilot: cadangan data dan impor CSV master dan stok awal · review · P0 · 1 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

@@ -1294,7 +1294,7 @@ const usage=()=>{const u={vendor:{},customer:{},supplier:{},armada:{}};const inc
 const masterKpi=k=>{const u=usage()[k];const col=MK[k];const aktif=S[col].filter(x=>x.aktif!==false).length;const nonaktif=S[col].filter(x=>x.aktif===false).length;const totalUsage=Object.values(u).reduce((a,b)=>a+b,0);const unreg=Object.keys(u).filter(nm=>!S[col].some(x=>(k==='armada'?x.nopol:x.nama)===nm)).length;return {aktif,nonaktif,totalUsage,unreg}};
 
 T['master-data']=()=>{const f=F['master-data'];const k=f.tab;const isKatalog=['item','grup','satuan'].includes(k);const isWc=k==='wc';
- return `${segBtns('master-data','tab',[['vendor','Vendor'],['customer','Customer'],['supplier','Supplier'],['armada','Armada'],['wc','Work Centre'],['item','Item SPK'],['grup','Judul section'],['satuan','Satuan & sales']])}<input class="inp search" id="q-master" placeholder="Cari nama…" value="${esc(f.q)}" data-act="q" data-view="master-data">${!isKatalog&&!isWc?`<label class="ck" style="font-size:13px;white-space:nowrap"><input type="checkbox" data-act="mshowInactive" ${f.showInactive?'checked':''}> Tampilkan nonaktif</label><button class="btn ghost sm" data-act="mcsv" title="Export CSV">${ic('download')} CSV</button>`:'<span class="grow"></span>'}<button class="btn primary" data-act="mnew">${ic('plus')}Tambah</button>`};
+ return `${segBtns('master-data','tab',[['vendor','Vendor'],['customer','Customer'],['supplier','Supplier'],['armada','Armada'],['wc','Work Centre'],['item','Item SPK'],['grup','Judul section'],['satuan','Satuan & sales']])}<input class="inp search" id="q-master" placeholder="Cari nama…" value="${esc(f.q)}" data-act="q" data-view="master-data">${!isKatalog&&!isWc?`<label class="ck" style="font-size:13px;white-space:nowrap"><input type="checkbox" data-act="mshowInactive" ${f.showInactive?'checked':''}> Tampilkan nonaktif</label><button class="btn ghost sm" data-act="mcsv" title="Export CSV">${ic('download')} CSV</button>`:'<span class="grow"></span>'}${canManage()?`<button class="btn ghost sm" data-act="importcsv" title="Impor dari CSV">${ic('dl')} Impor CSV</button>`:''}<button class="btn primary" data-act="mnew">${ic('plus')}Tambah</button>`};
 
 B['master-data']=()=>{
  if(F['master-data'].tab==='item')return katItemTab();if(F['master-data'].tab==='grup')return katGrupTab();if(F['master-data'].tab==='satuan')return katListTab();if(F['master-data'].tab==='wc')return wcTab();
@@ -3099,6 +3099,94 @@ function userForm(uid){
    await DB.doc('muser/'+m._id).update({nama:cleanName(d.nama),role,jabatan:String(d.jabatan||'').trim(),aktif:me?true:!!d.aktif,modul:role==='admin'?null:modulFrom(d),updAt:new Date().toISOString(),updBy:ME})},
   {submit:'Simpan',done:'Tersimpan · akses langsung berlaku',mount:mountRoleGrid});
 }
+/* ---- IMPOR CSV: master dan item beserta stok awal (khusus super admin) ---- */
+const IMP={
+ vendor:{l:'Vendor finishing',c:'mvendor',cols:['nama','proses','pic','telp','email','alamat'],req:['nama'],ex:['PT Contoh Vendor','HDG','Budi','0812xxxx','vendor@contoh.id','Jl. Contoh No. 1']},
+ customer:{l:'Customer',c:'mcustomer',cols:['nama','kota','npwp','pic','telp','email','alamat'],req:['nama'],ex:['PT Contoh Customer','Jakarta','','Sari','0812xxxx','cs@contoh.id','Jl. Contoh No. 2']},
+ supplier:{l:'Supplier',c:'msupplier',cols:['nama','kota','npwp','material','pic','telp','email','alamat'],req:['nama'],ex:['PT Contoh Supplier','Cikarang','','SPHC, GI Sheet','Andi','0812xxxx','sup@contoh.id','Jl. Contoh No. 3']},
+ armada:{l:'Armada',c:'marmada',cols:['nopol','jenis','driver','milik'],req:['nopol'],ex:['B 1234 XX','Truk CDD','Pak Contoh','MNI']},
+ rm:{l:'Item bahan baku + stok awal',c:'rm',cols:['item','ukuran','satuan','buffer','stok_awal','tanggal_stok_awal'],req:['item','ukuran'],ex:['Plat SPHC','1.2x1200x2400','Lembar','50','120',''],num:['buffer','stok_awal']},
+ fg:{l:'Item barang jadi + stok awal',c:'fg',cols:['kategori','type','ukuran','panjang','finishing','tebal','satuan','stok_awal','tanggal_stok_awal'],req:['kategori','ukuran'],ex:['Cable Tray','STU','200x100','3000','HDG','1.8','Btg','40',''],num:['stok_awal']}
+};
+/* CSV: pemisah koma atau titik koma (Excel Indonesia), tanda kutip ganda, baris kosong diabaikan */
+function parseCsv(text){
+ text=String(text||'').replace(/^﻿/,'');
+ const first=text.split(/\r?\n/)[0]||'';const sep=(first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length?';':',';
+ const rows=[];let row=[],cell='',q=false;
+ for(let i=0;i<text.length;i++){const ch=text[i];
+  if(q){if(ch==='"'){if(text[i+1]==='"'){cell+='"';i++}else q=false}else cell+=ch}
+  else if(ch==='"')q=true;
+  else if(ch===sep){row.push(cell);cell=''}
+  else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);cell='';if(row.some(x=>String(x).trim()!==''))rows.push(row);row=[]}
+  else cell+=ch}
+ row.push(cell);if(row.some(x=>String(x).trim()!==''))rows.push(row);
+ return rows}
+const csvQ=v=>{v=String(v??'');return /[",;\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+function impTemplate(k){const s=IMP[k];return '﻿'+[s.cols,s.ex].map(r=>r.map(csvQ).join(',')).join('\r\n')+'\r\n'}
+/* periksa isi CSV terhadap jenis data; kembalikan {ok:[doc], skip:[{n,why}], err:[{n,why}]} tanpa menulis apa pun */
+function impCheck(k,text){
+ const s=IMP[k];const R=parseCsv(text);const res={ok:[],skip:[],err:[],total:0};
+ if(R.length<1){res.err.push({n:0,why:'Isi CSV kosong.'});return res}
+ const head=R[0].map(h=>String(h).trim().toLowerCase().replace(/\s+/g,'_'));
+ const miss=s.req.filter(c=>!head.includes(c));
+ if(miss.length){res.err.push({n:1,why:'Kolom wajib tidak ada di baris judul: '+miss.join(', ')+'. Unduh templat untuk format yang benar.'});return res}
+ const unk=head.filter(h=>h&&!s.cols.includes(h));if(unk.length)res.err.push({n:1,why:'Kolom tidak dikenal (diabaikan): '+unk.join(', ')});
+ const seen=new Set();const t0=today();
+ const keyOf=d=>k==='armada'?String(d.nopol).toUpperCase().replace(/\s+/g,' ').trim()
+  :k==='rm'?(d.item+'|'+d.ukuran).toLowerCase().replace(/\s+/g,'')
+  :k==='fg'?[d.kategori,d.type,d.ukuran,d.panjang,d.finishing,d.tebal].map(x=>String(x||'').toLowerCase().replace(/\s+/g,'')).join('|')
+  :normName(d.nama);
+ const existing=new Set(S[s.c].map(keyOf));
+ R.slice(1).forEach((r,i)=>{const n=i+2;res.total++;const d={};head.forEach((h,j)=>{if(s.cols.includes(h))d[h]=String(r[j]??'').trim()});
+  const lack=s.req.filter(c=>!d[c]);if(lack.length){res.err.push({n,why:'Kolom wajib kosong: '+lack.join(', ')});return}
+  for(const c of s.num||[]){if(d[c]!==undefined&&d[c]!==''){const x=parseFloat(String(d[c]).replace(',','.'));if(isNaN(x)||x<0){res.err.push({n,why:`${c} harus angka 0 atau lebih`});return}d[c]=x}else d[c]=0}
+  if(d.tanggal_stok_awal&&!/^\d{4}-\d{2}-\d{2}$/.test(d.tanggal_stok_awal)){res.err.push({n,why:'tanggal_stok_awal harus berformat TTTT-BB-HH, mis. 2026-11-03'});return}
+  if(k==='armada')d.nopol=d.nopol.toUpperCase().replace(/\s+/g,' ');else if(d.nama)d.nama=cleanName(d.nama);
+  const key=keyOf(d);if(existing.has(key)){res.skip.push({n,why:'sudah ada di sistem'});return}
+  if(seen.has(key)){res.skip.push({n,why:'ganda di dalam berkas'});return}
+  seen.add(key);
+  let doc;
+  if(k==='rm')doc={item:d.item,ukuran:d.ukuran,satuan:d.satuan||'Lembar',buffer:d.buffer,stokAwal:d.stok_awal,tglStokAwal:d.tanggal_stok_awal||t0};
+  else if(k==='fg')doc={kategori:d.kategori,type:d.type||'',ukuran:d.ukuran,panjang:num0(d.panjang)||d.panjang||'',finishing:d.finishing||'',tebal:d.tebal||'',satuan:d.satuan||'Btg',stokAwal:d.stok_awal,tglStokAwal:d.tanggal_stok_awal||t0,ket:''};
+  else{doc={};s.cols.forEach(c=>doc[c]=d[c]||'');doc.aktif=true}
+  res.ok.push(doc)});
+ return res}
+function impPreviewHtml(k,res){
+ const lines=[];
+ lines.push(`<b>${res.ok.length}</b> baris siap diimpor · <b>${res.skip.length}</b> dilewati · <b style="color:${res.err.some(e=>e.n>0)?'var(--crit)':'inherit'}">${res.err.filter(e=>e.n>0).length}</b> bermasalah dari ${res.total} baris`);
+ const items=[...res.err.map(e=>`<li style="color:var(--crit)">${e.n?'Baris '+e.n+': ':''}${esc(e.why)}</li>`),...res.skip.slice(0,8).map(e=>`<li class="muted">Baris ${e.n}: dilewati, ${esc(e.why)}</li>`)];
+ if(res.skip.length>8)items.push(`<li class="muted">…dan ${res.skip.length-8} baris dilewati lainnya</li>`);
+ return `<div>${lines.join('')}</div>${items.length?`<ul style="margin:6px 0 0 18px;padding:0;font-size:12.5px;max-height:150px;overflow:auto">${items.join('')}</ul>`:''}`}
+function importForm(){
+ if(!canManage()){toast('Hanya super admin yang bisa mengimpor data.');return}
+ if(!DB){toast('Impor butuh backend yang tersambung.');return}
+ openModal('Impor CSV',
+  fld('Jenis data',`<select class="sel" name="jenis" id="m-jenis">${Object.entries(IMP).map(([k,s])=>`<option value="${k}">${s.l}</option>`).join('')}</select>`,true)+
+  `<div class="full"><button type="button" class="btn sm" id="m-tpl">${ic('dl')}Unduh templat CSV</button> <span class="note">Isi templat di Excel, simpan sebagai CSV (pemisah koma atau titik koma).</span></div>`+
+  fld('Pilih berkas CSV',`<input class="inp" type="file" id="m-file" accept=".csv,text/csv">`,true)+
+  fld('…atau tempel isi CSV di sini',`<textarea class="inp" name="csv" id="m-csv" rows="6" style="font-family:var(--f-mono,monospace);font-size:12px" placeholder="nama,proses,pic,telp,email,alamat"></textarea>`,true)+
+  `<div class="full note" id="m-prev">Pilih jenis data lalu muat berkas untuk melihat pratinjau sebelum impor. Baris yang sudah ada dilewati; tidak ada data yang ditimpa atau dihapus.</div>`,
+  async d=>{const k=d.jenis;const res=impCheck(k,d.csv);
+   if(res.err.some(e=>e.n===0||e.why.startsWith('Kolom wajib tidak ada')))throw new Error(res.err[0].why);
+   if(res.err.some(e=>e.n>0))throw new Error('Perbaiki baris bermasalah dulu (lihat pratinjau). Tidak ada yang diimpor.');
+   if(!res.ok.length)throw new Error('Tidak ada baris baru untuk diimpor.');
+   const s=IMP[k];if(res.ok.length>2000)throw new Error('Maksimal 2000 baris sekali impor. Bagi berkas menjadi beberapa bagian.');
+   await addMany(s.c,res.ok);
+   toast(`${res.ok.length} baris ${s.l} diimpor${res.skip.length?` · ${res.skip.length} dilewati`:''}`)},
+  {submit:'Impor',done:' ',mount:f=>{
+   const upd=()=>{const r=impCheck(f.jenis.value,f.csv.value);$('#m-prev').innerHTML=f.csv.value.trim()?impPreviewHtml(f.jenis.value,r):'Pilih jenis data lalu muat berkas untuk melihat pratinjau sebelum impor.'};
+   f.jenis.addEventListener('change',upd);f.csv.addEventListener('input',upd);
+   $('#m-file').addEventListener('change',e=>{const fl=e.target.files[0];if(!fl)return;const rd=new FileReader();rd.onload=()=>{f.csv.value=String(rd.result||'');upd()};rd.readAsText(fl)});
+   $('#m-tpl').addEventListener('click',async()=>{try{await DLS.save({filename:`templat-${f.jenis.value}.csv`,data:new Blob([impTemplate(f.jenis.value)],{type:'text/csv'})})}catch(e){if(e.code!=='declined')toast('Gagal mengunduh: '+(e.message||e.code))}})}});
+}
+async function addMany(c,list){
+ guard(c,list[0],null,'add');
+ const now=new Date().toISOString();
+ const docs=list.map(d=>({...d,at:now,by:ME||null}));
+ await DB.collection(c).addMany(docs);
+ DB.collection('log').add({u:ME,at:now,c,d:'',op:'add',k:`Impor CSV: ${docs.length} baris`,mod:'*any',ref:CNM[c]||c,tgl:'',auto:true}).catch(()=>{});
+}
+
 /* ---- Akun saya: informasi, ganti password sendiri, keluar ---- */
 function accountModal(){
  if(!ME_P){toast('Belum masuk.');return}
@@ -3536,6 +3624,7 @@ document.addEventListener('click',async e=>{
   case 'kpicsv':await kpiCsv();break;
   case 'mepage':case 'meclick':accountModal();break;
   case 'pwself':pwSelf();break;
+  case 'importcsv':importForm();break;
   case 'backup':closeModal();await backupData();break;
   case 'logout':closeModal();if(USER&&USER.signOut)await USER.signOut();break;
   case 'uedit':userForm(ds.uid);break;
