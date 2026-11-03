@@ -351,3 +351,13 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Pemeriksaan situs publik: host hanya Vercel, `inldyqigewmziwazalun.supabase.co`, dan Google Fonts; kunci berawalan `sb_publishable_d9B`; tidak ada mock aktif; X-Frame-Options dan nosniff aktif.
 - Temuan dan perbaikan: placeholder `%VITE_LOCAL_MOCK%`/`%VITE_APP_VERSION%` tertinggal di HTML produksi (dikosongkan, versi default); sebelum login aplikasi meminta 20 tabel dan mendapat 401 (kini tidak meminta data tanpa sesi); ditambahkan CSP, HSTS, Permissions-Policy. Preview development bersih: CSP aktif, tanpa pelanggaran, tanpa permintaan data pra-login.
 - Sisa: uji login di situs Vercel oleh pemilik (CSP dengan sesi, ekspor PDF/Excel), merge perbaikan ke main, atur Supabase Auth Site URL dan Redirect URL untuk domain Vercel bila memakai tautan email.
+
+### 2026-11-03 — PR #4 digabung; production Vercel diperiksa ulang
+
+- main = development (3b86bb0). Production https://mni-os-operational.vercel.app diperiksa dengan Playwright: host hanya Vercel dan Google Fonts sebelum login, 0 permintaan Supabase pra-login, 0 error konsol, CSP aktif, X-Frame-Options DENY, kunci `sb_publishable_d9B…`, mock kosong, versi 1.0.0. HSTS tidak tampak di domain `*.vercel.app` (Vercel mengelolanya; berlaku di domain sendiri).
+- Sisa: login pemilik di situs Vercel untuk menguji CSP bersama sesi, modul, dan ekspor PDF/Excel; Site URL dan Redirect URL Supabase Auth untuk domain Vercel (bila memakai tautan email).
+
+### 2026-11-03 — Audit kesiapan lokal, GitHub, Supabase, Vercel
+
+- Hasil dan 12 risiko berurutan ada di [[AUDIT_KESIAPAN]]. Diperbaiki: penguncian nomor dokumen kini atomik (migration 10, `try_lock`); email pribadi dihapus dari dokumen publik; ekspor PDF/Excel terbukti jalan di bawah CSP.
+- Penghalang sebelum data nyata: satu database dev berisi data uji, tanpa backup terverifikasi, Site URL Auth masih localhost, pendaftaran bebas aktif, hanya satu akun.

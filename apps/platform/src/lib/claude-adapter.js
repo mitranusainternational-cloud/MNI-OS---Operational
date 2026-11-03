@@ -334,6 +334,14 @@ function makeDoc(path) {
     // .acquire(opts) — kunci optimistis sederhana, disimpan di tabel master dengan key "lock:col:id"
     async acquire({ holder, ttlMs } = {}) {
       const lockKey = `lock:${col}:${rawId}`;
+      // Kunci atomik di database (try_lock): cek-lalu-tulis di sisi klien dapat memberi kunci yang sama ke dua pengguna.
+      const rpc = await supabase.rpc('try_lock', { p_key: lockKey, p_holder: String(holder || ''), p_ttl_ms: ttlMs || 30000 });
+      if (!rpc.error && rpc.data) {
+        return rpc.data.acquired
+          ? { acquired: true }
+          : { acquired: false, holder: rpc.data.holder, expiresAt: new Date(rpc.data.expires || Date.now()).toISOString() };
+      }
+      // Cadangan bila fungsi belum ada (migration 10 belum dijalankan): perilaku lama.
       const now = Date.now();
       const expires = now + (ttlMs || 30000);
 
