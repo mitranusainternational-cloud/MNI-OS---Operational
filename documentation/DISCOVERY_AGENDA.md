@@ -1,14 +1,14 @@
 ---
 type: agenda
 status: proposed
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # Agenda sesi discovery dengan tim Operasional
 
 Agenda ini menyiapkan tugas [[tasks/T-030-walkthrough-proses-dengan-process-owner|T-030]] (walkthrough proses), [[tasks/T-032-konfirmasi-owner-dan-cut-off-enam-workbook|T-032]] (owner dan cut-off workbook), [[tasks/T-031-pilih-pilot-pertama-dan-acceptance-criteria|T-031]] (pilot dan kriteria terima), dan [[tasks/T-036-tentukan-user-dan-role-awal|T-036]] (user dan role awal). Jalur ini menentukan kecepatan go-live ([[GO_LIVE_PLAN]]), jadi sesi sebaiknya dijadwalkan dalam minggu yang sama.
 
-Status: **usulan**. Tanggal, peserta, dan undangan belum dibuat; pemilik proyek yang menjadwalkan. Aturan pencatatan mengikuti [[OPERATIONAL_DISCOVERY]]: pisahkan `Observed`, `Interpretation`, `Assumption`, `Proposed`, dan `Approved`.
+Status: **siap dijadwalkan** (diperbarui 2026-11-03). Sistem sudah live di production dengan hak akses per modul ([[RENCANA_ADOPSI]]), jadi sesi ini adalah jalur kritis menuju go-live. Tanggal, peserta, dan undangan belum dibuat; pemilik proyek yang menjadwalkan. Aturan pencatatan mengikuti [[OPERATIONAL_DISCOVERY]]: pisahkan `Observed`, `Interpretation`, `Assumption`, `Proposed`, dan `Approved`.
 
 ## 1. Tujuan dan hasil
 
@@ -93,8 +93,8 @@ Total sekitar 5,5 jam, dapat dibagi dalam 2 hari. Durasi adalah usulan.
 
 | Menit | Topik | Hasil |
 |---|---|---|
-| 0–15 | Siapa saja user awal dan perannya (admin, manager, gudang, produksi, viewer) | Daftar role |
-| 15–30 | Siapa boleh mengubah apa; siapa hanya melihat | Matriks role usulan |
+| 0–15 | Siapa saja user awal dan perannya. Peran bawaan: Super Admin, PPIC, Produksi, Gudang Bahan Baku, Gudang Barang Jadi, Logistik, Viewer | Daftar user dan peran |
+| 15–30 | Untuk tiap orang, per modul: tidak terlihat, lihat saja, atau lihat dan ubah (modul: bahan baku, barang jadi, vendor, kirim customer, SPK dan produksi, bongkar muat, master data) | Matriks hak per orang |
 
 Daftar nama dan email disimpan di luar Git.
 
@@ -128,7 +128,9 @@ Daftar nama dan email disimpan di luar Git.
 - Siapa yang menandatangani penerimaan dan kapan mereka bisa menguji?
 
 ### User dan role
-- Siapa saja yang perlu masuk di minggu pertama dan apa yang boleh mereka ubah?
+- Siapa saja yang perlu masuk di minggu pertama dan modul apa yang boleh mereka lihat atau ubah? (Hak diatur per orang di menu Pengguna & Akses; peran hanya titik awal.)
+- Siapa super admin dan siapa penggantinya bila berhalangan?
+- Bagaimana password sementara diserahkan ke tiap orang dengan aman?
 - Apakah ada orang yang hanya perlu melihat (manajemen)? Siapa admin dan penggantinya?
 
 ## 7. Tabel keputusan (diisi saat sesi)
@@ -159,3 +161,37 @@ Daftar nama dan email disimpan di luar Git.
 - Agenda ini tidak menjadwalkan siapa pun dan tidak mengirim pesan.
 - Jawaban tim adalah sumber kebutuhan; hasil lain di vault (inventaris kode, mapping lama) tetap hipotesis sampai disetujui.
 - Bila pemilik proses tidak tersedia, jangan menyimpulkan keputusan dari dokumen; catat sebagai `Needs clarification` dan lanjutkan sesi lain.
+
+## 10. Paket sesi siap pakai (2026-11-03)
+
+### Urutan yang disarankan (2 hari, hindari menumpuk)
+
+| Hari | Sesi | Peserta inti |
+|---|---|---|
+| 1 pagi | Sesi 1 Alur SPK (90 menit) | Pemilik proses, PPIC, kepala produksi |
+| 1 siang | Sesi 2 Gudang (90 menit) | Pemilik proses, staf gudang bahan baku dan barang jadi |
+| 2 pagi | Sesi 3 Sumber data (60 menit) lalu Sesi 4 Pilot (60 menit) | Pemilik proses, pemilik workbook, PPIC |
+| 2 siang | Sesi 5 User dan hak (30 menit), lalu demo singkat sistem (15 menit, data sintetis) | Pemilik proses |
+
+### Pegangan fasilitator (satu halaman)
+
+1. Buka halaman ini, [[OPERATIONAL_DISCOVERY]], dan satu salinan [[templates/PROCESS_DISCOVERY_TEMPLATE]] per alur.
+2. Mulai tiap sesi dengan aturan di bagian 3; minta peserta memperagakan satu contoh nyata, jangan menjelaskan umum.
+3. Catat dengan label `Observed`, `Interpretation`, `Assumption`, `Proposed`, `Approved`. Tanpa data bisnis asli; pakai kode samaran.
+4. Isi tabel keputusan D-01 sampai D-10 langsung di layar; jangan menutup sesi dengan D yang kosong tanpa pemilik dan tanggal.
+5. Pilot dipilih **satu alur**. Jika peserta meminta banyak alur, minta mereka mengurutkan; sisanya masuk daftar v1.1 atau v1.2.
+6. Akhiri tiap sesi dengan membaca ulang ringkasan keputusan, lalu minta pemilik proses menyetujui secara lisan dan catat.
+
+### Bahan yang dibawa
+
+- Akses ke enam workbook ([[DATA_SOURCE_CATALOG]]) untuk ditampilkan di layar, tanpa dikirim ulang.
+- Situs sistem untuk demo di akhir hari 2: https://mni-gudang.vercel.app (login admin oleh pemilik; jangan tampilkan data nyata).
+- Tabel keputusan bagian 7 dan templat requirement ([[templates/REQUIREMENT_TEMPLATE]]).
+
+### Draf undangan (dikirim oleh pemilik proyek, bukan oleh agen)
+
+> Halo tim, kami sedang menyiapkan aplikasi Gudang & Logistik untuk membantu pencatatan SPK, stok bahan baku, barang jadi, dan pengiriman. Kami butuh [durasi] dari Anda untuk menunjukkan satu contoh kerja nyata dari awal sampai akhir, supaya aplikasinya mengikuti cara kerja Anda, bukan sebaliknya. Tidak perlu menyiapkan presentasi: cukup buka file kerja yang biasa dipakai (tanpa dikirim). Jadwal: [tanggal dan jam]. Tempat/media: [lokasi atau tautan].
+
+### Setelah sesi, urutan kerja agen (24 jam)
+
+Ikuti bagian 8, lalu: ubah status T-030, T-031, T-032, T-036 dengan bukti; mulai T-033 (pemetaan kolom) dan T-034 (skrip impor) setelah pilot dipilih; siapkan akun uji per orang lewat menu Pengguna & Akses oleh super admin.
