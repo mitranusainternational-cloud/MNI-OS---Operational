@@ -3096,6 +3096,23 @@ function userForm(uid){
    await DB.doc('muser/'+m._id).update({nama:cleanName(d.nama),role,jabatan:String(d.jabatan||'').trim(),aktif:me?true:!!d.aktif,modul:role==='admin'?null:modulFrom(d),updAt:new Date().toISOString(),updBy:ME})},
   {submit:'Simpan',done:'Tersimpan · akses langsung berlaku',mount:mountRoleGrid});
 }
+/* ---- Akun saya: informasi, ganti password sendiri, keluar ---- */
+function accountModal(){
+ if(!ME_P){toast('Belum masuk.');return}
+ const a=myAcc();
+ const mo=ME_P.role==='admin'?null:modulEff({role:ME_P.role,modul:ME_P.modul});
+ const mods=mo===null?'Semua modul':Object.entries(mo).map(([m,l])=>(MODL[m]||m)+(l==='lihat'?' (lihat)':'')).join(', ')||'Tidak ada';
+ openModal('Akun saya',`<div class="full"><div class="ucell">${av(ME,'xl')}<div><b>${esc(ME_P.name||'')}</b><div class="note">${esc(ME_P.email||'')}${ME_P.jabatan?' · '+esc(ME_P.jabatan):''}</div></div></div></div>
+  <div class="full note"><b>Peran:</b> ${esc(roleL(a.role))}<br><b>Akses modul:</b> ${esc(mods)}</div>
+  <div class="full" style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" data-act="pwself">Ganti password</button>${canManage()?'<a class="btn" href="#pengguna" data-act="closemodal">Kelola pengguna</a>':''}<button type="button" class="btn ghost danger" data-act="logout">Keluar</button></div>`,
+  async()=>{},{submit:'Tutup',done:' '});
+}
+function pwSelf(){
+ openModal('Ganti password',fld('Password baru (minimal 8 karakter)',inp('pw1','','password','required minlength="8" autocomplete="new-password"'),true)+fld('Ulangi password baru',inp('pw2','','password','required autocomplete="new-password"'),true),
+  async d=>{if(String(d.pw1).length<8)throw new Error('Password minimal 8 karakter.');if(d.pw1!==d.pw2)throw new Error('Kedua password tidak sama.');
+   if(!USER||!USER.changePassword)throw new Error('Fitur ganti password belum tersedia di mode ini.');await USER.changePassword(String(d.pw1))},
+  {submit:'Simpan password',done:'Password diganti · pakai password baru saat masuk berikutnya'});
+}
 function pwForm(uid){
  if(!canManage())return;const m=S.muser.find(x=>x._id===uid);if(!m)return;const pw=genPw();
  openModal('Atur ulang password',
@@ -3500,7 +3517,9 @@ document.addEventListener('click',async e=>{
   case 'prodfix':{const s=byId('spk',ds.id);const x=calc().spk[ds.id];const items=s.items.map((it,i)=>{const l=x.lines[i];return l&&l.kirim>=l.q?{...it,prod:+it.q}:it});await updDoc('spk',ds.id,{items});toast(`Progres produksi SPK ${s.no} diperbarui`);break}
   case 'kpiuser':if(!e.target.closest('button')||el.matches('button'))kpiUser(ds.uid);break;
   case 'kpicsv':await kpiCsv();break;
-  case 'mepage':case 'meclick':if(canManage())location.hash='pengguna';break;
+  case 'mepage':case 'meclick':accountModal();break;
+  case 'pwself':pwSelf();break;
+  case 'logout':closeModal();if(USER&&USER.signOut)await USER.signOut();break;
   case 'uedit':userForm(ds.uid);break;
   case 'upw':pwForm(ds.uid);break;
   case 'uinvite':inviteForm();break;

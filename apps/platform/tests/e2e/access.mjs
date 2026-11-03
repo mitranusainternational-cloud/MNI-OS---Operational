@@ -83,7 +83,25 @@ export async function runAccess(page, base) {
   const nSpk2 = await page.evaluate(() => new Promise(async (res) => { const db = await window.claude.use('db'); db.collection('spk').onSnapshot((s) => res(s.docs.length)); }));
   ok('A-14 data SPK terbaca setelah diberi akses', nSpk2 > 0, String(nSpk2));
 
-  ok('A-15 tanpa pageerror', errs.length === 0, errs.join(' | '));
+  // Akun saya: info peran dan akses, ganti password (validasi), keluar
+  await page.click('#who .mebtn'); await page.waitForTimeout(500);
+  const akun = await page.evaluate(() => (document.querySelector('#modal .mbody') || {}).innerText || '');
+  ok('A-15 Akun saya menampilkan peran dan akses modul', /Gudang Bahan Baku/.test(akun) && /Bahan baku/.test(akun) && /Ganti password/.test(akun) && /Keluar/.test(akun), akun.replace(/s+/g, ' ').slice(0, 120));
+  await page.click('#modal [data-act="pwself"]'); await page.waitForTimeout(400);
+  await page.fill('#m-pw1', 'abc'); await page.fill('#m-pw2', 'abc');
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(500);
+  ok('A-16 ganti password: terlalu pendek ditolak', /minimal 8/.test(await page.evaluate(() => document.getElementById('merr').textContent)));
+  await page.fill('#m-pw1', 'passwordbaru1'); await page.fill('#m-pw2', 'passwordbaru2');
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(500);
+  ok('A-17 ganti password: tidak sama ditolak', /tidak sama/.test(await page.evaluate(() => document.getElementById('merr').textContent)));
+  await page.fill('#m-pw2', 'passwordbaru1');
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(800);
+  await page.click('#who .mebtn'); await page.waitForTimeout(400);
+  await page.click('#modal [data-act="logout"]');
+  await page.waitForTimeout(2500);
+  ok('A-18 Keluar: kembali ke halaman masuk', await page.evaluate(() => { const g = document.getElementById('auth-gate'); return !!g && getComputedStyle(g).display !== 'none'; }));
+
+  ok('A-19 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;
   return { pass: R.length - fail, fail, detail: R };
 }
