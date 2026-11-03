@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Roadmap MNI OS Operational
 
 Roadmap ini menunjukkan urutan hasil yang perlu dibangun, bukan komitmen tanggal rilis. Perbarui status bersama bukti di [[PROJECT_PROGRESS|progress proyek]]. Jangan menandai item `Done` hanya karena file sudah dibuat.

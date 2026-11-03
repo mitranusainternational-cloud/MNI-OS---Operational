@@ -4,6 +4,8 @@ status: proposed
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Jalur integrasi bertahap: lokal → Supabase → GitHub → Vercel → (VPS)
 
 Tujuan: sistem bisa dipakai secepat mungkin dengan integrasi data yang kuat dan setiap tahap punya gerbang yang dapat dibuktikan. Urutan yang Anda usulkan (lokal, Supabase, GitHub, Vercel, lalu VPS) dipakai, dengan dua penyesuaian di bagian 3. Status hidup ada di [[PROGRESS_SNAPSHOT]]; rencana go-live di [[GO_LIVE_PLAN]]; arah produk di [[roadmap/PRODUCT_ROADMAP]]; skill pendamping: `release-pipeline`.

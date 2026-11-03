@@ -4,6 +4,8 @@ status: in-progress-with-explicit-gates
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Baseline fondasi MNI OS Operational
 
 Halaman ini merangkum keadaan yang benar-benar telah diperiksa. Status `done` berarti ada bukti; `blocked` berarti langkah berikutnya membutuhkan akses/keputusan yang belum tersedia.

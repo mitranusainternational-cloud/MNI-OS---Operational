@@ -6,6 +6,8 @@ active-version: development
 updated: 2026-11-03
 ---
 
+<img src="documentation/assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # MNI Gudang & Logistik
 
 > [!summary] Satu vault untuk kode, rencana, progress, riset, dan bukti

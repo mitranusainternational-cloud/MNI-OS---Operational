@@ -14,6 +14,8 @@ owner: ""
 updated: YYYY-MM-DD
 ---
 
+<img src="../assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # T-000 Judul
 
 Epic: `[[roadmap/epics/E-xx-nama-epic|E-xx]]` (ganti dengan tautan epic yang benar)  

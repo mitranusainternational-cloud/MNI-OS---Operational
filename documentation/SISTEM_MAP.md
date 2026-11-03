@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-03
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Peta sistem: nama baku, sumber daya, dan cara memantau
 
 Satu halaman untuk menjawab "apa saja yang kita punya, namanya apa, dan di mana melihat statusnya". Perbarui halaman ini setiap kali sebuah sumber daya dibuat, diganti nama, atau dipindah. Ringkasan lingkungan: [[ENVIRONMENTS]]. Log kerja: [[PROJECT_PROGRESS]]. Kesiapan: [[AUDIT_KESIAPAN]].

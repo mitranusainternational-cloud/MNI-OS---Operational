@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-03
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Cadangan dan pemulihan data
 
 Paket Supabase gratis tidak menyediakan cadangan yang dapat dipulihkan. Sampai paket berbayar dipakai, cadangan dibuat dari aplikasi. Syarat go-live: [[RENCANA_ADOPSI]] (G3), tugas T-061.

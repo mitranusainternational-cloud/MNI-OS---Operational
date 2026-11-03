@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-03
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Rencana adopsi: dari sistem siap menjadi sistem yang dipakai
 
 Tujuan: tim gudang, PPIC, dan logistik memakai MNI Gudang & Logistik setiap hari karena pekerjaannya jadi lebih cepat dan lebih sedikit salah, bukan karena diwajibkan. Dasar teknis: [[AUDIT_KESIAPAN]], [[ENVIRONMENTS]], [[TEST_MATRIX]]. Peta sumber daya: [[SISTEM_MAP]].

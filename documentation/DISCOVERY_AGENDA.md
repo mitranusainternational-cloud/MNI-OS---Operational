@@ -4,6 +4,8 @@ status: proposed
 updated: 2026-11-03
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Agenda sesi discovery dengan tim Operasional
 
 Agenda ini menyiapkan tugas [[tasks/T-030-walkthrough-proses-dengan-process-owner|T-030]] (walkthrough proses), [[tasks/T-032-konfirmasi-owner-dan-cut-off-enam-workbook|T-032]] (owner dan cut-off workbook), [[tasks/T-031-pilih-pilot-pertama-dan-acceptance-criteria|T-031]] (pilot dan kriteria terima), dan [[tasks/T-036-tentukan-user-dan-role-awal|T-036]] (user dan role awal). Jalur ini menentukan kecepatan go-live ([[GO_LIVE_PLAN]]), jadi sesi sebaiknya dijadwalkan dalam minggu yang sama.

@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-03
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Audit kesiapan sebelum dipakai tim (2026-11-03)
 
 Pemeriksaan silang lokal, GitHub, Supabase dev, dan Vercel. Bukti: [[TEST_MATRIX]], [[ENVIRONMENTS]], [[PROJECT_PROGRESS]].

@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Checklist promosi versi
 
 Gunakan daftar ini saat meninjau perubahan dari `development` ke `main`. Setiap item harus diberi status dan bukti; tulis N/A beserta alasan bila tidak berlaku.

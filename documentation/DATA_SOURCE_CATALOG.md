@@ -4,6 +4,8 @@ status: initial-audit-with-owner-gates
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Katalog sumber data Operasional
 
 ## Tujuan dan batas pemeriksaan

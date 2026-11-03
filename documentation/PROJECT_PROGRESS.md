@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Progress MNI OS Operational
 
 Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutnya berada di [[ROADMAP|roadmap]].

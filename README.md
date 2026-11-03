@@ -1,3 +1,5 @@
+<img src="documentation/assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # MNI Gudang & Logistik (repo `mni-gudang`)
 
 Repository ini sekaligus menjadi Obsidian vault untuk mengembangkan aplikasi MNI Gudang & Logistik dan menelusuri progress proyek. Aplikasi berjalan di https://mni-gudang.vercel.app (Vercel) dengan database Supabase; **peta semua sumber daya, nama baku, dan cara memantau ada di [`documentation/SISTEM_MAP.md`](documentation/SISTEM_MAP.md)**; riwayat perubahan di [`CHANGELOG.md`](CHANGELOG.md); kebijakan keamanan di [`SECURITY.md`](SECURITY.md). Dashboard proyek ada di [`Home.md`](Home.md); cara mengelola vault ada di [`documentation/WORKSPACE_GUIDE.md`](documentation/WORKSPACE_GUIDE.md).

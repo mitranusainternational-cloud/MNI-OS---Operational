@@ -4,6 +4,8 @@ status: discovery-not-started
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Discovery kebutuhan Operasional MNI
 
 Halaman ini adalah indeks kerja untuk merancang MNI OS custom sesuai proses tim Operasional. Belum ada proses atau fitur yang dianggap disetujui sampai ada bukti dan validasi pemilik proses.

@@ -4,6 +4,8 @@ status: draft-needs-owner-validation
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Kamus data Operasional — draft
 
 Kamus ini mencatat label dan bentuk data yang **terlihat pada workbook**, bukan definisi bisnis yang telah disepakati. Arti, satuan, key, grain, sumber resmi, dan aturan status perlu divalidasi pemilik proses sebelum desain aplikasi atau migrasi.

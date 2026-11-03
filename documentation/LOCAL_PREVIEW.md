@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Pratinjau lokal mni-app (mode mock)
 
 Cara menjalankan dan mencoba aplikasi di mesin sendiri **tanpa Docker dan tanpa Supabase**. Data bersifat sintetis dan disimpan di `localStorage` browser. Mode ini untuk meninjau UI dan alur; **bukan** bukti bahwa Supabase, Auth, RLS, atau realtime sungguhan bekerja (lihat [[GO_LIVE_PLAN]] T-011, T-020 sampai T-022).

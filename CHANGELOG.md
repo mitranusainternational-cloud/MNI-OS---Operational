@@ -1,3 +1,5 @@
+<img src="documentation/assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Catatan perubahan
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/); versi mengikuti [SemVer](https://semver.org/lang/id/). Tugas dan bukti rinci ada di [documentation/PROJECT_PROGRESS.md](documentation/PROJECT_PROGRESS.md) dan [documentation/TEST_MATRIX.md](documentation/TEST_MATRIX.md); peta sumber daya di [documentation/SISTEM_MAP.md](documentation/SISTEM_MAP.md).

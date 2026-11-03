@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-03
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Impor data awal (master dan stok awal)
 
 Panduan memasukkan data awal ke sistem lewat **Impor CSV** (Master Data, tombol *Impor CSV*, khusus super admin). Ini bagian dari gerbang go-live G2 di [[RENCANA_ADOPSI]] dan melengkapi pemetaan workbook (T-033, T-034). Aturan data nyata: workbook mentah tetap di `data/private-sources/` (diabaikan Git); jangan menyalin data bisnis ke Git, vault, atau screenshot.

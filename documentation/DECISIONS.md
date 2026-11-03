@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Log keputusan workspace
 
 ## 2026-11-03 — Migration tahan-urutan dan merge ke main

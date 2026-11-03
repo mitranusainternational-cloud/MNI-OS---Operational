@@ -6,6 +6,8 @@ owner:
 updated: YYYY-MM-DD
 ---
 
+<img src="../assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Walkthrough proses — [nama proses]
 
 > Catat proses yang benar-benar dijelaskan/diperlihatkan. Hindari menulis rekomendasi seolah-olah itu kondisi saat ini.
