@@ -33,7 +33,7 @@ Bergantung pada: T-163
 - [x] Pasang Edge Function di production (aktif, verify_jwt)
 - [x] Uji buat akun lewat menu (anggota pertama dibuat pemilik; akun dan hak modul tersimpan benar)
 - [ ] Uji reset password sungguhan lewat menu
-- [ ] Uji dua sesi: perubahan pengguna A terlihat pengguna B dalam hitungan detik
+- [x] Uji dua sesi: perubahan satu pengguna terlihat pengguna lain sekitar 1 detik (production)
 - [ ] Catat hasil di [[TEST_MATRIX]] dan [[ENVIRONMENTS]]
 
 ## Bukti
