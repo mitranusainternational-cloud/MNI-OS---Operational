@@ -344,3 +344,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Tinjauan konfigurasi menemukan dua masalah yang akan menggagalkan atau melemahkan deploy: (1) `vercel.json` memuat blok `env` yang merujuk secret Vercel lama (`@supabase-url`, `@supabase-anon-key`) sehingga build gagal; dihapus, variabel diisi di dashboard. (2) adapter memuat supabase-js dari CDN jsdelivr dengan versi mengambang `@2`; kini dibundel dari paket npm (versi terkunci lockfile), tanpa permintaan CDN saat runtime. `installCommand` diset `npm ci --ignore-scripts` seperti CI.
 - Diuji: build produksi lokal, regresi 38, role 12, dan aplikasi mode Supabase (semua permintaan REST 200, tanpa permintaan jsdelivr).
 - Catatan keamanan: `is_authenticated()` mensyaratkan baris `muser` aktif, jadi akun auth yang tidak terdaftar tidak dapat membaca data meski URL publik.
+
+### 2026-11-03 — Vercel: project dibuat dan deploy pertama diperiksa
+
+- Project `mni-os-operational` dibuat di tim Vercel `mitranusainternational-8337` (Hobby) lewat Chrome pemilik (setelah dua kali salah tempel kunci dari project Supabase lain yang terdeteksi dan dikoreksi sebelum deploy). Root `apps/platform`, preset Vite, env `VITE_SUPABASE_URL` dan `VITE_SUPABASE_ANON_KEY` (kunci publishable project MNI Gudang - Dev). Production: https://mni-os-operational.vercel.app, deploy dari `main`; preview dari `development`.
+- Pemeriksaan situs publik: host hanya Vercel, `inldyqigewmziwazalun.supabase.co`, dan Google Fonts; kunci berawalan `sb_publishable_d9B`; tidak ada mock aktif; X-Frame-Options dan nosniff aktif.
+- Temuan dan perbaikan: placeholder `%VITE_LOCAL_MOCK%`/`%VITE_APP_VERSION%` tertinggal di HTML produksi (dikosongkan, versi default); sebelum login aplikasi meminta 20 tabel dan mendapat 401 (kini tidak meminta data tanpa sesi); ditambahkan CSP, HSTS, Permissions-Policy. Preview development bersih: CSP aktif, tanpa pelanggaran, tanpa permintaan data pra-login.
+- Sisa: uji login di situs Vercel oleh pemilik (CSP dengan sesi, ekspor PDF/Excel), merge perbaikan ke main, atur Supabase Auth Site URL dan Redirect URL untuk domain Vercel bila memakai tautan email.
