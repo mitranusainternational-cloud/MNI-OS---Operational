@@ -614,5 +614,7 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .kpi-row+*{margin-top:0}
 
 .feed .fi time{color:var(--muted)}
+.rchip{display:inline-block;padding:1px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:11px;color:var(--muted);white-space:nowrap}.rchip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}.rarr{margin:0 3px;color:var(--faint);font-size:12px}
+.wc-notes{display:flex;flex-direction:column;gap:6px;margin-top:10px}.wc-note{padding:8px 12px;border-radius:8px;font-size:13px}.wc-note.crit{background:var(--crit-soft);color:var(--crit)}.wc-note.warn{background:var(--warn-soft);color:var(--warn)}
 .c-w{white-space:nowrap}.wtag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.03em;vertical-align:middle}
 .wtag.kalkulator{background:var(--accent-soft);color:var(--accent)}.wtag.manual{background:var(--warn-soft);color:var(--warn)}

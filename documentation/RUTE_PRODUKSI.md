@@ -1,0 +1,140 @@
+---
+type: design
+status: draft
+updated: 2026-11-03
+---
+
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
+# Skema produksi multi work center: rute, antrian, dan kapasitas
+
+Tujuan: satu batang tidak hanya berada di satu mesin. Cable Tray melewati Shearing, Punching, Bending; Accs melewati CNC Laser, Bending, Welding; Ladder melewati Shearing, Punching, Bending, Welding; sebagian item kondisional. Dari catatan itu sistem harus bisa menunjukkan **beban dan kapasitas tiap work center (WC)**, di mana **antrian menumpuk**, dan **perkiraan selesai tiap SPK**, tanpa membuat tim repot. Tugas: T-174. Status: **dibangun di lokal pada branch `fitur/produksi-multi-wc` (tidak di-push, tidak digabung ke `main`, migration 14 belum diterapkan, belum ditayangkan).**
+
+## 1. Kondisi sekarang dan batasnya
+
+| Hal | Sekarang | Akibatnya |
+|---|---|---|
+| Progres item | Satu angka "total diproduksi s/d sekarang" per item | Tidak tahu berapa batang yang sudah lewat Shearing tapi belum Punching |
+| Work center | Satu WC "saat ini" per item | Tidak bisa melihat beberapa mesin bekerja pada item yang sama |
+| Beban WC | Menjumlahkan angka progres per WC | Angka kumulatif ikut dijumlahkan, jadi beban tidak mencerminkan antrian sebenarnya |
+| Kapasitas | Belum ada | Tidak bisa tahu WC mana yang penuh atau kapan antrian habis |
+
+## 2. Prinsip: tim tidak diribetkan
+
+Kondisi (rute berbeda per produk dan bentuk) ditangani **sistem**, bukan diminta dari tim. Tiga lapis, dari yang otomatis:
+
+| Lapis | Siapa yang bekerja | Contoh |
+|---|---|---|
+| 1. **Rute standar per produk** | Sistem, dari judul section SPK | Cable Tray: Shearing → Punching → Bending |
+| 2. **Aturan khusus per bentuk** (tabel yang bisa diubah PPIC) | Sistem, dari kata di deskripsi item | Cover: Shearing → Bending (tanpa Punching dan Welding) |
+| 3. **Pengecualian per item** | Tim, satu ketukan "lewati langkah" | Satu item tidak perlu Punching |
+
+Tambahan agar tidak perlu menyempurnakan aturan di muka:
+- **Sistem belajar dari kejadian nyata.** Bila sebuah WC mencatat hasil untuk item yang rutenya belum memuat WC itu, sistem mengusulkan "Tambahkan Welding ke rute item ini?" dan cukup satu ketukan.
+- **Tim tidak memilih rute saat input.** Operator hanya melihat antrian di mesinnya.
+- **Kapasitas tidak perlu ditebak.** Sistem menghitung throughput aktual tiap WC dari catatan harian dan menyarankan angka kapasitas; pemilik tinggal menyetujui.
+- **Mode lama tetap ada** untuk SPK yang rutenya belum diatur: input satu angka seperti sekarang.
+
+## 3. Cara input (dua mode)
+
+**Mode Mesin (utama untuk lantai produksi).** Operator membuka WC miliknya (diingat sistem). Ia melihat daftar item yang **siap dikerjakan di mesinnya**, diurutkan menurut due date SPK, lalu mengisi jumlah selesai. Item otomatis pindah ke antrian mesin berikutnya di rutenya.
+
+```text
+ CNC Laser · Antrian 3 item                              Hari ini selesai: 46
+ ─────────────────────────────────────────────────────────────────────────
+ SPK 633  Horizontal Elbow W300xH100xR600   Siap 12   [ selesai: 4 ] [Simpan]
+ SPK 633  Inside Riser W300xH100xR600       Siap 6    [ selesai: _ ]
+ SPK 640  Cover Tee W300xR600               Siap 20   [ selesai: _ ]  due 20 Nov
+```
+
+**Mode SPK (untuk PPIC).** Lembar SPK menampilkan tiap item dengan langkah-langkahnya sebagai batang bertahap, mis. `Shearing 16/16 → Punching 10/16 → Bending 4/16`, dengan input per langkah dan "Set semua selesai". Rute item dapat diubah di sini (lewati atau tambah langkah).
+
+Validasi sederhana: jumlah di sebuah langkah tidak boleh melebihi yang sudah selesai di langkah sebelumnya (pesan jelas, mis. "Hanya 6 yang siap di Bending").
+
+## 4. Model data
+
+Prinsip: **kejadian produksi dicatat sebagai baris yang hanya ditambah** (tidak mengubah angka lama). Dua operator di dua mesin yang mengisi pada saat yang sama tidak saling menimpa (berbeda dengan angka kumulatif yang dibaca-ubah-tulis).
+
+| Data | Tempat | Isi |
+|---|---|---|
+| Kejadian produksi | Tabel baru `produksi_log` (draf migration 14, belum diterapkan) | spk, indeks item, deskripsi, WC, qty tambahan, tanggal, oleh, waktu |
+| Rute item | Pada item SPK (`rute: [...]`, snapshot saat dibuat atau diubah) | Urutan WC; kosong = ikuti aturan |
+| Rute standar dan aturan khusus | `master/rute_produksi` (satu dokumen kecil) | Dapat diubah super admin atau PPIC |
+| Kapasitas WC | Data work center (`mwc.data.kapasitas`) per hari kerja, per kelompok produk bila perlu | Mulai dari angka satu per WC |
+| Progres item lama (`item.prod`) | Tetap, diisi dari langkah terakhir | Modul lain (KPI, pengiriman, SPK) tetap berjalan |
+
+Draf SQL: `apps/platform/supabase/draft/20240101000014_produksi_log.sql` (draf migration 14). Disimpan di folder `draft`, bukan `migrations`, supaya tidak ikut terpasang tanpa persetujuan. RLS: pengguna dengan hak ubah SPK atau produksi menambah baris; semua yang boleh melihat SPK membaca; tidak ada ubah dan hapus (data tak dapat dimanipulasi, sejalan dengan riwayat perubahan).
+
+## 5. Perhitungan keluaran
+
+| Keluaran | Cara hitung |
+|---|---|
+| **Antrian WC** | Untuk tiap item aktif dan tiap langkah: yang sudah lolos langkah sebelumnya dikurangi yang sudah selesai di langkah ini; dijumlahkan per WC |
+| **Hari habis antrian** | Antrian ÷ kapasitas per hari |
+| **Status WC** | Kosong, Normal (≤ 1 hari), Padat (≤ 3 hari), Overload (> 3 hari), atau "Kapasitas belum diatur" (tidak pernah dianggap tak terbatas) |
+| **Selesai hari ini** | Jumlah kejadian bertanggal hari ini |
+| **Prediksi selesai SPK** | Tiap WC mengerjakan antriannya menurut due date terdekat; item selesai saat langkah terakhirnya selesai; tanggal = hari ini + hari kerja (akhir pekan dilewati). Sederhana dan transparan: penentunya (WC penahan) ditampilkan |
+| **Berisiko telat** | Prediksi selesai melewati due date; muncul di "Perlu tindakan" |
+| **Saran kapasitas** | Rata-rata hasil per hari aktif tiap WC dalam 14 hari terakhir |
+
+Keluaran di Dashboard Produksi: tabel Beban per Work Center (antrian, kapasitas, hari habis, status, selesai hari ini), penanda WC penahan (bottleneck), SPK berisiko telat beserta WC penyebabnya, dan throughput aktual per WC.
+
+## 6. Yang sudah dibangun di lokal
+
+| Bagian | Isi |
+|---|---|
+| Mesin hitung | `apps/platform/src/lib/produksi/rute.js` (rute, antrian, validasi, beban, prediksi, throughput, usulan langkah) dan `kinerja.js` (posisi, lama proses, kualifikasi vendor); uji `tests/unit` (23 + 11 skenario) |
+| Data | Tabel kejadian `produksi_log` (draf di `supabase/draft`; di mock sudah berjalan). Bila tabel belum ada di database, aplikasi memperlakukannya kosong (aman bila kode digabung lebih dulu) |
+| **Antrian Mesin** (menu baru) | Operator memilih mesinnya, melihat item yang siap menurut due date, mengisi jumlah selesai (atau tombol Semua); item pindah otomatis ke mesin berikutnya; melebihi yang siap ditolak |
+| **Dashboard Produksi** | Tabel Beban per work center: antrian, kapasitas, hari habis, selesai hari ini, aktual per hari 14 hari terakhir (saran kapasitas), lama proses, status; penahan (bottleneck); SPK berisiko telat; kolom Posisi SPK memuat sebaran batang per mesin dan di vendor |
+| **Vendor** | Tabel kecepatan dan kualifikasi: rata-rata TAT, tepat waktu, reject, masih di vendor (umur tertua), nilai A, B, atau C, dan perkiraan tanggal kembali tiap kiriman yang masih di vendor |
+| Master Data > Work Centre | Kolom kapasitas per hari kerja |
+| Kompatibilitas | Item tanpa kejadian memakai angka progres lama; item dengan kejadian memakai langkah terakhir sebagai progres, sehingga KPI, pengiriman, dan SPK lain tetap berjalan |
+| Uji | e2e produksi 15 skenario (rute, antrian, validasi, beban, vendor), sapu tampilan 67 (termasuk menu baru), total e2e 166 lulus |
+
+Temuan saat menguji: penambahan hari kerja memberi tanggal mundur sehari karena konversi zona waktu (UTC+7); diperbaiki sebelum dipakai.
+
+**Cara melihatnya di komputer ini (data contoh, tanpa menyentuh data nyata):** buka `http://127.0.0.1:5173/?demo=produksi` sekali (server mock lokal), masuk dengan `admin@mni.local` dan kode `123456`, lalu buka **Dashboard Produksi** dan **Antrian Mesin**. Data contoh hanya ada di browser itu.
+
+## 7. Keputusan yang dibutuhkan dari pemilik
+
+| # | Pertanyaan | Usulan |
+|---|---|---|
+| 1 | Nama WC yang dipakai sebagai langkah: Shearing, Punching, Bending, Welding, CNC Laser (sesuai master WC sekarang). Ada WC lain di rute (Rolling, BJP, Jointing, QC, Packing)? | Mulai dari lima WC di atas; sisanya bisa ditambah |
+| 2 | Daftar pengecualian bentuk (selain Cover): bentuk apa yang melewati mesin berbeda? Mis. Jointing, Fish Plate, Bracket, Clamp | Isi tabel aturan di bagian 8; kosong berarti ikut rute produk |
+| 3 | Satuan kapasitas: **batang per hari** per WC, atau **jam mesin** dengan waktu standar per bentuk? | Mulai batang per hari (mudah); saran angka dari throughput aktual; waktu standar ditambah kemudian bila dibutuhkan |
+| 4 | Kapasitas per kelompok produk (mis. Shearing tray vs ladder berbeda)? | Satu angka per WC dulu |
+| 5 | Siapa yang mengisi: operator di mesin atau PPIC dari rekap? | Mode Mesin untuk operator, Mode SPK untuk PPIC; dua-duanya jalan |
+| 6 | Jam kerja dan hari libur untuk hitung hari kerja | Senin sampai Jumat; hari libur nasional diatur kemudian |
+| 7 | Persetujuan menerapkan migration 14 (tabel `produksi_log`) setelah prototipe disetujui | Setelah uji lokal dan tinjauan |
+
+## 8. Tabel aturan khusus yang perlu diisi tim
+
+Isi sekali (dapat berubah); yang tidak diisi mengikuti rute produk.
+
+| Bentuk atau kata di deskripsi | Produk | Rute | Status |
+|---|---|---|---|
+| Cover | Ladder, Tray, Duct | Shearing → Bending | contoh awal |
+| Jointing, Fish Plate, End Plate | (semua) | ? | menunggu tim |
+| Bracket, Hanger, Clamp, Separator | (semua) | ? | menunggu tim |
+| Elbow, Tee, Cross, Riser, Reducer (Accs) | Accs | CNC Laser → Bending → Welding | sesuai uraian |
+| Lainnya | | ? | menunggu tim |
+
+## 9. Rencana pembangunan (tidak ditayangkan sebelum disetujui)
+
+1. Setujui skema dan jawab keputusan di bagian 7 dan 8.
+2. Bangun di lokal (mock): rute pada item, Mode Mesin, Mode SPK, tabel beban WC, prediksi; uji e2e.
+3. Uji bersama PPIC memakai data contoh.
+4. Terapkan migration 14 dan tayangkan hanya setelah persetujuan eksplisit.
+
+## 10. Kebutuhan tambahan dari pemilik (2026-11-03) dan jawabannya
+
+| Kebutuhan | Cara dipenuhi |
+|---|---|
+| Tahu **posisi** material dan SPK: sedang di work center mana | Kolom Posisi di Dashboard Produksi dan antrian per mesin (batang per tempat: tiap mesin, di vendor, selesai produksi) |
+| **Lama proses** per work center dan kecepatan produksi | Aktual per hari (throughput 14 hari), lama proses rata-rata (dari item tersedia di mesin itu sampai seluruh qty selesai, hari kerja) |
+| Operator mengisi di tiap WC, manajemen melihat progres aktual dan kapasitas | Menu Antrian Mesin untuk operator; Dashboard Produksi untuk manajemen; saran kapasitas dari hasil nyata |
+| Vendor dan subcon: tanggal kirim, tanggal kembali, kecepatan rata-rata, kualifikasi | Tabel kecepatan dan kualifikasi vendor; perkiraan kembali dari median riwayat vendor (target proses bila data belum cukup); nilai A, B, C minimal 3 kiriman selesai |
+| Banyak kondisi, tim tidak boleh repot | Rute otomatis dari produk dan aturan bentuk; tim hanya mengisi hasil di mesinnya; usulan langkah dari kejadian nyata bagian 2 |
+
+Yang belum dibangun (menunggu keputusan bagian 7 dan 8): tampilan pengecualian rute per item di editor SPK, tabel aturan khusus yang bisa diubah dari aplikasi (sementara aturan Cover dan rute standar tertanam di kode dan dapat ditimpa lewat `master/rute_produksi`), usulan "Tambahkan ke rute", tombol Mulai untuk waktu proses riil, dan impor ke produksi (migration 14 serta tayang).

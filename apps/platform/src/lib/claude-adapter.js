@@ -208,6 +208,7 @@ function makeCollection(col) {
         let q = supabase.from(table).select('*');
         if (orderCol) q = q.order(orderCol, { ascending: false });
         const { data, error } = await q;
+        if (error && table === 'produksi_log' && /produksi_log|schema cache|does not exist/i.test(error.message || '')) { if (lastSig !== '[]') { lastSig = '[]'; cb({ docs: [] }); } return; }
         if (error) { errCb && errCb(error); return; }
         const docs = (data || []).map((r) => (table === 'master' ? masterToDoc(r) : rowToDoc(numericNo(table, r))));
         // Lewati bila isi sama dengan pemuatan sebelumnya agar polling tidak merender ulang UI tanpa perubahan.
@@ -227,7 +228,7 @@ function makeCollection(col) {
       // Cek sidik perubahan (satu panggilan kecil bersama) tiap beberapa detik; bila fungsinya belum ada, kembali ke muat ulang berkala per tabel.
       startStampPoll();
       const pollMs = Number(window.__ENV?.POLL_MS) || 15000;
-      const timer = setInterval(() => { if (!document.hidden && !STAMP.ok) load(); }, pollMs);
+      const timer = setInterval(() => { if (!document.hidden && (!STAMP.ok || !(STAMP.last && table in STAMP.last))) load(); }, pollMs);
       const onVis = () => { if (!document.hidden) { load(); checkStamps(); } };
       document.addEventListener('visibilitychange', onVis);
 
@@ -562,6 +563,11 @@ window.MNIBerat = {
   info: () => (_katalogBerat ? { versi: _katalogBerat.versi, keluarga: Object.keys(_katalogBerat.keluarga).length, bentuk: Object.values(_katalogBerat.keluarga).reduce((a, f) => a + f.bentuk.length, 0) } : null),
   hitungItem: (o) => (_katalogBerat ? _hitungItem(_katalogBerat, o) : { ok: false, alasan: 'Katalog berat belum dipasang.' }),
 };
+
+// Mesin rute produksi multi work center: rute, antrian, beban, kapasitas, posisi, vendor (fungsi murni)
+import * as _rute from './produksi/rute.js';
+import * as _kinerja from './produksi/kinerja.js';
+window.MNIProduksi = { ..._rute, ..._kinerja };
 
 window.claude = CLAUDE_SHIM;
 window.__supabase = supabase;

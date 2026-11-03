@@ -96,12 +96,35 @@ const levelOf = (u, m) => {
   return (ROLE_MODS[u.role] || []).includes(m) ? 'ubah' : 'lihat';
 };
 
+// Data contoh untuk meninjau produksi multi work center: buka http://127.0.0.1:5173/?demo=produksi sekali (hanya mock lokal).
+function demoProduksi(state) {
+  const now = iso();
+  const tb = state.tables;
+  tb.mwc = [['WC-1', 'Shearing', 1, 100], ['WC-2', 'Punching', 2, 50], ['WC-3', 'Bending', 3, 40], ['WC-4', 'CNC Laser', 4, 60], ['WC-5', 'Welding', 5, 30]]
+    .map(([kode, nama, urutan, kap]) => ({ id: uid(), kode, nama, tipe: 'Internal', urutan, aktif: true, created_at: now, updated_at: now, created_by: 'seed', updated_by: 'seed', data: { kapasitas: kap } }));
+  const spk = tb.spk[0];
+  spk.items = [
+    { d: 'Cable Tray W100xH100xL3000 1.2', g: 'CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED', q: 100, u: 'Btg', w: 8.2, prod: 0 },
+    { d: 'Cable Ladder W300xH100xL3000 mm', g: 'CABLE LADDER TYPE SLW 2.0 HOTDIP GALVANIZED', q: 60, u: 'Btg', w: 17.5, prod: 0 },
+    { d: 'Horizontal Elbow Ladder W300xH100xR600 mm', g: 'ACCS LADDER TYPE SLW 2.0 HOTDIP GALVANIZED', q: 20, u: 'Btg', w: 9.4, prod: 0 },
+  ];
+  const hari = (n) => { const x = new Date(); x.setDate(x.getDate() - n); return x.toISOString(); };
+  const ev = (item, wc, qty, n) => ({ at: hari(n), tgl: hari(n).slice(0, 10), spk_id: spk.id, item_idx: item, item_desc: spk.items[item].d, wc, qty, oleh: 'operator@mni.local', data: {} });
+  tb.produksi_log = [ev(0, 'Shearing', 60, 4), ev(0, 'Shearing', 40, 3), ev(0, 'Punching', 50, 3), ev(0, 'Punching', 20, 2), ev(0, 'Bending', 30, 0),
+    ev(1, 'Shearing', 60, 2), ev(1, 'Punching', 20, 1), ev(2, 'CNC Laser', 12, 1), ev(2, 'Bending', 5, 0)].map((e, i) => ({ id: i + 1, ...e }));
+  const mk = (tgl, balik, q, rej) => ({ id: uid(), created_at: now, updated_at: now, data: { vendor: 'Berkah Jaya Plating', proses: 'HDG', tgl, noSJ: 'SJ-V/' + tgl, spk: '', status: balik ? 'Selesai' : 'Di Vendor',
+    items: [{ d: 'Cable Tray', g: '', q, u: 'Btg', kembali: balik ? q - rej : 0, reject: balik ? rej : 0 }], riwayat: balik ? [{ tgl: balik, qty: q - rej, rej }] : [] } });
+  const d = (n) => hari(n).slice(0, 10);
+  tb.vendor = [mk(d(35), d(30), 30, 0), mk(d(28), d(23), 30, 1), mk(d(21), d(17), 40, 0), mk(d(14), d(6), 20, 0), mk(d(2), null, 15, 0)];
+}
+
 export function createLocalClient() {
   const host = location.hostname;
   if (!['localhost', '127.0.0.1', '[::1]'].includes(host)) {
     throw new Error('Mode mock lokal hanya boleh dipakai di localhost.');
   }
   const state = load();
+  if (new URLSearchParams(location.search).get('demo') === 'produksi' && !state.demoProduksi) { demoProduksi(state); state.demoProduksi = true; }
   save(state);
   const listeners = new Set(); // { table, cb }
   const pkOf = (t) => (t === 'master' ? 'key' : 'id');
