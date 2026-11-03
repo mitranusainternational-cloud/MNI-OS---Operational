@@ -6,8 +6,8 @@ release: v1.0
 theme: Platform
 priority: P0
 status: active
-progress: 40
-tasks_total: 7
+progress: 31
+tasks_total: 10
 tasks_done: 3
 updated: 2026-11-03
 ---
@@ -34,5 +34,8 @@ Biaya dan manajemen secret; akun pemilik harus tersedia.
 - [ ] [[tasks/T-045-secrets-github-actions-dan-vercel|T-045]] Secrets GitHub Actions dan Vercel · todo · P0 · 0.5 hari
 - [x] [[tasks/T-046-ci-build-dan-smoke-test-pada-pr|T-046]] CI: build dan smoke test pada PR · done · P1 · 1 hari
 - [ ] [[tasks/T-047-konfigurasi-auth-supabase-produksi|T-047]] Konfigurasi Auth Supabase produksi · todo · P0 · 1 hari
+- [ ] [[tasks/T-163-aktifkan-supabase-production-dan-arahkan-vercel|T-163]] Aktifkan Supabase production dan arahkan Vercel · doing · P0 · 1 hari
+- [ ] [[tasks/T-165-pensiunkan-project-supabase-dev-lama|T-165]] Pensiunkan project Supabase dev lama · todo · P2 · 0.2 hari
+- [ ] [[tasks/T-166-putuskan-repo-publik-atau-privat-dan-aktifkan-depe|T-166]] Putuskan repo publik atau privat dan aktifkan Dependabot · todo · P1 · 0.2 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

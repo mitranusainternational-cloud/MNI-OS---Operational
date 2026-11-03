@@ -26,7 +26,7 @@ Fase: P4 Environment cloud
 
 ## Bukti
 
-- Target: repo organisasi `mitranusainternational-cloud/MNI-OS---Operational`. `gh` login sebagai akun organisasi; `gh api` melaporkan admin/push: true (2026-11-02).
+- Target: repo organisasi `mitranusainternational-cloud/mni-gudang`. `gh` login sebagai akun organisasi; `gh api` melaporkan admin/push: true (2026-11-02).
 
 ## Catatan
 

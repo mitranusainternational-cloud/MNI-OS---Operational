@@ -39,7 +39,7 @@ Bukti: [[screenshots/README]].
 
 | Layanan | Temuan | Arti untuk mni-app |
 |---|---|---|
-| GitHub | Repo organisasi `mitranusainternational-cloud/MNI-OS---Operational`, `main` terproteksi | Siap menerima kode |
+| GitHub | Repo organisasi `mitranusainternational-cloud/mni-gudang`, `main` terproteksi | Siap menerima kode |
 | Supabase (org pribadi pemilik) | 3 project: "MNI OS" (aktif, 1 tenant, tabel ERP multi-tenant: tenants, items, BOM, routings), "MNI OS - Operational" (aktif, 80 tabel ERP, 0 baris), "Marketing OS - NIJ" (nonaktif) | Dua project aktif berskema ERP **berbeda** dari schema mni-app (20 tabel `rm`, `fg`, `spk`, …). Jangan dipakai tanpa keputusan |
 | Vercel (team NIJ) | 0 project | Belum ada deployment |
 
@@ -104,7 +104,7 @@ Beberapa konektor di mesin ini terhubung ke akun lain. Selalu cocokkan sebelum b
 
 | Layanan | Yang dipakai proyek ini | Jangan disentuh |
 |---|---|---|
-| GitHub | akun `mitranusainternational-cloud`, repo `MNI-OS---Operational` (login `gh` keyring) | — |
+| GitHub | akun `mitranusainternational-cloud`, repo `mni-gudang` (login `gh` keyring) | — |
 | Supabase | org `wjebogebnwlxghsjbbdg`, project **`MNI Gudang - Dev`** (`inldyqigewmziwazalun`, ap-southeast-1) | `MNI OS` (srjtotk…, aktif), `MNI OS - Operational` (eonzept…, nonaktif), `Marketing OS - NIJ` (ovrvwj…) |
 | Vercel | tim **`mitranusainternational-8337`** (Hobby) di Chrome pemilik, lewat halaman import GitHub | Konektor Vercel di alat Claude terhubung ke tim lain (`NIJ`, `nij3`): jangan dipakai untuk project ini |
 
@@ -115,9 +115,9 @@ Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewa
 
 | Item | Nilai |
 |---|---|
-| Tim / project | `mitranusainternational-8337` (Hobby) / `mni-os-operational` |
-| Sumber | GitHub `MNI-OS---Operational`, root `apps/platform`, preset Vite (`vercel.json`: install `npm ci --ignore-scripts`, build `node scripts/extract-app.js && vite build`) |
-| Production | https://mni-os-operational.vercel.app (branch `main`) |
+| Tim / project | `mitranusainternational-8337` (Hobby) / `mni-gudang` |
+| Sumber | GitHub `mni-gudang`, root `apps/platform`, preset Vite (`vercel.json`: install `npm ci --ignore-scripts`, build `node scripts/extract-app.js && vite build`) |
+| Production | https://mni-gudang.vercel.app (branch `main`) |
 | Preview | per branch/PR, mis. `...-git-development-mitranusainternational-8337.vercel.app` (dilindungi login Vercel) |
 | Env | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable, Production dan Preview) mengarah ke Supabase **dev**: production Vercel saat ini = staging |
 | Keamanan | X-Frame-Options DENY, nosniff, Referrer-Policy, CSP (hanya self, cdnjs, Google Fonts, `*.supabase.co`), HSTS, Permissions-Policy |

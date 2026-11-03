@@ -6,13 +6,13 @@ updated: 2026-11-02
 
 # Migrasi ke GitHub
 
-> [!success] 2026-11-02: remote `origin` terpasang ke `mitranusainternational-cloud/MNI-OS---Operational`; `development` dan `docs` sudah di-push. Proteksi `main` aktif (PR + 1 approval, tanpa force-push). Promosi ke `main` hanya lewat PR dari `development`.
+> [!success] 2026-11-02: remote `origin` terpasang ke `mitranusainternational-cloud/mni-gudang`; `development` dan `docs` sudah di-push. Proteksi `main` aktif (PR + 1 approval, tanpa force-push). Promosi ke `main` hanya lewat PR dari `development`.
 
 Repo lokal ini (`mni-os`) menggantikan salinan kerja sebelumnya dan punya riwayat serta empat branch: `versi-awal`, `development`, `main`, `docs`. 
 
 ## Checklist sebelum push pertama
 
-- [ ] Putuskan target: repo organisasi `mitranusainternational-cloud/MNI-OS---Operational` (sudah berisi `main`, `development`, `docs`, `versi-awal` lama) atau repo kosong baru.
+- [ ] Putuskan target: repo organisasi `mitranusainternational-cloud/mni-gudang` (sudah berisi `main`, `development`, `docs`, `versi-awal` lama) atau repo kosong baru.
 - [ ] Login `gh` sebagai akun yang punya izin tulis (`gh auth status`; cek `push: true`).
 - [ ] Jika target sudah berisi riwayat berbeda, jangan force-push. Dorong ke repo kosong baru, atau rebase setelah dibandingkan.
 - [ ] Periksa tidak ada secret/workbook: `git ls-files | grep -Ei "\.env$|\.xlsx|\.pem|\.key"` harus kosong.

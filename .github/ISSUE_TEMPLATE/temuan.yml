@@ -1,0 +1,37 @@
+name: Temuan (bug atau masalah)
+description: Laporkan bug, galat, atau hal yang tidak sesuai dari pemakaian atau pengujian
+title: "[Temuan] "
+labels: ["jenis:temuan"]
+body:
+  - type: dropdown
+    id: env
+    attributes:
+      label: Di mana ditemukan
+      options: [Production, Staging (preview), Dev, Lokal (mock)]
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [Aplikasi, Database/Supabase, CI/Vercel, Dokumen]
+    validations:
+      required: true
+  - type: textarea
+    id: langkah
+    attributes:
+      label: Langkah yang dilakukan
+      description: Urutan klik/isian, akun dan role yang dipakai (jangan tulis password).
+    validations:
+      required: true
+  - type: textarea
+    id: hasil
+    attributes:
+      label: Hasil yang terjadi dan yang diharapkan
+    validations:
+      required: true
+  - type: textarea
+    id: bukti
+    attributes:
+      label: Bukti
+      description: Tangkapan layar, nomor dokumen, waktu kejadian. Jangan tempel kunci rahasia atau data pribadi.

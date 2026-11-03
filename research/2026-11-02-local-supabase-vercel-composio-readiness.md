@@ -15,7 +15,7 @@ Menyiapkan urutan untuk mematangkan aplikasi Gudang & Logistik di lokal, lalu me
 
 ### Checkout lokal
 
-- Repository aktif berada di branch `development` dan memiliki remote bernama `origin` ke repository MNI-OS---Operational. Tidak ada push atau publish yang dilakukan.
+- Repository aktif berada di branch `development` dan memiliki remote bernama `origin` ke repository mni-gudang. Tidak ada push atau publish yang dilakukan.
 - Aplikasi di `apps/gudang-logistik/` sekarang berupa HTML/CSS/JavaScript statis. Belum ada `package.json`, folder `supabase/`, file migration lokal, atau konfigurasi Vercel pada checkout ini.
 - `window.claude` adalah adapter data di prototype. Ini bukan konektor Supabase yang telah diverifikasi.
 - Pada folder sibling bernama `MNI OS - Dept. Operational` di parent project ditemukan dua SQL migration (`202610300001_operational_foundation.sql`, `202610300002_harden_foundation.sql`), tetapi folder itu bukan repository checkout ini. Migration tersebut memakai model `organizations`/`organization_members`, sedangkan project hosted yang diperiksa memakai `tenants`/`tenant_memberships`.

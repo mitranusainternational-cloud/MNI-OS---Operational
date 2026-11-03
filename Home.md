@@ -6,7 +6,7 @@ active-version: development
 updated: 2026-11-03
 ---
 
-# MNI OS — Gudang & Logistik
+# MNI Gudang & Logistik
 
 > [!summary] Satu vault untuk kode, rencana, progress, riset, dan bukti
 > Sistem custom untuk tim Operasional MNI. Arah, kebutuhan, dan prioritas berasal dari proses nyata tim; referensi eksternal hanya pembanding. Status di bawah dihitung dari catatan tugas, bukan ditulis tangan.
@@ -43,7 +43,9 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 | Menjalankan dan mengembangkan aplikasi | [[apps/gudang-logistik/docs/DEVELOPMENT]] dan `apps/platform/README.md` |
 | Mempelajari cara memakai aplikasi | [[apps/gudang-logistik/docs/USER_GUIDE]] |
 | Melihat bukti (screenshot) | [[documentation/screenshots/README]] |
+| Mengetahui nama dan lokasi semua sumber daya (GitHub, Vercel, Supabase, lokal) | [[documentation/SISTEM_MAP]] |
 | Memeriksa kesiapan dipakai tim | [[documentation/AUDIT_KESIAPAN]] |
+| Melihat riwayat perubahan per versi | [[CHANGELOG]] |
 | Merilis ke pengguna | [[documentation/RELEASE_CHECKLIST]] |
 | Membaca riset | [[research/README]] |
 | Memahami data operasional | [[documentation/DATA_SOURCE_CATALOG]], [[documentation/DATA_DICTIONARY]] |
