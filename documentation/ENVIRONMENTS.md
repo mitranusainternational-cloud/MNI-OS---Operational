@@ -142,3 +142,17 @@ Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewa
 | Advisor | keamanan: hanya 6 fungsi pembantu yang dapat dipanggil authenticated (disengaja); performa: 3 `multiple_permissive_policies` (policy ALL berdampingan dengan SELECT) dan indeks belum terpakai; tidak ada temuan anon, extension, atau initplan |
 | Data | **tidak ada data uji dipindahkan.** Isi dev lama hanya data uji (SPK 1–6, item/supplier/customer UJI, counter, katalog berisi customer uji). Production dimulai bersih; satu baris `muser` admin dibuat |
 | Env lokal | `apps/platform/.env.supabase-prod.local` (tidak di Git), server `vite --mode supabase-prod --port 5175` |
+
+### Status go-live production (diverifikasi ulang 2026-11-03, setelah pemilik mengatur Auth dan Vercel)
+
+| Langkah | Status | Bukti |
+|---|---|---|
+| Skema production (migration 1–10 pada project kosong) | Selesai | matriks role, advisor, uji tulis lulus |
+| Pengguna admin production | Selesai | Auth + `muser` admin; login berhasil |
+| Auth: Site URL dan Redirect URL | Selesai (sebagian) | Site URL `https://mni-gudang.vercel.app`; tiga Redirect URL tersimpan, tetapi entri preview tampil tanpa tanda `*` (`https://-mitranusainternational-8337.vercel.app/`), perlu diperiksa pemilik |
+| Auth: pendaftaran bebas dimatikan | Selesai | `GET /auth/v1/settings` → `disable_signup: true` |
+| Auth: leaked password protection | Belum diperiksa | opsi di Sign In / Providers, tergantung paket |
+| Env Vercel mengarah ke production | Selesai untuk Production | bundel `mni-gudang.vercel.app` memuat `lggqigmvtefkquqjrjsb` dan kunci `sb_publishable_odc9Y44…`; dashboard menampilkan variabel hanya untuk Production (Preview belum). Alias lama `mni-os-operational.vercel.app` kini 404 |
+| Pembersihan data uji production | Selesai (2026-11-03) | guard lolos (semua baris bertanda UJI-PROD); sesudahnya muser 1, role_modules 10, tabel lain 0; penomoran mulai lagi dari 001 |
+
+Sisa sebelum dibagikan ke tim: login admin di situs Vercel (uji CSP, 10 modul, ekspor), pembersihan data uji, Redirect URL preview, dan variabel Preview bila preview dipakai.

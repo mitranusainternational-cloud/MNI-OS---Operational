@@ -373,3 +373,20 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Nama baku **mni-gudang** (produk "MNI Gudang & Logistik"): repo GitHub `MNI-OS---Operational` menjadi `mni-gudang`; project Vercel `mni-os-operational` menjadi `mni-gudang` dengan domain production `mni-gudang.vercel.app` (alias lama tetap aktif); Supabase "MNI Gudang - Production". Folder kerja lokal masih `mni-os` (penggantian nama menunggu Obsidian dan terminal ditutup).
 - GitHub: deskripsi, topik, homepage, label standar (`area:*`, `env:*`, `prioritas:*`, `jenis:*`), template PR dan isu, CODEOWNERS, SECURITY.md, CHANGELOG.md. Hapus-branch-otomatis sengaja tidak dinyalakan agar branch kerja tidak ikut terhapus saat merge.
 - Vault: halaman [[SISTEM_MAP]] (daftar sumber daya, konvensi, rutinitas pemantauan, riwayat nama); rujukan nama lama di dokumen hidup diperbarui; Home, README, CLAUDE.md, skill dan agen Supabase disesuaikan.
+
+### 2026-11-03 — Login admin dan uji baca di Supabase Production
+
+- Pengguna admin dibuat pemilik di project MNI Gudang - Production (terkonfirmasi, berpasangan dengan `muser` admin). Login berhasil di server lokal mode production; 10 modul dan 21 tabel dibaca dengan benar; latensi median 233 ms ke Frankfurt. Lihat [[TEST_MATRIX]].
+- Skrip baru `apps/platform/tests/e2e/prod-check.mjs` (login manual pemilik; opsi `--tulis` untuk data uji `UJI-PROD`). Chromium berjendela tidak dapat dijalankan dari proses asisten (spawn UNKNOWN), jadi uji putaran ini lewat browser pane.
+- Sisa T-163: uji tulis di production (menunggu keputusan data uji), pengaturan Auth (Site URL, Redirect URL, sign-up, leaked password), env Vercel ke project production.
+
+### 2026-11-03 — Uji tulis di Supabase Production
+
+- Alur catat lengkap lulus di production (item, terima dua kali, pakai, opname, master tambah/ubah/hapus, tiga jenis SPK, kirim vendor, dua surat jalan, antrean bongkar otomatis); nomor dokumen, kolom relasi, dan kunci atomik benar; waktu simpan 0,6 sampai 1,5 detik. Detail di [[TEST_MATRIX]].
+- Data uji `UJI-PROD` tertinggal; skrip pembersih bersyarat tersedia di `apps/platform/supabase/ops/bersihkan_data_uji.sql` (pemilik menjalankan sebelum go-live).
+- Uji ganti role pada akun admin di production ditolak sebagai perubahan atas sumber daya bersama; tidak diulang.
+
+### 2026-11-03 — Verifikasi go-live: Auth dan Vercel belum diubah
+
+- Pemeriksaan langsung: Site URL production masih `http://localhost:3000` tanpa Redirect URL; `disable_signup=false`; env Vercel tidak berubah dan situs publik masih memakai database dev lama. Status rinci di [[ENVIRONMENTS]] (tabel "Status go-live production") dan tugas T-163.
+- Langkah-langkah itu adalah pengaturan keamanan dan kunci yang hanya dapat dilakukan pemilik; halaman yang diperlukan dibuka di Chrome pemilik (grup tab Claude) agar tinggal menyimpan.
