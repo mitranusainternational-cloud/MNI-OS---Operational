@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Tim kerja Codex dan skill lokal
 
 Model ini membagi pekerjaan berdasarkan hasil yang dibutuhkan. Definisi agent adalah panduan spesialis lokal; ia tidak menjalankan tim paralel secara otomatis. Koordinator memilih peran yang relevan untuk setiap pekerjaan.

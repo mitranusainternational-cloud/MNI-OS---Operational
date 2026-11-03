@@ -101,7 +101,44 @@ export async function runAccess(page, base) {
   await page.waitForTimeout(2500);
   ok('A-18 Keluar: kembali ke halaman masuk', await page.evaluate(() => { const g = document.getElementById('auth-gate'); return !!g && getComputedStyle(g).display !== 'none'; }));
 
-  ok('A-19 tanpa pageerror', errs.length === 0, errs.join(' | '));
+  // Cadangan data: admin mengunduh JSON berisi semua tabel; bukan admin tidak melihat tombolnya
+  await login('admin@mni.local');
+  const bnOk = await page.evaluate(() => !!document.querySelector('.brief [data-act="backup"]'));
+  const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 15000 }), page.evaluate(() => document.querySelector('[data-act="backup"]').click())]);
+  const bkPath = await dl.path();
+  const bk = JSON.parse((await import('node:fs')).readFileSync(bkPath, 'utf8'));
+  ok('A-19 admin: unduh cadangan berisi semua tabel', bnOk && bk.format === 'mni-gudang-backup' && bk.jumlah.spk > 0 && bk.jumlah.muser >= 7 && 'role_modules' in bk.data && /^MNI-cadangan-[0-9]{4}-[0-9]{2}-[0-9]{2}\.json$/.test(dl.suggestedFilename()), JSON.stringify(bk.jumlah).slice(0, 90));
+  await page.waitForTimeout(1200);
+  ok('A-20 penanda cadangan tersimpan (peringatan hilang)', !(await page.evaluate(() => /belum ada cadangan/i.test((document.querySelector('.brief .bt') || {}).innerText || ''))));
+  await login('gbb@mni.local');
+  ok('A-21 bukan admin: tombol cadangan tidak ada', !(await page.evaluate(() => !!document.querySelector('[data-act="backup"]'))));
+
+  // Impor CSV: pratinjau menolak baris bermasalah, lalu impor massal master dan item dengan stok awal
+  await login('admin@mni.local'); await go('master-data');
+  const nV0 = (await tab('mvendor')).length;
+  await page.click('[data-act="importcsv"]'); await page.waitForTimeout(400);
+  await page.selectOption('#m-jenis', 'vendor');
+  await page.fill('#m-csv', 'nama,proses,pic\nPT Impor Satu,HDG,Budi\n,ELG,Tanpa Nama\nPT Impor Satu,HDG,Ganda\nVendor Finishing Contoh,HDG,Sudah Ada');
+  await page.waitForTimeout(300);
+  const prev = await page.evaluate(() => document.getElementById('m-prev').innerText);
+  ok('A-23 pratinjau CSV: 1 siap, 2 dilewati, 1 bermasalah', /1\s*baris siap/.test(prev) && /2\s*dilewati/.test(prev) && /1\s*bermasalah/.test(prev) && /Kolom wajib kosong/.test(prev), prev.replace(/\s+/g, ' ').slice(0, 110));
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(600);
+  ok('A-24 impor ditolak selama masih ada baris bermasalah', (await tab('mvendor')).length === nV0);
+  await page.fill('#m-csv', 'nama;proses;pic\nPT Impor Satu;HDG;Budi\nPT Impor Dua;ELG;Sari');
+  await page.waitForTimeout(300);
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500);
+  ok('A-25 impor vendor (pemisah titik koma): 2 baris masuk', (await tab('mvendor')).length === nV0 + 2);
+  const nRm0 = (await tab('rm')).length;
+  await page.click('[data-act="importcsv"]'); await page.waitForTimeout(400);
+  await page.selectOption('#m-jenis', 'rm');
+  await page.fill('#m-csv', 'item,ukuran,satuan,buffer,stok_awal\nPlat Impor,1.5x1219x2438,Lembar,10,"1,5"\nPlat Impor,2.0x1219x2438,Lembar,5,40');
+  await page.waitForTimeout(300);
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500);
+  const rmNew = (await tab('rm')).filter((r) => r.data && r.data.item === 'Plat Impor' || r.item === 'Plat Impor');
+  ok('A-26 impor bahan baku dengan stok awal', (await tab('rm')).length === nRm0 + 2 && rmNew.length === 2, 'rm ' + (await tab('rm')).length);
+  ok('A-27 bukan admin: tombol Impor CSV tidak ada', await (async () => { await login('gbb@mni.local'); await go('master-data'); return !(await page.evaluate(() => !!document.querySelector('[data-act="importcsv"]'))); })());
+
+  ok('A-22 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;
   return { pass: R.length - fail, fail, detail: R };
 }

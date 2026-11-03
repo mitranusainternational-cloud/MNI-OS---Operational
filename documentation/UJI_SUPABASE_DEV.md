@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Skenario uji aplikasi terhadap Supabase dev
 
 Skenario manual yang dijalankan pemilik di `http://127.0.0.1:5174/` (login password), lalu diverifikasi agen lewat database dan log Supabase. Agen tidak login sendiri karena kredensial akan dikirim ke layanan cloud. Hasil dicatat di [[TEST_MATRIX]] dan tugas T-021, T-028, T-022. Data hanya sintetis (awali nama dengan "UJI").

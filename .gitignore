@@ -26,3 +26,6 @@ coverage/
 
 # Pengaturan lokal Claude Code (skill dan agen proyek tetap di-commit)
 .claude/settings.local.json
+
+# Cadangan data operasional (jangan pernah masuk Git)
+MNI-cadangan-*.json

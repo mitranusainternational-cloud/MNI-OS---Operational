@@ -4,6 +4,8 @@ status: active
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Panduan: aktifkan virtualisasi dan Docker untuk Supabase lokal
 
 Tujuan: Docker Desktop berjalan sehingga `supabase start` menyalakan database, Auth, dan realtime lokal. Ini membuka tugas [[tasks/T-010-aktifkan-docker-engine-di-windows|T-010]], T-011, T-012, T-013, lalu T-020 sampai T-022 di [[GO_LIVE_PLAN]].

@@ -112,6 +112,7 @@ export function createLocalClient() {
     select() { this.sel = true; return this; }
     order(col, { ascending = true } = {}) { this.ord = { col, ascending }; return this; }
     eq(col, val) { this.filters.push([col, val]); return this; }
+    range(a, b) { this.rg = [a, b]; return this; }
     single() { this.one = true; return this; }
     maybeSingle() { this.one = true; this.maybe = true; return this; } // nol baris = data null tanpa galat
     insert(p) { this.op = 'insert'; this.payload = p; return this; }
@@ -167,6 +168,7 @@ export function createLocalClient() {
           const { col, ascending } = this.ord;
           out = out.slice().sort((a, b) => ((a[col] ?? '') > (b[col] ?? '') ? 1 : (a[col] ?? '') < (b[col] ?? '') ? -1 : 0) * (ascending ? 1 : -1));
         }
+        if (this.rg) out = out.slice(this.rg[0], this.rg[1] + 1);
       } else if (this.op === 'insert' || this.op === 'upsert') {
         const list = Array.isArray(this.payload) ? this.payload : [this.payload];
         for (const p of list) {

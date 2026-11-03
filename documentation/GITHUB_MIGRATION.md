@@ -4,6 +4,8 @@ status: draft
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Migrasi ke GitHub
 
 > [!success] 2026-11-02: remote `origin` terpasang ke `mitranusainternational-cloud/mni-gudang`; `development` dan `docs` sudah di-push. Proteksi `main` aktif (PR + 1 approval, tanpa force-push). Promosi ke `main` hanya lewat PR dari `development`.

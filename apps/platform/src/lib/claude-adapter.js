@@ -180,6 +180,22 @@ function makeCollection(col) {
       return { id: result.id, ...numericNo(table, result) };
     },
 
+    // Impor massal: satu permintaan per 200 baris (hemat waktu dibanding add() satu per satu).
+    async addMany(list) {
+      const rows = [];
+      for (const data of list) {
+        const packed = packRow(table, textNo(table, await linkIds(table, docToRow(null, data))), true);
+        const row = { ...packed.row, data: packed.extra };
+        delete row.id;
+        rows.push(row);
+      }
+      for (let i = 0; i < rows.length; i += 200) {
+        const { error } = await supabase.from(table).insert(rows.slice(i, i + 200));
+        if (error) throw new Error(`[addMany:${table}] ${error.message}`);
+      }
+      notifyWrite(table);
+    },
+
     // Firestore: collection(col).onSnapshot(cb) → Realtime subscription
     onSnapshot(cb, errCb) {
       // Initial load
@@ -471,6 +487,22 @@ async function makeUserAdapter() {
       for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) % 360;
       return [id, { color: `hsl(${h} 55% 45%)`, avatarUrl: null }];
     })),
+    // Cadangan: semua tabel mentah (urutan aman untuk pemulihan). Hanya super admin yang membaca semuanya (RLS).
+    exportAll: async () => {
+      const tables = ['muser', 'role_modules', 'master', 'mwc', 'mvendor', 'mcustomer', 'msupplier', 'marmada', 'rm', 'fg', 'spk', 'rmhist', 'pr', 'opname', 'mutasi', 'vendor', 'kirim', 'bongkar', 'log'];
+      const out = {};
+      for (const t of tables) {
+        const rows = [];
+        for (let from = 0; ; from += 1000) {
+          const { data, error } = await supabase.from(t).select('*').range(from, from + 999);
+          if (error) throw new Error('Gagal membaca ' + t + ': ' + error.message);
+          rows.push(...data);
+          if (data.length < 1000) break;
+        }
+        out[t] = rows;
+      }
+      return out;
+    },
     // Ganti password sendiri (pengguna yang sedang login).
     changePassword: async (password) => {
       const { error } = await supabase.auth.updateUser({ password });

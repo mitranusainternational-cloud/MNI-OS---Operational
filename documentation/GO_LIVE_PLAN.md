@@ -4,6 +4,8 @@ status: proposed
 updated: 2026-11-02
 ---
 
+<img src="assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Rencana go-live MNI Gudang & Logistik
 
 Rencana ini menjawab: apa yang harus terjadi agar sistem dipakai tim Operasional dengan baik. Setiap langkah adalah catatan di `tasks/` (ID `T-xxx`); status hidup ada di [[PROGRESS_SNAPSHOT]] dan [[PROGRESS_DASHBOARD]]. Rencana ini usulan sampai pemilik proyek menyetujuinya.

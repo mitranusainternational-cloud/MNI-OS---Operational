@@ -6,6 +6,8 @@ status: in-progress
 updated: YYYY-MM-DD
 ---
 
+<img src="../assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 ## Hasil
 
 -

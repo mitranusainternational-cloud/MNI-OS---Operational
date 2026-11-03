@@ -1,3 +1,5 @@
+<img src="documentation/assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Kebijakan keamanan
 
 Sistem ini dipakai tim Operasional PT Mitra Nusa Internasional.

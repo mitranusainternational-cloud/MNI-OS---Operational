@@ -4,6 +4,8 @@ status: proposed
 updated: 2026-11-02
 ---
 
+<img src="../documentation/assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
+
 # Roadmap produk MNI Gudang & Logistik
 
 Roadmap ini mengurutkan **hasil** (bukan tanggal) dari kondisi sekarang sampai sistem dipakai dan berkembang. Status hidup dihitung otomatis dari catatan tugas: lihat [[PROGRESS_SNAPSHOT]] dan [[PROGRESS_DASHBOARD]]. Rencana operasional menuju rilis pertama: [[GO_LIVE_PLAN]]. Daftar periksa Now/Next/Later yang lebih rinci: [[ROADMAP]].
