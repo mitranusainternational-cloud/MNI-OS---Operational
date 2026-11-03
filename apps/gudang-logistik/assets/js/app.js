@@ -183,6 +183,7 @@ function route(){
   'kinerja':'Siapa mencatat apa, seberapa aktif, dan seberapa tepat waktu input data tiap anggota tim',
   'pengguna':'Akun tim, peran, dan hak akses per modul'}[VIEW];
  renderNav();renderTools();renderBody();window.scrollTo(0,0);
+ if(VIEW==='pengguna')loadAudit();
 }
 window.addEventListener('hashchange',route);
 
@@ -1301,7 +1302,7 @@ B['master-data']=()=>{
  const f=F['master-data'],k=f.tab,q=f.q.toLowerCase(),u=usage()[k],si=f.showInactive;const key=k==='armada'?'nopol':'nama';
  const kpi=masterKpi(k);
  // KPI row
- const kpiRow=`<div class="kpis" style="grid-template-columns:repeat(4,minmax(120px,1fr))">`+
+ const kpiRow=`<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))">`+
   `<div class="kpi ok"><div class="lb">Aktif</div><div class="v">${kpi.aktif}</div></div>`+
   `<div class="kpi${kpi.nonaktif>0?' warn':''}"><div class="lb">Nonaktif</div><div class="v">${kpi.nonaktif}</div></div>`+
   `<div class="kpi info"><div class="lb">Total transaksi</div><div class="v">${kpi.totalUsage}</div></div>`+
@@ -1468,7 +1469,7 @@ function wcTab(){
  const kpiInt=S.mwc.filter(x=>x.tipe==='Internal'&&x.aktif!==false).length;
  const kpiSub=S.mwc.filter(x=>x.tipe==='Subcont'&&x.aktif!==false).length;
  const kpiOff=S.mwc.filter(x=>x.aktif===false).length;
- const kpiRow=`<div class="kpis" style="grid-template-columns:repeat(4,minmax(120px,1fr))">
+ const kpiRow=`<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr))">
   <div class="kpi ok"><div class="lb">Internal</div><div class="v">${kpiInt}</div></div>
   <div class="kpi info"><div class="lb">Subcont</div><div class="v">${kpiSub}</div></div>
   <div class="kpi${kpiOff>0?' warn':''}"><div class="lb">Nonaktif</div><div class="v">${kpiOff}</div></div>
@@ -3053,8 +3054,34 @@ B.pengguna=()=>{
  h+=`<section class="panel"><header><h2>Paket peran bawaan</h2><span class="hint">titik awal; hak tiap orang tetap bisa diatur satu per satu</span></header><div class="tbl-wrap"><table class="mx"><thead><tr><th>Peran</th>${MODS.map(([,l])=>`<th class="c">${l}</th>`).join('')}</tr></thead><tbody>
   ${Object.entries(ROLES).map(([k,r])=>{const p=presetModul(k);return `<tr><td><b>${r.l}</b><div class="note">${r.d}</div></td>${MODS.map(([m])=>`<td class="c">${k==='admin'?'<span class="yes">✓</span>':p[m]==='ubah'?'<span class="yes" title="Lihat dan ubah">✓</span>':p[m]==='lihat'?'<span class="part" title="Lihat saja">lihat</span>':'<span class="no">–</span>'}</td>`).join('')}</tr>`}).join('')}</tbody></table></div>
   <div class="pbody note">✓ = lihat dan ubah · lihat = hanya melihat · – = modul tidak tampil. Aturan dijaga di database sehingga tidak bisa diakali dari browser. Data tetap satu dan terhubung: perubahan oleh satu pengguna terlihat oleh pengguna lain yang punya akses ke modul itu.</div></section>`;
+ h+=auditPanel();
  return h;
 };
+/* ---- Riwayat perubahan (audit database, khusus super admin) ---- */
+let AUDIT=null;
+async function loadAudit(){
+ if(!USER||!USER.auditList){AUDIT={na:true};return}
+ try{const r=await USER.auditList(200);AUDIT=r===null?{na:true}:{rows:r}}catch(e){AUDIT={err:e.message||'galat'}}
+ if(VIEW==='pengguna')renderBody();
+}
+const AUD_AKSI={INSERT:'Tambah',UPDATE:'Ubah',DELETE:'Hapus'};
+function auditRef(r){const x=r.baru||r.lama||{};const d=x.data||{};const v=x.no||x.no_sj||d.noSJ||x.nama||x.item||d.item||x.nopol||x.kode||x.email||'';return v?String(v):String(r.baris_id||'').slice(0,8)}
+function auditDiff(r){
+ if(r.aksi!=='UPDATE')return '';const o=r.lama||{},n=r.baru||{};const ch=[];
+ for(const k of new Set([...Object.keys(o),...Object.keys(n)])){if(['updated_at','updated_by','data'].includes(k))continue;if(JSON.stringify(o[k])!==JSON.stringify(n[k]))ch.push(k)}
+ const od=o.data||{},nd=n.data||{};
+ for(const k of new Set([...Object.keys(od),...Object.keys(nd)])){if(['updAt','updBy'].includes(k))continue;if(JSON.stringify(od[k])!==JSON.stringify(nd[k]))ch.push(k)}
+ return ch.slice(0,5).join(', ')+(ch.length>5?' …':'');
+}
+function auditPanel(){
+ const head=`<header><h2>Riwayat perubahan</h2><span class="hint">dicatat otomatis oleh database · 200 terbaru</span><button class="btn sm ghost" data-act="auditrefresh" style="margin-left:8px">Muat ulang</button></header>`;
+ if(AUDIT===null)return `<section class="panel">${head}<div class="pbody note">Memuat riwayat…</div></section>`;
+ if(AUDIT.na)return `<section class="panel">${head}<div class="pbody note">Riwayat perubahan belum aktif di database ini.</div></section>`;
+ if(AUDIT.err)return `<section class="panel">${head}<div class="pbody"><div class="ro">Gagal memuat riwayat: ${esc(AUDIT.err)}</div></div></section>`;
+ const rows=AUDIT.rows||[];
+ if(!rows.length)return `<section class="panel">${head}${empty('Belum ada riwayat','Perubahan data akan tercatat di sini.')}</section>`;
+ return `<section class="panel">${head}<div class="tbl-wrap"><table><thead><tr><th>Waktu</th><th>Oleh</th><th>Data</th><th>Aksi</th><th>Referensi</th><th>Yang berubah</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="muted" title="${esc(r.at)}">${esc(String(r.at||'').slice(0,16).replace('T',' '))}</td><td>${esc(uname(r.oleh)||r.oleh||'')}</td><td>${esc(CNM[r.tabel]||r.tabel)}</td><td>${chip(AUD_AKSI[r.aksi]||r.aksi,r.aksi==='DELETE'?'crit':r.aksi==='INSERT'?'ok':'info')}</td><td>${esc(auditRef(r))}</td><td class="muted">${esc(auditDiff(r))}</td></tr>`).join('')}</tbody></table></div></section>`;
+}
 const genPw=()=>{const A='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';const b=crypto.getRandomValues(new Uint8Array(12));return [...b].map(x=>A[x%A.length]).join('')};
 const modulGrid=cur=>`<div class="fld full"><label>Akses per modul</label><div class="tbl-wrap"><table class="mx"><tbody>${MODS.map(([m,l])=>`<tr><td>${l}</td><td><select class="sel" name="mod_${m}">${LVL_OPT.map(([v,t])=>`<option value="${v}" ${(cur[m]||'')===v?'selected':''}>${t}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div></div>`;
 const modulFrom=d=>{const o={};MODS.forEach(([m])=>{const v=d['mod_'+m];if(v==='lihat'||v==='ubah')o[m]=v});return o};
@@ -3624,6 +3651,7 @@ document.addEventListener('click',async e=>{
   case 'kpicsv':await kpiCsv();break;
   case 'mepage':case 'meclick':accountModal();break;
   case 'pwself':pwSelf();break;
+  case 'auditrefresh':AUDIT=null;renderBody();await loadAudit();break;
   case 'importcsv':importForm();break;
   case 'backup':closeModal();await backupData();break;
   case 'logout':closeModal();if(USER&&USER.signOut)await USER.signOut();break;

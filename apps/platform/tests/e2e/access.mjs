@@ -138,6 +138,21 @@ export async function runAccess(page, base) {
   ok('A-26 impor bahan baku dengan stok awal', (await tab('rm')).length === nRm0 + 2 && rmNew.length === 2, 'rm ' + (await tab('rm')).length);
   ok('A-27 bukan admin: tombol Impor CSV tidak ada', await (async () => { await login('gbb@mni.local'); await go('master-data'); return !(await page.evaluate(() => !!document.querySelector('[data-act="importcsv"]'))); })());
 
+  // Riwayat perubahan (audit database): baris contoh disuntik ke mock; admin melihatnya di Pengguna & Akses
+  await login('admin@mni.local');
+  await page.evaluate(() => {
+    const s = JSON.parse(localStorage.getItem('mni-local-mock-db'));
+    s.tables.audit_log = [
+      { id: 2, at: '2026-11-03T10:15:00Z', tabel: 'spk', aksi: 'UPDATE', baris_id: 'abc12345', oleh: 'ppic@mni.local', lama: { no: '1001', status: 'Draft', data: { catatan: 'a' } }, baru: { no: '1001', status: 'Terbit', data: { catatan: 'b' } } },
+      { id: 1, at: '2026-11-03T09:00:00Z', tabel: 'rm', aksi: 'INSERT', baris_id: 'def67890', oleh: 'gbb@mni.local', lama: null, baru: { item: 'Plat Uji', data: {} } },
+    ];
+    localStorage.setItem('mni-local-mock-db', JSON.stringify(s));
+  });
+  await page.reload(); await page.waitForTimeout(3500);
+  await page.evaluate(() => { location.hash = '#pengguna'; }); await page.waitForTimeout(1500);
+  const aud = await page.evaluate(() => document.getElementById('body').innerText);
+  ok('A-28 riwayat perubahan tampil untuk admin', /Riwayat perubahan/.test(aud) && /Ubah/.test(aud) && /Tambah/.test(aud) && /status, catatan/.test(aud) && /Plat Uji/.test(aud), JSON.stringify(aud.slice(aud.indexOf('Riwayat perubahan'), aud.indexOf('Riwayat perubahan') + 300)));
+
   ok('A-22 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;
   return { pass: R.length - fail, fail, detail: R };

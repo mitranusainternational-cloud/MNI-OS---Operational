@@ -33,6 +33,7 @@ Bergantung pada: T-167
 
 ## Bukti
 
+- Production (verified in browser, hanya baca): setelah PR #11 digabung, ekspor cadangan membaca 19 tabel, tombol Impor CSV dan logo baru tampil; lihat [[TEST_MATRIX]].
 - Mock (verified in browser, bukan bukti Supabase): cadangan berisi semua tabel, penanda tersimpan, impor menolak baris bermasalah dan memasukkan baris valid, hanya admin melihat tombolnya.
 - Production (verified in database): satu baris uji dihapus dengan kondisi id dan nopol yang tepat.
 

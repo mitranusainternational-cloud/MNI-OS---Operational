@@ -485,16 +485,17 @@ async function makeUserAdapter() {
     profiles: async (ids = []) => Object.fromEntries(ids.map((id) => {
       let h = 0;
       for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) % 360;
-      return [id, { color: `hsl(${h} 55% 45%)`, avatarUrl: null }];
+      return [id, { color: `hsl(${h} 55% 34%)`, avatarUrl: null }];
     })),
     // Cadangan: semua tabel mentah (urutan aman untuk pemulihan). Hanya super admin yang membaca semuanya (RLS).
     exportAll: async () => {
-      const tables = ['muser', 'role_modules', 'master', 'mwc', 'mvendor', 'mcustomer', 'msupplier', 'marmada', 'rm', 'fg', 'spk', 'rmhist', 'pr', 'opname', 'mutasi', 'vendor', 'kirim', 'bongkar', 'log'];
+      const tables = ['muser', 'role_modules', 'master', 'mwc', 'mvendor', 'mcustomer', 'msupplier', 'marmada', 'rm', 'fg', 'spk', 'rmhist', 'pr', 'opname', 'mutasi', 'vendor', 'kirim', 'bongkar', 'log', 'audit_log'];
       const out = {};
       for (const t of tables) {
         const rows = [];
         for (let from = 0; ; from += 1000) {
           const { data, error } = await supabase.from(t).select('*').range(from, from + 999);
+          if (error && t === 'audit_log') break; // migration 13 belum terpasang: lewati
           if (error) throw new Error('Gagal membaca ' + t + ': ' + error.message);
           rows.push(...data);
           if (data.length < 1000) break;
@@ -502,6 +503,12 @@ async function makeUserAdapter() {
         out[t] = rows;
       }
       return out;
+    },
+    // Riwayat perubahan (migration 13), hanya super admin. null = belum tersedia di database ini.
+    auditList: async (limit = 200) => {
+      const { data, error } = await supabase.from('audit_log').select('*').order('at', { ascending: false }).limit(limit);
+      if (error) { if (/audit_log|does not exist|schema cache/i.test(error.message)) return null; throw new Error(error.message); }
+      return data;
     },
     // Ganti password sendiri (pengguna yang sedang login).
     changePassword: async (password) => {

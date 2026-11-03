@@ -350,3 +350,29 @@ Sesi A: admin (pemantau waktu pada koleksi data). Sesi B: anggota berperan Logis
 Hasil: perubahan satu pengguna tampil di pengguna lain dalam sekitar 1 detik, lebih cepat dari batas 4 detik cek sidik. Baris tercatat atas nama anggota itu (created_by dan updBy benar). Login anggota dengan password sementara dari menu berfungsi.
 
 **Data uji tertinggal:** 1 baris bongkar muat dan 1 SPK yang tidak berpenanda UJI-PROD; skrip pembersih menolak berjalan sampai dicek (pengaman sengaja).
+
+## Cadangan, impor, dan logo di production (2026-11-03, verified in browser, hanya baca)
+
+Setelah PR #11 digabung (b290f9e) dan deploy Vercel berhasil, dengan sesi super admin:
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Ekspor cadangan membaca 19 tabel (jumlah baris cocok dengan database: pengguna 2, SPK 1, hak peran 11, dst.) | PASS (tanpa mengunduh berkas; penanda cadangan belum ditulis) |
+| Tombol Impor CSV tampil untuk super admin | PASS |
+| Lambang logo di sidebar dan favicon baru termuat | PASS |
+
+**Belum:** unduh cadangan sungguhan (pemilik menekan tombolnya agar penanda tersimpan), impor CSV dengan data nyata, ekspor PDF dan Excel dengan logo baru (dicek pemilik).
+
+## Riwayat perubahan dan larangan hapus permanen (migration 13, 2026-11-03, verified in database)
+
+Transaksi di-rollback, data produksi tidak tersentuh.
+
+| Skenario | Hasil |
+|---|---|
+| Menambah pengguna: baris audit INSERT tercatat | PASS |
+| Pengguna dengan hak ubah menambah dan mengubah item bahan baku: audit INSERT dan UPDATE tercatat atas nama pengguna itu | PASS |
+| Hapus permanen item lewat API: 0 baris terhapus | PASS |
+| Non-admin membaca audit_log: 0 baris | PASS |
+| Non-admin menulis atau mengubah audit_log: ditolak | PASS |
+
+**Tampilan (mock):** sapu otomatis 12 halaman pada desktop, tablet, dan ponsel; uji kontras tema gelap dan terang; total tampilan 62 lulus. Penyebab teks gelap di tema gelap: aturan CSS cetak checklist bocor ke stylesheet global.
