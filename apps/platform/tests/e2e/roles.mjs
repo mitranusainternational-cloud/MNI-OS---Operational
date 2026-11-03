@@ -25,8 +25,10 @@ export async function runRoles(page, base) {
     await page.goto(base); await page.reload();
     await page.fill('#auth-email', email); await page.click('#auth-btn');
     await page.waitForSelector('#auth-otp', { state: 'visible' }); await page.fill('#auth-otp', '123456');
-    await page.waitForTimeout(3000);
-    await page.waitForFunction(() => document.querySelectorAll('#nav a').length > 5);
+    // halaman dimuat ulang setelah login; tunggu sampai identitas pengguna terbaca (bukan "Tamu"), penting di runner CI yang lebih lambat
+    await page.waitForTimeout(2000);
+    await page.waitForFunction(() => document.querySelectorAll('#nav a').length > 5 && !/Tamu/.test(document.getElementById('who').innerText), null, { timeout: 30000 });
+    await page.waitForTimeout(800);
   };
   // percobaan mencatat: hasil = jumlah baris mutasi bertambah
   const tryMove = async (route, label, item, qty) => {

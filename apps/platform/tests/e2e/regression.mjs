@@ -42,7 +42,7 @@ export async function runRegression(page, base) {
   await page.fill('#auth-email', 'admin@mni.local'); await page.click('#auth-btn');
   await page.waitForSelector('#auth-otp', { state: 'visible' }); await page.fill('#auth-otp', '123456');
   await page.waitForTimeout(3000); // halaman dimuat ulang setelah login
-  await page.waitForFunction(() => document.querySelectorAll('#nav a').length > 5);
+  await page.waitForFunction(() => document.querySelectorAll('#nav a').length > 5 && !/Tamu/.test(document.getElementById('who').innerText), null, { timeout: 30000 });
   ok('F-01 login + nama', (await page.evaluate(() => document.getElementById('who').innerText)).includes('Admin Lokal'));
 
   // Smoke 10 modul
