@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:e2e": "node tests/e2e/run.mjs",
     "extract": "node scripts/extract-app.js",
     "setup": "node scripts/extract-app.js && npm run dev",
     "migrate": "node scripts/migrate-firestore.js",
