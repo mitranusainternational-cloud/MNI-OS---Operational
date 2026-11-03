@@ -29,14 +29,16 @@ Bergantung pada: T-163
 - [x] Edge Function `kelola-pengguna` (buat akun dan atur ulang password dengan kunci server)
 - [x] Sinkron antar pengguna: cek sidik perubahan tiap 4 detik, hanya tabel berubah yang dimuat ulang
 - [x] Uji mock: 15 skenario akses (`tests/e2e/access.mjs`) dan regresi 38 + role 12 tetap lulus
-- [ ] Terapkan migration 11 dan 12 di Supabase production, uji RLS dengan transaksi yang di-rollback
-- [ ] Pasang Edge Function di production dan uji buat akun dan reset password sungguhan
+- [x] Terapkan migration 11 dan 12 di Supabase production, uji RLS dengan transaksi yang di-rollback
+- [x] Pasang Edge Function di production (aktif, verify_jwt)
+- [ ] Uji buat akun dan reset password sungguhan lewat menu
 - [ ] Uji dua sesi: perubahan pengguna A terlihat pengguna B dalam hitungan detik
 - [ ] Catat hasil di [[TEST_MATRIX]] dan [[ENVIRONMENTS]]
 
 ## Bukti
 
 - Mock: 38 + 12 + 15 PASS (verified in browser, mock; bukan bukti Supabase).
+- Production: migration 11 dan 12 terpasang; uji RLS rollback lulus (verified in database); lihat [[TEST_MATRIX]].
 
 ## Catatan
 

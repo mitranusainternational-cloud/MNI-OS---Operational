@@ -156,3 +156,7 @@ Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewa
 | Pembersihan data uji production | Selesai (2026-11-03) | guard lolos (semua baris bertanda UJI-PROD); sesudahnya muser 1, role_modules 10, tabel lain 0; penomoran mulai lagi dari 001 |
 
 Sisa sebelum dibagikan ke tim: login admin di situs Vercel (uji CSP, 10 modul, ekspor), pembersihan data uji, Redirect URL preview, dan variabel Preview bila preview dipakai.
+
+### Hak akses per modul (2026-11-03)
+
+Production memakai migration 1–12 dan Edge Function `kelola-pengguna` (verify_jwt aktif; kunci server hanya di lingkungan fungsi). Pengguna tanpa hak khusus tetap mengikuti perilaku lama. Menu Pengguna & Akses baru tampil di aplikasi setelah `development` digabung ke `main`.

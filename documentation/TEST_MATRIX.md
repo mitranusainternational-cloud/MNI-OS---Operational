@@ -307,3 +307,26 @@ Bukti: verified in browser (browser pane, admin login oleh pemilik), tanpa menul
 | Baca REST tanpa login (anon) | PASS: ditolak `42501` |
 
 Belum diuji di Vercel: tombol ekspor PDF/Excel per modul (hanya pustakanya), tulis, dan penegakan UI per role.
+
+## Hak akses per pengguna dan per modul (T-167, 2026-11-03)
+
+**Mock (verified in browser, bukan bukti Supabase):** regresi 38 PASS, role 12 PASS, akses 15 PASS (`tests/e2e/access.mjs`): admin menambah anggota dengan hak modul khusus, menu hanya modul yang diizinkan, modul tanpa hak dialihkan ke dashboard dan datanya tidak terbaca, hak lihat saja mengunci tombol catat, bukan admin ditolak mengelola pengguna, perubahan hak berlaku setelah muat ulang.
+
+**Database production (verified in database, transaksi di-rollback, data produksi tidak tersentuh):** migration 11 dan 12 terpasang.
+
+| Skenario | Hasil |
+|---|---|
+| Hak khusus (bahan-baku ubah, bongkar-muat lihat): lihat SPK 0, lihat bahan baku, lihat barang jadi 0 | PASS |
+| Tulis bahan baku diizinkan; tulis bongkar muat (lihat saja) dan barang jadi ditolak | PASS |
+| Pengguna menaikkan perannya sendiri menjadi admin: 0 baris berubah | PASS |
+| Pengguna tanpa hak khusus (perilaku lama): lihat semua, tulis sesuai peran | PASS |
+| Hak "lihat" SPK: baca SPK, tidak membaca bahan baku, tulis SPK ditolak | PASS |
+| Akun nonaktif tidak membaca apa pun | PASS |
+| Admin melihat semua tabel dan semua pengguna | PASS |
+| `table_stamps` dan fungsi kelola: anon ditolak (42501 / 401) | PASS |
+| Penjaga admin terakhir: nonaktifkan dan hapus admin terakhir ditolak | PASS |
+| Edge Function `kelola-pengguna` tanpa token 401, dengan kunci publik 401 | PASS |
+
+Advisor: hanya peringatan yang sudah dikenal (fungsi pembantu RLS dapat dipanggil pengguna login, sengaja; leaked password protection menunggu paket berbayar).
+
+**Belum:** buat akun dan reset password sungguhan lewat menu (dikerjakan pemilik membuat anggota pertama), uji dua sesi untuk sinkron antar pengguna.
