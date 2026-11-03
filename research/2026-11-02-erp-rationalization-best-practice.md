@@ -1,83 +1,75 @@
 ---
+type: research
 date: 2026-11-02
-topic: ERP process discovery and feature rationalization
-status: preliminary
-sources-reviewed: Microsoft Learn, SAP Help Portal, OpenAI Developers
+topic: custom operational system discovery and design
+status: general-methods-only
+sources-reviewed: Microsoft Learn, SAP Help Portal
 ---
 
-# ERP process discovery and feature rationalization
+# Praktik discovery untuk MNI OS custom
 
-## Purpose and boundary
+## Arah dan batas riset
 
-This is a preliminary research note for reviewing MNI's ERP reference and related Google Sheets. It does not yet describe Antlia's actual modules or MNI's spreadsheet data. The Antlia page could not be inspected in this session because browser access is disabled in Work settings and the public page is not accessible through the web reader. Google Drive and Google Sheets connections are awaiting OAuth completion.
+Keputusan produk MNI OS adalah membangun sistem custom yang mengikuti kebutuhan tim Operasional MNI. Antlia dan produk ERP lain **bukan blueprint**, tidak menentukan modul yang harus ada, dan bukan sumber kebenaran requirement. Catatan ini mempertahankan sumber riset umum sebagai metode kerja saja; semua desain wajib ditautkan ke bukti proses MNI dan divalidasi pemilik proses.
 
-## Research findings
+Tidak ada proses MNI yang dibuktikan oleh sumber pada halaman ini. Data ERP/Sheets, walkthrough, dan wawancara Operasional belum diperiksa pada riset awal ini.
 
-### Start with end-to-end processes
+## Metode discovery yang disarankan
 
-Use process areas and outcomes as the unit of analysis, rather than starting from the ERP's menu labels. For manufacturing and operations, likely process chains to validate include:
+### Mulai dari pekerjaan nyata
 
-- Plan and source: demand or job → material planning → purchase request/order → supplier receipt.
-- Inventory and warehouse: receiving → put-away → storage → issue/transfer → cycle count → reconciliation.
-- Make and fulfill: customer order/SPK → production planning → work-center execution → quality → finished goods → delivery.
-- Finance/control: source transaction → valuation/costing → approval → ledger/reporting.
+Untuk setiap proses yang dipilih bersama tim, dokumentasikan:
 
-The process chains above are a discovery checklist, not a claim that every chain is used at MNI. Microsoft's process-focused guidance recommends mapping business processes and scope before configuring an implementation, then iterating through end-to-end flows and their subprocesses. [Process-focused implementation](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/process-focused-solution), [Inventory to deliver](https://learn.microsoft.com/en-us/dynamics365/guidance/business-processes/inventory-to-deliver-introduction).
+1. Outcome bisnis dan alasan proses dilakukan.
+2. Pemicu, aktor/peran, input, langkah, keputusan, handoff, dan output.
+3. Variasi, pengecualian, kegagalan, pekerjaan ulang, serta cara tim memulihkan kondisi.
+4. Aturan bisnis, otorisasi, kontrol, bukti, audit, dan tenggat.
+5. Sistem, file, formulir, percakapan kerja, dan data yang benar-benar digunakan.
+6. Masalah serta ukuran dampaknya menurut pengguna/proses owner.
 
-### Compare current practice with standard capability before tailoring
+Gunakan wawancara singkat, walkthrough satu kasus nyata yang diizinkan, dan pemeriksaan dokumen/sheet yang relevan. Catat tanggal, narasumber/pemilik proses, cakupan, dan keterbatasan. Jangan mengambil kesimpulan dari nama menu, mockup, atau jumlah baris saja.
 
-Run fit-to-standard workshops using process scenarios: demonstrate a standard flow, let process owners validate it against real work, record gaps, and only then consider adaptations or extensions. Microsoft advises adopting standard capabilities where they fit and adapting only when justified; SAP's fit-to-standard guidance similarly uses prebuilt process models, captures gaps, and records decisions against the process. [Microsoft fit-to-standard and fit-gap](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/process-focused-solution-fit-to-standard-fit-gap-analysis), [SAP fit-to-standard workshops](https://help.sap.com/docs/erp-transformation-with-itc/btm/fit-to-standard-workshops?locale=en-US&state=PRODUCTION&version=latest).
+### Bedakan bukti dan keputusan
 
-### Decide feature scope with evidence and dependency checks
+- **Observed:** langsung dilihat/didengar pada sesi atau sumber yang tercatat.
+- **Interpretation:** makna yang ditafsirkan dari bukti; butuh konfirmasi.
+- **Assumption:** dugaan sementara yang belum diverifikasi.
+- **Proposed:** opsi solusi atau rancangan yang diajukan.
+- **Approved:** keputusan pemilik proses yang memiliki tanggal dan cakupan.
 
-Do not label a feature “unneeded” solely because few rows appear in a spreadsheet or users rarely open its screen. For each feature/module, collect:
+Simpan referensi sumber tanpa menyalin data personal/operasional yang tidak dibutuhkan. Untuk Sheets, inventaris file, pemilik, tab, definisi kolom, formula, validasi, referensi antar-sheet, periode, dan kualitas data terlebih dahulu; ambil sampel minimum yang diizinkan.
 
-1. Business owner and process outcome supported.
-2. Recent usage and transaction evidence, with time window and source completeness.
-3. Dependencies on other modules, reports, interfaces, permissions, or statutory/control steps.
-4. Pain points, duplicate work, data quality, and workarounds.
-5. Options: retain as standard, configure, improve process, integrate, extend, replace, defer, or retire.
-6. Impact, risk, implementation effort, test needs, and owner approval.
+### Turunkan requirement dan desain custom
 
-Microsoft fit-gap guidance specifically asks teams to assess customization lifecycle cost, usability/performance effects, future product redundancy, and effects on connected processes. A removal decision therefore needs dependency mapping and process-owner sign-off, not just a low-use metric. [Fit-gap guidance](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/process-focused-solution-fit-to-standard-fit-gap-analysis).
+Satu requirement yang diterima memiliki ID, masalah/outcome, pengguna terdampak, bukti dan pemilik sumber, aturan/kontrol, prioritas, dependensi, risiko, opsi, acceptance criteria, serta status keputusan. Desain pengalaman dan schema database diturunkan dari requirement tervalidasi. Sumber luar boleh membantu membandingkan pola implementasi, tetapi tidak dapat menggantikan validasi kebutuhan lokal.
 
-### Treat ERP spreadsheets as evidence, not a system specification
+Setiap fitur dipertimbangkan berdasarkan manfaat proses, biaya kesalahan, kontrol, frekuensi, kualitas sumber, ketergantungan, effort, risiko migrasi, dan kemampuan diuji. Fitur tidak dihapus atau ditambahkan hanya karena ada/tidak ada pada ERP lain atau jarang terlihat di sampel.
 
-Inventory all accessible sheets first: owner/name, URL/ID, modified date, tabs, used ranges, formulas, validation, duplicate structures, and links between files. Then classify each sheet as master data, transaction register, planning model, report, control/reconciliation, or archive. Sample and profile data before interpreting it. Preserve row-level source references and distinguish:
+### Validasi secara bertahap
 
-- **Observed:** directly present in a sheet or ERP screen.
-- **Interpreted:** likely meaning inferred from structure or naming.
-- **Proposed:** future process or design recommendation.
+Pilih skenario bersama tim Operasional. Acceptance criteria mencakup alur normal dan pengecualian, permission, data invalid/kosong, audit, laporan, integrasi, serta pemulihan sesuai tingkat risiko. Lakukan review prototype dan UAT dengan pengguna/pemilik proses; catat penerimaan, gap, dan keputusan tindak lanjut.
 
-Microsoft's data guidance separates configuration data from migration data, requires discovery of source, type and volume, mapping and transformation, quality validation, and repeated migration tests. That is a useful discipline when deciding what must be retained or cleaned up. [Data management and migration](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/data-management-configuration-data-migration), [Data governance checklist](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/data-management-check-list).
+Prinsip umum ini sejalan dengan panduan implementasi yang memulai dari proses bisnis, menginventarisasi sumber data, dan menguji alur end-to-end. Sumber tersebut dipakai sebagai referensi metodologi, bukan sebagai spesifikasi MNI: [Microsoft process-focused implementation](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/process-focused-solution), [Microsoft data management and migration](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/data-management-configuration-data-migration), [Microsoft testing strategy](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/testing-strategy).
 
-### Validate with process owners and realistic scenarios
+## Artefak kerja yang akan dipelihara
 
-Turn each accepted requirement into a traceable scenario and test case. Include normal, exception, permissions, integration, reporting, and data cases in proportion to risk. Microsoft's guidance recommends end-to-end business-process tests and connecting test cases to the process and requirement they validate. [Test planning](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/testing-strategy-planning), [Testing strategy](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/testing-strategy).
+- Peta current-state per proses Operasional, lengkap dengan variasi dan sumber.
+- Requirement register dan backlog prioritas yang dapat ditelusuri.
+- Data dictionary serta lineage sumber, setelah akses disetujui.
+- Log keputusan produk, arsitektur, permission, dan data.
+- Prototype/vertical slice dan acceptance checklist yang terhubung ke requirement.
+- Catatan uji, UAT, risiko terbuka, serta runbook penggunaan/pemulihan.
 
-## Proposed analysis outputs
+## Status pengetahuan saat catatan dibuat
 
-- ERP module and process map with owners and source evidence.
-- Google Sheets inventory and data dictionary, with links and bounded cell ranges.
-- Current-state process maps and observed variants.
-- Fit-gap register with rationale and alternatives.
-- Feature disposition matrix: retain, configure, improve, integrate, extend, defer, or retire.
-- Dependency and risk register.
-- Prioritized roadmap and scenario-based acceptance checklist.
-
-## Current uncertainties
-
-- Antlia login and actual module/menu details have not been inspected.
-- No Google Drive/Sheets account is active in Composio yet; spreadsheet contents have not been read.
-- A low-use feature may still be required for compliance, month-end, audit, or downstream processing.
-- The final scope depends on MNI process-owner input and evidence from real workflows, not vendor documentation alone.
+- **Keputusan produk:** custom untuk kebutuhan tim Operasional; dicatat pada [[documentation/DECISIONS|log keputusan]].
+- **Belum diketahui:** current-state tiap proses, role/otorisasi, definisi data, volume/quality, prioritas, dan proses pilot.
+- **Hipotesis yang perlu ditinjau:** [[apps/gudang-logistik/docs/PILOT_BRIEF|brief saldo gudang]] dan [[apps/gudang-logistik/docs/DATA_MAPPING|mapping source/schema]].
+- **Batas:** riset generik tidak memverifikasi proses MNI; hosted Supabase candidate bukan model data final.
 
 ## Sources
 
-- Microsoft, [What is the Dynamics 365 implementation guide?](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/overview), accessed 2026-11-02.
 - Microsoft, [Implement a solution based on business processes](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/process-focused-solution), accessed 2026-11-02.
-- Microsoft, [Fit-to-standard and fit-gap analysis](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/process-focused-solution-fit-to-standard-fit-gap-analysis), accessed 2026-11-02.
 - Microsoft, [Manage configuration and migration data](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/data-management-configuration-data-migration), accessed 2026-11-02.
 - Microsoft, [Testing strategy planning](https://learn.microsoft.com/en-us/dynamics365/guidance/implementation-guide/testing-strategy-planning), accessed 2026-11-02.
-- SAP, [Fit-to-standard workshops](https://help.sap.com/docs/erp-transformation-with-itc/btm/fit-to-standard-workshops?locale=en-US&state=PRODUCTION&version=latest), accessed 2026-11-02.
-- OpenAI, [Codex skills and workflow guidance](https://developers.openai.com/plugins/concepts/skills), accessed 2026-11-02.
+- SAP, [Fit-to-standard workshops](https://help.sap.com/docs/erp-transformation-with-itc/btm/fit-to-standard-workshops?locale=en-US&state=PRODUCTION&version=latest), accessed 2026-11-02; generic workshop-method reference only.

@@ -1,0 +1,76 @@
+name: CI
+
+# Tahap S2 jalur rilis (documentation/INTEGRATION_PATH.md): setiap push dan PR diperiksa tanpa rahasia.
+# Tidak ada secret Supabase/Vercel di sini; regresi memakai mode mock (VITE_LOCAL_MOCK=1) dan data sintetis.
+# Deploy (Vercel) dikerjakan terpisah setelah persetujuan pemilik.
+
+on:
+  push:
+    branches: [development, docs]
+  pull_request:
+    branches: [main, development]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vault:
+    name: Vault (tautan dan properti)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Periksa vault
+        run: node scripts/check-vault.mjs
+
+  app:
+    name: Aplikasi (build dan regresi mock)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/platform
+    env:
+      VITE_LOCAL_MOCK: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/platform/package-lock.json
+      - name: Pasang dependensi
+        run: npm ci --ignore-scripts
+      - name: Ekstrak UI
+        run: npm run extract
+      - name: Build
+        run: npm run build
+      - name: Pasang Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Jalankan dev server mock
+        run: |
+          nohup npx vite --host 127.0.0.1 --port 5173 --no-open > "$RUNNER_TEMP/vite.log" 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fs http://127.0.0.1:5173/ > /dev/null && exit 0
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/vite.log"
+          exit 1
+      - name: Regresi UI dan uji role
+        run: npm run test:e2e -- http://127.0.0.1:5173/
+      - name: Unggah log bila gagal
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-ci
+          path: ${{ runner.temp }}/vite.log
+          if-no-files-found: ignore
+          retention-days: 7

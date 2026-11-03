@@ -1,0 +1,458 @@
+// Dihasilkan dari supabase/migrations (init_schema + app_shape_compat). Jangan edit manual.
+// TABLE_COLS: kolom nyata per tabel. Bidang dokumen app di luar daftar ini disimpan di kolom JSONB "data".
+// STRICT_COLS: kolom bertipe DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID yang menolak string kosong ("") di Postgres.
+// Dipakai bersama oleh adapter Supabase dan klien mock agar keduanya berperilaku sama.
+export const TABLE_COLS = {
+  "mwc": [
+    "id",
+    "kode",
+    "nama",
+    "tipe",
+    "urutan",
+    "aktif",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "mvendor": [
+    "id",
+    "nama",
+    "kode",
+    "alamat",
+    "telp",
+    "pic",
+    "aktif",
+    "ket",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "mcustomer": [
+    "id",
+    "nama",
+    "kode",
+    "alamat",
+    "telp",
+    "pic",
+    "aktif",
+    "ket",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "msupplier": [
+    "id",
+    "nama",
+    "kode",
+    "alamat",
+    "telp",
+    "pic",
+    "aktif",
+    "ket",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "marmada": [
+    "id",
+    "nopol",
+    "jenis",
+    "kapasitas",
+    "driver",
+    "aktif",
+    "ket",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "muser": [
+    "id",
+    "email",
+    "nama",
+    "role",
+    "aktif",
+    "foto",
+    "ket",
+    "last_login",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "rm": [
+    "id",
+    "item",
+    "ukuran",
+    "satuan",
+    "grade",
+    "tebal",
+    "lebar",
+    "panjang",
+    "stok_awal",
+    "tgl_stok_awal",
+    "buffer",
+    "ket",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "fg": [
+    "id",
+    "kategori",
+    "type",
+    "ukuran",
+    "panjang",
+    "finishing",
+    "tebal",
+    "satuan",
+    "stok_awal",
+    "tgl_stok_awal",
+    "ket",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "mutasi": [
+    "id",
+    "gudang",
+    "item_id",
+    "tgl",
+    "jenis",
+    "delta",
+    "no_dok",
+    "ref",
+    "pihak",
+    "ket",
+    "dikoreksi",
+    "koreksi_by",
+    "koreksi_at",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "rmhist": [
+    "id",
+    "rm_id",
+    "tgl",
+    "jenis",
+    "qty",
+    "no_dok",
+    "ref",
+    "pihak",
+    "ket",
+    "created_at",
+    "created_by",
+    "data"
+  ],
+  "opname": [
+    "id",
+    "gudang",
+    "tgl",
+    "status",
+    "items",
+    "catatan",
+    "selesai_at",
+    "selesai_by",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "spk": [
+    "id",
+    "no",
+    "tgl",
+    "customer",
+    "po",
+    "sales",
+    "lead",
+    "material",
+    "type",
+    "tebal",
+    "due",
+    "status",
+    "rev",
+    "items",
+    "prod_log",
+    "catatan",
+    "terbit_at",
+    "terbit_by",
+    "upd_at",
+    "upd_by",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "vendor": [
+    "id",
+    "spk_id",
+    "vendor",
+    "proses",
+    "tgl",
+    "no_sj",
+    "items",
+    "status",
+    "catatan",
+    "upd_at",
+    "upd_by",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "pr": [
+    "id",
+    "no",
+    "tgl",
+    "jenis",
+    "status",
+    "items",
+    "catatan",
+    "approved_at",
+    "approved_by",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "kirim": [
+    "id",
+    "no_sj",
+    "tgl",
+    "spk_id",
+    "customer",
+    "nopol",
+    "driver",
+    "status",
+    "items",
+    "catatan",
+    "upd_at",
+    "upd_by",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "bongkar": [
+    "id",
+    "tgl",
+    "supplier",
+    "no_do",
+    "status",
+    "items",
+    "catatan",
+    "selesai_at",
+    "selesai_by",
+    "created_at",
+    "updated_at",
+    "created_by",
+    "updated_by",
+    "data"
+  ],
+  "master": [
+    "id",
+    "key",
+    "value",
+    "ket",
+    "updated_at",
+    "updated_by"
+  ],
+  "log": [
+    "id",
+    "tgl",
+    "by",
+    "aksi",
+    "koleksi",
+    "doc_id",
+    "detail",
+    "ip",
+    "data"
+  ],
+  "ureq": [
+    "id",
+    "tgl",
+    "from_user",
+    "to_user",
+    "jenis",
+    "status",
+    "payload",
+    "diproses_at",
+    "diproses_by",
+    "created_at",
+    "data"
+  ],
+  "uinv": [
+    "id",
+    "email",
+    "role",
+    "token",
+    "expires_at",
+    "used_at",
+    "used_by",
+    "created_at",
+    "created_by",
+    "data"
+  ]
+};
+
+export const STRICT_COLS = {
+  "mwc": {
+    "id": "UUID",
+    "urutan": "INTEGER",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "mvendor": {
+    "id": "UUID",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "mcustomer": {
+    "id": "UUID",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "msupplier": {
+    "id": "UUID",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "marmada": {
+    "id": "UUID",
+    "kapasitas": "NUMERIC",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "muser": {
+    "id": "UUID",
+    "last_login": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "rm": {
+    "id": "UUID",
+    "tebal": "NUMERIC",
+    "lebar": "NUMERIC",
+    "panjang": "NUMERIC",
+    "stok_awal": "NUMERIC",
+    "tgl_stok_awal": "DATE",
+    "buffer": "NUMERIC",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "fg": {
+    "id": "UUID",
+    "panjang": "NUMERIC",
+    "tebal": "NUMERIC",
+    "stok_awal": "NUMERIC",
+    "tgl_stok_awal": "DATE",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "mutasi": {
+    "id": "UUID",
+    "item_id": "UUID",
+    "tgl": "DATE",
+    "delta": "NUMERIC",
+    "koreksi_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "rmhist": {
+    "id": "UUID",
+    "rm_id": "UUID",
+    "tgl": "DATE",
+    "qty": "NUMERIC",
+    "created_at": "TIMESTAMPTZ"
+  },
+  "opname": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "selesai_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "spk": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "due": "DATE",
+    "rev": "INTEGER",
+    "terbit_at": "TIMESTAMPTZ",
+    "upd_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "vendor": {
+    "id": "UUID",
+    "spk_id": "UUID",
+    "tgl": "DATE",
+    "upd_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "pr": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "approved_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "kirim": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "spk_id": "UUID",
+    "upd_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "bongkar": {
+    "id": "UUID",
+    "tgl": "DATE",
+    "selesai_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "master": {
+    "id": "UUID",
+    "updated_at": "TIMESTAMPTZ"
+  },
+  "log": {
+    "id": "UUID",
+    "tgl": "TIMESTAMPTZ"
+  },
+  "ureq": {
+    "id": "UUID",
+    "tgl": "TIMESTAMPTZ",
+    "diproses_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ"
+  },
+  "uinv": {
+    "id": "UUID",
+    "expires_at": "TIMESTAMPTZ",
+    "used_at": "TIMESTAMPTZ",
+    "created_at": "TIMESTAMPTZ"
+  }
+};

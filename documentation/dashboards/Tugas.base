@@ -1,0 +1,107 @@
+filters:
+  and:
+    - file.inFolder("tasks")
+    - 'type == "task"'
+properties:
+  id:
+    displayName: ID
+  title:
+    displayName: Tugas
+  phase:
+    displayName: Fase
+  epic:
+    displayName: Epic
+  release:
+    displayName: Rilis
+  status:
+    displayName: Status
+  priority:
+    displayName: Prioritas
+  env:
+    displayName: Versi
+  effort_days:
+    displayName: Hari
+  owner:
+    displayName: Pemilik
+  depends:
+    displayName: Bergantung pada
+views:
+  - type: table
+    name: Semua tugas per fase
+    groupBy:
+      property: phase
+      direction: ASC
+    order:
+      - id
+      - title
+      - status
+      - priority
+      - epic
+      - release
+      - env
+      - effort_days
+      - owner
+      - depends
+    sort:
+      - property: id
+        direction: ASC
+  - type: table
+    name: Belum selesai
+    filters:
+      and:
+        - 'status != "done"'
+    groupBy:
+      property: status
+      direction: ASC
+    order:
+      - id
+      - title
+      - priority
+      - phase
+      - owner
+      - depends
+    sort:
+      - property: priority
+        direction: ASC
+  - type: table
+    name: Prioritas P0 terbuka
+    filters:
+      and:
+        - 'status != "done"'
+        - 'priority == "P0"'
+    order:
+      - id
+      - title
+      - status
+      - phase
+      - owner
+      - depends
+    sort:
+      - property: id
+        direction: ASC
+  - type: table
+    name: Per rilis dan epic
+    groupBy:
+      property: release
+      direction: ASC
+    order:
+      - id
+      - title
+      - epic
+      - status
+      - priority
+      - effort_days
+    sort:
+      - property: epic
+        direction: ASC
+  - type: table
+    name: Diblokir atau menunggu review
+    filters:
+      or:
+        - 'status == "blocked"'
+        - 'status == "review"'
+    order:
+      - id
+      - title
+      - status
+      - owner

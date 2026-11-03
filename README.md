@@ -1,6 +1,17 @@
-# MNI OS Operational — Codex Workspace
+# MNI OS — Workspace Operasional
 
-Workspace kerja untuk mengembangkan sistem operasional MNI bersama Codex. Isi dibagi menurut jenis pekerjaan agar dokumentasi, website, aplikasi, dan hasil riset mudah ditemukan dan ditinjau.
+Repository ini sekaligus menjadi Obsidian vault untuk mengembangkan website/aplikasi MNI dan menelusuri progress proyek. Dashboard proyek ada di [`Home.md`](Home.md); cara mengelola vault ada di [`documentation/WORKSPACE_GUIDE.md`](documentation/WORKSPACE_GUIDE.md).
+
+## Versi dan branch
+
+| Versi | Branch | Kegunaan |
+|---|---|---|
+| Versi Awal | `versi-awal` | Snapshot referensi kondisi awal. |
+| Development | `development` | Pengembangan dan pengujian lokal; branch kerja. |
+| Main | `main` | Versi stabil untuk pengguna setelah tinjauan rilis. |
+| Docs | `docs` | Dokumentasi pengembangan dan materi website dokumentasi. |
+
+Rincian alur dan batas tiap environment ada di [`documentation/VERSION_STRATEGY.md`](documentation/VERSION_STRATEGY.md). Peta tugas ada di [`documentation/PROJECT_PROGRESS.md`](documentation/PROJECT_PROGRESS.md). Branch saja belum memisahkan deployment atau database.
 
 ## Peta workspace
 
@@ -8,16 +19,19 @@ Workspace kerja untuk mengembangkan sistem operasional MNI bersama Codex. Isi di
 .
 ├── Home.md                         # Halaman awal vault Obsidian
 ├── AGENTS.md                       # Cara Codex bekerja di workspace ini
-├── documentation/                  # Dokumentasi proses dan referensi kerja
-├── websites/                       # Website dan landing page
-├── research/                        # Riset, sumber, temuan, dan keputusan
+├── tasks/                          # Satu catatan per tugas (sumber status progress)
+├── documentation/                  # Progress, roadmap, panduan, screenshot, template
+├── websites/                       # Website lain dan situs dokumentasi
+├── research/                       # Riset bertanggal dan penerapan ke data MNI
+├── data/                           # README saja; workbook privat di data/private-sources/ (diabaikan Git)
+├── CLAUDE.md                       # Panduan untuk Claude Code
+├── .claude/                        # Skill dan agen proyek (Claude Code)
+├── .agents/skills/                 # Skill lokal (Codex)
+├── scripts/                        # progress-report.mjs (snapshot progress)
+├── .codex/agents/                  # Definisi agen (Codex)
 └── apps/
-    └── gudang-logistik/             # Aplikasi MNI Gudang & Logistik
-        ├── index.html
-        ├── assets/css/app.css
-        ├── assets/js/app.js
-        ├── reference/                # Salinan sumber untuk pembandingan
-        └── docs/                    # Panduan serta inventaris aplikasi
+    ├── gudang-logistik/            # Prototipe HTML/CSS/JS + reference + docs
+    └── platform/                   # Platform: Vite + adapter Supabase + migration + tes E2E + Vercel/VPS
 ```
 
 ## Mulai bekerja
@@ -25,15 +39,15 @@ Workspace kerja untuk mengembangkan sistem operasional MNI bersama Codex. Isi di
 1. Buka `Home.md` atau buka folder ini sebagai vault Obsidian.
 2. Baca `AGENTS.md` untuk aturan kerja dan pencatatan sumber.
 3. Pilih folder sesuai hasil kerja: `documentation/`, `websites/`, `research/`, atau `apps/`.
-4. Catat keputusan dan tautkan catatan terkait dengan wikilink Obsidian.
+4. Catat hasil di [`documentation/PROJECT_PROGRESS.md`](documentation/PROJECT_PROGRESS.md) dan urutan pekerjaan di [`documentation/ROADMAP.md`](documentation/ROADMAP.md).
+5. Gunakan wikilink yang path-nya dimulai dari root vault dan jangan menjadikan plugin sebagai satu-satunya penyimpanan status.
 
 ## Aplikasi Gudang & Logistik
 
-Mulai di [`apps/gudang-logistik/README.md`](apps/gudang-logistik/README.md). HTML sumber yang dipertahankan untuk pembandingan berada di `apps/gudang-logistik/reference/`; versi aktif dikembangkan dari file terpisah di folder aplikasi. Aplikasi lokal dapat dijalankan dengan `python -m http.server 8000` dari root workspace, lalu buka <http://localhost:8000/apps/gudang-logistik/>. Aplikasi memerlukan `window.claude` agar tersambung ke database dan layanan runtime; preview lokal tanpa runtime hanya untuk meninjau UI.
+Mulai dari [`apps/gudang-logistik/README.md`](apps/gudang-logistik/README.md), [`USER_GUIDE.md`](apps/gudang-logistik/docs/USER_GUIDE.md), dan [`DEVELOPMENT.md`](apps/gudang-logistik/docs/DEVELOPMENT.md). Jalankan preview mengikuti panduan development dan gunakan `/apps/gudang-logistik/`. Aplikasi memerlukan `window.claude` untuk database/runtime; server statis hanya membantu meninjau UI. Screenshot dan batas akses dicatat di [`documentation/screenshots/README.md`](documentation/screenshots/README.md).
 
 ## GitHub
 
-Repo: [mitranusainternational-cloud/MNI-OS---Operational](https://github.com/mitranusainternational-cloud/MNI-OS---Operational)  
-Branch snapshot awal: `versi-awal`.
+Remote: [mitranusainternational-cloud/MNI-OS---Operational](https://github.com/mitranusainternational-cloud/MNI-OS---Operational). Migrasi ke GitHub mengikuti [`documentation/GITHUB_MIGRATION.md`](documentation/GITHUB_MIGRATION.md). Branch: `versi-awal` (baseline beku), `development` (kerja), `main` (rilis), `docs` (dokumentasi). Lihat `documentation/VERSION_STRATEGY.md` dan `documentation/ENVIRONMENTS.md`.
 
 Jangan menyimpan kredensial, data operasional personal, atau ekspor transaksi ke repository. Detail historis dan sumber riset harus diberi tanggal serta tautan sumber.

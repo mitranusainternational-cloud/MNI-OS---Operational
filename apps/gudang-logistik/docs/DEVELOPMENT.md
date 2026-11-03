@@ -1,43 +1,72 @@
-# Panduan pengembangan
+---
+type: application-development-guide
+area: gudang-logistik
+status: active
+updated: 2026-11-02
+---
 
-## Struktur
+# Panduan pengembangan aplikasi
 
-- `apps/gudang-logistik/index.html`: kerangka dokumen dan elemen shell aplikasi.
-- `apps/gudang-logistik/assets/css/app.css`: seluruh CSS aplikasi.
-- `apps/gudang-logistik/assets/js/app.js`: logika runtime aplikasi.
-- `apps/gudang-logistik/docs/`: dokumentasi khusus aplikasi.
-- `apps/gudang-logistik/reference/`: salinan HTML sumber untuk pembandingan; jangan edit sebagai versi aktif.
+## Source aktif
 
-## Jalankan untuk inspeksi
+- `apps/gudang-logistik/index.html`: shell dokumen dan pemanggilan asset.
+- `apps/gudang-logistik/assets/css/app.css`: gaya tampilan.
+- `apps/gudang-logistik/assets/js/app.js`: navigasi, render, state, dan adapter data.
+- `apps/gudang-logistik/docs/`: panduan, inventaris, dan keputusan teknis.
+- `apps/gudang-logistik/reference/`: HTML sumber yang dipertahankan untuk perbandingan; jangan edit sebagai source aktif.
+- `apps/gudang-logistik/supabase/config.toml`: scaffold konfigurasi local Supabase; belum ada migration atau remote project link.
+- `apps/gudang-logistik/scripts/preview-server.mjs`: server preview statis pada loopback.
 
-Dari root workspace jalankan `python -m http.server 8000`, lalu kunjungi <http://localhost:8000/apps/gudang-logistik/>. Tanpa runtime Claude, UI dapat dimuat tetapi database, otorisasi, sinkronisasi, dan fasilitas unduhan runtime tidak tersedia.
+Aplikasi saat ini berbasis HTML/CSS/JavaScript tanpa bundler yang tercatat di repository. Jangan menambah framework/build pipeline sebelum keputusan arsitektur dicatat dan langkah pengembangan dipetakan.
 
-## Cara mengubah aplikasi
+## Jalankan preview UI
 
-1. Cari tampilan melalui daftar `VIEWS` di `assets/js/app.js`.
-2. Fungsi render tampilan berada di registri `B` dan toolbar di `T`.
-3. Formulir dan handler aksi menggunakan atribut `data-act`.
-4. Pembacaan dan penulisan data melalui helper `addDoc`, `updDoc`, dan `delDoc`; semuanya memerlukan adapter database.
-5. Perbarui dokumen di `docs/` jika perubahan mengubah alur atau batas sistem.
-
-## Menyiapkan GitHub
-
-Direktori ini belum memiliki remote. Setelah menentukan repositori tujuan:
+Dari folder `apps/gudang-logistik/`:
 
 ```powershell
-git init
-git add .
-git commit -m "Organize MNI warehouse logistics app"
-git branch -M main
-git remote add origin https://github.com/OWNER/REPOSITORY.git
-git push -u origin main
+node scripts/preview-server.mjs
 ```
 
-Ganti `OWNER/REPOSITORY` dengan alamat repositori yang benar. Tinjau isi commit sebelum push dan hindari file `.env`, data nyata, ekspor operasional, serta kredensial.
+Buka <http://localhost:8002/>. Server menyajikan folder aplikasi secara langsung dan bind hanya ke loopback `127.0.0.1`. Jika port `8002` sedang digunakan, hentikan proses preview project yang lama atau jalankan dengan port lain:
 
-## Langkah pengembangan berikutnya
+```powershell
+$env:MNI_PREVIEW_PORT = "8003"
+node scripts/preview-server.mjs
+```
 
-- Tetapkan kontrak backend dan adapter lokal yang aman sebelum mengganti `window.claude`.
-- Pisahkan modul JavaScript secara bertahap berdasarkan domain setelah perilaku aplikasi terdokumentasi.
-- Tambahkan pemeriksaan otomatis dan pengujian alur inti saat arsitektur penyimpanan lokal ditentukan.
-- Aktifkan autentikasi dan peran hanya setelah model otorisasi dan aturan akses backend tersedia.
+Lalu buka <http://localhost:8003/>.
+
+**Status akses 2026-11-02:** preview lokal berjalan pada `http://localhost:8002/` dari `scripts/preview-server.mjs`. HTTP 200 telah diverifikasi untuk HTML, CSS, dan JavaScript setelah memperbaiki pemetaan URL relatif. Render visual pascaperbaikan, console browser, responsive layout, dan alur UI belum diverifikasi oleh runner; ambil screenshot baru setelah pemeriksaan browser tersedia.
+
+## Batas runtime
+
+- `boot()` saat ini membaca adapter legacy `window.claude` dan memerlukan `db`, `user`, serta `downloads`. Preview lokal statis tidak menyediakan adapter ini dan tidak punya backend.
+- `addDoc`, `updDoc`, dan `delDoc` memerlukan database dan izin. Server statis hanya menyajikan file, tidak menyediakan database/API.
+- `ROLE_ON=false` di source; jangan klaim autentikasi/peran aktif.
+- Preview disconnected harus menyebut mode lokal secara jelas; jangan mengklaim penyimpanan bersama/sinkronisasi atau meminta pengguna membuka Claude.ai.
+- Jangan masukkan data operasional nyata di preview lokal disconnected.
+- Daftar koleksi di kode hanya indikasi model konsumsi aplikasi. Lihat [[apps/gudang-logistik/docs/DATA_INVENTORY|inventaris data]], bukan schema database resmi.
+- Supabase local stack belum berjalan karena Docker engine/service tidak dapat diakses dari sesi Windows ini. Config yang ada belum membuktikan database lokal siap.
+- Hosted project `MNI - Operational` belum dipastikan sebagai target; jangan menjalankan `supabase link`, `db push`, atau migrasi ke hosted sebelum [[documentation/FOUNDATION_BASELINE|target dan migration lineage]] diverifikasi.
+
+## Alur edit
+
+1. Kerjakan di branch `development`.
+2. Cari route/menu di daftar `VIEWS`, dan titik registri render di `assets/js/app.js` sebelum mengubahnya.
+3. Periksa apakah perubahan menyentuh data, status dokumen, perhitungan stok, atau write path sebelum mengedit.
+4. Pisahkan perubahan markup, styling, dan handler jika masuk akal; jangan mengubah file reference.
+5. Perbarui [[apps/gudang-logistik/docs/USER_GUIDE|panduan penggunaan]], [[apps/gudang-logistik/docs/INVENTORY|inventaris fitur]], dan [[apps/gudang-logistik/docs/DECISIONS|catatan keputusan]] bila relevan.
+6. Catat cara verifikasi, hasil browser/console, commit, risiko, dan hambatan di [[documentation/PROJECT_PROGRESS|progress]].
+
+## Checklist verifikasi untuk perubahan aplikasi
+
+- [ ] Pastikan browser memuat file dari branch yang sedang dikerjakan.
+- [ ] Periksa console/error dan kondisi runtime tanpa menyimpan data live.
+- [ ] Cek tampilan desktop/mobile dan navigasi relevan.
+- [ ] Untuk perubahan data, validasi hak akses, input, status, idempotensi, rekonsiliasi, dan audit di backend uji yang sah.
+- [ ] Capture screenshot bersih sesuai [[documentation/screenshots/README|aturan bukti visual]].
+- [ ] Perbarui progress dan dokumentasi.
+
+## Git/branch
+
+Peta versi ada di [[documentation/VERSION_STRATEGY|strategi branch]]. Gunakan pull request `development` → `main` setelah pemeriksaan dan persetujuan pada [[documentation/RELEASE_CHECKLIST|checklist rilis]]. Branch `docs` tidak menggantikan deployment situs dokumentasi.

@@ -13,8 +13,16 @@ coverage/
 .env.*
 !.env.example
 
+# Operational source workbooks stay local and are never committed
+/data/private-sources/
+
 # Obsidian workspace state (keep vault notes and templates in Git)
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
 .obsidian/cache
 .obsidian/graph.json
+.obsidian/appearance.json
+.obsidian/core-plugins.json
+
+# Pengaturan lokal Claude Code (skill dan agen proyek tetap di-commit)
+.claude/settings.local.json

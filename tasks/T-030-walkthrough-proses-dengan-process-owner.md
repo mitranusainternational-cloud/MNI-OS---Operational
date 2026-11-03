@@ -1,0 +1,35 @@
+---
+type: task
+id: T-030
+title: "Walkthrough proses dengan process owner"
+phase: P3
+epic: E-04
+release: v1.0
+status: todo
+priority: P0
+env: docs
+effort_days: 3
+depends: []
+owner: "tim Operasional"
+updated: 2026-11-02
+---
+
+# T-030 Walkthrough proses dengan process owner
+
+Epic: [[roadmap/epics/E-04-proses-data-dan-pilot|E-04]]  
+Fase: P3 Data dan proses
+
+## Kriteria selesai
+
+- [ ] Gudang, PPIC, dan logistik diwawancarai
+- [ ] Langkah aktual, pengecualian, kontrol, dan masalah tercatat di [[OPERATIONAL_DISCOVERY]]
+
+## Bukti
+
+- Belum ada.
+
+## Catatan
+
+Agenda, peserta, urutan sesi, dan pertanyaan kunci sudah disiapkan di [[DISCOVERY_AGENDA]] (2026-11-02). Belum dijadwalkan; pemilik proyek menetapkan tanggal dan mengirim undangan. Sesi 1 dan 2.
+
+Bisa jalan paralel sejak hari pertama; jalur kritis non-teknis.

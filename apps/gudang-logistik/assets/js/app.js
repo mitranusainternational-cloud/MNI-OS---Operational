@@ -83,7 +83,8 @@ const issues=()=>{const c=calc();return c._iss||(c._iss=dataIssues())};
 const rmLabel=r=>r?`${r.item} ${r.ukuran}`:'(item terhapus)';
 const fgLabel=f=>f?`${f.kategori}${f.type?' '+f.type:''} ${f.ukuran} L${f.panjang} · ${f.finishing} ${f.tebal}`:'(item terhapus)';
 const grade=r=>{const s=(r.item||'').toUpperCase();if(s.includes('SPHC'))return 'SPHC';if(s.includes('SPCC'))return 'SPCC';if(s.includes('304'))return 'SS304';if(s.includes('316'))return 'SS316';if(s.includes('ALU')||s.includes('ALM'))return 'Aluminium';return 'Lainnya'};
-const byId=(c,id)=>S[c].find(x=>x._id===id);
+/* window.__idAlias (opsional, diisi adapter Supabase) memetakan id buatan app ("spk-1003") ke id database (UUID). */
+const byId=(c,id)=>{const k=(window.__idAlias&&window.__idAlias[id])||id;return S[c].find(x=>x._id===k)};
 const spkName=id=>{const s=byId('spk',id);return s?`SPK ${s.no}`:(id||'–')};
 
 /* ---------- derived numbers (recomputed after each change) ---------- */
@@ -132,7 +133,7 @@ let rq=0,bodyPending=false;const typingInBody=()=>{const a=document.activeElemen
 document.addEventListener('focusout',()=>setTimeout(()=>{if(bodyPending&&!typingInBody()){bodyPending=false;renderBody()}},0));
 function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;if(ROLE_ON)autoClaim();renderNav();renderLive();renderMe();renderAccess();if(!$('#tools').contains(document.activeElement))renderTools();if(typingInBody())bodyPending=true;else renderBody();if(DRAWER)DRAWER();if(SHEET)renderSheet()})}
 const ready=()=>COLS.every(c=>loaded.has(c));
-const need=(c,data,id,op)=>{if(!DB)throw new Error('Database belum tersambung. Buka halaman ini di claude.ai.');if(!CAN)throw new Error('Akses Anda lihat saja.');guard(c,data,id,op||'upd')};
+const need=(c,data,id,op)=>{if(!DB)throw new Error('Fitur simpan belum tersedia di pratinjau lokal karena backend belum terhubung.');if(!CAN)throw new Error('Akses Anda lihat saja.');guard(c,data,id,op||'upd')};
 async function addDoc(c,data){need(c,data,null,'add');data.at=new Date().toISOString();data.by=ME||null;const r=await DB.collection(c).add(data);logAct(c,r&&r.id,'add',data);return r}
 async function updDoc(c,id,data){need(c,data,id,'upd');data.updAt=new Date().toISOString();data.updBy=ME||null;const r=await DB.doc(c+'/'+id).update(data);logAct(c,id,'upd',data);return r}
 async function delDoc(c,id){need(c,null,id,'del');logAct(c,id,'del',{});return DB.doc(c+'/'+id).delete()}
@@ -156,7 +157,8 @@ function renderNav(){
 }
 function renderLive(){
  const el=$('#live');el.className='live '+(LIVE==='on'?'on':LIVE==='off'?'off':'');
- el.querySelector('span').textContent=LIVE==='on'?`Realtime · tersinkron ${LAST.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`:LIVE==='off'?'Tidak tersambung ke database':'Menghubungkan…';
+ const fn=document.querySelector('.foot .muted');if(fn)fn.textContent=LIVE==='on'?'Terhubung ke database. Data tersimpan dan disinkronkan.':'Backend belum terhubung. Data tidak disimpan atau disinkronkan.';
+ el.querySelector('span').textContent=LIVE==='on'?`Realtime · tersinkron ${LAST.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`:LIVE==='off'?'Pratinjau lokal · backend belum terhubung':'Menyiapkan pratinjau lokal…';
 }
 function route(){
  const h=(location.hash||'').slice(1);VIEW=VIEWS.some(v=>v.id===h)?h:'dashboard';
@@ -176,7 +178,7 @@ function route(){
 }
 window.addEventListener('hashchange',route);
 
-const loading=()=>`<div class="panel"><div class="empty">${LIVE==='off'?'<b>Belum tersambung ke database</b><span>Buka aplikasi ini lewat link claude.ai supaya data bersama bisa dimuat.</span>':'<b>Memuat data…</b><span>Mengambil stok, SPK, dan transaksi terbaru.</span>'}</div></div>`;
+const loading=()=>`<div class="panel"><div class="empty">${LIVE==='off'?'<b>Mode pratinjau lokal</b><span>Backend belum dikonfigurasi. Data Operasional tidak dimuat, disimpan, atau disinkronkan.</span>':'<b>Menyiapkan pratinjau…</b><span>Menunggu koneksi backend yang dikonfigurasi.</span>'}</div></div>`;
 function renderBody(){const el=$('#body');if(!ready()){el.innerHTML=loading();return}el.innerHTML=(B[VIEW]||B.dashboard)();resolveNames()}
 function renderTools(){$('#tools').innerHTML=(T[VIEW]||(()=>''))();$('#tools').hidden=!$('#tools').innerHTML;renderAccess();renderMe()}
 
@@ -2685,7 +2687,7 @@ function sheetCtx(s){
  const lines={};(calc().spk[s._id]?.lines||[]).forEach(l=>{if(!lines[l.d])lines[l.d]=l});const ret=[],rej={};vs.filter(v=>v.status!=='Batal').forEach(v=>{(v.items||[]).forEach(i=>rej[i.d]=(rej[i.d]||0)+(+i.reject||0));vReturns(v).forEach(r=>ret.push({name:v.vendor,date:r.tgl?fdS(r.tgl)+(r.est?'*':''):'-',sort:r.tgl||'9',map:r.items||{}}))});ret.sort((a,b)=>a.sort.localeCompare(b.sort));
  return {lines,ret,rej,vend:vs.filter(v=>v.status!=='Batal').map(v=>({name:v.vendor,date:fdS(v.tgl),map:sum(v.items)})),cust:ks.map(k=>({name:k.noSJ||'',date:fdS(k.tgl),map:sum(k.items)})),tglLong:tglLong(s.tgl),logoB64:LOGO_B64,issued:s.terbitAt?`Diterbitkan via MNI Gudang & Logistik · ${tglLong(s.terbitAt)}`:''};
 }
-function openSheet(id){SHEET=id;closeDrawer();renderSheet();$('#sheet').hidden=false;document.body.style.overflow='hidden'}
+function openSheet(id,tries=0){if(!byId('spk',id)){if(tries<25)setTimeout(()=>openSheet(id,tries+1),120);return} /* B-010: tunggu snapshot SPK baru (maks ±3 dtk); jangan tampilkan lembar kosong yang menutup layar */SHEET=id;closeDrawer();renderSheet();$('#sheet').hidden=false;document.body.style.overflow='hidden'}
 function closeSheet(){SHEET=null;$('#sheet').hidden=true;$('#sheet').innerHTML='';if(!ED)document.body.style.overflow=''}
 function renderSheet(){
  const s0=byId('spk',SHEET);if(!s0){closeSheet();return}const s=spkFull(s0);
@@ -2813,6 +2815,7 @@ function myAcc(){
  if(!ME)return {st:'anon',role:null};
  const mu=byId('muser',ME);
  if(IS_OWNER)return {st:'ok',role:'admin',mu};
+ if(!ROLE_ON&&ME_P&&ME_P.role)return {st:'ok',role:ROLES[ME_P.role]&&ME_P.canEdit!==false?ME_P.role:'viewer',mu}; /* backend dengan peran bawaan (Supabase): peran dari tabel pengguna */
  if(mu&&mu.aktif===false)return {st:'off',role:'viewer',mu};
  if(mu&&ROLES[mu.role])return {st:'ok',role:mu.role,mu};
  if(IS_EDITOR)return {st:'ok',role:'admin',mu,implicit:true};
@@ -2832,7 +2835,7 @@ function modOf(c,data,id,op){
  return '*any';
 }
 function guard(c,data,id,op){
- if(!ROLE_ON)return;
+ if(!ROLE_ON&&!(ME_P&&ME_P.role))return;
  const a=myAcc();
  if(a.st==='new')throw new Error('Akun Anda belum terdaftar. Buka menu Pengguna & Akses lalu klik "Ajukan akses".');
  if(a.st==='req')throw new Error('Permintaan akses Anda masih menunggu persetujuan admin.');
@@ -3058,7 +3061,7 @@ function reqForm(){const r=byId('ureq',ME)||{};
   fld('Bagian / peran',`<select class="sel" name="role" id="m-role">${Object.entries(ROLES).filter(([k])=>k!=='admin').map(([k,x])=>`<option value="${k}" ${r.role===k?'selected':''}>${x.l} — ${x.d}</option>`).join('')}</select>`,true)+
   fld('Jabatan (opsional)',inp('jabatan',r.jabatan||'','text','placeholder="mis. Kepala Gudang, Staff PPIC"'))+fld('Catatan untuk admin (opsional)',inp('ket',r.ket||''))+
   `<div class="note full">Dengan kode undangan, akun Anda aktif otomatis. Tanpa kode, admin akan menyetujui dan menentukan peran Anda. Setelah disetujui, setiap data yang Anda input tercatat atas nama Anda.</div>`,
-  async d=>{if(!DB)throw new Error('Database belum tersambung.');if(!ME)throw new Error('Login ke Claude dulu.');if(!String(d.nama).trim())throw new Error('Isi nama lengkap.');
+  async d=>{if(!DB)throw new Error('Pembuatan pengguna belum tersedia di pratinjau lokal karena backend belum terhubung.');if(!ME)throw new Error('Autentikasi belum tersedia di pratinjau lokal.');if(!String(d.nama).trim())throw new Error('Isi nama lengkap.');
    await DB.doc('ureq/'+ME).set({kode:String(d.kode||'').toUpperCase().replace(/[^A-Z0-9]/g,''),nama:cleanName(d.nama),role:d.role,jabatan:String(d.jabatan||'').trim(),ket:String(d.ket||'').trim(),at:new Date().toISOString()})},
   {submit:'Kirim permintaan',done:'Permintaan terkirim · admin akan melihatnya langsung'})}
 function userForm(uid){
@@ -3085,7 +3088,7 @@ async function rejectReq(uid){if(!canManage())return;await DB.doc('ureq/'+uid).d
 /* ---- shell bits ---- */
 function renderMe(){
  const a=myAcc();const nm=ME?(uname(ME)||(ME_P&&ME_P.name)||'Pengguna'):'Tamu';
- const role=!ROLE_ON?(CAN?'Bisa mencatat':'Lihat saja'):a.st==='ok'?roleL(a.role):a.st==='req'?'Menunggu persetujuan':a.st==='off'?'Nonaktif':ME?'Belum terdaftar':'Mode lihat saja';
+ const role=!ROLE_ON?(ME_P&&ME_P.role&&a.st==='ok'?roleL(a.role):CAN?'Bisa mencatat':'Lihat saja'):a.st==='ok'?roleL(a.role):a.st==='req'?'Menunggu persetujuan':a.st==='off'?'Nonaktif':ME?'Belum terdaftar':'Mode lihat saja';
  const html=`${av(ME,'sm')}<span class="mi"><b>${esc(nm)}</b><small>${esc(role)}</small></span>`;
  const w=$('#who');if(w)w.innerHTML=`<button type="button" class="mebtn" data-act="mepage">${html}</button>`;
  const t=$('#mechip');if(t){t.innerHTML=html;t.title=nm+' · '+role}
@@ -3093,15 +3096,15 @@ function renderMe(){
 }
 function renderAccess(){
 /*RA*/ const ro=$('#ro');if(!ro)return;const a=myAcc();let msg='';
- if(!ROLE_ON){ro.hidden=CAN;ro.className='ro';ro.textContent=CAN?'':'Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';$('#tools').classList.remove('locked');return}
- if(!CAN)msg='Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';
+ if(!ROLE_ON&&!(ME_P&&ME_P.role)){ro.hidden=CAN;ro.className='ro';ro.textContent=CAN?'':'Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';$('#tools').classList.remove('locked');return}
+ if(!CAN)msg=ME_P&&ME_P.role?`Peran <b>${esc(roleL(a.role))}</b> hanya bisa melihat. Minta admin mengubah peran Anda untuk mencatat transaksi.`:'Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';
  else if(a.st==='new')msg=`Akun Anda belum terdaftar, jadi masih mode lihat saja. <button class="linkbtn" data-act="ureq">Ajukan akses sekarang</button>`;
  else if(a.st==='req')msg=a.rq.kode?`Kode undangan <b>${esc(a.rq.kode)}</b> terkirim. Akun aktif otomatis dalam beberapa detik begitu admin sedang membuka aplikasi.`:`Permintaan akses sebagai <b>${esc(roleL(a.rq.role))}</b> sudah terkirim — menunggu persetujuan admin.`;
  else if(a.st==='off')msg='Akun Anda dinonaktifkan admin. Mode lihat saja.';
  else if(MODL[VIEW]&&VIEW!=='master-data'&&!canMod(VIEW)){const who=Object.values(ROLES).filter(r=>r.mods.includes(VIEW)).map(r=>r.l).join(', ');msg=`Peran <b>${esc(roleL(a.role))}</b> hanya melihat modul ini. Pencatatan oleh: ${esc(who)}.`}
  if(VIEW==='pengguna'&&a.st==='new')msg='';
  ro.hidden=!msg;ro.className='ro';ro.innerHTML=msg;
- $('#tools').classList.toggle('locked',!!(MODL[VIEW]&&VIEW!=='master-data'&&!canMod(VIEW)));
+ $('#tools').classList.toggle('locked',!!(!CAN||(MODL[VIEW]&&VIEW!=='master-data'&&!canMod(VIEW))));
 }
 async function fillAvatars(){
  if(!USER)return;const els=[...document.querySelectorAll('[data-uav]')].filter(e=>e.dataset.uav&&!e.dataset.done);const ids=[...new Set(els.map(e=>e.dataset.uav))];if(!ids.length)return;
@@ -3428,7 +3431,7 @@ document.addEventListener('click',async e=>{
   case 'ed-up':case 'ed-down':{const i=+ds.s,j=a==='ed-up'?i-1:i+1;if(j>=0&&j<ED.sections.length){[ED.sections[i],ED.sections[j]]=[ED.sections[j],ED.sections[i]];EDDIRTY=true;rerenderSecs()}break}
   case 'openspk':spkDrawer(ds.id);break;
   case 'prod':prodForm(ds.id);break;
-  case 'prodall':document.querySelectorAll('#mform [name^="p_"]').forEach((inpEl,k)=>{const s=inpEl.closest('tr').children[1].textContent;inpEl.value=parseFloat(s.replace(/\./g,'').replace(',','.'))||inpEl.value});break;
+  case 'prodall':document.querySelectorAll('#mform [name^="p_"]').forEach(inpEl=>{const q=parseFloat(inpEl.max);if(q>0)inpEl.value=q});break; /* B-006: sebelumnya membaca sel tabel (closest('tr')) yang tidak ada di form kartu, sehingga melempar galat */
   case 'railtg':railToggle();break;
   case 'void':voidForm(ds.c,ds.id);break;
   case 'rmset':rmSetForm();break;
