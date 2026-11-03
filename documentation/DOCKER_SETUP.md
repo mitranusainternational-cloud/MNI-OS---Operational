@@ -10,16 +10,16 @@ Tujuan: Docker Desktop berjalan sehingga `supabase start` menyalakan database, A
 
 ## Diagnosis mesin ini (2026-11-02)
 
-| Item | Nilai | Arti |
-|---|---|---|
-| Perangkat | Lenovo, tipe 20R6S0L000, BIOS R15ET64W (1.45) | Kemungkinan ThinkPad seri L13 Yoga Gen 1 (tipe 20R5/20R6); cek label di bawah perangkat |
-| CPU | Intel Core i5-10210U | Mendukung VT-x |
-| OS | Windows 11 Pro Education | Mendukung WSL2 dan Hyper-V |
-| RAM / disk kosong | 15,7 GB / sekitar 98 GB | Cukup untuk stack Supabase |
-| `VirtualizationFirmwareEnabled` | **False** | **Penyebab utama:** virtualisasi dimatikan di BIOS |
-| Hypervisor aktif | False | Akibat di atas |
-| Docker Desktop | Terpasang, engine tidak start (error 500 pada pipe) | Bergantung pada virtualisasi |
-| WSL | Belum ada distribusi; fitur Windows belum bisa diperiksa tanpa admin | Perlu diaktifkan |
+| Item                            | Nilai                                                                | Arti                                                                                    |
+| ------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Perangkat                       | Lenovo, tipe 20R6S0L000, BIOS R15ET64W (1.45)                        | Kemungkinan ThinkPad seri L13 Yoga Gen 1 (tipe 20R5/20R6); cek label di bawah perangkat |
+| CPU                             | Intel Core i5-10210U                                                 | Mendukung VT-x                                                                          |
+| OS                              | Windows 11 Pro Education                                             | Mendukung WSL2 dan Hyper-V                                                              |
+| RAM / disk kosong               | 15,7 GB / sekitar 98 GB                                              | Cukup untuk stack Supabase                                                              |
+| `VirtualizationFirmwareEnabled` | **False**                                                            | **Penyebab utama:** virtualisasi dimatikan di BIOS                                      |
+| Hypervisor aktif                | False                                                                | Akibat di atas                                                                          |
+| Docker Desktop                  | Terpasang, engine tidak start (error 500 pada pipe)                  | Bergantung pada virtualisasi                                                            |
+| WSL                             | Belum ada distribusi; fitur Windows belum bisa diperiksa tanpa admin | Perlu diaktifkan                                                                        |
 
 ## Langkah 1 — Aktifkan virtualisasi di BIOS (perlu Anda, sekitar 5 menit)
 

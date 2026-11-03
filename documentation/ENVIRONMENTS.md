@@ -97,3 +97,15 @@ Migration 7 (`revoke_anon_helpers`) mencabut hak `anon` atas `get_user_role`, `i
 | Data | data uji `UJI-FINAL` dan `UJI-9999` masih ada di dev (penghapusan lewat konektor ditolak) |
 
 Aturan lingkungan baru (mis. Supabase production, S5): jalankan migration 1–9 berurutan di project kosong, lalu uji matriks role dan advisor sebelum dipakai. Migration 5 menghapus policy lama sehingga 6 dan 9 melewatinya (dijaga pemeriksaan keberadaan). Urutan ini diuji di dev hanya untuk bagian ALTER yang idempoten; jalankan penuh di branch/project baru sebelum production.
+
+## Koneksi akun yang benar (diverifikasi 2026-11-03)
+
+Beberapa konektor di mesin ini terhubung ke akun lain. Selalu cocokkan sebelum bertindak:
+
+| Layanan | Yang dipakai proyek ini | Jangan disentuh |
+|---|---|---|
+| GitHub | akun `mitranusainternational-cloud`, repo `MNI-OS---Operational` (login `gh` keyring) | — |
+| Supabase | org `wjebogebnwlxghsjbbdg`, project **`MNI Gudang - Dev`** (`inldyqigewmziwazalun`, ap-southeast-1) | `MNI OS` (srjtotk…, aktif), `MNI OS - Operational` (eonzept…, nonaktif), `Marketing OS - NIJ` (ovrvwj…) |
+| Vercel | tim **`mitranusainternational-8337`** (Hobby) di Chrome pemilik, lewat halaman import GitHub | Konektor Vercel di alat Claude terhubung ke tim lain (`NIJ`, `nij3`): jangan dipakai untuk project ini |
+
+Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewat konektor Vercel Claude, sampai konektor itu diarahkan ke tim yang benar. Setiap perintah Supabase memakai `project_id` `inldyqigewmziwazalun` secara eksplisit.
