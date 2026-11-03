@@ -11,11 +11,11 @@ generated: 2026-11-03
 
 ## Ringkasan
 
-- Tugas selesai: **18 / 87** (21%)
-- Bobot effort selesai: **16.5 / 147.59999999999997 hari kerja** (11%)
-- Sisa effort: **131.09999999999997 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
-- Cakupan go-live (fase P0-P7): **18 / 65** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
-- Diblokir: **1**, sedang dikerjakan: **1**
+- Tugas selesai: **18 / 88** (20%)
+- Bobot effort selesai: **16.5 / 149.59999999999997 hari kerja** (11%)
+- Sisa effort: **133.09999999999997 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
+- Cakupan go-live (fase P0-P7): **18 / 66** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
+- Diblokir: **1**, sedang dikerjakan: **2**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
 ## Per fase
@@ -27,7 +27,7 @@ generated: 2026-11-03
 | P2 Aplikasi siap uji | 4/15 | 7/23.5 hari (30%) | berjalan |
 | P3 Data dan proses | 0/7 | 0/13.5 hari (0%) | belum mulai |
 | P4 Environment cloud | 5/9 | 3/6 hari (50%) | berjalan |
-| P5 UAT pilot | 0/7 | 0/10.899999999999999 hari (0%) | belum mulai |
+| P5 UAT pilot | 0/8 | 0/12.899999999999999 hari (0%) | belum mulai |
 | P6 Hardening dan rilis | 0/7 | 0/9.5 hari (0%) | belum mulai |
 | P7 Operasi dan dokumentasi | 0/5 | 0/5.5 hari (0%) | belum mulai |
 | P8 v1.1 Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | belum mulai |
@@ -39,7 +39,7 @@ generated: 2026-11-03
 | Rilis | Tema | Tugas | Effort | Status |
 |---|---|---|---|---|
 | v0.9 | Fondasi | 11/17 | 7.5/10.7 hari (70%) | active |
-| v1.0 | Pilot go-live | 7/48 | 9/67.9 hari (13%) | active |
+| v1.0 | Pilot go-live | 7/49 | 9/69.9 hari (13%) | active |
 | v1.1 | Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | planned |
 | v1.2 | Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | planned |
 | v2.0 | Modernisasi dan perluasan | 0/8 | 0/27 hari (0%) | planned |
@@ -56,7 +56,7 @@ generated: 2026-11-03
 | [[roadmap/epics/E-06-uat-hardening-dan-go-live\|E-06]] UAT, hardening, dan go-live | v1.0 | 0/11 | 0% | planned |
 | [[roadmap/epics/E-07-dokumentasi-dan-situs-docs\|E-07]] Dokumentasi dan situs Docs | v1.0 | 0/4 | 0% | planned |
 | [[roadmap/epics/E-08-operasi-dan-dukungan\|E-08]] Operasi dan dukungan | v1.0 | 0/2 | 0% | planned |
-| [[roadmap/epics/E-09-akses-peran-dan-audit\|E-09]] Akses, peran, dan audit | v1.1 | 0/4 | 0% | planned |
+| [[roadmap/epics/E-09-akses-peran-dan-audit\|E-09]] Akses, peran, dan audit | v1.1 | 0/5 | 0% | active |
 | [[roadmap/epics/E-10-kualitas-data-dan-kontrol-stok\|E-10]] Kualitas data dan kontrol stok | v1.1 | 0/4 | 0% | planned |
 | [[roadmap/epics/E-11-integrasi-sumber-data\|E-11]] Integrasi sumber data | v1.2 | 0/3 | 0% | planned |
 | [[roadmap/epics/E-12-pelaporan-notifikasi-dan-dokumen\|E-12]] Pelaporan, notifikasi, dan dokumen | v1.2 | 0/3 | 0% | planned |
@@ -81,6 +81,7 @@ generated: 2026-11-03
 ## Sedang dikerjakan
 
 - [[tasks/T-163-aktifkan-supabase-production-dan-arahkan-vercel|T-163]] Aktifkan Supabase production dan arahkan Vercel · pemilik + dev
+- [[tasks/T-167-hak-akses-per-pengguna-dan-per-modul|T-167]] Hak akses per pengguna dan per modul, kelola pengguna dari aplikasi · dev + pemilik
 
 ## Diblokir
 
@@ -121,3 +122,8 @@ generated: 2026-11-03
 - [[tasks/T-065-go-live-dan-hypercare-lima-hari|T-065]] Go-live dan hypercare lima hari · todo · menunggu T-064, T-063, T-047
 - [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · review · menunggu T-022
 - [[tasks/T-163-aktifkan-supabase-production-dan-arahkan-vercel|T-163]] Aktifkan Supabase production dan arahkan Vercel · doing · menunggu T-162
+- [[tasks/T-167-hak-akses-per-pengguna-dan-per-modul|T-167]] Hak akses per pengguna dan per modul, kelola pengguna dari aplikasi · doing · menunggu T-163
+
+## Masalah data tugas
+
+- T-167: release v1.0 berbeda dengan epic E-09
