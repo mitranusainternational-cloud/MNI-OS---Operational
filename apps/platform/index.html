@@ -200,6 +200,12 @@
       }
     }
 
+    // Muat ulang tepat sekali setelah login berhasil. Dipanggil langsung oleh pengendali login (bukan hanya oleh
+    // onAuthStateChange) karena pendengar status auth baru terpasang setelah inisialisasi; login yang sangat cepat
+    // bisa terjadi sebelum itu dan aplikasi tetap berjalan sebagai "Tamu" (ditemukan oleh CI, B-018).
+    let _reloading = false;
+    function reloadOnce() { if (_reloading) return; _reloading = true; location.reload(); }
+
     async function authPasswordLogin() {
       const email = document.getElementById('auth-email').value.trim().toLowerCase();
       const password = document.getElementById('auth-password').value;
@@ -213,6 +219,7 @@
       try {
         const { error } = await window.__supabase.auth.signInWithPassword({ email, password });
         if (error) msgEl.textContent = 'Email atau password salah, atau akun belum dikonfirmasi.';
+        else reloadOnce();
         // Bila berhasil, perubahan status auth memuat ulang halaman (lihat onAuthStateChange).
       } catch (e) {
         msgEl.textContent = e.message || 'Gagal masuk.';
@@ -247,7 +254,7 @@
           type: 'email'
         });
         if (error) throw error;
-        // Auth state change will hide the gate automatically
+        reloadOnce();
       } catch (e) {
         msgEl.textContent = 'Kode salah atau expired. Coba lagi.';
         document.getElementById('auth-otp').value = '';
@@ -270,8 +277,8 @@
             let hadSession = !!session;
             gate.style.display = session ? 'none' : 'flex';
             window.__supabase.auth.onAuthStateChange((event, s) => {
-              if (event === 'SIGNED_IN' && !hadSession && s) { hadSession = true; location.reload(); return; }
-              if (event === 'SIGNED_OUT' && hadSession) { hadSession = false; location.reload(); return; }
+              if (event === 'SIGNED_IN' && !hadSession && s) { hadSession = true; reloadOnce(); return; }
+              if (event === 'SIGNED_OUT' && hadSession) { hadSession = false; reloadOnce(); return; }
               gate.style.display = s ? 'none' : 'flex';
             });
           });
