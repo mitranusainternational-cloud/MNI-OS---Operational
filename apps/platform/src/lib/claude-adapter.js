@@ -34,7 +34,8 @@ if (LOCAL_MOCK) {
   const { createLocalClient } = await import('./local-supabase.js');
   supabase = createLocalClient();
 } else {
-  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  // Dibundel oleh Vite dari paket npm (versi terkunci di package-lock.json), bukan dimuat dari CDN saat runtime.
+  const { createClient } = await import('@supabase/supabase-js');
   supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { persistSession: true, autoRefreshToken: true }
   });

@@ -338,3 +338,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - PR #1 (development ke main) digabung dengan hak admin atas persetujuan pemilik; main = development (11a2d40). Pemindaian rahasia bersih.
 - Cross-check Supabase dev: migration, RLS, advisor, replikasi. Perbaikan: migration 9 (initplan, pg_trgm), migration 6 dibuat tahan-urutan untuk lingkungan baru. Hasil di [[ENVIRONMENTS]] dan [[TEST_MATRIX]].
 - Berikutnya: PR kedua untuk perubahan ini, lalu persiapan Vercel preview (butuh akun dan persetujuan).
+
+### 2026-11-03 — Persiapan Vercel preview (S3)
+
+- Tinjauan konfigurasi menemukan dua masalah yang akan menggagalkan atau melemahkan deploy: (1) `vercel.json` memuat blok `env` yang merujuk secret Vercel lama (`@supabase-url`, `@supabase-anon-key`) sehingga build gagal; dihapus, variabel diisi di dashboard. (2) adapter memuat supabase-js dari CDN jsdelivr dengan versi mengambang `@2`; kini dibundel dari paket npm (versi terkunci lockfile), tanpa permintaan CDN saat runtime. `installCommand` diset `npm ci --ignore-scripts` seperti CI.
+- Diuji: build produksi lokal, regresi 38, role 12, dan aplikasi mode Supabase (semua permintaan REST 200, tanpa permintaan jsdelivr).
+- Catatan keamanan: `is_authenticated()` mensyaratkan baris `muser` aktif, jadi akun auth yang tidak terdaftar tidak dapat membaca data meski URL publik.
