@@ -75,7 +75,16 @@ const VIEWS=[
  {id:'master-data',t:'Master Data',ic:'db'},
  {id:'kinerja',t:'Kinerja Tim',ic:'chart',sec:'Tim'},
  {id:'pengguna',t:'Pengguna & Akses',ic:'users'}
-].filter(v=>ROLE_ON||!['kinerja','pengguna'].includes(v.id));
+];
+/* modul yang menjadi dasar hak tiap tampilan; dashboard terbuka untuk semua pengguna terdaftar, tampilan tim khusus admin */
+const VIEW_MOD={'bahan-baku':'bahan-baku','barang-jadi':'barang-jadi','bongkar-muat':'bongkar-muat','vendor':'vendor','pengiriman':'pengiriman','spk':'spk','produksi':'spk'};
+const ADMIN_VIEWS=['cek-data','kinerja','pengguna'];
+function viewOk(v){const id=v.id||v;
+ if(!ME_P)return !['kinerja','pengguna'].includes(id);
+ const adm=myRole()==='admin';
+ if(ADMIN_VIEWS.includes(id))return adm;
+ if(id==='master-data')return adm||myAnyEdit();
+ const m=VIEW_MOD[id];return !m||!!myLevel(m)}
 let VIEW='dashboard';
 const issues=()=>{const c=calc();return c._iss||(c._iss=dataIssues())};
 
@@ -84,7 +93,7 @@ const rmLabel=r=>r?`${r.item} ${r.ukuran}`:'(item terhapus)';
 const fgLabel=f=>f?`${f.kategori}${f.type?' '+f.type:''} ${f.ukuran} L${f.panjang} · ${f.finishing} ${f.tebal}`:'(item terhapus)';
 const grade=r=>{const s=(r.item||'').toUpperCase();if(s.includes('SPHC'))return 'SPHC';if(s.includes('SPCC'))return 'SPCC';if(s.includes('304'))return 'SS304';if(s.includes('316'))return 'SS316';if(s.includes('ALU')||s.includes('ALM'))return 'Aluminium';return 'Lainnya'};
 /* window.__idAlias (opsional, diisi adapter Supabase) memetakan id buatan app ("spk-1003") ke id database (UUID). */
-const byId=(c,id)=>{const k=(window.__idAlias&&window.__idAlias[id])||id;return S[c].find(x=>x._id===k)};
+const byId=(c,id)=>{const k=(window.__idAlias&&window.__idAlias[id])||id;return S[c].find(x=>x._id===k)||(c==='muser'&&typeof id==='string'&&id.includes('@')?S.muser.find(x=>String(x.email||'').toLowerCase()===id.toLowerCase()):undefined)};
 const spkName=id=>{const s=byId('spk',id);return s?`SPK ${s.no}`:(id||'–')};
 
 /* ---------- derived numbers (recomputed after each change) ---------- */
@@ -131,7 +140,7 @@ async function boot(){
 }
 let rq=0,bodyPending=false;const typingInBody=()=>{const a=document.activeElement;return a&&$('#body').contains(a)&&a.matches('input,select,textarea')};
 document.addEventListener('focusout',()=>setTimeout(()=>{if(bodyPending&&!typingInBody()){bodyPending=false;renderBody()}},0));
-function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;if(ROLE_ON)autoClaim();renderNav();renderLive();renderMe();renderAccess();if(!$('#tools').contains(document.activeElement))renderTools();if(typingInBody())bodyPending=true;else renderBody();if(DRAWER)DRAWER();if(SHEET)renderSheet()})}
+function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;renderNav();renderLive();renderMe();renderAccess();if(!$('#tools').contains(document.activeElement))renderTools();if(typingInBody())bodyPending=true;else renderBody();if(DRAWER)DRAWER();if(SHEET)renderSheet()})}
 const ready=()=>COLS.every(c=>loaded.has(c));
 const need=(c,data,id,op)=>{if(!DB)throw new Error('Fitur simpan belum tersedia di pratinjau lokal karena backend belum terhubung.');if(!CAN)throw new Error('Akses Anda lihat saja.');guard(c,data,id,op||'upd')};
 async function addDoc(c,data){need(c,data,null,'add');data.at=new Date().toISOString();data.by=ME||null;const r=await DB.collection(c).add(data);logAct(c,r&&r.id,'add',data);return r}
@@ -147,10 +156,9 @@ function renderNav(){
   {const I=issues();cnt['cek-data']=[I.filter(i=>i.sev>=2).length,I.some(i=>i.sev>=3)]}
   cnt['pengiriman']=[S.kirim.filter(k=>k.status==='Dalam Perjalanan').length,false];
   cnt['bongkar-muat']=[S.bongkar.filter(b=>b.status!=='Selesai').length,false];
-  cnt['spk']=[Object.values(c.spk).filter(x=>x.st==='Terlambat').length,true];
-  if(canManage())cnt['pengguna']=[S.ureq.filter(r=>!byId('muser',r._id)).length,true]}
+  cnt['spk']=[Object.values(c.spk).filter(x=>x.st==='Terlambat').length,true];}
  let h='';
- for(const v of VIEWS){if(v.sec)h+=`<div class="sec">${v.sec}</div>`;const k=cnt[v.id];
+ let secShown='';for(const v of VIEWS){if(!viewOk(v))continue;if(v.sec&&v.sec!==secShown){h+=`<div class="sec">${v.sec}</div>`;secShown=v.sec}const k=cnt[v.id];
   h+=`<a href="#${v.id}" class="${VIEW===v.id?'on':''}" title="${v.t}${k&&k[0]?' · '+k[0]:''}" aria-label="${v.t}">${ic(v.ic)}<span>${v.t}</span>${k&&k[0]?`<span class="cnt ${k[1]?'hot':''}">${k[0]}</span>`:''}</a>`}
  $('#nav').innerHTML=h;
  const on=$('#nav a.on');if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest'});
@@ -161,7 +169,7 @@ function renderLive(){
  el.querySelector('span').textContent=LIVE==='on'?`Realtime · tersinkron ${LAST.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`:LIVE==='off'?'Pratinjau lokal · backend belum terhubung':'Menyiapkan pratinjau lokal…';
 }
 function route(){
- const h=(location.hash||'').slice(1);VIEW=VIEWS.some(v=>v.id===h)?h:'dashboard';
+ const h=(location.hash||'').slice(1);VIEW=VIEWS.some(v=>v.id===h&&viewOk(v))?h:'dashboard';
  const v=VIEWS.find(x=>x.id===VIEW);$('#ttl').textContent=v.t;
  $('#sub').textContent={dashboard:'Ringkasan realtime gudang, logistik, dan SPK',
   'bahan-baku':'Stok plat & material — penerimaan, pemakaian, stock opname',
@@ -2799,31 +2807,42 @@ async function publishDraft(id){const s=byId('spk',id);if(!s)return;const items=
 /* ---------- events ---------- */
 let delArm=null;
 /* ================= USERS, ROLES & KPI ================= */
+/* Peran = paket hak bawaan (preset). Hak sebenarnya disimpan per pengguna di muser.modul {modul:'lihat'|'ubah'};
+   admin (super admin) selalu memiliki semua modul. mods = modul yang boleh DIUBAH, lihat = modul yang hanya boleh DILIHAT. */
 const ROLES={
- admin:{l:'Admin',d:'Semua modul + kelola pengguna',mods:['*']},
- ppic:{l:'PPIC / Produksi',d:'SPK, progres produksi, kirim ke vendor',mods:['spk','vendor']},
- gbb:{l:'Gudang Bahan Baku',d:'Stok plat, terima material, pakai produksi, opname, PR',mods:['bahan-baku','bongkar-muat']},
- gbj:{l:'Gudang Barang Jadi',d:'Stok barang jadi, terima dari vendor, surat jalan',mods:['barang-jadi','vendor','pengiriman','bongkar-muat']},
- logistik:{l:'Logistik / Pengiriman',d:'Surat jalan, armada, bongkar muat',mods:['pengiriman','bongkar-muat']},
- viewer:{l:'Viewer',d:'Hanya melihat, tidak mencatat',mods:[]}
+ admin:{l:'Super Admin',d:'Semua modul dan kelola pengguna',mods:['*'],lihat:[]},
+ ppic:{l:'PPIC',d:'SPK dan kirim ke vendor; melihat gudang dan pengiriman',mods:['spk','vendor'],lihat:['bahan-baku','barang-jadi','pengiriman','bongkar-muat']},
+ produksi:{l:'Produksi',d:'Progres produksi pada SPK; melihat vendor',mods:['spk'],lihat:['vendor']},
+ gbb:{l:'Gudang Bahan Baku',d:'Stok plat, terima material, pakai produksi, opname, PR',mods:['bahan-baku','bongkar-muat'],lihat:['spk']},
+ gbj:{l:'Gudang Barang Jadi',d:'Stok barang jadi, terima dari vendor, surat jalan',mods:['barang-jadi','vendor','pengiriman','bongkar-muat'],lihat:['spk']},
+ logistik:{l:'Logistik / Pengiriman',d:'Surat jalan, armada, bongkar muat',mods:['pengiriman','bongkar-muat'],lihat:['spk','barang-jadi']},
+ viewer:{l:'Viewer',d:'Hanya melihat semua modul, tidak mencatat',mods:[],lihat:['bahan-baku','barang-jadi','vendor','pengiriman','spk','bongkar-muat']}
 };
 const MODS=[['bahan-baku','Bahan baku'],['barang-jadi','Barang jadi'],['vendor','Vendor'],['pengiriman','Kirim customer'],['spk','SPK & produksi'],['bongkar-muat','Bongkar muat'],['master-data','Master data']];
 const MODL=Object.fromEntries(MODS);
+const presetModul=r=>{const p=ROLES[r];if(!p||p.mods[0]==='*')return {};const o={};p.lihat.forEach(m=>o[m]='lihat');p.mods.forEach(m=>o[m]='ubah');return o};
 let IS_OWNER=false,IS_EDITOR=false,ME_P=null;
+function myRole(){return ME_P?(ME_P.role||'viewer'):null}
+/* level saya pada satu modul: 'ubah' | 'lihat' | null (tidak terlihat) */
+function myLevel(m){
+ if(!ME_P)return CAN?'ubah':'lihat';
+ if(ME_P.role==='admin')return 'ubah';
+ if(ME_P.modul&&typeof ME_P.modul==='object')return ME_P.modul[m]||null;
+ const md=(ROLES[ME_P.role]||{mods:[]}).mods;return md.includes(m)?'ubah':'lihat'}
+const myAnyEdit=()=>ME_P?(ME_P.role==='admin'||MODS.some(([m])=>myLevel(m)==='ubah')):CAN;
 const roleL=r=>(ROLES[r]||{}).l||'Belum terdaftar';
 function myAcc(){
  if(!ME)return {st:'anon',role:null};
  const mu=byId('muser',ME);
+ if(ME_P&&ME_P.role){if(ME_P.terdaftar===false)return {st:'new',role:null,mu};return {st:'ok',role:ROLES[ME_P.role]?ME_P.role:'viewer',mu}} /* peran dari tabel pengguna (Supabase) */
  if(IS_OWNER)return {st:'ok',role:'admin',mu};
- if(!ROLE_ON&&ME_P&&ME_P.role)return {st:'ok',role:ROLES[ME_P.role]&&ME_P.canEdit!==false?ME_P.role:'viewer',mu}; /* backend dengan peran bawaan (Supabase): peran dari tabel pengguna */
  if(mu&&mu.aktif===false)return {st:'off',role:'viewer',mu};
  if(mu&&ROLES[mu.role])return {st:'ok',role:mu.role,mu};
  if(IS_EDITOR)return {st:'ok',role:'admin',mu,implicit:true};
- if(byId('ureq',ME))return {st:'req',role:null,rq:byId('ureq',ME)};
  return {st:'new',role:null};
 }
-function canMod(m){const r=myAcc().role;if(!r)return false;const md=ROLES[r].mods;if(md[0]==='*')return true;if(m==='*any')return md.length>0;return md.includes(m)}
-const canManage=()=>IS_EDITOR||IS_OWNER;
+function canMod(m){if(!ME_P&&!ME)return false;if(m==='*any')return myAnyEdit();return myLevel(m)==='ubah'}
+const canManage=()=>!!ME_P&&myRole()==='admin';
 function modOf(c,data,id,op){
  if(['rm','rmhist','pr','opname'].includes(c))return 'bahan-baku';
  if(c==='fg')return 'barang-jadi';
@@ -2837,11 +2856,10 @@ function modOf(c,data,id,op){
 function guard(c,data,id,op){
  if(!ROLE_ON&&!(ME_P&&ME_P.role))return;
  const a=myAcc();
- if(a.st==='new')throw new Error('Akun Anda belum terdaftar. Buka menu Pengguna & Akses lalu klik "Ajukan akses".');
- if(a.st==='req')throw new Error('Permintaan akses Anda masih menunggu persetujuan admin.');
+ if(a.st==='new')throw new Error('Akun Anda belum terdaftar sebagai pengguna. Minta super admin mendaftarkan akun Anda.');
  if(a.st==='off')throw new Error('Akun Anda dinonaktifkan admin.');
  const m=modOf(c,data,id,op);
- if(!canMod(m))throw new Error(`Peran ${roleL(a.role)} tidak bisa mencatat di ${MODL[m]||'modul ini'}. Minta admin menambah akses.`);
+ if(!canMod(m))throw new Error(`Akses Anda (${roleL(a.role)}) tidak mencakup pencatatan di ${MODL[m]||'modul ini'}. Minta super admin menambah akses.`);
 }
 /* ---- audit log: one row per write ---- */
 const CNM={rm:'item bahan baku',fg:'item barang jadi',mutasi:'mutasi stok',spk:'SPK',vendor:'kiriman vendor',kirim:'surat jalan',bongkar:'bongkar muat',pr:'PR',opname:'opname',master:'pengaturan',mvendor:'master vendor',mcustomer:'master customer',msupplier:'master supplier',marmada:'master armada',rmhist:'riwayat harga',muser:'data pengguna'};
@@ -2993,102 +3011,84 @@ async function saveCsv(name,head,rows){
  if(!DLS){toast('Unduhan tidak tersedia di tampilan ini.');return}
  try{await DLS.save({filename:name,data:new Blob([csv],{type:'text/csv'})})}catch(e){if(e.code!=='declined')toast('Gagal mengunduh: '+(e.message||e.code))}
 }
-/* ---- PENGGUNA & AKSES ---- */
+/* ---- PENGGUNA & AKSES (khusus super admin) ---- */
+const LVL_OPT=[['','Tidak ada akses'],['lihat','Lihat saja'],['ubah','Lihat dan ubah']];
+const modulEff=m=>m.role==='admin'?null:(m.modul&&typeof m.modul==='object'?m.modul:presetModul(m.role));
+const modulChips=m=>{const o=modulEff(m);if(o===null)return '<span class="wchip">Semua modul</span>';const k=Object.keys(o);
+ return k.length?k.map(x=>`<span class="wchip" style="${o[x]==='lihat'?'opacity:.6':''}" title="${o[x]==='ubah'?'Lihat dan ubah':'Lihat saja'}">${MODL[x]||x}${o[x]==='lihat'?' (lihat)':''}</span>`).join(''):'<span class="muted">tidak ada akses</span>'};
 T.pengguna=()=>canManage()?`<span class="grow"></span><button class="btn primary" data-act="uinvite">${ic('plus')}Tambah anggota tim</button>`:'';
 B.pengguna=()=>{
- const a=myAcc();const man=canManage();
- const reqs=S.ureq.filter(r=>!byId('muser',r._id)).sort((x,y)=>(y.at||'').localeCompare(x.at||''));
- const K=kpiAgg('30');
- let h='';
- // my account
- const stTxt={ok:a.implicit?'Admin (pemilik / editor aplikasi)':roleL(a.role),req:'Menunggu persetujuan admin',new:'Belum terdaftar',off:'Dinonaktifkan',anon:'Tidak masuk'}[a.st];
- h+=`<section class="panel me-card"><div class="pbody me-row">${av(ME,'xl')}<div class="grow"><div class="me-nm">${ME?uName(ME):'Tamu'}</div><div class="note">${ME_P&&ME_P.email?esc(ME_P.email)+' · ':''}Login lewat akun Claude</div>
-  <div style="margin-top:6px">${chip(stTxt,a.st==='ok'?'ok':a.st==='req'?'warn':a.st==='off'?'crit':'')}${a.role&&a.role!=='viewer'?' '+(ROLES[a.role].mods[0]==='*'?chip('Semua modul','plain'):ROLES[a.role].mods.map(m=>chip(MODL[m],'plain')).join(' ')):''}</div></div>
-  <div class="me-act">${a.st==='new'&&CAN?`<button class="btn primary" data-act="ureq">${ic('send')}Ajukan akses</button>`:''}${a.st==='req'&&CAN?`<button class="btn" data-act="ureq">Ubah permintaan</button>`:''}${a.st==='ok'&&man?`<button class="btn" data-act="uedit" data-uid="${esc(ME)}">${ic('edit2')}Atur profil saya</button>`:''}${ME?`<button class="btn ghost" data-act="kpiuser" data-uid="${esc(ME)}">Aktivitas saya</button>`:''}</div></div>
-  ${a.st==='new'&&!CAN?`<div class="pbody"><div class="ro">Akses Anda di link ini hanya Viewer. Minta pemilik membagikan aplikasi ke Anda sebagai <b>Contributor</b>, lalu buka lagi dan klik Ajukan akses.</div></div>`:''}</section>`;
- // requests
- if(man&&reqs.length)h+=`<section class="panel"><header><h2>Permintaan akses</h2><span class="hint">${reqs.length} menunggu</span></header><div class="tbl-wrap"><table><thead><tr><th>Nama</th><th>Peran diminta</th><th>Jabatan</th><th>Catatan</th><th>Diajukan</th><th></th></tr></thead><tbody>
-  ${reqs.map(r=>`<tr><td><div class="ucell">${av(r._id)}<div><b>${uName(r._id)}</b>${r.kode&&!byId('uinv',String(r.kode).toUpperCase())?`<div class="note" style="color:var(--warn)">kode ${esc(r.kode)} tidak cocok</div>`:''}</div></div></td><td>${chip(roleL(r.role),'info')}</td><td>${esc(r.jabatan||'')}</td><td class="muted">${esc(r.ket||'')}</td><td class="muted">${ago(r.at)}</td><td class="act"><button class="btn sm primary" data-act="uedit" data-uid="${esc(r._id)}">Setujui</button> <button class="btn sm ghost danger" data-act="urej" data-uid="${esc(r._id)}">Tolak</button></td></tr>`).join('')}</tbody></table></div></section>`;
- // invites
- const invs=S.uinv.slice().sort((x,y)=>(y.at||'').localeCompare(x.at||''));
- if(man&&invs.length)h+=`<section class="panel"><header><h2>Undangan belum dipakai</h2><span class="hint">aktif otomatis begitu kode dimasukkan</span></header><div class="tbl-wrap"><table><thead><tr><th>Nama</th><th>Peran</th><th>Jabatan</th><th>Kode</th><th>Dibuat</th><th></th></tr></thead><tbody>
-  ${invs.map(v=>`<tr><td><b>${esc(v.nama)}</b></td><td>${chip(roleL(v.role),'info')}</td><td>${esc(v.jabatan||'')}</td><td><span class="code">${esc(v._id)}</span></td><td class="muted">${ago(v.at)}</td><td class="act"><button class="btn sm" data-act="invmsg" data-code="${esc(v._id)}">Salin pesan</button> <button class="btn sm ghost danger" data-act="invdel" data-code="${esc(v._id)}">Hapus</button></td></tr>`).join('')}</tbody></table></div></section>`;
- // user list
- const ids=[...new Set([...(IS_OWNER||IS_EDITOR?[ME]:[]),...S.muser.map(m=>m._id)])].filter(Boolean);
- h+=`<section class="panel"><header><h2>Daftar pengguna</h2><span class="hint">${ids.filter(id=>(byId('muser',id)||{}).aktif!==false).length} aktif · aktivitas 30 hari</span></header>${ids.length?`<div class="tbl-wrap"><table><thead><tr><th>Pengguna</th><th>Peran</th><th>Akses modul</th><th class="num">Aktivitas 30 hr</th><th>Terakhir aktif</th><th>Status</th>${man?'<th></th>':''}</tr></thead><tbody>
-  ${ids.map(id=>{const m=byId('muser',id)||{};const r=id===ME&&IS_OWNER?'admin':m.role||(id===ME?myAcc().role:'');const o=K.U[id]||{total:0};const md=r&&ROLES[r]?ROLES[r].mods:[];
-   return `<tr class="click" data-act="kpiuser" data-uid="${esc(id)}"><td><div class="ucell">${av(id)}<div><b>${uName(id)}</b>${id===ME?' <span class="note">(Anda)</span>':''}<div class="note">${esc(m.jabatan||'')}</div></div></div></td><td>${esc(roleL(r))}${id===ME&&IS_OWNER?' <span class="note">· pemilik</span>':''}</td><td><div class="wchips">${md[0]==='*'?'<span class="wchip">Semua modul</span>':md.length?md.map(x=>`<span class="wchip">${MODL[x]}</span>`).join(''):'<span class="muted">lihat saja</span>'}</div></td><td class="num">${n(o.total)}</td><td class="muted">${o.lastAll?ago(o.lastAll):'–'}</td><td>${m.aktif===false?chip('Nonaktif','crit'):chip('Aktif','ok')}</td>${man?`<td class="act"><button class="btn sm" data-act="uedit" data-uid="${esc(id)}">${ic('edit2')}Atur</button></td>`:''}</tr>`}).join('')}</tbody></table></div>`:empty('Belum ada pengguna','Tambahkan anggota tim supaya setiap transaksi tercatat atas nama mereka.')}</section>`;
- // matrix
- h+=`<section class="panel"><header><h2>Matriks akses per peran</h2><span class="hint">semua peran bisa melihat seluruh data</span></header><div class="tbl-wrap"><table class="mx"><thead><tr><th>Peran</th>${MODS.map(([,l])=>`<th class="c">${l}</th>`).join('')}<th class="c">Kelola pengguna</th></tr></thead><tbody>
-  ${Object.entries(ROLES).map(([k,r])=>`<tr><td><b>${r.l}</b><div class="note">${r.d}</div></td>${MODS.map(([m])=>`<td class="c">${r.mods[0]==='*'||r.mods.includes(m)?'<span class="yes">✓</span>':m==='master-data'&&r.mods.length?'<span class="part" title="Bisa menambah vendor/customer/armada baru dari form, tidak bisa menghapus">tambah</span>':'<span class="no">–</span>'}</td>`).join('')}<td class="c">${k==='admin'?'<span class="yes">✓</span>':'<span class="no">–</span>'}</td></tr>`).join('')}</tbody></table></div>
-  <div class="pbody note">Kelola pengguna hanya bisa dilakukan pemilik aplikasi dan orang yang dibagikan sebagai <b>Editor</b>. Aturan ini dijaga di server, jadi tidak bisa diakali dari browser.</div></section>`;
+ if(!canManage())return `<section class="panel"><div class="pbody"><div class="ro">Hanya super admin yang bisa mengatur pengguna dan akses.</div></div></section>`;
+ const K=kpiAgg('30');const us=S.muser.slice().sort((x,y)=>(x.role==='admin'?0:1)-(y.role==='admin'?0:1)||String(x.nama||'').localeCompare(String(y.nama||'')));
+ const aktif=us.filter(u=>u.aktif!==false).length;
+ let h=`<section class="panel"><header><h2>Daftar pengguna</h2><span class="hint">${aktif} aktif dari ${us.length} · aktivitas 30 hari</span></header>${us.length?`<div class="tbl-wrap"><table><thead><tr><th>Pengguna</th><th>Peran</th><th>Akses modul</th><th class="num">Aktivitas 30 hr</th><th>Terakhir aktif</th><th>Status</th><th></th></tr></thead><tbody>
+  ${us.map(u=>{const o=K.U[u.email]||{total:0};const me=String(u.email||'').toLowerCase()===String(ME||'').toLowerCase();
+   return `<tr class="click" data-act="kpiuser" data-uid="${esc(u.email)}"><td><div class="ucell">${av(u.email)}<div><b>${esc(u.nama||u.email)}</b>${me?' <span class="note">(Anda)</span>':''}<div class="note">${esc(u.email||'')}${u.jabatan?' · '+esc(u.jabatan):''}</div></div></div></td><td>${esc(roleL(u.role))}</td><td><div class="wchips">${modulChips(u)}</div></td><td class="num">${n(o.total)}</td><td class="muted">${o.lastAll?ago(o.lastAll):'–'}</td><td>${u.aktif===false?chip('Nonaktif','crit'):chip('Aktif','ok')}</td><td class="act"><button class="btn sm" data-act="uedit" data-uid="${esc(u._id)}">${ic('edit2')}Atur</button> <button class="btn sm ghost" data-act="upw" data-uid="${esc(u._id)}">Password</button></td></tr>`}).join('')}</tbody></table></div>`:empty('Belum ada pengguna','Tambahkan anggota tim agar setiap transaksi tercatat atas nama mereka.')}</section>`;
+ h+=`<section class="panel"><header><h2>Paket peran bawaan</h2><span class="hint">titik awal; hak tiap orang tetap bisa diatur satu per satu</span></header><div class="tbl-wrap"><table class="mx"><thead><tr><th>Peran</th>${MODS.map(([,l])=>`<th class="c">${l}</th>`).join('')}</tr></thead><tbody>
+  ${Object.entries(ROLES).map(([k,r])=>{const p=presetModul(k);return `<tr><td><b>${r.l}</b><div class="note">${r.d}</div></td>${MODS.map(([m])=>`<td class="c">${k==='admin'?'<span class="yes">✓</span>':p[m]==='ubah'?'<span class="yes" title="Lihat dan ubah">✓</span>':p[m]==='lihat'?'<span class="part" title="Lihat saja">lihat</span>':'<span class="no">–</span>'}</td>`).join('')}</tr>`}).join('')}</tbody></table></div>
+  <div class="pbody note">✓ = lihat dan ubah · lihat = hanya melihat · – = modul tidak tampil. Aturan dijaga di database sehingga tidak bisa diakali dari browser. Data tetap satu dan terhubung: perubahan oleh satu pengguna terlihat oleh pengguna lain yang punya akses ke modul itu.</div></section>`;
  return h;
 };
-const APP_URL='https://claude.ai/artifact/2diVb85CqzzMtCkBgJ9jrP';
-const newCode=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<6;i++)c+=A[Math.floor(Math.random()*A.length)];return byId('uinv',c)?newCode():c};
+const genPw=()=>{const A='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';const b=crypto.getRandomValues(new Uint8Array(12));return [...b].map(x=>A[x%A.length]).join('')};
+const modulGrid=cur=>`<div class="fld full"><label>Akses per modul</label><div class="tbl-wrap"><table class="mx"><tbody>${MODS.map(([m,l])=>`<tr><td>${l}</td><td><select class="sel" name="mod_${m}">${LVL_OPT.map(([v,t])=>`<option value="${v}" ${(cur[m]||'')===v?'selected':''}>${t}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div></div>`;
+const modulFrom=d=>{const o={};MODS.forEach(([m])=>{const v=d['mod_'+m];if(v==='lihat'||v==='ubah')o[m]=v});return o};
+const roleOpts=sel=>Object.entries(ROLES).map(([k,x])=>`<option value="${k}" ${sel===k?'selected':''}>${x.l}</option>`).join('');
+function mountRoleGrid(f){const s=()=>{const adm=f.role.value==='admin';MODS.forEach(([m])=>{f['mod_'+m].disabled=adm});const r=ROLES[f.role.value];$('#m-rdesc').textContent=r?r.l+': '+r.d:''};
+ f.role.addEventListener('change',()=>{const p=presetModul(f.role.value);MODS.forEach(([m])=>{f['mod_'+m].value=p[m]||''});s()});s()}
 function inviteForm(){
- if(!canManage()){toast('Hanya pemilik / Editor aplikasi yang bisa menambah anggota.');return}
- openModal('Tambah anggota tim',fld('Nama lengkap',inp('nama','','text','required placeholder="mis. Budi Santoso"'),true)+
-  fld('Peran',`<select class="sel" name="role" id="m-role">${Object.entries(ROLES).map(([k,x])=>`<option value="${k}" ${k==='gbb'?'selected':''}>${x.l}</option>`).join('')}</select>`)+
-  fld('Jabatan (opsional)',inp('jabatan','','text','placeholder="mis. Kepala Gudang"'))+`<div class="note full" id="m-rdesc"></div>`+
-  `<div class="note full">Aplikasi membuat <b>kode undangan</b>. Kirim kode itu ke orangnya. Begitu mereka memasukkan kode, akun mereka langsung aktif dengan peran ini, tanpa perlu disetujui manual. Tambah sebanyak yang dibutuhkan.</div>`,
-  async d=>{need();if(!String(d.nama).trim())throw new Error('Isi nama.');const code=newCode();
-   await DB.doc('uinv/'+code).set({nama:cleanName(d.nama),role:d.role,jabatan:String(d.jabatan||'').trim(),at:new Date().toISOString(),by:ME});
-   setTimeout(()=>inviteMsg(code,{nama:cleanName(d.nama),role:d.role}),60)},
-  {submit:'Buat undangan',done:' ',mount:f=>{const s=()=>{const r=ROLES[f.role.value];$('#m-rdesc').textContent=r?r.l+': '+r.d:''};f.role.addEventListener('change',s);s()}});
+ if(!canManage()){toast('Hanya super admin yang bisa menambah anggota.');return}
+ openModal('Tambah anggota tim',
+  fld('Nama lengkap',inp('nama','','text','required placeholder="mis. Budi Santoso"'),true)+
+  fld('Email (untuk login)',inp('email','','email','required placeholder="nama@perusahaan.com" autocomplete="off"'),true)+
+  fld('Jabatan (opsional)',inp('jabatan','','text','placeholder="mis. Kepala Gudang"'))+
+  fld('Peran (paket hak bawaan)',`<select class="sel" name="role" id="m-role">${roleOpts('gbb')}</select>`)+
+  `<div class="note full" id="m-rdesc"></div>`+modulGrid(presetModul('gbb'))+
+  fld('Cara memberi akses',`<select class="sel" name="cara"><option value="pw">Buat password sementara (disarankan)</option><option value="inv">Kirim undangan lewat email</option></select>`,true)+
+  `<div class="note full">Dengan password sementara, Anda menerima kata sandi satu kali untuk diberikan ke orangnya. Mereka bisa langsung masuk lewat "Masuk dengan password".</div>`,
+  async d=>{if(!USER||!USER.manage)throw new Error('Fitur kelola pengguna belum tersedia di mode ini.');
+   const role=d.role;const password=d.cara==='pw'?genPw():'';
+   await USER.manage('create',{email:String(d.email).trim(),nama:cleanName(d.nama),role,jabatan:String(d.jabatan||'').trim(),modul:role==='admin'?null:modulFrom(d),password});
+   setTimeout(()=>credMsg(String(d.email).trim().toLowerCase(),cleanName(d.nama),role,password),60)},
+  {submit:'Buat akun',done:' ',mount:mountRoleGrid});
 }
-function inviteMsg(code,v){v=v||byId('uinv',code);if(!v)return;
- const msg=`Halo ${v.nama}, kamu diundang ke aplikasi Gudang & Logistik PT Mitra Nusa Internasional sebagai ${roleL(v.role)}.\n\n1. Buka link: ${APP_URL}\n2. Login dengan akun Claude kamu\n3. Buka menu "Pengguna & Akses", klik "Ajukan akses"\n4. Masukkan kode undangan: ${code}\n\nSetelah itu semua data yang kamu input tercatat atas nama kamu.`;
- openModal('Undangan siap dikirim',`<div class="full"><div class="bigcode">${esc(code)}</div></div>
-  <div class="full steps"><div><b>1</b><span>Klik tombol Share di pojok kanan atas aplikasi, undang email ${esc(v.nama)} sebagai Contributor${v.role==='admin'?' (Editor kalau perlu ikut menyetujui pengguna)':''}. Tanpa langkah ini link tidak bisa dibuka.</span></div><div><b>2</b><span>Kirim pesan di bawah lewat WhatsApp atau email.</span></div></div>
-  <div class="full"><textarea class="invmsg" id="m-invmsg" readonly>${esc(msg)}</textarea></div>`,
+function credMsg(email,nama,role,password){
+ const msg=`Halo ${nama}, akun kamu di aplikasi Gudang & Logistik PT Mitra Nusa Internasional sudah siap (${roleL(role)}).\n\nBuka: ${location.origin}\nEmail: ${email}\n${password?`Password sementara: ${password}\n\nKlik "Masuk dengan password" lalu masukkan email dan password di atas.`:'Cek email kamu untuk undangan, lalu ikuti tautannya.'}`;
+ openModal(password?'Akun siap, kirim ke orangnya':'Undangan terkirim',
+  `<div class="full note">${password?'Password ini hanya ditampilkan sekali. Salin dan kirim lewat WhatsApp atau email.':'Undangan dikirim ke '+esc(email)+'.'}</div><div class="full"><textarea class="invmsg" id="m-invmsg" readonly>${esc(msg)}</textarea></div>`,
   async()=>{const t=$('#m-invmsg');let ok=false;try{await navigator.clipboard.writeText(t.value);ok=true}catch(_){}if(!ok){t.focus();t.select();try{ok=document.execCommand('copy')}catch(_){}}if(!ok)throw new Error('Browser menolak menyalin otomatis. Teks sudah diblok, tekan Ctrl+C.')},
-  {submit:'Salin pesan',done:'Pesan undangan tersalin'})}
-const CLAIMING=new Set();
-async function autoClaim(){
- if(!canManage()||!DB||!S.ureq.length)return;
- for(const r of S.ureq){const code=String(r.kode||'').toUpperCase().trim();const v=code&&byId('uinv',code);
-  if(!v||byId('muser',r._id)||CLAIMING.has(r._id))continue;CLAIMING.add(r._id);
-  try{const now=new Date().toISOString();
-   await DB.doc('muser/'+r._id).set({nama:v.nama||r.nama,role:v.role,jabatan:v.jabatan||r.jabatan||'',aktif:true,kode:code,at:now,by:v.by||ME,updAt:now,updBy:ME});
-   await DB.doc('ureq/'+r._id).delete().catch(()=>{});await DB.doc('uinv/'+code).delete().catch(()=>{});
-   DB.collection('log').add({u:ME,at:now,c:'muser',d:r._id,op:'add',k:'Pengguna aktif via kode undangan',mod:'*any',ref:(v.nama||r.nama)+' · '+roleL(v.role),tgl:'',auto:true}).catch(()=>{});
-   toast(`${v.nama||r.nama} memakai kode ${code} · akun aktif sebagai ${roleL(v.role)}`)
-  }catch(e){CLAIMING.delete(r._id)}}
-}
-function reqForm(){const r=byId('ureq',ME)||{};
- openModal('Ajukan akses',fld('Kode undangan (kalau dapat dari admin)',inp('kode',r.kode||'','text','placeholder="mis. K7M2QX" autocomplete="off" style="text-transform:uppercase;letter-spacing:.12em;font-weight:700"'),true)+fld('Nama lengkap',inp('nama',r.nama||(ME_P&&ME_P.name)||'','text','required autocomplete="name"'),true)+
-  fld('Bagian / peran',`<select class="sel" name="role" id="m-role">${Object.entries(ROLES).filter(([k])=>k!=='admin').map(([k,x])=>`<option value="${k}" ${r.role===k?'selected':''}>${x.l} — ${x.d}</option>`).join('')}</select>`,true)+
-  fld('Jabatan (opsional)',inp('jabatan',r.jabatan||'','text','placeholder="mis. Kepala Gudang, Staff PPIC"'))+fld('Catatan untuk admin (opsional)',inp('ket',r.ket||''))+
-  `<div class="note full">Dengan kode undangan, akun Anda aktif otomatis. Tanpa kode, admin akan menyetujui dan menentukan peran Anda. Setelah disetujui, setiap data yang Anda input tercatat atas nama Anda.</div>`,
-  async d=>{if(!DB)throw new Error('Pembuatan pengguna belum tersedia di pratinjau lokal karena backend belum terhubung.');if(!ME)throw new Error('Autentikasi belum tersedia di pratinjau lokal.');if(!String(d.nama).trim())throw new Error('Isi nama lengkap.');
-   await DB.doc('ureq/'+ME).set({kode:String(d.kode||'').toUpperCase().replace(/[^A-Z0-9]/g,''),nama:cleanName(d.nama),role:d.role,jabatan:String(d.jabatan||'').trim(),ket:String(d.ket||'').trim(),at:new Date().toISOString()})},
-  {submit:'Kirim permintaan',done:'Permintaan terkirim · admin akan melihatnya langsung'})}
+  {submit:'Salin pesan',done:'Pesan tersalin'})}
 function userForm(uid){
- if(!canManage()){toast('Hanya pemilik / Editor aplikasi yang bisa mengatur pengguna.');return}
- const m=byId('muser',uid)||{},q=byId('ureq',uid)||{};const isMe=uid===ME;
- const role=m.role||q.role||(isMe?'admin':'gbb');
- openModal(m._id?'Atur pengguna':q._id?'Setujui akses':'Profil saya',
-  fld('Nama tampil',inp('nama',m.nama||q.nama||(isMe&&ME_P?ME_P.name:'')||'','text','required'),true)+
-  fld('Peran',`<select class="sel" name="role" id="m-role" ${isMe&&IS_OWNER?'disabled':''}>${Object.entries(ROLES).map(([k,x])=>`<option value="${k}" ${role===k?'selected':''}>${x.l}</option>`).join('')}</select>`)+
-  fld('Jabatan',inp('jabatan',m.jabatan||q.jabatan||'','text','placeholder="mis. Kepala Gudang"'))+
-  `<div class="note full" id="m-rdesc"></div>`+
-  (isMe?'':`<label class="ck full"><input type="checkbox" name="aktif" id="m-aktif" ${m.aktif===false?'':'checked'}> Aktif — bisa mencatat sesuai peran</label>`)+
-  (q.ket?`<div class="note full">Catatan pemohon: ${esc(q.ket)}</div>`:'')+
-  `<div class="note full">Peran Admin di aplikasi membuka semua modul. Untuk bisa menyetujui pengguna lain, orang itu juga harus dibagikan sebagai Editor di menu Share.</div>`,
+ if(!canManage()){toast('Hanya super admin yang bisa mengatur pengguna.');return}
+ const m=S.muser.find(x=>x._id===uid);if(!m)return;const me=String(m.email||'').toLowerCase()===String(ME||'').toLowerCase();
+ openModal('Atur pengguna',
+  fld('Nama tampil',inp('nama',m.nama||'','text','required'),true)+
+  fld('Email',`<input class="inp" value="${esc(m.email||'')}" disabled>`,true)+
+  fld('Jabatan',inp('jabatan',m.jabatan||'','text','placeholder="mis. Kepala Gudang"'))+
+  fld('Peran (paket hak bawaan)',`<select class="sel" name="role" id="m-role" ${me?'disabled':''}>${roleOpts(m.role)}</select>`)+
+  `<div class="note full" id="m-rdesc"></div>`+modulGrid(modulEff(m)||{})+
+  (me?'<div class="note full">Anda tidak bisa mengubah peran atau menonaktifkan akun sendiri.</div>':`<label class="ck full"><input type="checkbox" name="aktif" ${m.aktif===false?'':'checked'}> Aktif — bisa masuk dan memakai aplikasi</label>`)+
+  `<div class="note full">Perubahan berlaku segera di database. Menu baru tampil pada orang tersebut setelah ia memuat ulang halaman.</div>`,
   async d=>{if(!String(d.nama).trim())throw new Error('Isi nama tampil.');
-   const now=new Date().toISOString();
-   const doc={nama:cleanName(d.nama),role:isMe&&IS_OWNER?'admin':d.role,jabatan:String(d.jabatan||'').trim(),aktif:isMe?true:!!d.aktif,at:m.at||now,by:m.by||ME,updAt:now,updBy:ME};
-   await DB.doc('muser/'+uid).set(doc);
-   if(q._id)await DB.doc('ureq/'+uid).delete().catch(()=>{});
-   DB.collection('log').add({u:ME,at:now,c:'muser',d:uid,op:m._id?'upd':'add',k:m._id?'Ubah akses pengguna':'Setujui pengguna baru',mod:'*any',ref:doc.nama+' · '+roleL(doc.role),tgl:'',auto:true}).catch(()=>{})},
-  {submit:q._id&&!m._id?'Setujui':'Simpan',done:'Tersimpan · akses pengguna langsung berlaku',mount:f=>{const s=()=>{const r=ROLES[f.role.value];$('#m-rdesc').textContent=r?r.l+': '+r.d:''};f.role.addEventListener('change',s);s()}});
+   const role=me?m.role:d.role;
+   await DB.doc('muser/'+m._id).update({nama:cleanName(d.nama),role,jabatan:String(d.jabatan||'').trim(),aktif:me?true:!!d.aktif,modul:role==='admin'?null:modulFrom(d),updAt:new Date().toISOString(),updBy:ME})},
+  {submit:'Simpan',done:'Tersimpan · akses langsung berlaku',mount:mountRoleGrid});
 }
-async function rejectReq(uid){if(!canManage())return;await DB.doc('ureq/'+uid).delete();toast('Permintaan ditolak')}
+function pwForm(uid){
+ if(!canManage())return;const m=S.muser.find(x=>x._id===uid);if(!m)return;const pw=genPw();
+ openModal('Atur ulang password',
+  fld('Pengguna',`<input class="inp" value="${esc((m.nama||'')+' · '+(m.email||''))}" disabled>`,true)+
+  fld('Password baru (minimal 8 karakter)',inp('password',pw,'text','required minlength="8" autocomplete="off"'),true)+
+  `<div class="note full">Password lama langsung tidak berlaku. Kirim password baru ke orangnya lewat saluran yang aman.</div>`,
+  async d=>{if(!USER||!USER.manage)throw new Error('Fitur kelola pengguna belum tersedia di mode ini.');
+   if(String(d.password).length<8)throw new Error('Password minimal 8 karakter.');
+   await USER.manage('reset_password',{email:m.email,password:String(d.password)});
+   setTimeout(()=>credMsg(String(m.email).toLowerCase(),m.nama||m.email,m.role,String(d.password)),60)},
+  {submit:'Atur ulang',done:' '});
+}
 /* ---- shell bits ---- */
 function renderMe(){
  const a=myAcc();const nm=ME?(uname(ME)||(ME_P&&ME_P.name)||'Pengguna'):'Tamu';
- const role=!ROLE_ON?(ME_P&&ME_P.role&&a.st==='ok'?roleL(a.role):CAN?'Bisa mencatat':'Lihat saja'):a.st==='ok'?roleL(a.role):a.st==='req'?'Menunggu persetujuan':a.st==='off'?'Nonaktif':ME?'Belum terdaftar':'Mode lihat saja';
+ const role=ME_P&&ME_P.role&&a.st==='ok'?roleL(a.role):a.st==='new'?'Belum terdaftar':a.st==='off'?'Nonaktif':CAN?'Bisa mencatat':'Lihat saja';
  const html=`${av(ME,'sm')}<span class="mi"><b>${esc(nm)}</b><small>${esc(role)}</small></span>`;
  const w=$('#who');if(w)w.innerHTML=`<button type="button" class="mebtn" data-act="mepage">${html}</button>`;
  const t=$('#mechip');if(t){t.innerHTML=html;t.title=nm+' · '+role}
@@ -3096,16 +3096,16 @@ function renderMe(){
 }
 function renderAccess(){
 /*RA*/ const ro=$('#ro');if(!ro)return;const a=myAcc();let msg='';
- if(!ROLE_ON&&!(ME_P&&ME_P.role)){ro.hidden=CAN;ro.className='ro';ro.textContent=CAN?'':'Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';$('#tools').classList.remove('locked');return}
- if(!CAN)msg=ME_P&&ME_P.role?`Peran <b>${esc(roleL(a.role))}</b> hanya bisa melihat. Minta admin mengubah peran Anda untuk mencatat transaksi.`:'Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';
- else if(a.st==='new')msg=`Akun Anda belum terdaftar, jadi masih mode lihat saja. <button class="linkbtn" data-act="ureq">Ajukan akses sekarang</button>`;
- else if(a.st==='req')msg=a.rq.kode?`Kode undangan <b>${esc(a.rq.kode)}</b> terkirim. Akun aktif otomatis dalam beberapa detik begitu admin sedang membuka aplikasi.`:`Permintaan akses sebagai <b>${esc(roleL(a.rq.role))}</b> sudah terkirim — menunggu persetujuan admin.`;
- else if(a.st==='off')msg='Akun Anda dinonaktifkan admin. Mode lihat saja.';
- else if(MODL[VIEW]&&VIEW!=='master-data'&&!canMod(VIEW)){const who=Object.values(ROLES).filter(r=>r.mods.includes(VIEW)).map(r=>r.l).join(', ');msg=`Peran <b>${esc(roleL(a.role))}</b> hanya melihat modul ini. Pencatatan oleh: ${esc(who)}.`}
- if(VIEW==='pengguna'&&a.st==='new')msg='';
+ if(!ME_P){ro.hidden=CAN;ro.className='ro';ro.textContent=CAN?'':'Anda punya akses lihat saja.';$('#tools').classList.remove('locked');return}
+ const lvl=VIEW_MOD[VIEW]?myLevel(VIEW_MOD[VIEW]):'ubah';
+ if(a.st==='new')msg='Akun Anda belum terdaftar sebagai pengguna aplikasi. Minta super admin mendaftarkan akun Anda.';
+ else if(a.st==='off')msg='Akun Anda dinonaktifkan oleh super admin.';
+ else if(!CAN)msg=`Akses Anda (<b>${esc(roleL(a.role))}</b>) hanya untuk melihat. Minta super admin menambah akses ubah bila perlu mencatat.`;
+ else if(lvl==='lihat'){const who=Object.values(ROLES).filter(r=>r.mods.includes(VIEW_MOD[VIEW])).map(r=>r.l).join(', ');msg=`Anda hanya bisa <b>melihat</b> modul ini. Pencatatan oleh: ${esc(who)}.`}
  ro.hidden=!msg;ro.className='ro';ro.innerHTML=msg;
- $('#tools').classList.toggle('locked',!!(!CAN||(MODL[VIEW]&&VIEW!=='master-data'&&!canMod(VIEW))));
+ $('#tools').classList.toggle('locked',!!(!CAN||lvl==='lihat'||a.st!=='ok'));
 }
+
 async function fillAvatars(){
  if(!USER)return;const els=[...document.querySelectorAll('[data-uav]')].filter(e=>e.dataset.uav&&!e.dataset.done);const ids=[...new Set(els.map(e=>e.dataset.uav))];if(!ids.length)return;
  const ps=await USER.profiles(ids);els.forEach(e=>{const p=ps[e.dataset.uav];if(!p)return;e.style.setProperty('--uc',p.color||'');if(p.avatarUrl){const i=new Image();i.alt='';i.src=p.avatarUrl;i.onload=()=>{e.textContent='';e.appendChild(i)}}e.dataset.done='1'});
@@ -3477,13 +3477,10 @@ document.addEventListener('click',async e=>{
   case 'prodfix':{const s=byId('spk',ds.id);const x=calc().spk[ds.id];const items=s.items.map((it,i)=>{const l=x.lines[i];return l&&l.kirim>=l.q?{...it,prod:+it.q}:it});await updDoc('spk',ds.id,{items});toast(`Progres produksi SPK ${s.no} diperbarui`);break}
   case 'kpiuser':if(!e.target.closest('button')||el.matches('button'))kpiUser(ds.uid);break;
   case 'kpicsv':await kpiCsv();break;
-  case 'mepage':case 'meclick':if(ROLE_ON)location.hash='pengguna';break;
-  case 'ureq':reqForm();break;
+  case 'mepage':case 'meclick':if(canManage())location.hash='pengguna';break;
   case 'uedit':userForm(ds.uid);break;
-  case 'urej':await rejectReq(ds.uid);break;
+  case 'upw':pwForm(ds.uid);break;
   case 'uinvite':inviteForm();break;
-  case 'invmsg':inviteMsg(ds.code);break;
-  case 'invdel':if(canManage()){await DB.doc('uinv/'+ds.code).delete();toast('Undangan dihapus')}break;
   case 'doc':await downloadDoc(ds.kind,ds.ref,ds.fmt);break;
   case 'spktarget':spkTargetForm();break;
   case 'kpivendor':kpiVendor(ds.v);break;

@@ -13,7 +13,7 @@ import { TABLE_COLS, STRICT_COLS } from './schema-columns.js';
 
 const STORE_KEY = 'mni-local-mock-db';
 const SESSION_KEY = 'mni-local-mock-session';
-const VERSION = 6; // naikkan bila bentuk data seed berubah agar browser memuat seed baru
+const VERSION = 7; // naikkan bila bentuk data seed berubah agar browser memuat seed baru
 // Kode masuk untuk pratinjau lokal. Bukan rahasia dan tidak berlaku di environment lain.
 export const LOCAL_OTP = '123456';
 
@@ -31,6 +31,7 @@ function seed() {
     ['gbb@mni.local', 'Gudang Bahan Baku Lokal', 'gbb'],
     ['gbj@mni.local', 'Gudang Barang Jadi Lokal', 'gbj'],
     ['logistik@mni.local', 'Logistik Lokal', 'logistik'],
+    ['produksi@mni.local', 'Produksi Lokal', 'produksi'],
     ['viewer@mni.local', 'Viewer Lokal', 'viewer'],
   ].map(([email, nama, role]) => base({ email, nama, role, aktif: true }));
   db.mwc = [['CNC', 'CNC Cutting', 'Internal', 1], ['BENDING', 'Bending', 'Internal', 2], ['WELDING', 'Welding', 'Internal', 3],
@@ -83,6 +84,17 @@ function load() {
 function save(state) {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch { /* penyimpanan penuh atau diblokir */ }
 }
+
+// Meniru fungsi SQL mod_level/can_view: hak per modul (muser.data.modul) atau, bila kosong, peta peran bawaan.
+const MOD_OF = { rm: 'bahan-baku', rmhist: 'bahan-baku', pr: 'bahan-baku', opname: 'bahan-baku', fg: 'barang-jadi', spk: 'spk', vendor: 'vendor', kirim: 'pengiriman', bongkar: 'bongkar-muat' };
+const ROLE_MODS = { ppic: ['spk', 'vendor'], produksi: ['spk'], gbb: ['bahan-baku', 'bongkar-muat'], gbj: ['barang-jadi', 'vendor', 'pengiriman', 'bongkar-muat'], logistik: ['pengiriman', 'bongkar-muat'] };
+const levelOf = (u, m) => {
+  if (!u || u.aktif === false) return null;
+  if (u.role === 'admin') return 'ubah';
+  const modul = u.data && u.data.modul;
+  if (modul && typeof modul === 'object') return modul[m] || null;
+  return (ROLE_MODS[u.role] || []).includes(m) ? 'ubah' : 'lihat';
+};
 
 export function createLocalClient() {
   const host = location.hostname;
@@ -144,6 +156,13 @@ export function createLocalClient() {
       }
       if (this.op === 'select') {
         out = rows.filter((r) => this.match(r));
+        // Meniru RLS baca per modul (migration 11): tabel modul hanya terbaca bila pengguna punya hak lihat.
+        const sess = readSession();
+        if (sess && sess.user) {
+          const me = state.tables.muser.find((r) => r.email === String(sess.user.email).toLowerCase());
+          const modFor = (r) => (this.t === 'mutasi' ? (r.gudang === 'rm' ? 'bahan-baku' : 'barang-jadi') : MOD_OF[this.t]);
+          if (MOD_OF[this.t] || this.t === 'mutasi') out = out.filter((r) => levelOf(me, modFor(r)));
+        }
         if (this.ord) {
           const { col, ascending } = this.ord;
           out = out.slice().sort((a, b) => ((a[col] ?? '') > (b[col] ?? '') ? 1 : (a[col] ?? '') < (b[col] ?? '') ? -1 : 0) * (ascending ? 1 : -1));
@@ -208,6 +227,11 @@ export function createLocalClient() {
     },
     // Meniru fungsi SQL try_lock (kunci atomik; JS satu utas sehingga tanpa celah).
     async rpc(name, args = {}) {
+      if (name === 'table_stamps') {
+        const out = {};
+        for (const [tbl, rows] of Object.entries(state.tables)) out[tbl] = rows.length + '|' + rows.reduce((m, r) => { const s = r.updated_at || r.created_at || ''; return s > m ? s : m; }, '');
+        return { data: out, error: null };
+      }
       if (name !== 'try_lock') return { data: null, error: { code: 'PGRST202', message: `Could not find the function public.${name}` } };
       const rows = (state.tables.master ||= []);
       const now = Date.now();
@@ -221,6 +245,26 @@ export function createLocalClient() {
         return { data: { acquired: true }, error: null };
       }
       return { data: { acquired: false, holder: v.holder, expires: v.expires }, error: null };
+    },
+    // Meniru Edge Function kelola-pengguna (hanya admin): buat pengguna dan atur ulang password.
+    functions: {
+      async invoke(name, { body = {} } = {}) {
+        if (name !== 'kelola-pengguna') return { data: null, error: { message: 'Fungsi tidak ada' } };
+        const sess = readSession();
+        const me = sess && state.tables.muser.find((r) => r.email === String(sess.user.email).toLowerCase() && r.aktif);
+        if (!me || me.role !== 'admin') return { data: { error: 'Hanya super admin yang boleh mengelola pengguna.' }, error: null };
+        if (body.action === 'create') {
+          const email = String(body.email || '').trim().toLowerCase();
+          if (!/^[^s@]+@[^s@]+.[^s@]+$/.test(email)) return { data: { error: 'Email tidak valid.' }, error: null };
+          if (state.tables.muser.some((r) => r.email === email)) return { data: { error: 'Email ini sudah terdaftar sebagai pengguna.' }, error: null };
+          const row = { id: uid(), email, nama: body.nama, role: body.role, aktif: true, created_at: iso(), updated_at: iso(), created_by: me.email, updated_by: me.email,
+            data: { jabatan: body.jabatan || '', ...(body.modul ? { modul: body.modul } : {}) } };
+          state.tables.muser.push(row); save(state);
+          return { data: { ok: true, id: row.id, dengan_password: !!body.password }, error: null };
+        }
+        if (body.action === 'reset_password') return { data: { ok: true }, error: null };
+        return { data: { error: 'Aksi tidak dikenal.' }, error: null };
+      },
     },
     removeChannel(ch) { ch._l.forEach((l) => listeners.delete(l)); return Promise.resolve('ok'); },
     auth,

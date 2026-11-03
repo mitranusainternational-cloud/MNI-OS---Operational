@@ -208,9 +208,11 @@ function makeCollection(col) {
       if (!REFRESH.has(table)) REFRESH.set(table, new Set());
       REFRESH.get(table).add(load);
       // Cadangan bila event Realtime tidak tiba (B-017): muat ulang berkala saat tab terlihat dan saat tab kembali fokus.
+      // Cek sidik perubahan (satu panggilan kecil bersama) tiap beberapa detik; bila fungsinya belum ada, kembali ke muat ulang berkala per tabel.
+      startStampPoll();
       const pollMs = Number(window.__ENV?.POLL_MS) || 15000;
-      const timer = setInterval(() => { if (!document.hidden) load(); }, pollMs);
-      const onVis = () => { if (!document.hidden) load(); };
+      const timer = setInterval(() => { if (!document.hidden && !STAMP.ok) load(); }, pollMs);
+      const onVis = () => { if (!document.hidden) { load(); checkStamps(); } };
       document.addEventListener('visibilitychange', onVis);
 
       // Realtime
@@ -366,6 +368,33 @@ function makeDoc(path) {
   };
 }
 
+// ── Sinkron antar pengguna: penanda perubahan tabel (migration 12) ───────────
+// Satu panggilan rpc('table_stamps') tiap STAMP_MS; hanya tabel yang sidiknya berubah yang dimuat ulang.
+const STAMP = { ok: false, last: null, timer: null, busy: false };
+async function checkStamps() {
+  if (STAMP.busy) return;
+  STAMP.busy = true;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const { data, error } = await supabase.rpc('table_stamps');
+    if (error || !data) { STAMP.ok = false; return; }
+    STAMP.ok = true;
+    const prev = STAMP.last;
+    STAMP.last = data;
+    if (!prev) return;
+    for (const [tbl, sig] of Object.entries(data)) {
+      if (prev[tbl] !== sig) REFRESH.get(tbl)?.forEach((fn) => { try { fn(); } catch { /* abaikan */ } });
+    }
+  } catch { STAMP.ok = false; } finally { STAMP.busy = false; }
+}
+function startStampPoll() {
+  if (STAMP.timer) return;
+  const ms = Number(window.__ENV?.STAMP_MS) || 4000;
+  STAMP.timer = setInterval(() => { if (!document.hidden) checkStamps(); }, ms);
+  checkStamps();
+}
+
 // ── Muat ulang setelah tulis lokal ────────────────────────────────────────────
 // Pendengar (onSnapshot) per tabel; dipanggil setelah add/set/update/delete berhasil agar UI langsung
 // memuat ulang meski event Realtime lambat atau tidak tiba. Realtime tetap dipakai untuk tulisan dari sesi lain.
@@ -383,7 +412,16 @@ const DB_ADAPTER = {
 
 // ── User adapter (replaces window.claude.use('user')) ────────────────────────
 // Role model aplikasi (ROLES di app.js); sama dengan role_modules di database. viewer tidak menulis.
-const WRITE_ROLES = ['admin', 'ppic', 'gbb', 'gbj', 'logistik'];
+const WRITE_ROLES = ['admin', 'ppic', 'gbb', 'gbj', 'logistik', 'produksi'];
+
+// Hak ubah efektif: admin selalu; hak khusus (muser.data.modul) bila ada, selain itu mengikuti peran bawaan.
+const bisaMengubah = (muser) => {
+  if (!muser || muser.aktif === false) return false;
+  if (muser.role === 'admin') return true;
+  const modul = muser.data && muser.data.modul;
+  if (modul && typeof modul === 'object') return Object.values(modul).includes('ubah');
+  return WRITE_ROLES.includes(muser.role);
+};
 
 async function makeUserAdapter() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -404,15 +442,27 @@ async function makeUserAdapter() {
       name: muser?.nama || user.email, // dipakai app untuk nama tampilan
       nama: muser?.nama || user.email,
       role: muser?.role || 'viewer',
+      modul: muser?.data?.modul || null, // hak per modul {"spk":"ubah","bahan-baku":"lihat"}; null = ikuti peran
+      jabatan: muser?.data?.jabatan || '',
+      terdaftar: !!muser,
       isOwner: muser?.role === 'admin' && muser?.aktif !== false,
-      canEdit: WRITE_ROLES.includes(muser?.role) && muser?.aktif !== false,
+      canEdit: bisaMengubah(muser),
     }),
     can: async (permission) => {
-      const role = muser?.aktif === false ? 'viewer' : (muser?.role || 'viewer');
-      if (permission === 'data.write') {
-        return WRITE_ROLES.includes(role);
+      if (permission === 'data.write') return bisaMengubah(muser);
+      return !!muser && muser.aktif !== false;
+    },
+    // Kelola pengguna (hanya admin): Edge Function kelola-pengguna memakai kunci server yang tidak pernah sampai ke browser.
+    manage: async (action, payload = {}) => {
+      const { data, error } = await supabase.functions.invoke('kelola-pengguna', { body: { action, ...payload } });
+      if (error) {
+        let msg = error.message;
+        try { const j = await error.context.json(); if (j && j.error) msg = j.error; } catch { /* pakai pesan bawaan */ }
+        throw new Error(msg);
       }
-      return role !== 'viewer';
+      if (data && data.error) throw new Error(data.error);
+      notifyWrite('muser'); // muat ulang daftar pengguna segera
+      return data;
     },
     // App memanggil USER.profiles(ids) untuk warna dan foto avatar (API platform asli).
     // Warna dibuat deterministik dari id; foto belum didukung.
