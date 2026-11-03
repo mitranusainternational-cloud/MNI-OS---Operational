@@ -31,6 +31,7 @@ Bergantung pada: tidak ada
 
 ## Bukti
 
+- Production (verified in browser, hanya baca): setelah PR #11 digabung, ekspor cadangan membaca 19 tabel, tombol Impor CSV dan logo baru tampil; lihat [[TEST_MATRIX]].
 - Mock (verified in browser): halaman masuk dan sidebar menampilkan logo baru; `vite build` berhasil.
 
 ## Catatan

@@ -350,3 +350,15 @@ Sesi A: admin (pemantau waktu pada koleksi data). Sesi B: anggota berperan Logis
 Hasil: perubahan satu pengguna tampil di pengguna lain dalam sekitar 1 detik, lebih cepat dari batas 4 detik cek sidik. Baris tercatat atas nama anggota itu (created_by dan updBy benar). Login anggota dengan password sementara dari menu berfungsi.
 
 **Data uji tertinggal:** 1 baris bongkar muat dan 1 SPK yang tidak berpenanda UJI-PROD; skrip pembersih menolak berjalan sampai dicek (pengaman sengaja).
+
+## Cadangan, impor, dan logo di production (2026-11-03, verified in browser, hanya baca)
+
+Setelah PR #11 digabung (b290f9e) dan deploy Vercel berhasil, dengan sesi super admin:
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Ekspor cadangan membaca 19 tabel (jumlah baris cocok dengan database: pengguna 2, SPK 1, hak peran 11, dst.) | PASS (tanpa mengunduh berkas; penanda cadangan belum ditulis) |
+| Tombol Impor CSV tampil untuk super admin | PASS |
+| Lambang logo di sidebar dan favicon baru termuat | PASS |
+
+**Belum:** unduh cadangan sungguhan (pemilik menekan tombolnya agar penanda tersimpan), impor CSV dengan data nyata, ekspor PDF dan Excel dengan logo baru (dicek pemilik).
