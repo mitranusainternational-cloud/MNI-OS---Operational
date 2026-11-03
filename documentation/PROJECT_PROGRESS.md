@@ -385,3 +385,8 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Alur catat lengkap lulus di production (item, terima dua kali, pakai, opname, master tambah/ubah/hapus, tiga jenis SPK, kirim vendor, dua surat jalan, antrean bongkar otomatis); nomor dokumen, kolom relasi, dan kunci atomik benar; waktu simpan 0,6 sampai 1,5 detik. Detail di [[TEST_MATRIX]].
 - Data uji `UJI-PROD` tertinggal; skrip pembersih bersyarat tersedia di `apps/platform/supabase/ops/bersihkan_data_uji.sql` (pemilik menjalankan sebelum go-live).
 - Uji ganti role pada akun admin di production ditolak sebagai perubahan atas sumber daya bersama; tidak diulang.
+
+### 2026-11-03 — Verifikasi go-live: Auth dan Vercel belum diubah
+
+- Pemeriksaan langsung: Site URL production masih `http://localhost:3000` tanpa Redirect URL; `disable_signup=false`; env Vercel tidak berubah dan situs publik masih memakai database dev lama. Status rinci di [[ENVIRONMENTS]] (tabel "Status go-live production") dan tugas T-163.
+- Langkah-langkah itu adalah pengaturan keamanan dan kunci yang hanya dapat dilakukan pemilik; halaman yang diperlukan dibuka di Chrome pemilik (grup tab Claude) agar tinggal menyimpan.

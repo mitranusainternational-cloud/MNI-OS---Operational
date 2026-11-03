@@ -36,4 +36,6 @@ Bergantung pada: T-162
 
 ## Catatan
 
+**Sisa (2026-11-03, diverifikasi):** Site URL masih localhost; pendaftaran bebas masih aktif; env Vercel belum diganti (bundel masih ke dev lama). Langkah aksi pemilik: Supabase Production → Auth → URL Configuration (Site URL `https://mni-gudang.vercel.app`; Redirect URLs `https://mni-gudang.vercel.app/**`, `https://*-mitranusainternational-8337.vercel.app/**`, `http://127.0.0.1:5175/**`), Sign In / Providers (matikan sign-up), Vercel → Environment Variables (`VITE_SUPABASE_URL` = `https://lggqigmvtefkquqjrjsb.supabase.co`, `VITE_SUPABASE_ANON_KEY` = kunci publishable production) lalu Redeploy.
+
 Langkah akun dilakukan pemilik. Region project eu-central-1 (latensi lebih tinggi dari Singapura); ukur setelah login.
