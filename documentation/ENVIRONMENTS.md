@@ -39,7 +39,7 @@ Bukti: [[screenshots/README]].
 
 | Layanan | Temuan | Arti untuk mni-app |
 |---|---|---|
-| GitHub | Repo organisasi `mitranusainternational-cloud/MNI-OS---Operational`, `main` terproteksi | Siap menerima kode |
+| GitHub | Repo organisasi `mitranusainternational-cloud/mni-gudang`, `main` terproteksi | Siap menerima kode |
 | Supabase (org pribadi pemilik) | 3 project: "MNI OS" (aktif, 1 tenant, tabel ERP multi-tenant: tenants, items, BOM, routings), "MNI OS - Operational" (aktif, 80 tabel ERP, 0 baris), "Marketing OS - NIJ" (nonaktif) | Dua project aktif berskema ERP **berbeda** dari schema mni-app (20 tabel `rm`, `fg`, `spk`, …). Jangan dipakai tanpa keputusan |
 | Vercel (team NIJ) | 0 project | Belum ada deployment |
 
@@ -104,7 +104,7 @@ Beberapa konektor di mesin ini terhubung ke akun lain. Selalu cocokkan sebelum b
 
 | Layanan | Yang dipakai proyek ini | Jangan disentuh |
 |---|---|---|
-| GitHub | akun `mitranusainternational-cloud`, repo `MNI-OS---Operational` (login `gh` keyring) | — |
+| GitHub | akun `mitranusainternational-cloud`, repo `mni-gudang` (login `gh` keyring) | — |
 | Supabase | org `wjebogebnwlxghsjbbdg`, project **`MNI Gudang - Dev`** (`inldyqigewmziwazalun`, ap-southeast-1) | `MNI OS` (srjtotk…, aktif), `MNI OS - Operational` (eonzept…, nonaktif), `Marketing OS - NIJ` (ovrvwj…) |
 | Vercel | tim **`mitranusainternational-8337`** (Hobby) di Chrome pemilik, lewat halaman import GitHub | Konektor Vercel di alat Claude terhubung ke tim lain (`NIJ`, `nij3`): jangan dipakai untuk project ini |
 
@@ -115,9 +115,9 @@ Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewa
 
 | Item | Nilai |
 |---|---|
-| Tim / project | `mitranusainternational-8337` (Hobby) / `mni-os-operational` |
-| Sumber | GitHub `MNI-OS---Operational`, root `apps/platform`, preset Vite (`vercel.json`: install `npm ci --ignore-scripts`, build `node scripts/extract-app.js && vite build`) |
-| Production | https://mni-os-operational.vercel.app (branch `main`) |
+| Tim / project | `mitranusainternational-8337` (Hobby) / `mni-gudang` |
+| Sumber | GitHub `mni-gudang`, root `apps/platform`, preset Vite (`vercel.json`: install `npm ci --ignore-scripts`, build `node scripts/extract-app.js && vite build`) |
+| Production | https://mni-gudang.vercel.app (branch `main`) |
 | Preview | per branch/PR, mis. `...-git-development-mitranusainternational-8337.vercel.app` (dilindungi login Vercel) |
 | Env | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable, Production dan Preview) mengarah ke Supabase **dev**: production Vercel saat ini = staging |
 | Keamanan | X-Frame-Options DENY, nosniff, Referrer-Policy, CSP (hanya self, cdnjs, Google Fonts, `*.supabase.co`), HSTS, Permissions-Policy |
@@ -128,3 +128,17 @@ Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewa
 - Chrome pemilik untuk Supabase masuk sebagai akun lain (organisasi "Software Development", 2 project, termasuk `lggqigmvtefkquqjrjsb` "MNI-OS - Operational"). Di akun itu project dev tidak terlihat: membuka dashboard `inldyqigewmziwazalun` mengarah ke daftar organisasi. Inilah sebab kunci project yang salah tertempel ke Vercel dua kali (terdeteksi sebelum deploy).
 - Akibat: pengaturan Auth (Site URL, Redirect URL, template email, leaked password) dan SQL Editor project dev hanya bisa dibuka dengan login Supabase akun pemilik project itu, atau setelah akun lain diundang sebagai anggota organisasinya. Sampai Site URL diubah, tautan masuk email mengarah ke `http://localhost:3000` dan sesi harus dipindahkan manual ke domain Vercel.
 - Aturan: jangan menulis alamat email akun pribadi di repositori publik; sebut "akun pemilik".
+
+## Project Supabase production di akun mitranusainternational (2026-11-03)
+
+| Item | Nilai |
+|---|---|
+| Project | **MNI Gudang - Production** (nama awal "MNI-OS - Operational"), ref `lggqigmvtefkquqjrjsb`, URL `https://lggqigmvtefkquqjrjsb.supabase.co` |
+| Akun / organisasi | akun mitranusainternational, organisasi "Software Devellopment" (paket gratis), pemilik = akun itu |
+| Region | eu-central-1 (Frankfurt); tidak bisa dipindah. Jarak ke Indonesia menambah latensi tiap permintaan; dicatat sebagai risiko |
+| Konektor Claude | konektor Supabase kedua (id `72053749-…`) terhubung ke akun ini; konektor `plugin_supabase` terhubung ke akun pribadi pemilik (project dev lama `inldyqigewmziwazalun`) |
+| Migration | 1–10 dijalankan berurutan pada project **kosong** (uji lingkungan baru): hasilnya 21 tabel, RLS aktif semua, satu set policy bersih (tanpa duplikat), `role_modules`, `try_lock`; migration 5 (DROP policy lama) diterima konektor di project baru |
+| Matriks role (rollback) | admin semua; viewer, gudang, manager ditolak semua; ppic: log, SPK, master; gbb: log, bahan baku, master; gbj: log, barang jadi, master; logistik: log, master; kunci `try_lock` hanya untuk role yang boleh mencatat |
+| Advisor | keamanan: hanya 6 fungsi pembantu yang dapat dipanggil authenticated (disengaja); performa: 3 `multiple_permissive_policies` (policy ALL berdampingan dengan SELECT) dan indeks belum terpakai; tidak ada temuan anon, extension, atau initplan |
+| Data | **tidak ada data uji dipindahkan.** Isi dev lama hanya data uji (SPK 1–6, item/supplier/customer UJI, counter, katalog berisi customer uji). Production dimulai bersih; satu baris `muser` admin dibuat |
+| Env lokal | `apps/platform/.env.supabase-prod.local` (tidak di Git), server `vite --mode supabase-prod --port 5175` |

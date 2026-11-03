@@ -1,0 +1,27 @@
+name: Tugas terencana
+description: Tugas kerja yang juga dicatat di vault (tasks/T-nnn)
+title: "[Tugas] "
+labels: ["jenis:tugas"]
+body:
+  - type: input
+    id: id
+    attributes:
+      label: ID tugas di vault
+      description: Contoh T-163 (sumber kebenaran status ada di tasks/ pada vault).
+  - type: textarea
+    id: tujuan
+    attributes:
+      label: Tujuan dan kriteria selesai
+    validations:
+      required: true
+  - type: dropdown
+    id: prioritas
+    attributes:
+      label: Prioritas
+      options: [P0 menghalangi pemakaian tim, P1 penting, P2 biasa]
+    validations:
+      required: true
+  - type: textarea
+    id: dependensi
+    attributes:
+      label: Bergantung pada

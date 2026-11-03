@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Peta sistem dan cara memantau
+    url: https://github.com/mitranusainternational-cloud/mni-gudang/blob/main/documentation/SISTEM_MAP.md
+    about: Daftar sumber daya (GitHub, Vercel, Supabase, lokal) dan rutinitas pemeriksaan.

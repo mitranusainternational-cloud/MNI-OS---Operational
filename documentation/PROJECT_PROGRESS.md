@@ -361,3 +361,15 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 - Hasil dan 12 risiko berurutan ada di [[AUDIT_KESIAPAN]]. Diperbaiki: penguncian nomor dokumen kini atomik (migration 10, `try_lock`); email pribadi dihapus dari dokumen publik; ekspor PDF/Excel terbukti jalan di bawah CSP.
 - Penghalang sebelum data nyata: satu database dev berisi data uji, tanpa backup terverifikasi, Site URL Auth masih localhost, pendaftaran bebas aktif, hanya satu akun.
+
+### 2026-11-03 — Production di akun Supabase mitranusainternational (pekerjaan database selesai)
+
+- Project kosong `lggqigmvtefkquqjrjsb` diganti nama menjadi **MNI Gudang - Production**; migration 1–10 dijalankan berurutan dan hasilnya diperiksa dari fondasi: 21 tabel, RLS, satu set policy, matriks role (rollback), advisor, `try_lock`. Admin `muser` dibuat. Lihat [[ENVIRONMENTS]].
+- Koreksi: kunci `sb_publishable_odc9Y44…` yang pemilik tempel ke Vercel sebelumnya ternyata kunci project ini; saya keliru menyebutnya salah project karena saat itu belum tahu project ini dibuat untuk production.
+- Sisa (butuh pemilik): buat pengguna auth admin di project ini, atur Auth (Site URL, Redirect URL, sign-up, leaked password), perbarui env Vercel, lalu uji login dan alur penuh.
+
+### 2026-11-03 — Penyamaan nama dan penataan lintas platform
+
+- Nama baku **mni-gudang** (produk "MNI Gudang & Logistik"): repo GitHub `MNI-OS---Operational` menjadi `mni-gudang`; project Vercel `mni-os-operational` menjadi `mni-gudang` dengan domain production `mni-gudang.vercel.app` (alias lama tetap aktif); Supabase "MNI Gudang - Production". Folder kerja lokal masih `mni-os` (penggantian nama menunggu Obsidian dan terminal ditutup).
+- GitHub: deskripsi, topik, homepage, label standar (`area:*`, `env:*`, `prioritas:*`, `jenis:*`), template PR dan isu, CODEOWNERS, SECURITY.md, CHANGELOG.md. Hapus-branch-otomatis sengaja tidak dinyalakan agar branch kerja tidak ikut terhapus saat merge.
+- Vault: halaman [[SISTEM_MAP]] (daftar sumber daya, konvensi, rutinitas pemantauan, riwayat nama); rujukan nama lama di dokumen hidup diperbarui; Home, README, CLAUDE.md, skill dan agen Supabase disesuaikan.

@@ -1,6 +1,6 @@
-# MNI OS — Workspace Operasional
+# MNI Gudang & Logistik (repo `mni-gudang`)
 
-Repository ini sekaligus menjadi Obsidian vault untuk mengembangkan website/aplikasi MNI dan menelusuri progress proyek. Dashboard proyek ada di [`Home.md`](Home.md); cara mengelola vault ada di [`documentation/WORKSPACE_GUIDE.md`](documentation/WORKSPACE_GUIDE.md).
+Repository ini sekaligus menjadi Obsidian vault untuk mengembangkan aplikasi MNI Gudang & Logistik dan menelusuri progress proyek. Aplikasi berjalan di https://mni-gudang.vercel.app (Vercel) dengan database Supabase; **peta semua sumber daya, nama baku, dan cara memantau ada di [`documentation/SISTEM_MAP.md`](documentation/SISTEM_MAP.md)**; riwayat perubahan di [`CHANGELOG.md`](CHANGELOG.md); kebijakan keamanan di [`SECURITY.md`](SECURITY.md). Dashboard proyek ada di [`Home.md`](Home.md); cara mengelola vault ada di [`documentation/WORKSPACE_GUIDE.md`](documentation/WORKSPACE_GUIDE.md).
 
 ## Versi dan branch
 
@@ -48,6 +48,6 @@ Mulai dari [`apps/gudang-logistik/README.md`](apps/gudang-logistik/README.md), [
 
 ## GitHub
 
-Remote: [mitranusainternational-cloud/MNI-OS---Operational](https://github.com/mitranusainternational-cloud/MNI-OS---Operational). Migrasi ke GitHub mengikuti [`documentation/GITHUB_MIGRATION.md`](documentation/GITHUB_MIGRATION.md). Branch: `versi-awal` (baseline beku), `development` (kerja), `main` (rilis), `docs` (dokumentasi). Lihat `documentation/VERSION_STRATEGY.md` dan `documentation/ENVIRONMENTS.md`.
+Remote: [mitranusainternational-cloud/mni-gudang](https://github.com/mitranusainternational-cloud/mni-gudang). Migrasi ke GitHub mengikuti [`documentation/GITHUB_MIGRATION.md`](documentation/GITHUB_MIGRATION.md). Branch: `versi-awal` (baseline beku), `development` (kerja), `main` (rilis), `docs` (dokumentasi). Lihat `documentation/VERSION_STRATEGY.md` dan `documentation/ENVIRONMENTS.md`.
 
 Jangan menyimpan kredensial, data operasional personal, atau ekspor transaksi ke repository. Detail historis dan sumber riset harus diberi tanggal serta tautan sumber.

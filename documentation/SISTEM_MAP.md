@@ -1,0 +1,124 @@
+---
+type: registry
+status: active
+updated: 2026-11-03
+---
+
+# Peta sistem: nama baku, sumber daya, dan cara memantau
+
+Satu halaman untuk menjawab "apa saja yang kita punya, namanya apa, dan di mana melihat statusnya". Perbarui halaman ini setiap kali sebuah sumber daya dibuat, diganti nama, atau dipindah. Ringkasan lingkungan: [[ENVIRONMENTS]]. Log kerja: [[PROJECT_PROGRESS]]. Kesiapan: [[AUDIT_KESIAPAN]].
+
+## Konvensi nama
+
+| Hal | Aturan | Contoh |
+|---|---|---|
+| Nama produk | **MNI Gudang & Logistik** | judul halaman, README |
+| Slug (huruf kecil, tanda hubung) | **`mni-gudang`** untuk repo, project Vercel, dan folder kerja | `mni-gudang` |
+| Nama tampilan Supabase | **MNI Gudang - {Environment}** | MNI Gudang - Production, MNI Gudang - Dev |
+| Environment | Production, Staging (preview Vercel), Dev, Lokal (mock) | |
+| Branch | `main` (stabil, hanya lewat PR), `development` (kerja), `docs` (cermin dokumentasi), `versi-awal` (beku) | |
+| Commit | kalimat perintah Bahasa Indonesia, jelas satu perubahan; trailer Co-Authored-By bila dibantu Claude | "Perbaiki B-018: muat ulang setelah login" |
+| Migration | `2024010100NNNN_nama_singkat.sql` berurutan, tidak mengubah yang sudah terpasang | `20240101000010_atomic_try_lock.sql` |
+| Tugas / bug / keputusan | `T-nnn` (vault `tasks/`), `B-nnn` (TEST_MATRIX), keputusan bertanggal di DECISIONS | T-162, B-018 |
+| Label GitHub | `area:*`, `env:*`, `prioritas:P0|P1|P2`, `jenis:tugas|temuan` | `area:database` |
+
+## Daftar sumber daya
+
+### GitHub
+
+| Item | Nilai |
+|---|---|
+| Akun | `mitranusainternational-cloud` |
+| Repo | **`mni-gudang`** (publik; dahulu `MNI-OS---Operational`, alamat lama dialihkan otomatis) |
+| URL | https://github.com/mitranusainternational-cloud/mni-gudang |
+| Branch | `main` (terproteksi: PR, 1 approval, CI wajib), `development`, `docs`, `versi-awal` |
+| CI | `.github/workflows/ci.yml`: job "Vault (tautan dan properti)" dan "Aplikasi (build dan regresi mock)" |
+| Keamanan | secret scanning dan push protection aktif; Dependabot alerts nonaktif (lihat AUDIT_KESIAPAN) |
+| Template | PR ([[PULL_REQUEST_TEMPLATE]]) dan isu (`temuan`, `tugas`) di `.github/`; CODEOWNERS; kebijakan [[SECURITY]]; [[CHANGELOG]] |
+
+### Vercel
+
+| Item | Nilai |
+|---|---|
+| Tim | `mitranusainternational-8337` (Hobby) |
+| Project | **`mni-gudang`** (dahulu `mni-os-operational`) |
+| Domain production | **https://mni-gudang.vercel.app** (alias lama `mni-os-operational.vercel.app` masih aktif dan menuju deploy yang sama) |
+| Root dan build | `apps/platform`, preset Vite; `vercel.json` (install `npm ci --ignore-scripts`, build `node scripts/extract-app.js && vite build`) |
+| Pemetaan branch | `main` ke Production; branch lain (mis. `development`) ke Preview |
+| Env | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable, Production dan Preview) |
+
+### Supabase
+
+| Item | Production | Dev lama |
+|---|---|---|
+| Nama | **MNI Gudang - Production** | MNI Gudang - Dev |
+| Ref | `lggqigmvtefkquqjrjsb` | `inldyqigewmziwazalun` |
+| URL | https://lggqigmvtefkquqjrjsb.supabase.co | https://inldyqigewmziwazalun.supabase.co |
+| Akun / organisasi | mitranusainternational, "Software Devellopment" | akun pribadi pemilik (dipensiunkan setelah production terbukti) |
+| Region | eu-central-1 (Frankfurt) | ap-southeast-1 (Singapura) |
+| Konektor Claude | konektor Supabase kedua (id `72053749-…`) | konektor `plugin_supabase` |
+| Isi | skema bersih migration 1–10, satu admin | data uji saja |
+
+Project lain di akun-akun itu (`MNI - Operational`, `MNI OS`, `MNI OS - Operational`, `Marketing OS - NIJ`) bukan bagian sistem ini: jangan disentuh.
+
+### Lokal
+
+| Item | Nilai |
+|---|---|
+| Folder kerja (repo dan vault) | `D:\Sistem Kerja\01_Kerja\01_Proyek_Aktif\12. Sistem MNI\mni-os\` (akan diganti nama `mni-gudang`; lihat PROJECT_PROGRESS) |
+| Arsip | `12. Sistem MNI\_Arsip\` (folder lama, tidak dikerjakan) |
+| Server lokal | 5173 mock (data sintetis), 5174 Supabase dev lama, 5175 Supabase production; env di `apps/platform/.env.*.local` (tidak di Git) |
+| Obsidian | vault = folder kerja; mulai dari [[Home]] |
+
+### Akun dan konektor (pegangan agar tidak salah sasaran)
+
+| Layanan | Akun yang dipakai |
+|---|---|
+| GitHub | mitranusainternational-cloud (login `gh`) |
+| Vercel | mitranusainternational-8337 lewat Chrome pemilik; konektor Vercel Claude terhubung ke tim lain: jangan dipakai |
+| Supabase production | akun mitranusainternational (konektor kedua) |
+| Supabase dev lama | akun pribadi pemilik (konektor `plugin_supabase`) |
+
+## Alur data antar-lapisan
+
+```text
+folder lokal (mni-gudang)  --git push-->  GitHub (development)  --PR + CI-->  GitHub (main)
+                                                                   |                |
+                                                                   v                v
+                                                          Vercel Preview     Vercel Production
+                                                                   \                /
+                                                                    v              v
+                                                         Supabase (Production: MNI Gudang - Production)
+```
+
+Migration: file di `apps/platform/supabase/migrations/` (Git) lalu dipasang ke Supabase; hasilnya dicatat di [[ENVIRONMENTS]] dan [[TEST_MATRIX]].
+
+## Cara memantau (satu tempat per pertanyaan)
+
+| Pertanyaan | Lihat |
+|---|---|
+| Apa yang sedang dikerjakan dan sisanya? | [[PROGRESS_SNAPSHOT]], [[PROGRESS_DASHBOARD]], `tasks/` |
+| Apa yang sudah diuji dan hasilnya? | [[TEST_MATRIX]] |
+| Apakah siap dipakai tim? | [[AUDIT_KESIAPAN]] |
+| Kode terakhir yang masuk dan CI-nya? | GitHub: tab Actions; `gh run list --repo mitranusainternational-cloud/mni-gudang` |
+| Versi mana yang live? | Vercel: Deployments; `git log origin/main -1` harus sama dengan commit deploy Production |
+| Skema, RLS, dan kesehatan database? | Supabase: Advisors, Migrations; cek jumlah migration sama dengan file repo |
+| Siapa yang bisa masuk? | Supabase Auth Users dan tabel `muser` (harus berpasangan) |
+| Perubahan dari versi ke versi? | [[CHANGELOG]] (di akar repo), [[PROJECT_PROGRESS]] |
+
+### Rutinitas
+
+| Kapan | Periksa |
+|---|---|
+| Harian (saat dipakai tim) | Vercel Production Ready; Supabase tidak dijeda; galat di Logs Vercel; `log` aktivitas aneh |
+| Mingguan | CI hijau di `main`; advisor Supabase; PR terbuka; tugas `blocked`; jalankan `node scripts/sync-vault.mjs` |
+| Setiap rilis | PR ke `main` hijau; migration baru diuji di project kosong atau branch; regresi dan uji role; catat di CHANGELOG dan TEST_MATRIX; cocokkan commit GitHub, deploy Vercel, dan jumlah migration Supabase |
+| Setiap mengganti nama atau memindah sumber daya | perbarui halaman ini, [[ENVIRONMENTS]], `CLAUDE.md`, README, dan label atau konektor terkait |
+
+## Riwayat penggantian nama
+
+| Tanggal | Sumber daya | Dari | Ke |
+|---|---|---|---|
+| 2026-11-03 | Repo GitHub | `MNI-OS---Operational` | `mni-gudang` |
+| 2026-11-03 | Project Vercel | `mni-os-operational` | `mni-gudang` (domain baru `mni-gudang.vercel.app`) |
+| 2026-11-03 | Project Supabase production | "MNI-OS - Operational" | "MNI Gudang - Production" |

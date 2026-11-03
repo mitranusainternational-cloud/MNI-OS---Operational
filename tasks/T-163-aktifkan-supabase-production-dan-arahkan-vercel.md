@@ -1,0 +1,37 @@
+---
+type: task
+id: T-163
+title: "Aktifkan Supabase production dan arahkan Vercel"
+phase: P5
+epic: E-05
+release: v1.0
+status: doing
+priority: P0
+env: production
+effort_days: 1
+depends: [T-162]
+owner: "pemilik + dev"
+updated: 2026-11-03
+---
+
+# T-163 Aktifkan Supabase production dan arahkan Vercel
+
+Epic: [[roadmap/epics/E-05-environment-cloud-dan-ci-cd|E-05]]
+Fase: P5  
+Bergantung pada: T-162
+
+## Kriteria selesai
+
+- [ ] Pengguna auth admin dibuat di project MNI Gudang - Production dan login berhasil
+- [ ] Auth: Site URL, Redirect URL, sign-up dimatikan, leaked password protection aktif
+- [ ] Env Vercel (Production dan Preview) mengarah ke project production
+- [ ] Uji penuh dari fondasi ke output (RLS, alur aplikasi, ekspor) di production
+- [ ] Catat di ENVIRONMENTS, SISTEM_MAP, TEST_MATRIX
+
+## Bukti
+
+- Migration 1–10 terpasang berurutan pada project kosong, matriks role dan advisor diperiksa (2026-11-03); lihat [[ENVIRONMENTS]].
+
+## Catatan
+
+Langkah akun dilakukan pemilik. Region project eu-central-1 (latensi lebih tinggi dari Singapura); ukur setelah login.

@@ -10,15 +10,15 @@ Roadmap ini mengurutkan **hasil** (bukan tanggal) dari kondisi sekarang sampai s
 
 ## 1. Posisi sekarang (fakta, 2026-11-02)
 
-| Aspek | Kondisi | Bukti |
-|---|---|---|
-| Kode aplikasi | Prototipe vanilla JS (sekitar 3.500 baris `app.js`) memakai 20 koleksi; scaffold `apps/platform` (Vite + Supabase + Vercel) memuatnya dan build lolos | [[documentation/ENVIRONMENTS]], [[documentation/DECISIONS]] |
-| Browser | Halaman login dan shell aplikasi termuat tanpa error JS dengan environment dummy | [[documentation/screenshots/README]] |
-| Database | Schema 20 tabel + RLS per role ada sebagai migration; belum pernah dijalankan; Docker belum bisa start (virtualisasi BIOS nonaktif); pratinjau lokal berjalan di mode mock | [[documentation/FOUNDATION_BASELINE]] |
-| Data | Enam workbook operasional dibaca read-only; saldo antar file belum direkonsiliasi | [[documentation/DATA_SOURCE_CATALOG]] |
-| Kebutuhan | Discovery bersama tim Operasional belum dilakukan; pilot belum dipilih | [[documentation/OPERATIONAL_DISCOVERY]] |
-| Repo dan versi | 4 branch di GitHub, `development` dan `docs` terkini; `main` belum berisi pekerjaan baru | [[documentation/VERSION_STRATEGY]] |
-| Cloud | Belum ada Supabase dev/prod, Vercel, CI, atau pengguna | [[documentation/PROJECT_PROGRESS]] |
+| Aspek          | Kondisi                                                                                                                                                                    | Bukti                                                       |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Kode aplikasi  | Prototipe vanilla JS (sekitar 3.500 baris `app.js`) memakai 20 koleksi; scaffold `apps/platform` (Vite + Supabase + Vercel) memuatnya dan build lolos                      | [[documentation/ENVIRONMENTS]], [[documentation/DECISIONS]] |
+| Browser        | Halaman login dan shell aplikasi termuat tanpa error JS dengan environment dummy                                                                                           | [[documentation/screenshots/README]]                        |
+| Database       | Schema 20 tabel + RLS per role ada sebagai migration; belum pernah dijalankan; Docker belum bisa start (virtualisasi BIOS nonaktif); pratinjau lokal berjalan di mode mock | [[documentation/FOUNDATION_BASELINE]]                       |
+| Data           | Enam workbook operasional dibaca read-only; saldo antar file belum direkonsiliasi                                                                                          | [[documentation/DATA_SOURCE_CATALOG]]                       |
+| Kebutuhan      | Discovery bersama tim Operasional belum dilakukan; pilot belum dipilih                                                                                                     | [[documentation/OPERATIONAL_DISCOVERY]]                     |
+| Repo dan versi | 4 branch di GitHub, `development` dan `docs` terkini; `main` belum berisi pekerjaan baru                                                                                   | [[documentation/VERSION_STRATEGY]]                          |
+| Cloud          | Belum ada Supabase dev/prod, Vercel, CI, atau pengguna                                                                                                                     | [[documentation/PROJECT_PROGRESS]]                          |
 
 Terverifikasi di mode mock (bukan Supabase): 10 modul UI dan 30 fitur ([[documentation/TEST_MATRIX]]). Belum diverifikasi: login OTP nyata, baca/tulis database, realtime, dan RLS.
 

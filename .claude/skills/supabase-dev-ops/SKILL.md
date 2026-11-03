@@ -3,9 +3,9 @@ name: supabase-dev-ops
 description: Kerjakan database dan Auth Supabase untuk MNI OS dengan aman: terapkan migration, uji RLS dan bentuk data dengan transaksi yang di-rollback, baca log, dan periksa advisor. Gunakan untuk setiap perubahan schema, uji login nyata, atau diagnosis galat Supabase.
 ---
 
-# Operasi Supabase (dev)
+# Operasi Supabase (production dan dev)
 
-Project dev: `MNI Gudang - Dev`, ref `inldyqigewmziwazalun`, region ap-southeast-1. Jangan menyentuh project ERP lain di akun yang sama ("MNI OS", "MNI OS - Operational" yang dijeda). Detail: `documentation/ENVIRONMENTS.md`.
+Project: **MNI Gudang - Production** (`lggqigmvtefkquqjrjsb`, eu-central-1, akun mitranusainternational, konektor Supabase kedua) dan dev lama **MNI Gudang - Dev** (`inldyqigewmziwazalun`, ap-southeast-1, konektor `plugin_supabase`, akan dipensiunkan). Jangan menyentuh project lain di akun mana pun (mis. "MNI - Operational", "MNI OS"). Detail: `documentation/SISTEM_MAP.md` dan `documentation/ENVIRONMENTS.md`.
 
 ## Aturan keras
 

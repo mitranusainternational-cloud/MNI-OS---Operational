@@ -1,0 +1,6 @@
+# Pemilik kode: setiap perubahan butuh tinjauan pemilik repo.
+*                                   @mitranusainternational-cloud
+# Perubahan database dan konfigurasi rilis perlu perhatian khusus.
+/apps/platform/supabase/            @mitranusainternational-cloud
+/.github/                           @mitranusainternational-cloud
+/apps/platform/vercel.json          @mitranusainternational-cloud

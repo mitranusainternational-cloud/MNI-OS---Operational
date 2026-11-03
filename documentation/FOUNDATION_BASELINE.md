@@ -12,7 +12,7 @@ Halaman ini merangkum keadaan yang benar-benar telah diperiksa. Status `done` be
 
 | Bagian | Keadaan | Bukti / batas |
 |---|---|---|
-| Checkout aktif | Branch `development` | Source dan dokumentasi lokal berada di repository `MNI-OS---Operational`; belum ada push pada pekerjaan ini. |
+| Checkout aktif | Branch `development` | Source dan dokumentasi lokal berada di repository `mni-gudang`; belum ada push pada pekerjaan ini. |
 | Source aplikasi | HTML/CSS/JavaScript tanpa bundler | `apps/gudang-logistik/index.html`, `assets/css/app.css`, `assets/js/app.js`; HTML asal ada di `reference/`. |
 | Data adapter aktif | `window.claude` | Source menunggu runtime adapter; ini bukan koneksi Supabase. |
 | Preview UI | `http://localhost:8002/` | `scripts/preview-server.mjs`, bind loopback; root, CSS, JS merespons HTTP 200. Tidak menyediakan database. |
