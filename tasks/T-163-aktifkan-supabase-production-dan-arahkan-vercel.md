@@ -22,7 +22,7 @@ Bergantung pada: T-162
 
 ## Kriteria selesai
 
-- [ ] Pengguna auth admin dibuat di project MNI Gudang - Production dan login berhasil
+- [x] Pengguna auth admin dibuat di project MNI Gudang - Production dan login berhasil
 - [ ] Auth: Site URL, Redirect URL, sign-up dimatikan, leaked password protection aktif
 - [ ] Env Vercel (Production dan Preview) mengarah ke project production
 - [ ] Uji penuh dari fondasi ke output (RLS, alur aplikasi, ekspor) di production
@@ -30,6 +30,7 @@ Bergantung pada: T-162
 
 ## Bukti
 
+- Login admin dan uji baca production lulus 2026-11-03 (10 modul, 21 tabel, latensi median 233 ms); lihat [[TEST_MATRIX]].
 - Migration 1–10 terpasang berurutan pada project kosong, matriks role dan advisor diperiksa (2026-11-03); lihat [[ENVIRONMENTS]].
 
 ## Catatan

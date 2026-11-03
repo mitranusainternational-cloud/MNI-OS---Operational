@@ -253,3 +253,17 @@ Di luar mock: login OTP nyata, RLS per role, realtime antar pengguna, dan konfli
 | CSP dan pustaka ekspor | PASS dengan kebijakan yang sama: jsPDF, autotable, html2canvas, ExcelJS dari cdnjs dimuat; PDF (3155 B) dan Excel (6084 B) dibuat; fallback jsdelivr terblokir sesuai desain (hanya cadangan) |
 | Pemindaian rahasia dan email | tidak ada kunci rahasia; alamat email pribadi pemilik dihapus dari dokumen |
 | Hasil lengkap dan risiko | [[AUDIT_KESIAPAN]] |
+
+## Production: putaran baca lewat aplikasi (2026-11-03, project MNI Gudang - Production)
+
+Login admin lewat browser pane pada server lokal mode production (`vite --mode supabase-prod`, port 5175), terhubung ke `lggqigmvtefkquqjrjsb`. Bukti: verified in browser dan lewat REST dengan token sesi.
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Login admin (Auth + baris `muser`) | PASS: "Admin MNI", label "Terhubung ke database", versi 1.0.0-prod, kunci `sb_publishable_odc9Y44…` |
+| Sepuluh modul | PASS: semua terbuka dengan judul benar, tanpa galat halaman |
+| 21 tabel dibaca admin lewat RLS | PASS: semua HTTP 200; `muser` 1 baris, `role_modules` 10 baris, tabel lain kosong (production bersih) |
+| Latensi ke Frankfurt dari komputer ini | median 233 ms per permintaan (226 sampai 311 ms); memuat 21 tabel paralel 632 ms |
+| Sebelum login | tidak ada permintaan data ke Supabase |
+
+Putaran tulis (alur catat dengan data berawalan `UJI-PROD`) belum dijalankan: menunggu keputusan pemilik karena data uji harus dibersihkan sebelum dipakai tim. Skrip uji ulang: `apps/platform/tests/e2e/prod-check.mjs` (tanpa `--tulis` hanya membaca).
