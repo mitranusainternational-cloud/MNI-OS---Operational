@@ -330,3 +330,7 @@ Belum diuji di Vercel: tombol ekspor PDF/Excel per modul (hanya pustakanya), tul
 Advisor: hanya peringatan yang sudah dikenal (fungsi pembantu RLS dapat dipanggil pengguna login, sengaja; leaked password protection menunggu paket berbayar).
 
 **Belum:** buat akun dan reset password sungguhan lewat menu (dikerjakan pemilik membuat anggota pertama), uji dua sesi untuk sinkron antar pengguna.
+
+**Menu Pengguna & Akses di situs live (2026-11-03, verified in browser dan database):** admin membuka menu, membuat anggota pertama lewat Edge Function; akun Auth terkonfirmasi dan baris `muser` dengan hak modul tersimpan benar. Dengan identitas anggota itu (transaksi rollback): membaca SPK (hak lihat), tidak membaca log dan pengguna lain, tulis SPK dan bahan baku (lihat) ditolak, tulis bongkar muat (ubah) diterima. Perbaikan bug tautan langsung `#pengguna` ada di `development` (c8717dc).
+
+**Belum:** reset password sungguhan dan uji dua sesi dengan dua orang yang login bersamaan.

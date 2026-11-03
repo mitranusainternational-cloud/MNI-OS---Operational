@@ -31,7 +31,8 @@ Bergantung pada: T-163
 - [x] Uji mock: 15 skenario akses (`tests/e2e/access.mjs`) dan regresi 38 + role 12 tetap lulus
 - [x] Terapkan migration 11 dan 12 di Supabase production, uji RLS dengan transaksi yang di-rollback
 - [x] Pasang Edge Function di production (aktif, verify_jwt)
-- [ ] Uji buat akun dan reset password sungguhan lewat menu
+- [x] Uji buat akun lewat menu (anggota pertama dibuat pemilik; akun dan hak modul tersimpan benar)
+- [ ] Uji reset password sungguhan lewat menu
 - [ ] Uji dua sesi: perubahan pengguna A terlihat pengguna B dalam hitungan detik
 - [ ] Catat hasil di [[TEST_MATRIX]] dan [[ENVIRONMENTS]]
 
