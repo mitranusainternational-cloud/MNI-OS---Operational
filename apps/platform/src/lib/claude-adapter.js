@@ -553,6 +553,16 @@ const CLAUDE_SHIM = {
 };
 
 // Inject before main app loads
+// Mesin hitung berat (kalkulator Excel). Katalog rumus dimuat aplikasi dari database setelah login (bukan dikemas di JS publik).
+import { hitungItem as _hitungItem } from './berat/parser.js';
+let _katalogBerat = null;
+window.MNIBerat = {
+  siap: () => !!_katalogBerat,
+  setKatalog: (c) => { _katalogBerat = c; },
+  info: () => (_katalogBerat ? { versi: _katalogBerat.versi, keluarga: Object.keys(_katalogBerat.keluarga).length, bentuk: Object.values(_katalogBerat.keluarga).reduce((a, f) => a + f.bentuk.length, 0) } : null),
+  hitungItem: (o) => (_katalogBerat ? _hitungItem(_katalogBerat, o) : { ok: false, alasan: 'Katalog berat belum dipasang.' }),
+};
+
 window.claude = CLAUDE_SHIM;
 window.__supabase = supabase;
 

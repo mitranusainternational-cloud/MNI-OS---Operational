@@ -614,3 +614,5 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .kpi-row+*{margin-top:0}
 
 .feed .fi time{color:var(--muted)}
+.c-w{white-space:nowrap}.wtag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.03em;vertical-align:middle}
+.wtag.kalkulator{background:var(--accent-soft);color:var(--accent)}.wtag.manual{background:var(--warn-soft);color:var(--warn)}

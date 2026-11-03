@@ -29,3 +29,7 @@ coverage/
 
 # Cadangan data operasional (jangan pernah masuk Git)
 MNI-cadangan-*.json
+
+# Katalog rumus berat diturunkan dari workbook internal; tidak masuk Git selama repo publik
+apps/platform/src/lib/berat/catalog.json
+apps/platform/tests/unit/berat-excel-expected.json

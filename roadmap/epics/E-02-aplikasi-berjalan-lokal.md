@@ -6,8 +6,8 @@ release: v0.9
 theme: Fondasi
 priority: P0
 status: active
-progress: 42
-tasks_total: 10
+progress: 28
+tasks_total: 11
 tasks_done: 4
 updated: 2026-11-03
 ---
@@ -37,5 +37,6 @@ Docker belum aktif di mesin kerja (T-010).
 - [x] [[tasks/T-016-pratinjau-lokal-mode-mock-dengan-login|T-016]] Pratinjau lokal mode mock dengan login · done · P0 · 1 hari
 - [ ] [[tasks/T-017-rapikan-identitas-pengguna-dan-teks-backend-di-mni|T-017]] Rapikan identitas pengguna dan teks backend di mni-app · todo · P2 · 0.5 hari
 - [ ] [[tasks/T-168-rapikan-dashboard-ringkasan-kpi-dan-analisis|T-168]] Rapikan dashboard: ringkasan kondisi, KPI bertingkat, funnel SPK · review · P1 · 0.5 hari
+- [ ] [[tasks/T-173-berat-otomatis-pada-spk-dari-kalkulator|T-173]] Berat otomatis pada SPK dari kalkulator penghitung berat · doing · P1 · 3 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

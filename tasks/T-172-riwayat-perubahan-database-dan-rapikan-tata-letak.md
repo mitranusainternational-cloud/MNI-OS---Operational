@@ -5,7 +5,7 @@ title: "Riwayat perubahan di database, larangan hapus permanen, dan rapikan tata
 phase: P5
 epic: E-09
 release: v1.1
-status: doing
+status: done
 priority: P0
 env: production
 effort_days: 1
@@ -30,7 +30,7 @@ Bergantung pada: T-167
 - [x] Uji kontras otomatis tema gelap dan terang pada 12 halaman (kontras minimal 3:1); perbaikan kartu nol funnel, penanda cek data, avatar, dan jam aktivitas
 - [x] Sapu tampilan otomatis (`tests/e2e/sweep.mjs`): 12 halaman pada desktop, tablet, ponsel, plus lembar SPK; total e2e 38 + 12 + 28 + 38 lulus
 - [x] Migration 13 terpasang di production (disetujui pemilik) dan diuji dengan transaksi rollback: riwayat INSERT, UPDATE, dan DELETE tercatat atas nama pengguna yang benar, hapus permanen lewat API 0 baris, non-admin tidak membaca atau menulis audit_log
-- [ ] Gabung ke `main`, deploy Vercel, verifikasi di production
+- [x] Gabung ke `main` (PR #12, 35c21e3), deploy Vercel berhasil, tema gelap terverifikasi di production setelah muat ulang
 
 ## Bukti
 

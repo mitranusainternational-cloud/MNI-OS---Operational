@@ -6,9 +6,9 @@ release: v1.1
 theme: Keamanan
 priority: P1
 status: active
-progress: 0
+progress: 8
 tasks_total: 7
-tasks_done: 0
+tasks_done: 1
 updated: 2026-11-03
 ---
 
@@ -33,6 +33,6 @@ Saat ini ROLE_ON=false di prototipe; aturan peran perlu disepakati dengan pemili
 - [ ] [[tasks/T-104-tinjau-kebijakan-sesi-dan-otp|T-104]] Tinjau kebijakan sesi dan OTP · todo · P2 · 1 hari
 - [ ] [[tasks/T-167-hak-akses-per-pengguna-dan-per-modul|T-167]] Hak akses per pengguna dan per modul, kelola pengguna dari aplikasi · review · P0 · 2 hari
 - [ ] [[tasks/T-169-akun-saya-ganti-dan-lupa-password-dan-keluar|T-169]] Akun saya: ganti password, lupa password, dan tombol keluar · review · P0 · 0.5 hari
-- [ ] [[tasks/T-172-riwayat-perubahan-database-dan-rapikan-tata-letak|T-172]] Riwayat perubahan di database, larangan hapus permanen, dan rapikan tata letak · doing · P0 · 1 hari
+- [x] [[tasks/T-172-riwayat-perubahan-database-dan-rapikan-tata-letak|T-172]] Riwayat perubahan di database, larangan hapus permanen, dan rapikan tata letak · done · P0 · 1 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].
