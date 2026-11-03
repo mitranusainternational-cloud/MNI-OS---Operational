@@ -1,10 +1,13 @@
 -- ============================================================
 -- MNI Gudang - Pembersihan policy lama setelah model role baru (2026-11-02)
 -- ============================================================
--- MENGANDUNG DROP POLICY: jalankan hanya dengan persetujuan pemilik, SETELAH uji matriks role lulus
--- (lihat documentation/TEST_MATRIX.md). Akibatnya: role lama manager/gudang/produksi tidak lagi
--- mendapat hak tulis; viewer tidak lagi dapat menulis log; hanya admin yang membaca log dan seluruh muser.
--- Dapat dijalankan di SQL Editor Supabase. Setelah itu jalankan advisor keamanan.
+-- MENGANDUNG DROP POLICY. Peran di lingkungan baru (mis. Supabase production): migration ini berjalan dalam urutan
+-- setelah migration 4 sehingga hanya satu set policy (_v2 dan policy baca) yang tersisa; migration 6 dan 9 melewati
+-- policy yang sudah tidak ada. Di Supabase dev migration ini TIDAK dijalankan (perintah DROP ditolak persetujuan SQL
+-- lewat konektor) sehingga policy lama ada berdampingan dengan _v2 dengan isi identik (migration 6); menjalankannya
+-- di SQL Editor dev hanya merapikan duplikat (advisor multiple_permissive_policies) dan tidak mengubah hak.
+-- Efeknya: role lama manager/gudang/produksi tidak mendapat hak tulis; viewer tidak menulis log; hanya admin membaca log.
+-- Lingkungan baru wajib diuji penuh (matriks role, advisor) sebelum dipakai.
 
 -- Kebijakan tulis lama (FOR ALL berbasis role lama)
 DROP POLICY IF EXISTS "mwc_write"       ON public.mwc;

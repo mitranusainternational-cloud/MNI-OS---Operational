@@ -332,3 +332,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 ### 2026-11-03 — Required check CI aktif pada main
 
 - Atas persetujuan pemilik, proteksi `main` kini mewajibkan job "Vault (tautan dan properti)" dan "Aplikasi (build dan regresi mock)" lulus, selain aturan lama. Diverifikasi lewat API GitHub. T-046 dan T-077 selesai; tahap S2 selesai. Berikutnya S3: Vercel preview (akun, butuh persetujuan).
+
+### 2026-11-03 — Merge ke main dan cross-check Supabase
+
+- PR #1 (development ke main) digabung dengan hak admin atas persetujuan pemilik; main = development (11a2d40). Pemindaian rahasia bersih.
+- Cross-check Supabase dev: migration, RLS, advisor, replikasi. Perbaikan: migration 9 (initplan, pg_trgm), migration 6 dibuat tahan-urutan untuk lingkungan baru. Hasil di [[ENVIRONMENTS]] dan [[TEST_MATRIX]].
+- Berikutnya: PR kedua untuk perubahan ini, lalu persiapan Vercel preview (butuh akun dan persetujuan).

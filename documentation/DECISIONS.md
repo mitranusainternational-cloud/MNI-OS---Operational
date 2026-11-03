@@ -6,6 +6,12 @@ updated: 2026-11-02
 
 # Log keputusan workspace
 
+## 2026-11-03 — Migration tahan-urutan dan merge ke main
+
+- **Konteks:** migration 5 (DROP policy lama) tidak dijalankan di dev, tetapi di lingkungan baru ia berjalan sebelum migration 6 yang meng-ALTER policy lama; tanpa pengaman, migration 6 akan gagal di project kosong (production).
+- **Keputusan:** migration 6 dan 9 membungkus setiap ALTER dengan pemeriksaan keberadaan policy; migration 5 tetap berurutan. Advisor performa diperbaiki lewat migration 9 (initplan `auth.email()`, `pg_trgm` ke schema `extensions`). PR #1 development ke main digabung oleh pemilik dengan hak admin (syarat approval dilewati karena hanya satu akun), CI hijau.
+- **Konsekuensi:** CI juga berjalan pada push ke main. Production wajib diuji penuh di project kosong sebelum dipakai.
+
 ## 2026-11-03 — CI wajib lulus sebelum merge ke main
 
 - **Keputusan (pemilik):** job CI "Vault (tautan dan properti)" dan "Aplikasi (build dan regresi mock)" menjadi required status check pada `main`; strict (branch harus up to date) dimatikan; admin tidak dikecualikan secara berbeda dari sebelumnya.

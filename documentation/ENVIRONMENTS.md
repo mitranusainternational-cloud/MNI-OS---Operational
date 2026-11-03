@@ -61,7 +61,7 @@ Urutan setelah database ada: terapkan migration, uji login OTP dan adapter di Po
 |---|---|
 | Project | `MNI Gudang - Dev`, ref `inldyqigewmziwazalun`, region ap-southeast-1 |
 | URL | `https://inldyqigewmziwazalun.supabase.co` (bukan rahasia) |
-| Migration terpasang | init_schema, rls_policies, app_shape_compat, role_model_app_aligned (tabel `role_modules`, fungsi `can_mod`/`can_any`/`is_admin`, policy `_v2`). role_model_supersede (ALTER POLICY: policy lama = model baru). role_model_cleanup (DROP) opsional, tidak dipasang |
+| Migration terpasang | init_schema, rls_policies, app_shape_compat, role_model_app_aligned (tabel `role_modules`, fungsi `can_mod`/`can_any`/`is_admin`, policy `_v2`). role_model_supersede, revoke_anon_helpers, backfill_relation_ids, advisor_fixes (7 migration terpasang; role_model_cleanup (DROP) sengaja tidak dipasang di dev) |
 | Kunci di aplikasi | hanya kunci anon/publishable (publik); kunci service-role tidak dipakai di mana pun |
 | Menjalankan app ke project ini | file lokal `apps/platform/.env.supabase-dev.local` (diabaikan Git), lalu `npx vite --mode supabase-dev` |
 | Perubahan akun | project `MNI OS - Operational` (kosong) dijeda agar muat di batas gratis; dapat dipulihkan dari dashboard |
@@ -82,3 +82,18 @@ Diamati dari log Auth saat percobaan login pertama:
 ### Advisor keamanan Supabase dev (2026-11-02, setelah migration 6 dan 7)
 
 Migration 7 (`revoke_anon_helpers`) mencabut hak `anon` atas `get_user_role`, `is_admin_or_manager`, `is_authenticated`. Sisa peringatan (WARN, bukan ERROR): `pg_trgm` di schema public; fungsi `can_any/can_mod/is_admin` dapat dipanggil `authenticated` (hanya menjawab hak pemanggil sendiri; disengaja); proteksi kata sandi bocor (leaked password) nonaktif, aktifkan di dashboard Auth bila memakai login password (tindakan pemilik).
+
+
+### Cross-check Supabase dev setelah merge ke main (2026-11-03)
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Migration terpasang vs berkas repo | 7 terpasang (init_schema, rls_policies, app_shape_compat, role_model_app_aligned, role_model_supersede, revoke_anon_helpers, backfill_relation_ids) + advisor_fixes = 8; berkas repo 1–9 (5 = DROP, hanya untuk lingkungan baru) |
+| Tabel dan RLS | 21 tabel `public`, semuanya RLS aktif; 19 punya kolom JSONB `data` (`master` dan `role_modules` tidak) |
+| Hak per role | diuji ulang setelah migration 9 (rollback): viewer menulis log ditolak, ppic menulis, admin membaca semua `muser`, lainnya hanya barisnya sendiri |
+| Advisor keamanan | tersisa 2 jenis WARN: 6 fungsi pembantu (`can_any`, `can_mod`, `is_admin`, `get_user_role`, `is_admin_or_manager`, `is_authenticated`) dapat dipanggil `authenticated` karena dipakai policy (disengaja); leaked password protection nonaktif (aksi pemilik di dashboard Auth). `pg_trgm` sudah dipindah ke schema `extensions` |
+| Advisor performa | initplan `auth.email()` diperbaiki (migration 9). Tersisa: 79 "multiple permissive policies" karena policy lama berdampingan dengan `_v2` (isi identik; hilang setelah migration 5 dijalankan owner di SQL Editor atau di lingkungan baru) dan 23 indeks belum terpakai (INFO) |
+| Replikasi Realtime | publikasi memuat 17 tabel, slot aktif; push event tidak tiba, diganti polling (T-162 opsional) |
+| Data | data uji `UJI-FINAL` dan `UJI-9999` masih ada di dev (penghapusan lewat konektor ditolak) |
+
+Aturan lingkungan baru (mis. Supabase production, S5): jalankan migration 1–9 berurutan di project kosong, lalu uji matriks role dan advisor sebelum dipakai. Migration 5 menghapus policy lama sehingga 6 dan 9 melewatinya (dijaga pemeriksaan keberadaan). Urutan ini diuji di dev hanya untuk bagian ALTER yang idempoten; jalankan penuh di branch/project baru sebelum production.
