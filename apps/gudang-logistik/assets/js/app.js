@@ -3087,7 +3087,7 @@ async function rejectReq(uid){if(!canManage())return;await DB.doc('ureq/'+uid).d
 /* ---- shell bits ---- */
 function renderMe(){
  const a=myAcc();const nm=ME?(uname(ME)||(ME_P&&ME_P.name)||'Pengguna'):'Tamu';
- const role=!ROLE_ON?(CAN?'Bisa mencatat':'Lihat saja'):a.st==='ok'?roleL(a.role):a.st==='req'?'Menunggu persetujuan':a.st==='off'?'Nonaktif':ME?'Belum terdaftar':'Mode lihat saja';
+ const role=!ROLE_ON?(ME_P&&ME_P.role&&a.st==='ok'?roleL(a.role):CAN?'Bisa mencatat':'Lihat saja'):a.st==='ok'?roleL(a.role):a.st==='req'?'Menunggu persetujuan':a.st==='off'?'Nonaktif':ME?'Belum terdaftar':'Mode lihat saja';
  const html=`${av(ME,'sm')}<span class="mi"><b>${esc(nm)}</b><small>${esc(role)}</small></span>`;
  const w=$('#who');if(w)w.innerHTML=`<button type="button" class="mebtn" data-act="mepage">${html}</button>`;
  const t=$('#mechip');if(t){t.innerHTML=html;t.title=nm+' · '+role}

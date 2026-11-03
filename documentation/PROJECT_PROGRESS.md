@@ -311,3 +311,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 - `apps/mni-app` menjadi `apps/platform`; 55 rujukan di 30 berkas diperbarui; peta folder induk ditulis ulang. Folder lama dipindah ke `_Arsip/`.
 - Uji dari lokasi baru: sync vault OK (0 tautan rusak), regresi 36 PASS, role 12 PASS, server Supabase dev 200.
+
+### 2026-11-03 — Uji aplikasi di Supabase dev dari lokal; dua bug nyata ditemukan dan diperbaiki
+
+- Uji lewat Playwright (sesi pemilik) di aplikasi lokal terhubung Supabase dev: alur admin lulus; role gbb, gbj, ppic, viewer diuji lewat aplikasi dengan mengganti role akun pemilik sementara dan memulihkannya ke admin (diverifikasi).
+- Bug: B-014 (UI tidak memuat data baru setelah tulis) dan B-015 (nomor dokumen berulang karena counter dibaca salah). Keduanya diperbaiki di adapter; regresi 37 PASS dan role 12 PASS di mock.
+- Sisa sebelum naik ke GitHub/Vercel: commit perbaikan, ubah dan hapus master, opname bahan baku (tombol tidak ada), Realtime antar sesi, `mutasi.item_id` kosong (keputusan model data).

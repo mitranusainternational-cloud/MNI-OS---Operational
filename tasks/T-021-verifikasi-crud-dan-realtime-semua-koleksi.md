@@ -32,6 +32,8 @@ Bergantung pada: T-020
 
 ## Catatan
 
+Tambahan 2026-11-03: alur admin di Supabase lulus (item RM, terima, pakai, master, SPK baru/tanpa due/duplikat). B-014 (UI tidak segar setelah tulis) dan B-015 (nomor dokumen berulang) ditemukan dan diperbaiki. Sisa: ubah/hapus master, opname RM, Realtime antar sesi.
+
 Ulangan di Supabase (2026-11-02 16:03–16:13): terima/pakai material, revisi SPK, dan log aktivitas PASS; tanpa galat di log API/Postgres. Kriteria yang belum: delete, realtime antar sesi, dan 8 koleksi yang belum disentuh (rmhist, pr, opname RM, ureq, uinv, muser dari UI, dll.). Status `review` sampai disepakati cukup.
 
 Uji tulis nyata di Supabase dev (2026-11-02): 12 jenis tulis PASS, log sebagian gagal (B-013, diperbaiki di adapter; perlu uji ulang). Sisa: terima/pakai material, revisi/duplikat SPK, ubah/hapus master. Lihat [[TEST_MATRIX]].

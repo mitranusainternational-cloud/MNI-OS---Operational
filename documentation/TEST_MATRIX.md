@@ -86,6 +86,8 @@ Kriteria PASS: judul benar, isi tampil, tidak ada `pageerror`. Skrip: `tests/e2e
 | B-008 | Edit SPK dianggap ganti nomor dan membuat baris ganda | `spk.no` TEXT di DB, app membandingkan angka dengan `!==` | Adapter mengubah `no` ke angka saat dibaca dan ke teks saat ditulis | Selesai di adapter; verifikasi nyata di T-028 |
 | B-009 | Dokumen `master/*` (pengaturan) tidak terbaca atau tertulis | Tabel master memakai kolom `key` + `value`, bukan `id` | Adapter memetakan dokumen master ke objek datar berbasis key | Selesai di adapter; verifikasi nyata di T-028 |
 | B-013 | Penulisan `log` ke Supabase gagal 16 dari sekitar 24 kali (HTTP 400, `invalid input syntax for type timestamp with time zone: ""`) | Dokumen app memakai `""` untuk "kosong"; Postgres menolak `""` di kolom DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID (mis. `log.tgl`, `spk.due`). Mock tidak menolaknya | `STRICT_COLS` di `schema-columns.js`; adapter menghilangkan nilai kosong saat insert (DEFAULT berlaku) dan mengubahnya ke NULL saat update/set; mock kini menolak `""` seperti Postgres | Selesai; **terverifikasi di Supabase** (2026-11-02 16:05–16:13 UTC): semua `POST log` 201, 34 baris log, 0 `tgl` NULL, tanpa galat Postgres |
+| B-014 | Di mode Supabase, item baru tidak muncul di UI/pilihan setelah disimpan | Event Realtime tidak tiba; UI hanya memuat saat awal | `notifyWrite`: adapter memuat ulang koleksi setelah add/set/update/delete | Selesai; terverifikasi di aplikasi Supabase (2026-11-03) |
+| B-015 | Nomor dokumen berulang (RCV/2026/11/001 untuk tiga penerimaan) | `counter.get()` mengembalikan `{value:{n}}`, app membaca `.n` | `get()` mengembalikan `{n}`; regresi B-015 (gagal pada adapter lama) | Selesai; regresi 37 PASS |
 | B-012 | Setelah permintaan kode OTP ditolak (HTTP 429), layar tetap menulis "Cek email Anda" | `signInWithOtp` mengembalikan `{ error }` (tidak melempar) dan tidak diperiksa | Pesan galat ditampilkan (batas email dijelaskan) dan layar kode tidak dibuka; ditambah opsi "Masuk dengan password" sebagai cadangan di Supabase | Selesai; terverifikasi di browser (mode mock menyembunyikan opsi password) |
 | B-011 | Di Supabase nyata, `master` dan `log` gagal dibaca (HTTP 400) | Adapter selalu mengurutkan menurut `created_at`; tabel `master` hanya punya `updated_at` dan `log` hanya `tgl`. Mock tidak menolak pengurutan kolom yang tidak ada | Adapter memilih kolom urut dari `TABLE_COLS`; mock kini menolak pengurutan kolom tak dikenal | Selesai; terverifikasi: muat halaman di Supabase dev tanpa respons 4xx |
 | B-010 | Setelah menerbitkan SPK muncul lembar kosong layar penuh yang memblokir seluruh UI | App membuka lembar memakai id buatannya ("spk-1003"), yang kini dipetakan ke UUID, jadi `byId` tidak menemukannya; `openSheet` tetap menampilkan overlay | `window.__idAlias` (diisi adapter) dipakai `byId`; `openSheet` menunggu snapshot dan tidak menampilkan lembar kosong | Selesai. Ditemukan lewat uji regresi; regresi dari perbaikan B-007 |
@@ -184,6 +186,37 @@ Status migration: 4 (`role_model_app_aligned`, tambahan) dan 6 (`role_model_supe
 ### Penegakan role di UI (mock, 2026-11-02)
 
 Skrip `apps/platform/tests/e2e/roles.mjs` (12 pemeriksaan): viewer tidak mencatat; gbb hanya bahan baku; gbj hanya barang jadi; logistik dan ppic tidak mencatat di gudang; admin mencatat di keduanya. Hasil: 12 PASS. Di mode Supabase peran berasal dari tabel `muser` lewat `me().role`; di platform asli (tanpa `role` dari adapter) perilaku lama tidak berubah.
+
+### Uji aplikasi di Supabase dev dari lokal (2026-11-03, Playwright, akun admin pemilik)
+
+Aplikasi lokal (`vite --mode supabase-dev`, port 5174) memakai Supabase dev nyata; hasil diperiksa lewat REST dengan token sesi dan SQL. Data uji berawalan `UJI-FINAL`.
+
+| Skenario | Hasil | Bukti |
+|---|---|---|
+| Item bahan baku baru | PASS | baris `rm` baru |
+| Terima material (+ supplier baru otomatis, daftar ulang saat simpan kedua) | PASS | `mutasi` masuk +6, `msupplier` bertambah |
+| Pakai melebihi stok ditolak; pakai non-SPK | PASS | tidak ada baris untuk 999; -2 tercatat |
+| Master vendor tambah | PASS | `mvendor` |
+| SPK baru (terbit), SPK tanpa due (due NULL), duplikat SPK | PASS | SPK 2, 3 (due NULL), 4 |
+| Log aktivitas | PASS | 46+ baris, tgl NULL = 0 |
+| Opname bahan baku | Tidak diuji | tidak ada tombol opname di Gudang Bahan Baku (opname barang jadi ada); cek desain |
+| Ubah dan hapus master | Belum diuji | |
+
+**Per role lewat aplikasi** (role akun pemilik diganti sementara di `muser`, lalu dipulihkan ke admin):
+
+| Role | Terima material (RM) | Barang masuk (FG) | SPK baru |
+|---|---|---|---|
+| gbb | tercatat | ditolak | ditolak |
+| gbj | ditolak | tercatat | ditolak (pesan: "Peran Gudang Barang Jadi tidak bisa mencatat di SPK & produksi") |
+| ppic | ditolak | ditolak | tercatat (draft SPK 5) |
+| viewer | UI "Lihat saja"; REST langsung: tulis `log` 403, tulis `spk` 403 | | |
+
+Logistik tidak diulang di aplikasi (terbukti di SQL dan mock).
+
+**Temuan baru**
+- **B-014 (diperbaiki):** setelah tulis lokal, UI Supabase tidak menampilkan data baru (item baru tidak muncul di pilihan) karena event Realtime tidak tiba. Adapter kini memuat ulang koleksi setelah add/set/update/delete (`notifyWrite`). Realtime antar sesi belum terbukti (T-021).
+- **B-015 (diperbaiki):** `counter.get()` mengembalikan `{ value: { n } }` padahal app membaca `.n`, sehingga semua dokumen bernomor sama (RCV/2026/11/001 berulang di Supabase dan mock). Adapter mengembalikan `{ n }`. Pemeriksaan B-015 ditambahkan ke regresi (gagal pada adapter lama, lulus setelah perbaikan).
+- **Catatan (belum diperbaiki):** `mutasi.item_id` selalu NULL (referensi item disimpan di JSONB `data`), sehingga tidak ada kunci asing; tombol aksi tetap terlihat untuk viewer dan role lain (ditolak saat dipakai); banner "Minta pemilik membagikan sebagai Contributor" adalah teks platform asli dan membingungkan; label pengguna kini menampilkan nama role.
 
 ## Belum diuji (jadwal di tracking)
 

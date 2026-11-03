@@ -9,7 +9,7 @@ status: active
 progress: 45
 tasks_total: 9
 tasks_done: 4
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # E-02 Aplikasi berjalan lokal

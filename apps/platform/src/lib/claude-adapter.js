@@ -166,6 +166,7 @@ function makeCollection(col) {
         .select()
         .single();
       if (error) throw new Error(`[add:${table}] ${error.message}`);
+      notifyWrite(table);
       return { id: result.id, ...numericNo(table, result) };
     },
 
@@ -185,6 +186,9 @@ function makeCollection(col) {
       };
 
       load();
+      // Muat ulang segera setelah tulis dari tab ini, tanpa menunggu event Realtime (B-014).
+      if (!REFRESH.has(table)) REFRESH.set(table, new Set());
+      REFRESH.get(table).add(load);
 
       // Realtime
       const channel = supabase
@@ -199,7 +203,7 @@ function makeCollection(col) {
         });
 
       // Return unsubscribe (Firestore returns the unsubscribe fn directly)
-      return () => supabase.removeChannel(channel);
+      return () => { REFRESH.get(table)?.delete(load); return supabase.removeChannel(channel); };
     }
   };
 }
@@ -232,7 +236,9 @@ function makeDoc(path) {
     async get() {
       if (keyed) {
         const { data } = await supabase.from('master').select('*').eq('key', keyOf()).maybeSingle();
-        return { exists: !!data, data: () => (data ? (isCounter ? { value: data.value } : masterToDoc(data)) : null) };
+        // Counter: app membaca ref.get().data().n, jadi kembalikan isi value ({ n }) apa adanya (B-015).
+        const counterVal = (v) => { if (typeof v === 'string') { try { v = JSON.parse(v); } catch { /* biarkan */ } } return isObj(v) ? v : { value: v }; };
+        return { exists: !!data, data: () => (data ? (isCounter ? counterVal(data.value) : masterToDoc(data)) : null) };
       }
       const { data, error } = await supabase.from(table).select('*').eq('id', await idOf()).maybeSingle();
       if (error && error.code !== 'PGRST116') throw error;
@@ -245,6 +251,7 @@ function makeDoc(path) {
         const value = isCounter ? (data.value ?? data) : stripMeta(data);
         const { error } = await supabase.from('master').upsert({ key: keyOf(), value }, { onConflict: 'key' });
         if (error) throw new Error(`[set:master:${keyOf()}] ${error.message}`);
+        notifyWrite('master');
         return;
       }
       const id = await idOf();
@@ -253,6 +260,7 @@ function makeDoc(path) {
       row.id = id;
       const { error } = await supabase.from(table).upsert(row, { onConflict: 'id' });
       if (error) throw new Error(`[set:${table}:${id}] ${error.message}`);
+      notifyWrite(table);
     },
 
     // .update(data) — pembaruan parsial
@@ -263,6 +271,7 @@ function makeDoc(path) {
         const value = isCounter ? (data.value ?? data) : { ...old, ...stripMeta(data) };
         const { error } = await supabase.from('master').upsert({ key: keyOf(), value }, { onConflict: 'key' });
         if (error) throw new Error(`[update:master:${keyOf()}] ${error.message}`);
+        notifyWrite('master');
         return;
       }
       const id = await idOf();
@@ -276,12 +285,14 @@ function makeDoc(path) {
       }
       const { error } = await supabase.from(table).update(row).eq('id', id);
       if (error) throw new Error(`[update:${table}:${id}] ${error.message}`);
+      notifyWrite(table);
     },
 
     // .delete()
     async delete() {
       if (keyed) {
         await supabase.from('master').delete().eq('key', keyOf());
+        notifyWrite('master');
         return;
       }
       const id = await idOf();
@@ -294,6 +305,7 @@ function makeDoc(path) {
         const { error } = await supabase.from(table).delete().eq('id', id);
         if (error) throw new Error(`[delete:${table}:${id}] ${error.message}`);
       }
+      notifyWrite(table);
     },
 
     // .acquire(opts) — kunci optimistis sederhana, disimpan di tabel master dengan key "lock:col:id"
@@ -321,6 +333,15 @@ function makeDoc(path) {
       return { acquired: true };
     }
   };
+}
+
+// ── Muat ulang setelah tulis lokal ────────────────────────────────────────────
+// Pendengar (onSnapshot) per tabel; dipanggil setelah add/set/update/delete berhasil agar UI langsung
+// memuat ulang meski event Realtime lambat atau tidak tiba. Realtime tetap dipakai untuk tulisan dari sesi lain.
+const REFRESH = new Map();
+function notifyWrite(table) {
+  const fns = REFRESH.get(table);
+  if (fns) fns.forEach((fn) => { try { fn(); } catch { /* abaikan */ } });
 }
 
 // ── Main DB Object (replaces Firestore) ───────────────────────────────────────

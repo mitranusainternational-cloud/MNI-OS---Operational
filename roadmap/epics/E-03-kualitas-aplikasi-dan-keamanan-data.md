@@ -9,7 +9,7 @@ status: active
 progress: 25
 tasks_total: 13
 tasks_done: 3
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # E-03 Kualitas aplikasi dan keamanan data
@@ -39,6 +39,6 @@ Adapter meniru API Firestore di atas Postgres; perilaku realtime dan lock perlu 
 - [ ] [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]] Verifikasi adapter id, no SPK, dan master di Supabase · review · P0 · 1 hari
 - [ ] [[tasks/T-077-jadikan-regresi-e2e-runner-mandiri-dan-bagian-ci|T-077]] Jadikan regresi E2E runner mandiri dan bagian CI · doing · P1 · 1.5 hari
 - [ ] [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · review · P0 · 0.5 hari
-- [ ] [[tasks/T-079-uji-role-lewat-aplikasi-dengan-akun-uji-per-role|T-079]] Uji role lewat aplikasi dengan akun uji per role · todo · P1 · 1 hari
+- [ ] [[tasks/T-079-uji-role-lewat-aplikasi-dengan-akun-uji-per-role|T-079]] Uji role lewat aplikasi dengan akun uji per role · review · P1 · 1 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

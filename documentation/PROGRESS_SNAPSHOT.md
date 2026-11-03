@@ -1,8 +1,8 @@
 ---
 type: progress-snapshot
 status: generated
-updated: 2026-11-02
-generated: 2026-11-02
+updated: 2026-11-03
+generated: 2026-11-03
 ---
 
 # Snapshot progress
@@ -90,6 +90,7 @@ generated: 2026-11-02
 - [[tasks/T-022-uji-rls-per-role-dengan-skenario-negatif|T-022]] Uji RLS per role dengan skenario negatif · dev
 - [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]] Verifikasi adapter id, no SPK, dan master di Supabase · dev
 - [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · pemilik akun Supabase
+- [[tasks/T-079-uji-role-lewat-aplikasi-dengan-akun-uji-per-role|T-079]] Uji role lewat aplikasi dengan akun uji per role · pemilik + dev
 
 ## Tugas P0 yang belum selesai
 

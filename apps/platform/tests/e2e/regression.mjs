@@ -69,6 +69,13 @@ export async function runRegression(page, base) {
   ok('F-05 pakai > stok ditolak', (await tab('mutasi')).length === n);
   await page.fill('#m-qty-0', '3'); await submit();
   ok('F-04 pakai produksi', (await tab('mutasi')).length === n + 1);
+  // B-015: penomoran dokumen harus naik (dua penerimaan tidak boleh memakai nomor sama)
+  await closeAll(); await go('bahan-baku');
+  await page.click('#tools [data-act="mv"]:has-text("Terima material")'); await page.waitForTimeout(400);
+  await page.selectOption('#m-item-0', await opt('#m-item-0', 'Plat Uji E2E')); await page.fill('#m-qty-0', '1'); await page.fill('#m-pihak', 'Supplier Contoh A'); await dockOff(); await submit();
+  const rcv = (await tab('mutasi')).filter((m) => String(m.no_dok || '').startsWith('RCV/'));
+  ok('B-015 nomor dokumen RCV unik dan naik', rcv.length >= 2 && new Set(rcv.map((m) => m.no_dok)).size === rcv.length, rcv.map((m) => m.no_dok).join(','));
+  await closeAll();
 
   // Barang jadi
   await go('barang-jadi'); n = (await tab('mutasi')).length;
