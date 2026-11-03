@@ -32,7 +32,7 @@ export async function runRoles(page, base) {
   const tryMove = async (route, label, item, qty) => {
     await go(route); await page.waitForTimeout(500); const n = await count('mutasi');
     const btn = await page.$(`#tools [data-act="mv"]:has-text("${label}")`);
-    if (!btn) return 'tombol-tersembunyi';
+    if (!btn || !(await btn.isVisible())) return 'tombol-tersembunyi';
     await btn.click(); await page.waitForTimeout(400);
     await page.selectOption('#m-item-0', await opt('#m-item-0', item)); await page.fill('#m-qty-0', String(qty));
     if (route === 'bahan-baku' && label === 'Terima material') await page.fill('#m-pihak', 'Supplier Contoh A');
@@ -47,8 +47,8 @@ export async function runRoles(page, base) {
   // viewer: tidak boleh mencatat apa pun
   await login('viewer@mni.local');
   ok('R-01 viewer: nama tampil', (await page.evaluate(() => document.getElementById('who').innerText)).includes('Viewer Lokal'));
-  ok('R-02 viewer: terima material tidak tercatat', (await tryMove('bahan-baku', 'Terima material', 'Plat', 5)) !== 'tercatat');
-  ok('R-03 viewer: barang masuk tidak tercatat', (await tryMove('barang-jadi', 'Barang masuk', '40x40', 5)) !== 'tercatat');
+  ok('R-02 viewer: tombol terima material tersembunyi', (await tryMove('bahan-baku', 'Terima material', 'Plat', 5)) === 'tombol-tersembunyi');
+  ok('R-03 viewer: tombol barang masuk tersembunyi', (await tryMove('barang-jadi', 'Barang masuk', '40x40', 5)) === 'tombol-tersembunyi');
 
   // gbb: bahan baku ya, barang jadi tidak
   await login('gbb@mni.local');

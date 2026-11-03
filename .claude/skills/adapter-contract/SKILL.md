@@ -33,3 +33,10 @@ description: Aturan untuk mengubah jembatan data app (apps/platform/src/lib/clau
 3. Mock harus tetap **lebih ketat atau sama** dengan Postgres (menolak kolom/ id/ urutan yang ditolak Postgres). Jangan melonggarkannya agar tes lulus.
 4. Catat bug (B-xxx) dan keputusan; skill `vault-progress`.
 5. Jangan menambah dependensi atau mengganti arsitektur tanpa catatan keputusan.
+
+## Perilaku adapter yang harus dijaga (2026-11-03)
+
+- `notifyWrite(table)` memuat ulang koleksi setelah add/set/update/delete (B-014); `onSnapshot` juga polling 15 detik (`window.__ENV.POLL_MS`) dan memuat ulang saat tab kembali terlihat, melewati render bila data sama (B-017; push Realtime belum tiba, T-162).
+- `counter.get()` harus mengembalikan `{ n }` karena app membaca `.n` (B-015); regresi memeriksa nomor RCV naik.
+- `linkIds` mengisi `mutasi.item_id`, `kirim.spk_id`, `vendor.spk_id` dari bidang app tanpa menghapusnya dari JSONB (B-016). Referensi SPK harus SPK yang ada (kunci asing).
+- UI memakai `me().role` bila ada: `guard()`, banner role, dan `.tools.locked` (tombol catat disembunyikan) aktif tanpa `ROLE_ON`.

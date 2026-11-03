@@ -11,7 +11,7 @@ env: development
 effort_days: 3
 depends: [T-020]
 owner: "dev"
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # T-021 Verifikasi CRUD dan realtime semua koleksi
@@ -31,6 +31,8 @@ Bergantung pada: T-020
 - Sebagian lewat mock (bukan Supabase): CRUD add/update/delete dan validasi diuji pada bahan baku, barang jadi, SPK, vendor, surat jalan, bongkar muat, dan master (14 fitur PASS, lihat [[TEST_MATRIX]]). Realtime dan konflik belum diuji. Tugas tetap `todo` sampai diuji pada Supabase.
 
 ## Catatan
+
+Tambahan 2026-11-03: opname RM, ubah/hapus master, nonaktif master terpakai PASS di Supabase. Realtime push tidak tiba (B-017); polling 15 detik jadi cadangan dan terverifikasi. Akar masalah: T-162.
 
 Tambahan 2026-11-03: alur admin di Supabase lulus (item RM, terima, pakai, master, SPK baru/tanpa due/duplikat). B-014 (UI tidak segar setelah tulis) dan B-015 (nomor dokumen berulang) ditemukan dan diperbaiki. Sisa: ubah/hapus master, opname RM, Realtime antar sesi.
 

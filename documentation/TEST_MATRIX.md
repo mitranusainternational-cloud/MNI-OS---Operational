@@ -87,6 +87,8 @@ Kriteria PASS: judul benar, isi tampil, tidak ada `pageerror`. Skrip: `tests/e2e
 | B-009 | Dokumen `master/*` (pengaturan) tidak terbaca atau tertulis | Tabel master memakai kolom `key` + `value`, bukan `id` | Adapter memetakan dokumen master ke objek datar berbasis key | Selesai di adapter; verifikasi nyata di T-028 |
 | B-013 | Penulisan `log` ke Supabase gagal 16 dari sekitar 24 kali (HTTP 400, `invalid input syntax for type timestamp with time zone: ""`) | Dokumen app memakai `""` untuk "kosong"; Postgres menolak `""` di kolom DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID (mis. `log.tgl`, `spk.due`). Mock tidak menolaknya | `STRICT_COLS` di `schema-columns.js`; adapter menghilangkan nilai kosong saat insert (DEFAULT berlaku) dan mengubahnya ke NULL saat update/set; mock kini menolak `""` seperti Postgres | Selesai; **terverifikasi di Supabase** (2026-11-02 16:05–16:13 UTC): semua `POST log` 201, 34 baris log, 0 `tgl` NULL, tanpa galat Postgres |
 | B-014 | Di mode Supabase, item baru tidak muncul di UI/pilihan setelah disimpan | Event Realtime tidak tiba; UI hanya memuat saat awal | `notifyWrite`: adapter memuat ulang koleksi setelah add/set/update/delete | Selesai; terverifikasi di aplikasi Supabase (2026-11-03) |
+| B-016 | `mutasi.item_id`, `kirim.spk_id`, `vendor.spk_id` kosong | Referensi hanya di JSONB | `linkIds` di adapter + migration 8 | Selesai; regresi B-016, terverifikasi di Supabase |
+| B-017 | UI tidak menerima perubahan dari sesi lain | Event Realtime tidak tiba (SUBSCRIBED, slot aktif, tanpa event) | Polling cadangan 15 detik | Mitigasi terverifikasi; akar masalah di T-162 |
 | B-015 | Nomor dokumen berulang (RCV/2026/11/001 untuk tiga penerimaan) | `counter.get()` mengembalikan `{value:{n}}`, app membaca `.n` | `get()` mengembalikan `{n}`; regresi B-015 (gagal pada adapter lama) | Selesai; regresi 37 PASS |
 | B-012 | Setelah permintaan kode OTP ditolak (HTTP 429), layar tetap menulis "Cek email Anda" | `signInWithOtp` mengembalikan `{ error }` (tidak melempar) dan tidak diperiksa | Pesan galat ditampilkan (batas email dijelaskan) dan layar kode tidak dibuka; ditambah opsi "Masuk dengan password" sebagai cadangan di Supabase | Selesai; terverifikasi di browser (mode mock menyembunyikan opsi password) |
 | B-011 | Di Supabase nyata, `master` dan `log` gagal dibaca (HTTP 400) | Adapter selalu mengurutkan menurut `created_at`; tabel `master` hanya punya `updated_at` dan `log` hanya `tgl`. Mock tidak menolak pengurutan kolom yang tidak ada | Adapter memilih kolom urut dari `TABLE_COLS`; mock kini menolak pengurutan kolom tak dikenal | Selesai; terverifikasi: muat halaman di Supabase dev tanpa respons 4xx |
@@ -199,8 +201,12 @@ Aplikasi lokal (`vite --mode supabase-dev`, port 5174) memakai Supabase dev nyat
 | Master vendor tambah | PASS | `mvendor` |
 | SPK baru (terbit), SPK tanpa due (due NULL), duplikat SPK | PASS | SPK 2, 3 (due NULL), 4 |
 | Log aktivitas | PASS | 46+ baris, tgl NULL = 0 |
-| Opname bahan baku | Tidak diuji | tidak ada tombol opname di Gudang Bahan Baku (opname barang jadi ada); cek desain |
-| Ubah dan hapus master | Belum diuji | |
+| Opname bahan baku (tab "Stock opname", nomor OPN) | PASS | mutasi opname +1 dan baris `opname` baru, OPN/2026/11/001 (opname RM ada di tab, bukan tombol) |
+| Ubah master | PASS | nama vendor berubah di `mvendor` |
+| Hapus master permanen / master terpakai hanya nonaktif | PASS | baris terhapus; supplier terpakai `aktif=false` tanpa opsi hapus permanen |
+| Nomor dokumen berikutnya (B-015) | PASS | RCV 002 sampai 004, SJ-V 002 |
+| Kolom relasi terisi (B-016) | PASS | `mutasi.item_id` dan `vendor.spk_id` terisi pada tulisan baru; baris lama di-backfill (migration 8) |
+| Data luar muncul di UI tanpa reload (B-017) | PASS lewat polling | perubahan SQL tampil ±14 detik; push Realtime tidak tiba |
 
 **Per role lewat aplikasi** (role akun pemilik diganti sementara di `muser`, lalu dipulihkan ke admin):
 
@@ -216,7 +222,9 @@ Logistik tidak diulang di aplikasi (terbukti di SQL dan mock).
 **Temuan baru**
 - **B-014 (diperbaiki):** setelah tulis lokal, UI Supabase tidak menampilkan data baru (item baru tidak muncul di pilihan) karena event Realtime tidak tiba. Adapter kini memuat ulang koleksi setelah add/set/update/delete (`notifyWrite`). Realtime antar sesi belum terbukti (T-021).
 - **B-015 (diperbaiki):** `counter.get()` mengembalikan `{ value: { n } }` padahal app membaca `.n`, sehingga semua dokumen bernomor sama (RCV/2026/11/001 berulang di Supabase dan mock). Adapter mengembalikan `{ n }`. Pemeriksaan B-015 ditambahkan ke regresi (gagal pada adapter lama, lulus setelah perbaikan).
-- **Catatan (belum diperbaiki):** `mutasi.item_id` selalu NULL (referensi item disimpan di JSONB `data`), sehingga tidak ada kunci asing; tombol aksi tetap terlihat untuk viewer dan role lain (ditolak saat dipakai); banner "Minta pemilik membagikan sebagai Contributor" adalah teks platform asli dan membingungkan; label pengguna kini menampilkan nama role.
+- **B-016 (diperbaiki):** `mutasi.item_id`, `kirim.spk_id`, `vendor.spk_id` selalu NULL karena referensi disimpan hanya di JSONB. Adapter `linkIds` mengisi kolom relasi (bidang app tetap di JSONB), migration 8 mengisi baris lama (9 mutasi, 2 kirim, 2 vendor terisi semua).
+- **B-017 (mitigasi, akar masalah belum ketemu):** channel Realtime berstatus SUBSCRIBED dan slot replikasi aktif, tetapi tidak ada event INSERT/UPDATE yang tiba. Adapter memuat ulang berkala (15 detik saat tab terlihat dan saat kembali fokus) dan melewati render bila data sama. Tugas T-162 untuk menyelidiki (Realtime Inspector di dashboard atau diagnostik yang butuh persetujuan pemilik).
+- **UI role (diperbaiki):** untuk viewer dan modul di luar hak, tombol catat disembunyikan dan banner menyebut peran ("Peran Viewer hanya bisa melihat. Minta admin..."); teks kaki "Backend belum terhubung" kini berubah menjadi "Terhubung ke database" saat tersambung; label pengguna menampilkan nama role.
 
 ## Belum diuji (jadwal di tracking)
 

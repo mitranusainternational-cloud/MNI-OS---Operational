@@ -441,6 +441,7 @@ td.act{white-space:nowrap;text-align:right}
 .kpi-help p{margin:0 0 8px}.kpi-help p:last-child{margin:0}
 .steps{display:flex;flex-direction:column;gap:12px}.steps>div{display:flex;gap:12px;align-items:flex-start}.steps>div>b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
 .tools.locked .btn.primary{display:none}
+.tools.locked [data-act="mv"],.tools.locked [data-act="newitem"],.tools.locked [data-act="rmset"],.tools.locked [data-act="mnew"],.tools.locked [data-act="newspk"],.tools.locked [data-act="newvendor"],.tools.locked [data-act="newkirim"],.tools.locked [data-act="newbongkar"]{display:none}
 .code{font-family:var(--f-mono);font-weight:700;letter-spacing:.12em;background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:6px}
 .invmsg{width:100%;min-height:170px;font:inherit;font-size:13px;line-height:1.5;padding:10px 12px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface-2);color:var(--fg);resize:vertical}
 .bigcode{font-family:var(--f-mono);font-size:30px;font-weight:700;letter-spacing:.2em;text-align:center;padding:10px;border:1px dashed var(--accent);border-radius:10px;color:var(--accent);background:var(--accent-soft)}

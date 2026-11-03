@@ -123,6 +123,15 @@ function docToRow(docPath, data) {
   return row;
 }
 
+// Isi kolom relasi (item_id, spk_id) dari bidang app (item, spk) tanpa mengubah bidang app; bidang app tetap
+// disimpan di JSONB sehingga pembacaan tidak berubah (B-016). Hanya bila nilainya ada.
+async function linkIds(table, row) {
+  const link = async (field, col) => { if (row[field] && !row[col]) row[col] = await toDbId(row[field]); };
+  if (table === 'mutasi') await link('item', 'item_id');
+  if (table === 'kirim' || table === 'vendor') await link('spk', 'spk_id');
+  return row;
+}
+
 function rowToDoc(input) {
   if (!input) return null;
   const row = unpackRow(input);
@@ -157,7 +166,7 @@ function makeCollection(col) {
   return {
     // Firestore: collection(col).add(data) → INSERT
     async add(data) {
-      const packed = packRow(table, textNo(table, docToRow(null, data)), true);
+      const packed = packRow(table, textNo(table, await linkIds(table, docToRow(null, data))), true);
       const row = { ...packed.row, data: packed.extra };
       delete row.id; // let DB generate UUID
       const { data: result, error } = await supabase
@@ -181,14 +190,24 @@ function makeCollection(col) {
         const { data, error } = await q;
         if (error) { errCb && errCb(error); return; }
         const docs = (data || []).map((r) => (table === 'master' ? masterToDoc(r) : rowToDoc(numericNo(table, r))));
+        // Lewati bila isi sama dengan pemuatan sebelumnya agar polling tidak merender ulang UI tanpa perubahan.
+        const sig = JSON.stringify(docs);
+        if (sig === lastSig) return;
+        lastSig = sig;
         // Emulate Firestore snapshot shape
         cb({ docs: docs.map(d => ({ data: () => d, id: d._id })) });
       };
+      let lastSig = '';
 
       load();
       // Muat ulang segera setelah tulis dari tab ini, tanpa menunggu event Realtime (B-014).
       if (!REFRESH.has(table)) REFRESH.set(table, new Set());
       REFRESH.get(table).add(load);
+      // Cadangan bila event Realtime tidak tiba (B-017): muat ulang berkala saat tab terlihat dan saat tab kembali fokus.
+      const pollMs = Number(window.__ENV?.POLL_MS) || 15000;
+      const timer = setInterval(() => { if (!document.hidden) load(); }, pollMs);
+      const onVis = () => { if (!document.hidden) load(); };
+      document.addEventListener('visibilitychange', onVis);
 
       // Realtime
       const channel = supabase
@@ -203,7 +222,7 @@ function makeCollection(col) {
         });
 
       // Return unsubscribe (Firestore returns the unsubscribe fn directly)
-      return () => { REFRESH.get(table)?.delete(load); return supabase.removeChannel(channel); };
+      return () => { REFRESH.get(table)?.delete(load); clearInterval(timer); document.removeEventListener('visibilitychange', onVis); return supabase.removeChannel(channel); };
     }
   };
 }
@@ -255,7 +274,7 @@ function makeDoc(path) {
         return;
       }
       const id = await idOf();
-      const packed = packRow(table, textNo(table, docToRow(path, data)));
+      const packed = packRow(table, textNo(table, await linkIds(table, docToRow(path, data))));
       const row = { ...packed.row, data: packed.extra };
       row.id = id;
       const { error } = await supabase.from(table).upsert(row, { onConflict: 'id' });
@@ -275,7 +294,7 @@ function makeDoc(path) {
         return;
       }
       const id = await idOf();
-      const packed = packRow(table, textNo(table, docToRow(path, data)));
+      const packed = packRow(table, textNo(table, await linkIds(table, docToRow(path, data))));
       const row = packed.row;
       delete row.id;
       if (Object.keys(packed.extra).length) {

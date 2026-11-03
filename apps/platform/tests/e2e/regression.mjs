@@ -75,6 +75,7 @@ export async function runRegression(page, base) {
   await page.selectOption('#m-item-0', await opt('#m-item-0', 'Plat Uji E2E')); await page.fill('#m-qty-0', '1'); await page.fill('#m-pihak', 'Supplier Contoh A'); await dockOff(); await submit();
   const rcv = (await tab('mutasi')).filter((m) => String(m.no_dok || '').startsWith('RCV/'));
   ok('B-015 nomor dokumen RCV unik dan naik', rcv.length >= 2 && new Set(rcv.map((m) => m.no_dok)).size === rcv.length, rcv.map((m) => m.no_dok).join(','));
+  ok('B-016 mutasi.item_id terisi', (await tab('mutasi')).filter((m) => m.gudang === 'rm' && m.jenis === 'masuk').every((m) => /^[0-9a-f-]{36}$/.test(String(m.item_id || ''))));
   await closeAll();
 
   // Barang jadi

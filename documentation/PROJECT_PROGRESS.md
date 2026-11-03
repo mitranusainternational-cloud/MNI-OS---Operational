@@ -317,3 +317,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Uji lewat Playwright (sesi pemilik) di aplikasi lokal terhubung Supabase dev: alur admin lulus; role gbb, gbj, ppic, viewer diuji lewat aplikasi dengan mengganti role akun pemilik sementara dan memulihkannya ke admin (diverifikasi).
 - Bug: B-014 (UI tidak memuat data baru setelah tulis) dan B-015 (nomor dokumen berulang karena counter dibaca salah). Keduanya diperbaiki di adapter; regresi 37 PASS dan role 12 PASS di mock.
 - Sisa sebelum naik ke GitHub/Vercel: commit perbaikan, ubah dan hapus master, opname bahan baku (tombol tidak ada), Realtime antar sesi, `mutasi.item_id` kosong (keputusan model data).
+
+### 2026-11-03 — Sisa temuan Supabase diselesaikan
+
+- Diuji di Supabase dev: opname bahan baku (tab), ubah dan hapus master, master terpakai hanya nonaktif. Semua PASS.
+- Diperbaiki: B-016 (kolom relasi terisi, migration 8 backfill), UI viewer (tombol catat tersembunyi, banner jelas, teks kaki sesuai koneksi). B-017: Realtime tidak mengirim event; polling 15 detik sebagai cadangan (terverifikasi ±14 detik); penyebab di T-162.
+- Regresi 38 PASS, role 12 PASS di mock.

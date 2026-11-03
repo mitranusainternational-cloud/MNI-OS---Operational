@@ -157,6 +157,7 @@ function renderNav(){
 }
 function renderLive(){
  const el=$('#live');el.className='live '+(LIVE==='on'?'on':LIVE==='off'?'off':'');
+ const fn=document.querySelector('.foot .muted');if(fn)fn.textContent=LIVE==='on'?'Terhubung ke database. Data tersimpan dan disinkronkan.':'Backend belum terhubung. Data tidak disimpan atau disinkronkan.';
  el.querySelector('span').textContent=LIVE==='on'?`Realtime · tersinkron ${LAST.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`:LIVE==='off'?'Pratinjau lokal · backend belum terhubung':'Menyiapkan pratinjau lokal…';
 }
 function route(){
@@ -3095,15 +3096,15 @@ function renderMe(){
 }
 function renderAccess(){
 /*RA*/ const ro=$('#ro');if(!ro)return;const a=myAcc();let msg='';
- if(!ROLE_ON){ro.hidden=CAN;ro.className='ro';ro.textContent=CAN?'':'Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';$('#tools').classList.remove('locked');return}
- if(!CAN)msg='Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';
+ if(!ROLE_ON&&!(ME_P&&ME_P.role)){ro.hidden=CAN;ro.className='ro';ro.textContent=CAN?'':'Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';$('#tools').classList.remove('locked');return}
+ if(!CAN)msg=ME_P&&ME_P.role?`Peran <b>${esc(roleL(a.role))}</b> hanya bisa melihat. Minta admin mengubah peran Anda untuk mencatat transaksi.`:'Anda punya akses lihat saja di link ini. Minta pemilik membagikan sebagai Contributor agar bisa mencatat transaksi.';
  else if(a.st==='new')msg=`Akun Anda belum terdaftar, jadi masih mode lihat saja. <button class="linkbtn" data-act="ureq">Ajukan akses sekarang</button>`;
  else if(a.st==='req')msg=a.rq.kode?`Kode undangan <b>${esc(a.rq.kode)}</b> terkirim. Akun aktif otomatis dalam beberapa detik begitu admin sedang membuka aplikasi.`:`Permintaan akses sebagai <b>${esc(roleL(a.rq.role))}</b> sudah terkirim — menunggu persetujuan admin.`;
  else if(a.st==='off')msg='Akun Anda dinonaktifkan admin. Mode lihat saja.';
  else if(MODL[VIEW]&&VIEW!=='master-data'&&!canMod(VIEW)){const who=Object.values(ROLES).filter(r=>r.mods.includes(VIEW)).map(r=>r.l).join(', ');msg=`Peran <b>${esc(roleL(a.role))}</b> hanya melihat modul ini. Pencatatan oleh: ${esc(who)}.`}
  if(VIEW==='pengguna'&&a.st==='new')msg='';
  ro.hidden=!msg;ro.className='ro';ro.innerHTML=msg;
- $('#tools').classList.toggle('locked',!!(MODL[VIEW]&&VIEW!=='master-data'&&!canMod(VIEW)));
+ $('#tools').classList.toggle('locked',!!(!CAN||(MODL[VIEW]&&VIEW!=='master-data'&&!canMod(VIEW))));
 }
 async function fillAvatars(){
  if(!USER)return;const els=[...document.querySelectorAll('[data-uav]')].filter(e=>e.dataset.uav&&!e.dataset.done);const ids=[...new Set(els.map(e=>e.dataset.uav))];if(!ids.length)return;
