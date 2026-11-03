@@ -291,3 +291,19 @@ Admin login, server lokal mode production (port 5175), UI dijalankan lewat brows
 **Hak per role:** diuji dengan transaksi yang di-rollback pada database production (lihat [[ENVIRONMENTS]]); mengganti role akun admin sungguhan di production untuk uji UI ditolak sebagai perubahan atas sumber daya bersama, jadi penegakan UI per role di production mengandalkan kode yang sama dengan dev (regresi role 12 PASS di mock, 4 role diuji di dev).
 
 **Data uji di production:** 4 SPK, 1 item bahan baku, 4 mutasi, 1 vendor kirim, 2 surat jalan, 1 bongkar, 1 opname, master vendor/supplier/customer uji, 23 log, 15 baris `master` (katalog, penghitung, kunci). Pembersihan: `apps/platform/supabase/ops/bersihkan_data_uji.sql` (dijalankan pemilik di SQL Editor; berhenti sendiri bila ada data tidak bertanda uji).
+
+## Production di Vercel: uji baca dengan sesi admin (2026-11-03, https://mni-gudang.vercel.app)
+
+Bukti: verified in browser (browser pane, admin login oleh pemilik), tanpa menulis data.
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Halaman login sebelum sesi | PASS: tanpa galat konsol, tanpa permintaan data |
+| Bundel memakai project production | PASS: `lggqigmvtefkquqjrjsb`, kunci `sb_publishable_odc9Y44…` |
+| 10 modul dibuka berurutan | PASS: tanpa galat JS dan tanpa pelanggaran CSP; tabel terisi dengan data uji `UJI-PROD` |
+| Ekspor CSV (Monitoring SPK) | PASS: berkas `MNI-spk-2026-11-03.csv` terunduh |
+| Pustaka ExcelJS dan jsPDF + autotable dari cdnjs di bawah CSP production | PASS: termuat, PDF dan xlsx dapat dibuat |
+| Baca REST dengan token admin (5 kali) | 233 sampai 307 ms |
+| Baca REST tanpa login (anon) | PASS: ditolak `42501` |
+
+Belum diuji di Vercel: tombol ekspor PDF/Excel per modul (hanya pustakanya), tulis, dan penegakan UI per role.
