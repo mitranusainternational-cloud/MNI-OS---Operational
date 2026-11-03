@@ -15,7 +15,7 @@ generated: 2026-11-03
 - Bobot effort selesai: **14 / 146 hari kerja** (10%)
 - Sisa effort: **132 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
 - Cakupan go-live (fase P0-P7): **16 / 61** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
-- Diblokir: **1**, sedang dikerjakan: **1**
+- Diblokir: **1**, sedang dikerjakan: **0**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
 ## Per fase
@@ -78,7 +78,7 @@ generated: 2026-11-03
 
 ## Sedang dikerjakan
 
-- [[tasks/T-077-jadikan-regresi-e2e-runner-mandiri-dan-bagian-ci|T-077]] Jadikan regresi E2E runner mandiri dan bagian CI · dev
+- Tidak ada
 
 ## Diblokir
 
@@ -89,6 +89,8 @@ generated: 2026-11-03
 - [[tasks/T-021-verifikasi-crud-dan-realtime-semua-koleksi|T-021]] Verifikasi CRUD dan realtime semua koleksi · dev
 - [[tasks/T-022-uji-rls-per-role-dengan-skenario-negatif|T-022]] Uji RLS per role dengan skenario negatif · dev
 - [[tasks/T-028-verifikasi-adapter-id-no-spk-dan-master-di-supabas|T-028]] Verifikasi adapter id, no SPK, dan master di Supabase · dev
+- [[tasks/T-046-ci-build-dan-smoke-test-pada-pr|T-046]] CI: build dan smoke test pada PR · dev
+- [[tasks/T-077-jadikan-regresi-e2e-runner-mandiri-dan-bagian-ci|T-077]] Jadikan regresi E2E runner mandiri dan bagian CI · dev
 - [[tasks/T-078-jalankan-migration-pembersihan-policy-role-lama|T-078]] Jalankan migration pembersihan policy role lama · pemilik akun Supabase
 - [[tasks/T-079-uji-role-lewat-aplikasi-dengan-akun-uji-per-role|T-079]] Uji role lewat aplikasi dengan akun uji per role · pemilik + dev
 

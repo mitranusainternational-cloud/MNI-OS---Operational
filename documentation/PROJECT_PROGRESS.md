@@ -323,3 +323,8 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 - Diuji di Supabase dev: opname bahan baku (tab), ubah dan hapus master, master terpakai hanya nonaktif. Semua PASS.
 - Diperbaiki: B-016 (kolom relasi terisi, migration 8 backfill), UI viewer (tombol catat tersembunyi, banner jelas, teks kaki sesuai koneksi). B-017: Realtime tidak mengirim event; polling 15 detik sebagai cadangan (terverifikasi ±14 detik); penyebab di T-162.
 - Regresi 38 PASS, role 12 PASS di mock.
+
+### 2026-11-03 — CI GitHub Actions berjalan (tahap S2)
+
+- Workflow `.github/workflows/ci.yml`: job Vault dan job Aplikasi (build, regresi mock 38, uji role 12). Dicoba dulu di clone bersih lokal, lalu di GitHub: run pertama merah karena uji role, penyebabnya bug aplikasi nyata B-018 (login sangat cepat sebelum pendengar auth terpasang tidak memuat ulang halaman sehingga identitas "Tamu"). Diperbaiki di `index.html`; run berikutnya hijau (41558796125).
+- Sisa S2: jadikan dua job itu required check pada `main` (pengaturan repo, butuh persetujuan pemilik). Berikutnya S3: Vercel preview (akun, butuh persetujuan).

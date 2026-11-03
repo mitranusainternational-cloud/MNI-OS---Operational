@@ -77,3 +77,6 @@ Katalog lengkap: [[TEAM_AND_SKILLS]].
 - Setiap perubahan adapter atau UI: regresi penuh 0 FAIL sebelum commit.
 - Setiap akhir tahap: perbarui matriks di atas dan [[ENVIRONMENTS]], lalu tinjau gerbang tahap berikutnya.
 - Tindakan akun (membuat project, menghubungkan Vercel ke organisasi, DNS, merge `main`) dilakukan pemilik atau setelah persetujuan eksplisit.
+
+
+> Pembaruan 2026-11-03: S2 CI GitHub berjalan (`.github/workflows/ci.yml`, run hijau 41558796125); sisa: required status check pada `main` (persetujuan pemilik).
