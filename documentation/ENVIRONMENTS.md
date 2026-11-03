@@ -143,16 +143,16 @@ Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewa
 | Data | **tidak ada data uji dipindahkan.** Isi dev lama hanya data uji (SPK 1–6, item/supplier/customer UJI, counter, katalog berisi customer uji). Production dimulai bersih; satu baris `muser` admin dibuat |
 | Env lokal | `apps/platform/.env.supabase-prod.local` (tidak di Git), server `vite --mode supabase-prod --port 5175` |
 
-### Status go-live production (diverifikasi 2026-11-03, setelah uji tulis)
+### Status go-live production (diverifikasi ulang 2026-11-03, setelah pemilik mengatur Auth dan Vercel)
 
 | Langkah | Status | Bukti |
 |---|---|---|
 | Skema production (migration 1–10 pada project kosong) | Selesai | matriks role, advisor, uji tulis lulus |
 | Pengguna admin production | Selesai | Auth + `muser` admin; login berhasil |
-| Auth: Site URL dan Redirect URL | **Belum** | dashboard masih `http://localhost:3000`, tanpa Redirect URL |
-| Auth: pendaftaran bebas dimatikan | **Belum** | `GET /auth/v1/settings` → `disable_signup: false` |
+| Auth: Site URL dan Redirect URL | Selesai (sebagian) | Site URL `https://mni-gudang.vercel.app`; tiga Redirect URL tersimpan, tetapi entri preview tampil tanpa tanda `*` (`https://-mitranusainternational-8337.vercel.app/`), perlu diperiksa pemilik |
+| Auth: pendaftaran bebas dimatikan | Selesai | `GET /auth/v1/settings` → `disable_signup: true` |
 | Auth: leaked password protection | Belum diperiksa | opsi di Sign In / Providers, tergantung paket |
-| Env Vercel mengarah ke production | **Belum** | variabel masih "Added 2h ago"; bundel `mni-gudang.vercel.app` memuat URL dev lama `inldyqigewmziwazalun` dan kunci `sb_publishable_d9B…` |
+| Env Vercel mengarah ke production | Selesai untuk Production | bundel `mni-gudang.vercel.app` memuat `lggqigmvtefkquqjrjsb` dan kunci `sb_publishable_odc9Y44…`; dashboard menampilkan variabel hanya untuk Production (Preview belum). Alias lama `mni-os-operational.vercel.app` kini 404 |
 | Pembersihan data uji production | Belum | `apps/platform/supabase/ops/bersihkan_data_uji.sql` |
 
-Selama dua baris "Belum" pertama untuk Vercel dan Auth belum selesai, situs publik masih memakai database dev lama dan tidak boleh dibagikan ke tim. Langkah-langkah ini adalah pengaturan keamanan dan kunci yang hanya pemilik yang boleh mengubah; panduannya ada di [[SISTEM_MAP]] bagian rutinitas dan di tugas T-163.
+Sisa sebelum dibagikan ke tim: login admin di situs Vercel (uji CSP, 10 modul, ekspor), pembersihan data uji, Redirect URL preview, dan variabel Preview bila preview dipakai.
