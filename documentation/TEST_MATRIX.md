@@ -376,3 +376,5 @@ Transaksi di-rollback, data produksi tidak tersentuh.
 | Non-admin menulis atau mengubah audit_log: ditolak | PASS |
 
 **Tampilan (mock):** sapu otomatis 12 halaman pada desktop, tablet, dan ponsel; uji kontras tema gelap dan terang; total tampilan 62 lulus. Penyebab teks gelap di tema gelap: aturan CSS cetak checklist bocor ke stylesheet global.
+
+**Verifikasi di situs live setelah PR #12 (verified in browser):** stylesheet live tidak lagi memuat aturan cetak yang bocor; di tema gelap warna judul, tabel, dan tombol terang (230,236,247) dan terbaca. Catatan: tab yang sudah terbuka sebelum deploy masih memakai CSS lama sampai dimuat ulang (header cache `must-revalidate`, jadi muat ulang biasa cukup).
