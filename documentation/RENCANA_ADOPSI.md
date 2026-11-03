@@ -21,7 +21,7 @@ Tujuan: tim gudang, PPIC, dan logistik memakai MNI Gudang & Logistik setiap hari
 | # | Gerbang | Pemilik | Bukti |
 |---|---|---|---|
 | G1 | Login admin di situs Vercel, 10 modul, ekspor PDF/Excel, CSP bersih | dev + pemilik | catatan di [[TEST_MATRIX]] |
-| G2 | Data uji production dibersihkan (`bersihkan_data_uji.sql`) | pemilik | hitungan tabel nol kecuali `muser` dan `role_modules` |
+| G2 | Data uji production dibersihkan (`bersihkan_data_uji.sql`): **selesai 2026-11-03** | pemilik | hitungan tabel nol kecuali `muser` dan `role_modules` |
 | G3 | Cadangan: paket Supabase berbayar (backup harian) atau ekspor terjadwal; uji pulih sekali | pemilik | tanggal uji pulih tercatat |
 | G4 | Akun tim dibuat lewat Auth + `muser` dengan role yang benar; tidak ada pendaftaran bebas | pemilik | daftar akun dan role |
 | G5 | Redirect URL Auth dan variabel Preview dirapikan | pemilik | [[ENVIRONMENTS]] |

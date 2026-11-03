@@ -153,6 +153,6 @@ Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewa
 | Auth: pendaftaran bebas dimatikan | Selesai | `GET /auth/v1/settings` → `disable_signup: true` |
 | Auth: leaked password protection | Belum diperiksa | opsi di Sign In / Providers, tergantung paket |
 | Env Vercel mengarah ke production | Selesai untuk Production | bundel `mni-gudang.vercel.app` memuat `lggqigmvtefkquqjrjsb` dan kunci `sb_publishable_odc9Y44…`; dashboard menampilkan variabel hanya untuk Production (Preview belum). Alias lama `mni-os-operational.vercel.app` kini 404 |
-| Pembersihan data uji production | Belum | `apps/platform/supabase/ops/bersihkan_data_uji.sql` |
+| Pembersihan data uji production | Selesai (2026-11-03) | guard lolos (semua baris bertanda UJI-PROD); sesudahnya muser 1, role_modules 10, tabel lain 0; penomoran mulai lagi dari 001 |
 
 Sisa sebelum dibagikan ke tim: login admin di situs Vercel (uji CSP, 10 modul, ekspor), pembersihan data uji, Redirect URL preview, dan variabel Preview bila preview dipakai.
