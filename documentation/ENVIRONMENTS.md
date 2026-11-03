@@ -109,3 +109,15 @@ Beberapa konektor di mesin ini terhubung ke akun lain. Selalu cocokkan sebelum b
 | Vercel | tim **`mitranusainternational-8337`** (Hobby) di Chrome pemilik, lewat halaman import GitHub | Konektor Vercel di alat Claude terhubung ke tim lain (`NIJ`, `nij3`): jangan dipakai untuk project ini |
 
 Aturan: tindakan Vercel dilakukan lewat Chrome pemilik (tim di atas), bukan lewat konektor Vercel Claude, sampai konektor itu diarahkan ke tim yang benar. Setiap perintah Supabase memakai `project_id` `inldyqigewmziwazalun` secara eksplisit.
+
+
+### Vercel (dibuat 2026-11-03)
+
+| Item | Nilai |
+|---|---|
+| Tim / project | `mitranusainternational-8337` (Hobby) / `mni-os-operational` |
+| Sumber | GitHub `MNI-OS---Operational`, root `apps/platform`, preset Vite (`vercel.json`: install `npm ci --ignore-scripts`, build `node scripts/extract-app.js && vite build`) |
+| Production | https://mni-os-operational.vercel.app (branch `main`) |
+| Preview | per branch/PR, mis. `...-git-development-mitranusainternational-8337.vercel.app` (dilindungi login Vercel) |
+| Env | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (publishable, Production dan Preview) mengarah ke Supabase **dev**: production Vercel saat ini = staging |
+| Keamanan | X-Frame-Options DENY, nosniff, Referrer-Policy, CSP (hanya self, cdnjs, Google Fonts, `*.supabase.co`), HSTS, Permissions-Policy |

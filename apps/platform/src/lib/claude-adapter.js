@@ -184,6 +184,9 @@ function makeCollection(col) {
     onSnapshot(cb, errCb) {
       // Initial load
       const load = async () => {
+        // Sebelum login tidak ada sesi: jangan minta data (menghindari 401 di konsol); halaman dimuat ulang setelah login.
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { if (lastSig === '') { lastSig = '[]'; cb({ docs: [] }); } return; }
         // Kolom pengurut berbeda per tabel: master hanya punya updated_at, log hanya punya tgl.
         const orderCol = ['created_at', 'updated_at', 'tgl'].find((c) => (TABLE_COLS[table] || ['created_at']).includes(c));
         let q = supabase.from(table).select('*');

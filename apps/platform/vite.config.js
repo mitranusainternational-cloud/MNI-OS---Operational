@@ -9,6 +9,18 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
 
   return {
+    plugins: [
+      {
+        // Variabel VITE_* yang tidak diisi tetap berupa teks %VITE_X% di index.html (mis. LOCAL_MOCK, APP_VERSION di produksi).
+        name: 'isi-env-html',
+        transformIndexHtml(html) {
+          return html
+            .replace(/%VITE_APP_VERSION%/g, env.VITE_APP_VERSION || '1.0.0')
+            .replace(/%VITE_[A-Z0-9_]+%/g, '');
+        }
+      }
+    ],
+
     root: '.',
     publicDir: 'public',
 
