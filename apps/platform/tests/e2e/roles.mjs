@@ -8,6 +8,9 @@
 export async function runRoles(page, base) {
   const R = [];
   const ok = (id, pass, info = '') => R.push((pass ? 'PASS ' : 'FAIL ') + id + (info ? ' · ' + info : ''));
+  const errs = [];
+  page.on('pageerror', (e) => errs.push(String(e.message).slice(0, 160)));
+  page.on('console', (m) => { if (m.type() === 'error') errs.push(m.text().slice(0, 160)); });
   const tab = (t) => page.evaluate((t) => JSON.parse(localStorage.getItem('mni-local-mock-db')).tables[t], t);
   const count = async (t) => (await tab(t)).length;
   const opt = (sel, n) => page.evaluate(([s, n]) => [...document.querySelector(s).options].find((o) => o.text.includes(n))?.value, [sel, n]);
@@ -30,8 +33,9 @@ export async function runRoles(page, base) {
     try {
       await page.waitForFunction(() => document.querySelectorAll('#nav a').length > 5 && !/Tamu/.test(document.getElementById('who').innerText), null, { timeout: 30000 });
     } catch (e) {
+      const me = await page.evaluate(async () => { try { const u = await window.claude.use('user'); return u ? await u.me() : 'user=null'; } catch (e) { return 'galat: ' + e.message; } });
       const info = await page.evaluate(() => ({ url: location.href, who: (document.getElementById('who') || {}).innerText, nav: document.querySelectorAll('#nav a').length, auth: (document.body.innerText || '').slice(0, 200), session: localStorage.getItem('mni-local-mock-session') }));
-      throw new Error('login ' + email + ' gagal: ' + JSON.stringify(info));
+      throw new Error('login ' + email + ' gagal: ' + JSON.stringify({ ...info, me, errs }));
     }
     await page.waitForTimeout(800);
   };
