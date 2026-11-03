@@ -140,7 +140,7 @@ async function boot(){
 }
 let rq=0,bodyPending=false;const typingInBody=()=>{const a=document.activeElement;return a&&$('#body').contains(a)&&a.matches('input,select,textarea')};
 document.addEventListener('focusout',()=>setTimeout(()=>{if(bodyPending&&!typingInBody()){bodyPending=false;renderBody()}},0));
-function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;renderNav();renderLive();renderMe();renderAccess();if(!$('#tools').contains(document.activeElement))renderTools();if(typingInBody())bodyPending=true;else renderBody();if(DRAWER)DRAWER();if(SHEET)renderSheet()})}
+function schedule(){if(rq)return;rq=requestAnimationFrame(()=>{rq=0;pasangKatalogBerat();renderNav();renderLive();renderMe();renderAccess();if(!$('#tools').contains(document.activeElement))renderTools();if(typingInBody())bodyPending=true;else renderBody();if(DRAWER)DRAWER();if(SHEET)renderSheet()})}
 const ready=()=>COLS.every(c=>loaded.has(c));
 const need=(c,data,id,op)=>{if(!DB)throw new Error('Fitur simpan belum tersedia di pratinjau lokal karena backend belum terhubung.');if(!CAN)throw new Error('Akses Anda lihat saja.');guard(c,data,id,op||'upd')};
 async function addDoc(c,data){need(c,data,null,'add');data.at=new Date().toISOString();data.by=ME||null;const r=await DB.collection(c).add(data);logAct(c,r&&r.id,'add',data);return r}
@@ -1295,7 +1295,7 @@ const usage=()=>{const u={vendor:{},customer:{},supplier:{},armada:{}};const inc
 const masterKpi=k=>{const u=usage()[k];const col=MK[k];const aktif=S[col].filter(x=>x.aktif!==false).length;const nonaktif=S[col].filter(x=>x.aktif===false).length;const totalUsage=Object.values(u).reduce((a,b)=>a+b,0);const unreg=Object.keys(u).filter(nm=>!S[col].some(x=>(k==='armada'?x.nopol:x.nama)===nm)).length;return {aktif,nonaktif,totalUsage,unreg}};
 
 T['master-data']=()=>{const f=F['master-data'];const k=f.tab;const isKatalog=['item','grup','satuan'].includes(k);const isWc=k==='wc';
- return `${segBtns('master-data','tab',[['vendor','Vendor'],['customer','Customer'],['supplier','Supplier'],['armada','Armada'],['wc','Work Centre'],['item','Item SPK'],['grup','Judul section'],['satuan','Satuan & sales']])}<input class="inp search" id="q-master" placeholder="Cari nama…" value="${esc(f.q)}" data-act="q" data-view="master-data">${!isKatalog&&!isWc?`<label class="ck" style="font-size:13px;white-space:nowrap"><input type="checkbox" data-act="mshowInactive" ${f.showInactive?'checked':''}> Tampilkan nonaktif</label><button class="btn ghost sm" data-act="mcsv" title="Export CSV">${ic('download')} CSV</button>`:'<span class="grow"></span>'}${canManage()?`<button class="btn ghost sm" data-act="importcsv" title="Impor dari CSV">${ic('dl')} Impor CSV</button>`:''}<button class="btn primary" data-act="mnew">${ic('plus')}Tambah</button>`};
+ return `${segBtns('master-data','tab',[['vendor','Vendor'],['customer','Customer'],['supplier','Supplier'],['armada','Armada'],['wc','Work Centre'],['item','Item SPK'],['grup','Judul section'],['satuan','Satuan & sales']])}<input class="inp search" id="q-master" placeholder="Cari nama…" value="${esc(f.q)}" data-act="q" data-view="master-data">${!isKatalog&&!isWc?`<label class="ck" style="font-size:13px;white-space:nowrap"><input type="checkbox" data-act="mshowInactive" ${f.showInactive?'checked':''}> Tampilkan nonaktif</label><button class="btn ghost sm" data-act="mcsv" title="Export CSV">${ic('download')} CSV</button>`:'<span class="grow"></span>'}${canManage()?`<button class="btn ghost sm" data-act="katberat" title="Katalog rumus berat">Katalog berat</button><button class="btn ghost sm" data-act="importcsv" title="Impor dari CSV">${ic('dl')} Impor CSV</button>`:''}<button class="btn primary" data-act="mnew">${ic('plus')}Tambah</button>`};
 
 B['master-data']=()=>{
  if(F['master-data'].tab==='item')return katItemTab();if(F['master-data'].tab==='grup')return katGrupTab();if(F['master-data'].tab==='satuan')return katListTab();if(F['master-data'].tab==='wc')return wcTab();
@@ -2492,52 +2492,15 @@ function beratOf(d,h){const k=KAT().berat||{};const t=thkOf(h);if(k[d+'|'+t])ret
 /* weightCalc: hitung berat per pcs dari dimensi produk berdasarkan template Excel
    Reference: REAL kg/pcs dari sheet SLU/SLW/SLHD/SLHDC/STC/STU (bj=7.85)
    Scaling: berat ∝ l (straight) dan ∝ t (semua tipe) */
-function weightCalc(desc,sectionHeader){
- const D=String(desc||'').toUpperCase();const H=String(sectionHeader||'').toUpperCase();
- /* === parse fitment === */
- let fitment='STRAIGHT';
- if(/\bCROSS\b/.test(D))fitment='CROSS';
- else if(/\bTEE\b/.test(D))fitment='TEE';
- else if(/\bELBOW\b/.test(D))fitment='ELBOW';
- else if(/\bINSIDE\b/.test(D))fitment='INSIDE';
- else if(/\bOUTSIDE\b/.test(D))fitment='OUTSIDE';
- else if(/\bREDUCER\b/.test(D))fitment='REDUCER';
- else if(/\bJOINT(?:ING)?\b/.test(D))fitment='JOINTING';
- /* === parse product type === */
- let ptype='';
- if(/\bSLHDC\b/.test(D)||/\bSLHDC\b/.test(H))ptype='SLHDC';
- else if(/\bSLHD\b/.test(D)||/\bSLHD\b/.test(H))ptype='SLHD';
- else if(/\bSLW\b/.test(D)||/\bSLW\b/.test(H))ptype='SLW';
- else if(/\bSLU\b/.test(D)||/\bSLU\b/.test(H))ptype='SLU';
- else if(/\bSTU\b/.test(D)||/\bSTU\b/.test(H))ptype='STU';
- else if(/\bSTC\b/.test(D)||/\bSTC\b/.test(H))ptype='STC';
- else if(/CABLE LADDER/.test(D)||/CABLE LADDER/.test(H))ptype='SLU';
- else if(/PERFORATED CABLE TRAY/.test(D)||/PERFORATED CABLE TRAY/.test(H))ptype='STC';
- else if(/CABLE TRAY/.test(D)||/CABLE TRAY/.test(H))ptype='STU';
- if(!ptype)return 0;
- /* === reference table: [refKg, refL, refT] dari Excel REAL column === */
- const REF={
-  SLU:  {STRAIGHT:[14.703,3000,1.8],ELBOW:[5.453,300,1.8],TEE:[10.743,300,1.8],CROSS:[16.725,300,1.8],INSIDE:[6.858,300,1.8],OUTSIDE:[6.858,300,1.8],REDUCER:[4.018,300,1.8],JOINTING:[0.341,300,1.8]},
-  SLW:  {STRAIGHT:[31.638,3000,2.0],ELBOW:[4.911,300,2.0],TEE:[4.911,300,2.0],CROSS:[4.911,300,2.0],INSIDE:[4.911,300,2.0],OUTSIDE:[4.911,300,2.0],REDUCER:[4.911,300,2.0],JOINTING:[0.400,300,2.0]},
-  SLHD: {STRAIGHT:[23.592,3000,2.0],ELBOW:[12.150,300,2.0],TEE:[8.964,300,2.0],CROSS:[11.467,300,2.0],INSIDE:[11.084,300,2.0],OUTSIDE:[8.839,300,2.0],REDUCER:[2.746,300,2.0],JOINTING:[0.453,300,2.0]},
-  SLHDC:{STRAIGHT:[20.026,3000,1.8],ELBOW:[7.233,300,1.8],TEE:[9.957,300,1.8],CROSS:[12.584,300,1.8],INSIDE:[6.383,300,1.8],OUTSIDE:[6.383,300,1.8],REDUCER:[3.183,300,1.8],JOINTING:[0.203,300,1.8]},
-  STC:  {STRAIGHT:[13.713,3000,1.8],ELBOW:[2.871,300,1.8],TEE:[4.446,300,1.8],CROSS:[6.230,300,1.8],INSIDE:[6.715,300,1.8],OUTSIDE:[6.579,300,1.8],REDUCER:[2.504,300,1.8],JOINTING:[0.341,300,1.8]},
-  STU:  {STRAIGHT:[12.722,3000,1.8],ELBOW:[2.017,300,1.8],TEE:[3.800,300,1.8],CROSS:[8.179,300,1.8],INSIDE:[7.612,300,1.8],OUTSIDE:[11.624,300,1.8],REDUCER:[3.608,300,1.8],JOINTING:[0.321,300,1.8]}
- };
- const ref=REF[ptype]&&REF[ptype][fitment];if(!ref)return 0;
- const[refKg,refL,refT]=ref;
- /* === parse dimensi dari desc: W___xH___xL___ atau W___H___L___ === */
- let l=null,t=null;
- const lm=D.match(/L\s*[=x×]?\s*(\d+(?:[.,]\d+)?)/i)||D.match(/[×x]\s*(\d{3,4})\s*(?:MM|PCS|$)/i);
- if(lm)l=parseFloat(lm[1].replace(',','.'));
- /* thickness from section header */
- const th=thkOf(sectionHeader);if(th)t=parseFloat(th);
- /* scale: untuk STRAIGHT scale by l and t; untuk fitting hanya t */
- let kg=refKg;
- if(fitment==='STRAIGHT'&&l&&l>0)kg=kg*(l/refL);
- if(t&&t>0)kg=kg*(t/refT);
- return Math.round(kg*1000)/1000;
-}
+/* Berat per pcs dari kalkulator berat (katalog rumus Excel di database). 0 bila katalog belum terpasang atau item tidak dikenali:
+   lebih baik kosong (diisi manual) daripada angka perkiraan yang salah. */
+function weightInfo(desc,sectionHeader){const B=window.MNIBerat;if(!B||!B.siap())return null;return B.hitungItem({judulSection:sectionHeader,deskripsi:desc,material:ED?ED.material:'',tebal:ED?(parseFloat(ED.tebal)||null):null})}
+function weightCalc(desc,sectionHeader){const r=weightInfo(desc,sectionHeader);return r&&r.ok?Math.round(r.beratSPK*1000)/1000:0}
+function wTag(tr,L){const td=tr.querySelector('.c-w');if(!td)return;let s=td.querySelector('.wtag');if(!L.wsrc){if(s)s.remove();return}
+ if(!s){s=document.createElement('span');td.appendChild(s)}s.className='wtag '+L.wsrc;s.textContent=L.wsrc==='kalkulator'?'auto':'manual';s.title=L.wsrc==='kalkulator'?'Dihitung otomatis dari kalkulator berat. Ubah angkanya untuk menimpa.':'Diisi atau diubah manual.'}
+/* hitung ulang baris yang berat otomatisnya bergantung pada judul section, material, atau tebal; yang manual tidak disentuh */
+function edHitungUlang(){let k=0;for(const s of ED.sections)for(const l of s.lines){if(!l.d||!(l.wsrc==='kalkulator'||(!l.w&&!l.wsrc)))continue;const wi=weightInfo(l.d,s.h);if(wi&&wi.ok){const w=Math.round(wi.beratSPK*1000)/1000;if(w!==l.w||l.wsrc!=='kalkulator'){l.w=w;l.wsrc='kalkulator';k++}}}
+ if(k){rerenderSecs();toast(`${k} berat dihitung ulang dari kalkulator`)}}
 function derive(h){const H=String(h||'').toUpperCase();let fin='';if(H.includes('ELECTRO'))fin='ELG';else if(H.includes('HOTDIP')||H.includes('HOT DIP'))fin='HDG';else if(H.includes('POWDER')||H.includes('PDC'))fin='PDC';else if(H.includes('NON'))fin='Non Finishing';
  let base='SPHC';if(H.includes('STAINLESS')||/SS ?3\d\d/.test(H))base=H.includes('316')?'SS316':'SS304';else if(H.includes('ALU'))base='Aluminium';
  return {material:(base==='SPHC'&&fin)?`SPHC / ${fin}`:base,tebal:thkOf(h),type:(H.match(/TYPE\s+([A-Z]+)/)||[])[1]||''}}
@@ -2554,7 +2517,7 @@ function secsOf(s){const secs=[];for(const it of s.items||[]){const g=it.g||'';i
 /* ----- editor ----- */
 let ED=null,EDT=null,EDDIRTY=false;
 function newEd(){const no=nextNo();return {id:null,no,tgl:today(),sales:'',customer:'',po:'',lead:'5 Hari Kerja',due:'',dueAuto:true,material:'',tebal:'',type:'',matAuto:true,note:'',noteAuto:true,dist:DIST_DEF.slice(),signProc:'Halimah',signPpic:'Muin M.K.',status:'Draft',rev:0,revAlasan:'',orig:null,sections:[{h:'CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED',lines:[blankLine(),blankLine(),blankLine()]}]}}
-function edFrom(s,copy){const secs=secsOf(s).map(x=>({h:x.h,lines:x.lines.map(it=>({d:it.d,q:it.q,u:it.u||'Pcs',w:+it.w||'',ket:it.ket||'',catatan:it.catatan||'',prod:copy?0:(+it.prod||0)}))}));
+function edFrom(s,copy){const secs=secsOf(s).map(x=>({h:x.h,lines:x.lines.map(it=>({d:it.d,q:it.q,u:it.u||'Pcs',w:+it.w||'',wsrc:it.ws==='k'?'kalkulator':it.ws==='m'?'manual':'',ket:it.ket||'',catatan:it.catatan||'',prod:copy?0:(+it.prod||0)}))}));
  if(!secs.length)secs.push({h:'',lines:[blankLine()]});
  return {id:copy?null:s._id,no:copy?nextNo():s.no,tgl:copy?today():s.tgl,sales:s.sales||'',customer:copy?'':s.customer||'',po:copy?'':(s.po||''),lead:s.lead||'',due:copy?'':(s.due||''),dueAuto:copy||!s.due,material:s.material||'',tebal:s.tebal||'',type:s.type||'',matAuto:!s.material,note:copy?'':(s.note||''),noteAuto:copy||!s.note,dist:(s.dist||DIST_DEF).slice(),signProc:s.signProc||'Halimah',signPpic:s.signPpic||'Muin M.K.',status:copy?'Draft':(s.status||'Terbit'),rev:copy?0:(s.rev||0),revAlasan:'',orig:copy?null:s,sections:secs}}
 function edAuto(){const e=ED;if(e.dueAuto&&leadMax(e.lead))e.due=addWorkdays(e.tgl,leadMax(e.lead));if(e.noteAuto)e.note=e.due?'NOTE : ESTIMASI KIRIM '+tglLong(e.due).toUpperCase():'';
@@ -2574,7 +2537,7 @@ function edSecHtml(s,si,startNo){
   <td class="c-ket"><input class="inp red" data-f="ket" value="${esc(l.ket)}" placeholder="opsional" id="ed-k-${si}-${li}"></td>
   <td class="c-q"><input class="inp num" data-f="q" type="number" min="0" step="any" value="${esc(l.q)}" id="ed-q-${si}-${li}" inputmode="decimal"></td>
   <td class="c-u"><input class="inp" data-f="u" value="${esc(l.u)}" list="dl-sat" id="ed-u-${si}-${li}"></td>
-  <td class="c-w"><input class="inp num" data-f="w" type="number" min="0" step="any" value="${esc(l.w)}" id="ed-w-${si}-${li}" inputmode="decimal"></td>
+  <td class="c-w"><input class="inp num" data-f="w" type="number" min="0" step="any" value="${esc(l.w)}" id="ed-w-${si}-${li}" inputmode="decimal">${l.wsrc?`<span class="wtag ${l.wsrc}" title="${l.wsrc==='kalkulator'?'Dihitung otomatis dari kalkulator berat. Ubah angkanya untuk menimpa.':'Diisi atau diubah manual.'}">${l.wsrc==='kalkulator'?'auto':'manual'}</span>`:''}</td>
   <td class="c-bi num" data-bi>${bi?n(bi):'–'}</td>
   <td class="c-cat"><input class="inp" data-f="catatan" value="${esc(l.catatan)}" id="ed-c-${si}-${li}"></td>
   <td><button type="button" class="ibtn" data-act="ed-delline" data-s="${si}" data-l="${li}" aria-label="Hapus baris">×</button></td></tr>`}).join('');
@@ -2639,21 +2602,24 @@ function parsePaste(txt,curH){
   if(/^total$/i.test(d))continue;
   let q=numDot(rest[0]),u=rest[1]||'',w=rest[2]!==undefined?numDot(rest[2]):null;if(u&&numDot(u)!==null){w=numDot(u);u=''}
   if(!sec){sec={h:curH,lines:[],cont:true};out.push(sec)}
-  const h=sec.h;sec.lines.push({d,q:q??'',u:u||(KAT().satuan||{})[d]||'Pcs',w:w||beratOf(d,h)||weightCalc(d,h)||'',ket:'',catatan:'',prod:0})}
+  const h=sec.h;sec.lines.push({d,q:q??'',u:u||(KAT().satuan||{})[d]||'Pcs',w:w||weightCalc(d,h)||beratOf(d,h)||'',wsrc:w?'manual':(weightCalc(d,h)?'kalkulator':''),ket:'',catatan:'',prod:0})}
  return out;
 }
 function edInput(e){
  const t=e.target;if(!ED)return;
  if(t.dataset.h){const k=t.dataset.h;let v=t.value;if(k==='no')v=parseInt(v)||'';ED[k]=v;EDDIRTY=true;
   if(k==='due')ED.dueAuto=false;if(k==='note')ED.noteAuto=false;if(['material','tebal','type'].includes(k))ED.matAuto=false;
-  if(['tgl','lead','due','no'].includes(k)){edAuto();edSyncHeader()}return}
+  if(['tgl','lead','due','no'].includes(k)){edAuto();edSyncHeader()}if(e.type==='change'&&['material','tebal'].includes(k))edHitungUlang();return}
  if(t.dataset.sf==='h'){const si=+t.dataset.s;ED.sections[si].h=t.value;EDDIRTY=true;edAuto();edSyncHeader();
-  if(e.type==='change'){const hb=parseH(t.value);['p','t','tb','f'].forEach(k=>{const s=$(`#ed-h${k}-${si}`);if(s)s.value=hb[k]})}return}
- if(t.dataset.hb){const si=+t.dataset.s;const hb=parseH(ED.sections[si].h);hb[t.dataset.hb]=t.value;ED.sections[si].h=composeH(hb);$('#ed-h-'+si).value=ED.sections[si].h;EDDIRTY=true;edAuto();edSyncHeader();return}
+  if(e.type==='change'){const hb=parseH(t.value);['p','t','tb','f'].forEach(k=>{const s=$(`#ed-h${k}-${si}`);if(s)s.value=hb[k]});edHitungUlang()}return}
+ if(t.dataset.hb){const si=+t.dataset.s;const hb=parseH(ED.sections[si].h);hb[t.dataset.hb]=t.value;ED.sections[si].h=composeH(hb);$('#ed-h-'+si).value=ED.sections[si].h;EDDIRTY=true;edAuto();edSyncHeader();edHitungUlang();return}
  if(t.dataset.dist!==undefined){const d=t.dataset.dist;ED.dist=t.checked?[...new Set([...ED.dist,d])]:ED.dist.filter(x=>x!==d);EDDIRTY=true;return}
  const tr=t.closest('tr[data-s]');if(!tr||!t.dataset.f)return;
  const si=+tr.dataset.s,li=+tr.dataset.l,f=t.dataset.f,L=ED.sections[si].lines[li];L[f]=t.value;EDDIRTY=true;
- if(f==='d'&&e.type==='change'){const k=KAT();if(!L.w){const w=beratOf(L.d,ED.sections[si].h);if(w){L.w=w;tr.querySelector('[data-f=w]').value=w}}if(k.satuan&&k.satuan[L.d]){L.u=k.satuan[L.d];tr.querySelector('[data-f=u]').value=L.u}/* fallback: fill satuan & berat from SPK history if not in master katalog */if(!L.u||!L.w){const hi=katIndex().arr.find(x=>x.d===L.d);if(hi){if(!L.u&&hi.u){L.u=hi.u;const uf=tr.querySelector('[data-f=u]');if(uf)uf.value=hi.u}if(!L.w&&hi.w&&hi.w['–']){L.w=hi.w['–'];const wf=tr.querySelector('[data-f=w]');if(wf)wf.value=hi.w['–']}}}/* final fallback: hitung dari formula Excel weightCalc */if(!L.w){const wc=weightCalc(L.d,ED.sections[si].h);if(wc){L.w=wc;const wf=tr.querySelector('[data-f=w]');if(wf)wf.value=wc}}}
+ if(f==='w'){L.wsrc=t.value===''?'':'manual';wTag(tr,L)}
+ if(f==='d'&&e.type==='change'){const k=KAT();
+  if(!L.w||L.wsrc==='kalkulator'){const wi=weightInfo(L.d,ED.sections[si].h);if(wi&&wi.ok){L.w=Math.round(wi.beratSPK*1000)/1000;L.wsrc='kalkulator';tr.querySelector('[data-f=w]').value=L.w;wTag(tr,L);if(wi.catatan&&wi.catatan.length)toast('Berat dari kalkulator · '+wi.catatan.join('; '))}else if(L.wsrc==='kalkulator'){L.w='';L.wsrc='';tr.querySelector('[data-f=w]').value='';wTag(tr,L)}}
+  if(!L.w){const w=beratOf(L.d,ED.sections[si].h);if(w){L.w=w;tr.querySelector('[data-f=w]').value=w}}if(k.satuan&&k.satuan[L.d]){L.u=k.satuan[L.d];tr.querySelector('[data-f=u]').value=L.u}/* fallback: fill satuan & berat from SPK history if not in master katalog */if(!L.u||!L.w){const hi=katIndex().arr.find(x=>x.d===L.d);if(hi){if(!L.u&&hi.u){L.u=hi.u;const uf=tr.querySelector('[data-f=u]');if(uf)uf.value=hi.u}if(!L.w&&hi.w&&hi.w['–']){L.w=hi.w['–'];const wf=tr.querySelector('[data-f=w]');if(wf)wf.value=hi.w['–']}}}/* final fallback: hitung dari formula Excel weightCalc */if(!L.w){const wc=weightCalc(L.d,ED.sections[si].h);if(wc){L.w=wc;const wf=tr.querySelector('[data-f=w]');if(wf)wf.value=wc}}}
  const bi=(+L.q||0)*(+L.w||0);tr.querySelector('[data-bi]').textContent=bi?n(bi):'–';renderTotals();
  if(li===ED.sections[si].lines.length-1&&f==='d'&&t.value&&e.type==='input'&&!tr.nextElementSibling){ED.sections[si].lines.push(blankLine());const id=t.id;const pos=t.selectionStart;rerenderSecs();const x=$('#'+id);if(x){x.focus();try{x.setSelectionRange(pos,pos)}catch(_){}}}
 }
@@ -2683,7 +2649,7 @@ async function saveEditor(mode){
  const e=ED,err=$('#ed-err');err.textContent='';
  try{need('spk');
   const no=parseInt(e.no);if(!no)throw new Error('Isi No SPK.');if(!String(e.customer).trim())throw new Error('Isi nama customer.');e.customer=cleanName(e.customer);{const sim=similarTo('customer',e.customer);if(sim){e.customer=sim.nama;const ci=$('#ed-cust');if(ci)ci.value=sim.nama;throw new Error(`Customer disamakan ke "${sim.nama}" (sudah terdaftar). Klik simpan lagi.`)}}if(!e.tgl)throw new Error('Isi tanggal SPK.');
-  const items=[];for(const s of e.sections)for(const l of s.lines){if(!String(l.d).trim())continue;const q=num0(l.q);if(q<=0)throw new Error(`Qty untuk "${l.d}" belum diisi.`);items.push({d:String(l.d).trim(),g:String(s.h||'').trim(),q,u:String(l.u||'Pcs').trim(),w:num0(l.w),ket:String(l.ket||'').trim(),catatan:String(l.catatan||'').trim(),prod:Math.min(q,+l.prod||0)})}
+  const items=[];for(const s of e.sections)for(const l of s.lines){if(!String(l.d).trim())continue;const q=num0(l.q);if(q<=0)throw new Error(`Qty untuk "${l.d}" belum diisi.`);items.push({d:String(l.d).trim(),g:String(s.h||'').trim(),q,u:String(l.u||'Pcs').trim(),w:num0(l.w),...(l.wsrc&&num0(l.w)>0?{ws:l.wsrc==='kalkulator'?'k':'m'}:{}),ket:String(l.ket||'').trim(),catatan:String(l.catatan||'').trim(),prod:Math.min(q,+l.prod||0)})}
   if(!items.length)throw new Error('Tambahkan minimal satu item.');
   const editTerbit=e.id&&e.orig&&(e.orig.status||'Terbit')==='Terbit';
   if(editTerbit&&!String(e.revAlasan).trim())throw new Error('Isi alasan revisi.');
@@ -3225,6 +3191,28 @@ function accountModal(){
   <div class="full" style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" data-act="pwself">Ganti password</button>${canManage()?'<a class="btn" href="#pengguna" data-act="closemodal">Kelola pengguna</a><button type="button" class="btn" data-act="backup">Unduh cadangan</button>':''}<button type="button" class="btn ghost danger" data-act="logout">Keluar</button></div>`,
   async()=>{},{submit:'Tutup',done:' '});
 }
+/* ---- Katalog berat (rumus kalkulator): disimpan terkompresi di database (master/katalog_berat), dimuat setelah login ---- */
+let KB_TS=null;
+async function pasangKatalogBerat(){
+ const d=byId('master','katalog_berat');if(!d||!d.gz||d.ts===KB_TS||!window.MNIBerat)return;KB_TS=d.ts;
+ try{const bin=Uint8Array.from(atob(d.gz),c=>c.charCodeAt(0));const txt=await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).text();window.MNIBerat.setKatalog(JSON.parse(txt));if(ED)edHitungUlang()}
+ catch(e){KB_TS=null;console.warn('Katalog berat gagal dipasang',e)}
+}
+const b64=u8=>{let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s)};
+function katalogBeratForm(){
+ if(!canManage()){toast('Hanya super admin yang bisa memasang katalog berat.');return}
+ const d=byId('master','katalog_berat');const inf=window.MNIBerat&&window.MNIBerat.info();
+ openModal('Katalog berat (kalkulator)',`<div class="full note">${inf?`Terpasang: <b>${inf.bentuk} bentuk</b> dalam ${inf.keluarga} keluarga produk${d&&d.ts?` · diunggah ${esc(String(d.ts).slice(0,16).replace('T',' '))}${d.by?' oleh '+esc(uName(d.by)||d.by):''}`:''}.`:'Belum ada katalog. Berat SPK diisi manual sampai katalog dipasang.'}</div>
+  ${fld('Berkas katalog (catalog.json dari kalkulator Excel)',`<input class="inp" type="file" id="m-kb" accept=".json,application/json">`,true)}
+  <div class="full note">Katalog dibuat lokal dari workbook dengan <code>node scripts/build-weight-catalog.mjs</code> dan hanya disimpan di database (terbaca pengguna yang login), bukan di Git atau berkas situs.</div>`,
+  async()=>{const fl=$('#m-kb').files[0];if(!fl)throw new Error('Pilih berkas catalog.json.');
+   let cat;try{cat=JSON.parse(await fl.text())}catch(_){throw new Error('Berkas bukan JSON yang valid.')}
+   if(!cat||!cat.keluarga||!Object.values(cat.keluarga).every(f=>Array.isArray(f.bentuk)&&f.bentuk.every(b=>b.id&&b.rumus&&b.masukan)))throw new Error('Format katalog tidak dikenali.');
+   const gz=new Uint8Array(await new Response(new Blob([JSON.stringify(cat)]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+   const jumlah=Object.values(cat.keluarga).reduce((a,f)=>a+f.bentuk.length,0);
+   await DB.doc('master/katalog_berat').set({v:cat.versi||1,ts:new Date().toISOString(),by:ME,jumlah,gz:b64(gz)});
+   toast(`Katalog berat dipasang: ${jumlah} bentuk`)},{submit:'Pasang katalog',done:' '});
+}
 /* ---- Cadangan data (super admin): unduh semua tabel sebagai satu berkas JSON ---- */
 async function backupData(){
  if(!canManage()){toast('Hanya super admin yang bisa mengunduh cadangan.');return}
@@ -3651,6 +3639,7 @@ document.addEventListener('click',async e=>{
   case 'kpicsv':await kpiCsv();break;
   case 'mepage':case 'meclick':accountModal();break;
   case 'pwself':pwSelf();break;
+  case 'katberat':katalogBeratForm();break;
   case 'auditrefresh':AUDIT=null;renderBody();await loadAudit();break;
   case 'importcsv':importForm();break;
   case 'backup':closeModal();await backupData();break;

@@ -29,15 +29,17 @@ Bergantung pada: tidak ada
 - [x] Pengevaluasi rumus Excel dan mesin hitung; semua sel workbook direproduksi dengan 0 selisih
 - [x] Parser teks item SPK ke bentuk, ukuran, material; menolak yang tidak dikenali
 - [x] Uji otomatis `npm run test:berat` (6 + 24 lulus)
-- [ ] Keputusan pemilik atas enam pertanyaan di [[KALKULATOR_BERAT]] bagian 4
-- [ ] Katalog rumus dimuat dari database setelah login (bukan JavaScript publik)
-- [ ] Integrasi ke formulir SPK: isi otomatis, lencana "dari kalkulator", timpa manual
-- [ ] Uji di mock dan di production dengan SPK nyata dibandingkan hitungan Excel
+- [x] Keputusan pemilik atas enam pertanyaan (disetujui 2026-11-03; pengguna tetap fleksibel menimpa)
+- [x] Katalog rumus dimuat dari database setelah login (master/katalog_berat, terkompresi); unggah oleh super admin di Master Data
+- [x] Integrasi ke formulir SPK: isi otomatis, lencana auto dan manual, timpa manual, hitung ulang, tempel dari Excel
+- [x] Uji mock (e2e A-29 sampai A-34)
+- [ ] Pasang katalog asli di production dan bandingkan beberapa SPK nyata dengan hitungan Excel
 
 ## Bukti
 
-- Unit (source-level): mesin dan parser lulus uji terhadap nilai tersimpan workbook. Belum ada bukti di browser karena belum terintegrasi.
+- Unit (source-level): mesin dan parser lulus uji terhadap nilai tersimpan workbook.
+- Mock (verified in browser): alur isi otomatis, timpa manual, hitung ulang, dan item tak dikenali; total e2e 38 + 12 + 34 + 62 lulus.
 
 ## Catatan
 
-Katalog turunan workbook tidak masuk Git (repo publik); dibangun lokal. Pengerjaan integrasi menunggu keputusan pemilik di dokumen kerangka.
+Katalog turunan workbook tidak masuk Git (repo publik); dibangun lokal. Cara memasang katalog: lihat [[KALKULATOR_BERAT]] bagian 7.

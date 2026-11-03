@@ -1,6 +1,6 @@
 ---
 type: design
-status: draft
+status: active
 updated: 2026-11-03
 ---
 
@@ -8,7 +8,7 @@ updated: 2026-11-03
 
 # Kerangka hitung berat otomatis pada SPK
 
-Tujuan: saat pengguna mengisi item SPK (mis. `Cable Tray W100xH100xL3000 1.2`), sistem mengenali produknya dan mengisi **berat per pcs** dan **berat per item** otomatis sesuai perhitungan di workbook `kalkulator penghitung berat.xlsx`, tanpa pengguna mengetik berat. Dokumen ini adalah **kerangka dan pemetaan**; belum tersambung ke formulir SPK. Tugas: T-173.
+Tujuan: saat pengguna mengisi item SPK (mis. `Cable Tray W100xH100xL3000 1.2`), sistem mengenali produknya dan mengisi **berat per pcs** dan **berat per item** otomatis sesuai perhitungan di workbook `kalkulator penghitung berat.xlsx`, tanpa pengguna mengetik berat. Dokumen ini memuat kerangka, pemetaan, keputusan, dan status integrasi. Tugas: T-173.
 
 ## 1. Isi workbook (hasil pembacaan)
 
@@ -73,16 +73,16 @@ Setiap bentuk memakai parameter dimensi sendiri: `w` (lebar), `h` (tinggi), `l` 
 
 Aturan: bagian setelah `c/w` (baut dan sejenisnya) diabaikan; tebal diambil dari angka polos di akhir teks, lalu dari judul section, lalu dari tebal SPK; keluarga dari judul section (`STU`, `STC`, `SLU`, `SLW`, `SLHD`, `SLHDC`).
 
-## 4. Keputusan yang dibutuhkan dari pemilik
+## 4. Keputusan pemilik (disetujui 2026-11-03)
 
-| # | Pertanyaan | Usulan saya |
+| # | Pertanyaan | Keputusan |
 |---|---|---|
 | 1 | Berat yang dipakai di SPK: **Estimasi** atau **Real**? Untuk Cable Tray, **dikurangi lubang** atau tidak? | Real; untuk Cable Tray real dikurangi lubang (paling dekat "aktual") |
 | 2 | Massa jenis per material | Baja (SPHC, SPCC, GI): **7,85** (sama dengan workbook); SS304: **7,93**; SS316: **7,98**; Aluminium: **2,70** |
 | 3 | Apakah "Adjustable" = Fish Plate, dan "End Plate" = End Stop? | Ya (ditandai asumsi pada hasil) |
 | 4 | Tee dan Cross tidak sama lebar (mis. W300/200/300): format penulisannya? | Sementara dianggap lebar sama; selain itu diisi manual |
 | 5 | Item di luar 32 bentuk (mis. baut, aksesori khusus) | Berat tetap diisi manual |
-| 6 | Bolehkah pengguna menimpa berat otomatis? | Ya, dengan penanda "manual" |
+| 6 | Bolehkah pengguna menimpa berat otomatis? | Ya, dengan penanda "manual". **Pengguna tetap fleksibel mengubah angka kapan saja** |
 
 ## 5. Rencana integrasi ke formulir SPK (setelah keputusan di atas)
 
@@ -103,3 +103,31 @@ Aturan: bagian setelah `c/w` (baut dan sejenisnya) diabaikan; tebal diambil dari
 | Uji otomatis | `npm run test:berat` (di `apps/platform`): 6 + 24 lulus |
 
 **Catatan keamanan data:** katalog turunan workbook (`catalog.json`) dan nilai uji Excel tidak disimpan di Git selama repo masih publik (keputusan T-166). Katalog dibangun lokal dengan `node scripts/build-weight-catalog.mjs "<xlsx>"`.
+
+## 7. Status integrasi ke formulir SPK (selesai di kode)
+
+Perilaku di editor SPK:
+
+| Situasi | Perilaku |
+|---|---|
+| Deskripsi item selesai diketik atau ditempel dari Excel lama dan berat kosong | Berat per pcs terisi otomatis dari kalkulator, lencana **auto** di samping angka |
+| Pengguna mengubah angka berat | Lencana menjadi **manual**; angka tidak pernah ditimpa otomatis lagi |
+| Pengguna mengosongkan berat lalu mengubah deskripsi | Dihitung ulang otomatis |
+| Judul section, tebal, atau material SPK berubah | Baris berlencana **auto** dihitung ulang; baris manual tidak disentuh |
+| Item tidak dikenali, ukuran kurang, atau katalog belum terpasang | Berat dibiarkan kosong untuk diisi manual (tidak ada angka perkiraan) |
+| Berat per item | Tetap qty dikali berat per pcs, seperti sebelumnya |
+
+Perkiraan lama (skala dari berat acuan, mengabaikan lebar dan tinggi) sudah dihapus karena bisa memberi angka salah.
+
+### Memasang katalog (super admin, sekali, dan setiap workbook berubah)
+
+1. Bangun katalog lokal: `node scripts/build-weight-catalog.mjs "<jalur workbook>"` di `apps/platform` (hasil: `src/lib/berat/catalog.json`, tidak masuk Git).
+2. Di aplikasi: **Master Data → Katalog berat → pilih catalog.json → Pasang katalog**.
+3. Katalog disimpan terkompresi di database (`master/katalog_berat`, sekitar 16 KB) dan dimuat otomatis setelah login oleh semua pengguna. Tidak ada rumus di berkas situs atau Git.
+4. Ganti katalog: ulangi langkah 1 dan 2. Pengguna menerima versi baru saat data disinkronkan.
+
+### Bukti
+
+- Unit: mesin mereproduksi 1.505 sel workbook dengan 0 selisih; pemetaan teks lulus (`npm run test:berat`).
+- Mock (verified in browser): e2e A-29 sampai A-34, memakai katalog uji sederhana buatan sendiri (bukan rumus perusahaan): katalog terpasang dari database, berat auto, timpa manual, manual tidak ditimpa, hitung ulang, item tak dikenali dikosongkan.
+- **Belum:** uji di production dengan katalog asli dan SPK nyata dibandingkan hitungan Excel.

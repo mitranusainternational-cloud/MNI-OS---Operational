@@ -153,6 +153,30 @@ export async function runAccess(page, base) {
   const aud = await page.evaluate(() => document.getElementById('body').innerText);
   ok('A-28 riwayat perubahan tampil untuk admin', /Riwayat perubahan/.test(aud) && /Ubah/.test(aud) && /Tambah/.test(aud) && /status, catatan/.test(aud) && /Plat Uji/.test(aud), JSON.stringify(aud.slice(aud.indexOf('Riwayat perubahan'), aud.indexOf('Riwayat perubahan') + 300)));
 
+  // Berat otomatis dari kalkulator (katalog uji sederhana): terisi otomatis, bisa ditimpa manual, hitung ulang bila dikosongkan
+  await login('admin@mni.local'); await go('master-data');
+  const fixture = new URL('./fixtures/katalog-uji.json', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+  await page.click('[data-act="katberat"]'); await page.waitForTimeout(400);
+  await page.setInputFiles('#m-kb', decodeURIComponent(fixture));
+  await submit();
+  await page.waitForFunction(() => window.MNIBerat && window.MNIBerat.siap(), null, { timeout: 15000 }).catch(() => {});
+  ok('A-29 katalog berat terpasang dari database', await page.evaluate(() => !!(window.MNIBerat && window.MNIBerat.siap())), JSON.stringify(await page.evaluate(() => window.MNIBerat && window.MNIBerat.info())));
+  await go('spk');
+  await page.click('#tools [data-act="newspk"]'); await page.waitForTimeout(700);
+  await page.fill('#ed-h-0', 'CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED'); await page.dispatchEvent('#ed-h-0', 'change'); await page.waitForTimeout(300);
+  await page.fill('#ed-d-0-0', 'Cable Tray W100xH100xL3000 1.2'); await page.dispatchEvent('#ed-d-0-0', 'change'); await page.waitForTimeout(400);
+  const w1 = parseFloat(await page.inputValue('#ed-w-0-0'));
+  ok('A-30 berat terisi otomatis dari kalkulator', Math.abs(w1 - 8.69) < 0.005 && (await page.textContent('#ed-w-0-0 >> xpath=..')).includes('auto'), String(w1));
+  await page.fill('#ed-w-0-0', '9.5'); await page.waitForTimeout(200);
+  ok('A-31 pengguna menimpa: tertanda manual', (await page.textContent('#ed-w-0-0 >> xpath=..')).includes('manual'));
+  await page.fill('#ed-d-0-0', 'Cable Tray W200xH100xL3000 1.2'); await page.dispatchEvent('#ed-d-0-0', 'change'); await page.waitForTimeout(400);
+  ok('A-32 angka manual tidak ditimpa saat deskripsi berubah', parseFloat(await page.inputValue('#ed-w-0-0')) === 9.5);
+  await page.fill('#ed-w-0-0', ''); await page.fill('#ed-d-0-0', 'Cable Tray W300xH100xL3000 1.2'); await page.dispatchEvent('#ed-d-0-0', 'change'); await page.waitForTimeout(400);
+  const w3 = parseFloat(await page.inputValue('#ed-w-0-0'));
+  ok('A-33 dikosongkan lalu dihitung ulang otomatis (W300: 14.48)', Math.abs(w3 - 14.483) < 0.01, String(w3));
+  await page.fill('#ed-d-0-0', 'Baut M10 custom'); await page.dispatchEvent('#ed-d-0-0', 'change'); await page.waitForTimeout(300);
+  ok('A-34 item tak dikenali: berat otomatis dikosongkan, tidak menebak', (await page.inputValue('#ed-w-0-0')) === '');
+
   ok('A-22 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;
   return { pass: R.length - fail, fail, detail: R };
