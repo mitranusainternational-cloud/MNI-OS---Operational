@@ -26,12 +26,15 @@ Bergantung pada: T-167
 - [x] Kebijakan DELETE dicabut pada tabel transaksi (SPK, vendor, kirim, bongkar, PR, mutasi, opname, riwayat harga, bahan baku, barang jadi); aplikasi sudah memakai pembatalan lunak
 - [x] Panel Riwayat perubahan di menu Pengguna & Akses (super admin); cadangan dan skrip pulih ikut memuat `audit_log`
 - [x] Perbaikan tata letak: header lembar SPK (drawer) tanpa gaya, kartu KPI Dashboard Produksi menumpuk satu per baris, grid KPI Master Data melebar di ponsel
+- [x] Tema gelap: aturan CSS cetak checklist yang bocor ke stylesheet global (warna teks #111, header tabel terang, margin dan padding global) dihapus; teks dan tabel kembali terbaca di tema gelap
+- [x] Uji kontras otomatis tema gelap dan terang pada 12 halaman (kontras minimal 3:1); perbaikan kartu nol funnel, penanda cek data, avatar, dan jam aktivitas
 - [x] Sapu tampilan otomatis (`tests/e2e/sweep.mjs`): 12 halaman pada desktop, tablet, ponsel, plus lembar SPK; total e2e 38 + 12 + 28 + 38 lulus
-- [ ] Terapkan migration 13 di production dan uji dengan transaksi rollback (menunggu persetujuan eksplisit pemilik untuk tahap production)
+- [x] Migration 13 terpasang di production (disetujui pemilik) dan diuji dengan transaksi rollback: riwayat INSERT, UPDATE, dan DELETE tercatat atas nama pengguna yang benar, hapus permanen lewat API 0 baris, non-admin tidak membaca atau menulis audit_log
 - [ ] Gabung ke `main`, deploy Vercel, verifikasi di production
 
 ## Bukti
 
+- Production (verified in database, transaksi rollback): lihat [[TEST_MATRIX]].
 - Mock (verified in browser, bukan bukti Supabase): panel riwayat, sapu tampilan, tangkapan layar Dashboard Produksi dan lembar SPK setelah perbaikan.
 
 ## Catatan

@@ -362,3 +362,17 @@ Setelah PR #11 digabung (b290f9e) dan deploy Vercel berhasil, dengan sesi super 
 | Lambang logo di sidebar dan favicon baru termuat | PASS |
 
 **Belum:** unduh cadangan sungguhan (pemilik menekan tombolnya agar penanda tersimpan), impor CSV dengan data nyata, ekspor PDF dan Excel dengan logo baru (dicek pemilik).
+
+## Riwayat perubahan dan larangan hapus permanen (migration 13, 2026-11-03, verified in database)
+
+Transaksi di-rollback, data produksi tidak tersentuh.
+
+| Skenario | Hasil |
+|---|---|
+| Menambah pengguna: baris audit INSERT tercatat | PASS |
+| Pengguna dengan hak ubah menambah dan mengubah item bahan baku: audit INSERT dan UPDATE tercatat atas nama pengguna itu | PASS |
+| Hapus permanen item lewat API: 0 baris terhapus | PASS |
+| Non-admin membaca audit_log: 0 baris | PASS |
+| Non-admin menulis atau mengubah audit_log: ditolak | PASS |
+
+**Tampilan (mock):** sapu otomatis 12 halaman pada desktop, tablet, dan ponsel; uji kontras tema gelap dan terang; total tampilan 62 lulus. Penyebab teks gelap di tema gelap: aturan CSS cetak checklist bocor ke stylesheet global.

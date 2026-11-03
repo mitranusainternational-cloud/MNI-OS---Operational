@@ -52,6 +52,35 @@ export async function runSweep(page, base) {
     }
   }
 
+  // Tema gelap dan terang: teks harus terbaca (kontras minimal 3:1 terhadap latar efektifnya). Lembar kertas (pp, pratinjau
+  // dokumen) sengaja putih di kedua tema dan dilewati.
+  for (const theme of ['dark', 'light']) {
+    await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+    for (const v of VIEWS) {
+      await page.evaluate((v) => { location.hash = '#' + v; }, v);
+      await page.waitForTimeout(600);
+      const low = await page.evaluate(() => {
+        const parse = (s) => { const m = s.match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(',').map((x) => parseFloat(x)); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; };
+        const lum = (c) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
+        const bgOf = (el) => { for (let e = el; e; e = e.parentElement) { const c = parse(getComputedStyle(e).backgroundColor); if (c && c.a > 0.5) return c; } return { r: 255, g: 255, b: 255, a: 1 }; };
+        const bad = [];
+        const walker = document.createTreeWalker(document.querySelector('#body'), NodeFilter.SHOW_TEXT);
+        let n;
+        while ((n = walker.nextNode())) {
+          const t = n.textContent.trim(); if (!t) continue;
+          const el = n.parentElement; if (!el || el.closest('.pp, table.pp, .sj-prev, .paper, [hidden]')) continue;
+          const b = el.getBoundingClientRect(); if (b.width < 2 || b.height < 2 || getComputedStyle(el).visibility === 'hidden') continue;
+          const fg = parse(getComputedStyle(el).color), bg = bgOf(el); if (!fg) continue;
+          const L1 = lum(fg), L2 = lum(bg); const cr = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+          if (cr < 3) { bad.push((el.className || el.tagName).toString().slice(0, 24) + ' "' + t.slice(0, 16) + '" ' + cr.toFixed(1)); if (bad.length >= 4) break; }
+        }
+        return bad;
+      });
+      ok(`K ${v} @${theme}`, low.length === 0, low.join(' ; '));
+    }
+  }
+  await page.evaluate(() => document.documentElement.removeAttribute('data-theme'));
+
   // Lembar SPK (drawer): header harus bergaya (padding, tombol tutup sejajar)
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.evaluate(() => { location.hash = '#spk'; }); await page.waitForTimeout(700);

@@ -485,7 +485,7 @@ async function makeUserAdapter() {
     profiles: async (ids = []) => Object.fromEntries(ids.map((id) => {
       let h = 0;
       for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) % 360;
-      return [id, { color: `hsl(${h} 55% 45%)`, avatarUrl: null }];
+      return [id, { color: `hsl(${h} 55% 34%)`, avatarUrl: null }];
     })),
     // Cadangan: semua tabel mentah (urutan aman untuk pemulihan). Hanya super admin yang membaca semuanya (RLS).
     exportAll: async () => {

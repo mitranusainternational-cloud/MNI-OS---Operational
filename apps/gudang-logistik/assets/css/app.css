@@ -354,16 +354,16 @@ table.pp .ws{vertical-align:top}
 .cd-area-sub{display:flex;justify-content:center;gap:4px;margin-top:5px;flex-wrap:wrap}
 .ok-txt{font-size:11px;color:var(--ok);font-weight:600}
 .cd-pip{font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;font-family:var(--f-mono)}
-.cd-pip.crit{background:var(--crit);color:#fff}
-.cd-pip.warn{background:var(--warn);color:#fff}
-.cd-pip.info{background:var(--info);color:#fff}
+.cd-pip.crit{background:var(--crit);color:var(--accent-fg,#fff)}
+.cd-pip.warn{background:var(--warn);color:var(--accent-fg,#fff)}
+.cd-pip.info{background:var(--info);color:var(--accent-fg,#fff)}
 .cd-group{margin-bottom:6px}
 .cd-group-hd{display:flex;align-items:center;gap:7px;padding:9px 16px;font-size:12.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;border-bottom:1px solid var(--line)}
 .cd-group-hd.crit{background:var(--crit-soft);color:var(--crit)}
 .cd-group-hd.warn{background:var(--warn-soft);color:var(--warn)}
 .cd-group-hd.info{background:var(--info-soft);color:var(--info)}
 .cd-group-cnt{margin-left:auto;background:rgba(0,0,0,.1);border-radius:10px;padding:1px 7px;font-size:11px}
-.cd-detail{font-size:11.5px;color:var(--faint);margin-top:3px;font-style:italic}
+.cd-detail{font-size:11.5px;color:var(--muted);margin-top:3px;font-style:italic}
 .cd-total-badge{background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:1px 8px;font-size:11px;font-weight:700;font-family:var(--f-mono);margin-left:4px}
 .cd-area-panel header{border-bottom:none;padding-bottom:0}
 .tb-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -437,7 +437,7 @@ html.rail-mini .mechip{display:flex}
 .grow{flex:1}
 .tbar{height:4px;background:var(--surface-2);border-radius:2px;margin-bottom:4px;min-width:60px}.tbar i{display:block;height:100%;background:var(--s1);border-radius:2px}
 table.kt .mcol{font-size:12px}
-table.mx td.c,table.mx th.c{text-align:center}table.mx td:first-child{min-width:230px}.mx .yes{color:var(--ok);font-weight:700}.mx .no{color:var(--faint)}.mx .part{font-size:11px;color:var(--warn);font-weight:600}
+table.mx td.c,table.mx th.c{text-align:center}table.mx td:first-child{min-width:230px}.mx .yes{color:var(--ok);font-weight:700}.mx .no{color:var(--muted)}.mx .part{font-size:11px;color:var(--warn);font-weight:600}
 td.act{white-space:nowrap;text-align:right}
 .ustat{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}.ustat div{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column}
 .ustat b{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}.ustat b small{font-size:13px;color:var(--muted)}.ustat span{font-size:11.5px;color:var(--muted)}
@@ -576,24 +576,6 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 @media (max-width:860px){.rail-tg{display:none}html.rail-mini .app{grid-template-columns:minmax(0,1fr)}html.rail-mini .brand>div:last-child,html.rail-mini .nav a>span:not(.cnt){display:revert}html.rail-mini .nav .sec{display:none}html.rail-mini .nav a{padding:7px 10px;justify-content:flex-start}html.rail-mini .nav a .cnt{position:static}}
 @media print{.rail,.toolbar,.tabs,.kpis,button,.segs,.btn,.search,.sel,.pbody:not(#ks-print-area,.pbody .pbody),#ks-print-area>.pbody .kv+.pbody{display:none!important}.main{overflow:visible;padding:0}.panel{box-shadow:none;border:none;padding:8px 0}.kartu-stok{padding:0}#ks-print-area{display:block!important}table{font-size:10px}th,td{padding:3px 6px}}
 
-  *{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:12px;color:#111;padding:28px 32px}
-  .ph{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:14px}
-  .ph-co{font-size:9px;color:#555;margin-top:2px}.ph-logo{font-size:20px;font-weight:800;color:#1a3a6b;letter-spacing:-.5px}
-  .ph-doc{text-align:right}.ph-title{font-size:17px;font-weight:700;letter-spacing:.04em}.ph-sub{font-size:10px;color:#555;margin-top:2px}
-  .meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;margin-bottom:14px;font-size:11px}
-  .meta-row{display:flex;gap:4px}.meta-row .lbl{color:#555;width:90px;flex-shrink:0}.meta-row .val{font-weight:600}
-  table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:11.5px}
-  th{background:#f0f4fa;padding:5px 7px;text-align:left;font-weight:700;border:1px solid #ccc}
-  td{padding:5px 7px;border:1px solid #ddd;vertical-align:top}
-  .pck-no{text-align:center;width:32px;color:#777}.pck-num{text-align:right;width:60px;font-weight:600}
-  .pck-u{text-align:center;width:55px;color:#555}.pck-ck{text-align:center;width:36px;font-size:16px}
-  .foot-row td{background:#f5f5f5;font-weight:700}
-  .signs{display:flex;margin-top:20px;border-top:1px solid #ddd;padding-top:14px}
-  .sign{flex:1;text-align:center;padding:0 8px;font-size:10px;color:#555}
-  .sign+.sign{border-left:1px solid #ddd}
-  .sign-line{height:44px}.sign-lbl{font-weight:600;font-size:10px;color:#333}
-  .note{font-size:10px;color:#777;margin-top:6px;font-style:italic}
-  @media print{body{padding:12px 16px}@page{size:A4;margin:12mm 14mm}}
 
 /* ---------- Dashboard: ringkasan, KPI bertingkat, funnel, kolom ---------- */
 .brief{display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-bottom:14px;flex-wrap:wrap}
@@ -624,9 +606,11 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .funnel .fleg div{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
 .funnel .fleg b{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}
 .funnel .fleg span{color:var(--muted);font-size:12px}
-.funnel .fleg .zero b{color:var(--line-2)}
+.funnel .fleg .zero b{color:var(--muted);font-weight:600}
 @media (max-width:1100px){.dash-cols,.dash-pair{grid-template-columns:minmax(0,1fr)}.funnel .fleg{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 /* KPI baris (Dashboard Produksi, KPI lain): kartu berjajar, bukan menumpuk satu per baris */
 .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
 .kpi-row+*{margin-top:0}
+
+.feed .fi time{color:var(--muted)}
