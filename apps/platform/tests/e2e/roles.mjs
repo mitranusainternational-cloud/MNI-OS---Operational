@@ -27,7 +27,12 @@ export async function runRoles(page, base) {
     await page.waitForSelector('#auth-otp', { state: 'visible' }); await page.fill('#auth-otp', '123456');
     // halaman dimuat ulang setelah login; tunggu sampai identitas pengguna terbaca (bukan "Tamu"), penting di runner CI yang lebih lambat
     await page.waitForTimeout(2000);
-    await page.waitForFunction(() => document.querySelectorAll('#nav a').length > 5 && !/Tamu/.test(document.getElementById('who').innerText), null, { timeout: 30000 });
+    try {
+      await page.waitForFunction(() => document.querySelectorAll('#nav a').length > 5 && !/Tamu/.test(document.getElementById('who').innerText), null, { timeout: 30000 });
+    } catch (e) {
+      const info = await page.evaluate(() => ({ url: location.href, who: (document.getElementById('who') || {}).innerText, nav: document.querySelectorAll('#nav a').length, auth: (document.body.innerText || '').slice(0, 200), session: localStorage.getItem('mni-local-mock-session') }));
+      throw new Error('login ' + email + ' gagal: ' + JSON.stringify(info));
+    }
     await page.waitForTimeout(800);
   };
   // percobaan mencatat: hasil = jumlah baris mutasi bertambah
