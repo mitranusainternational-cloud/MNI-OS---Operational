@@ -13,9 +13,11 @@ CREATE TABLE IF NOT EXISTS public.produksi_log (
   item_idx  INTEGER NOT NULL CHECK (item_idx >= 0),    -- urutan item pada SPK
   item_desc TEXT NOT NULL,                             -- salinan deskripsi (tahan terhadap revisi urutan)
   wc        TEXT NOT NULL,                             -- nama work center (mwc.nama)
-  qty       NUMERIC NOT NULL CHECK (qty > 0),          -- jumlah SELESAI yang ditambahkan (bukan kumulatif)
+  qty       NUMERIC NOT NULL DEFAULT 0 CHECK (qty >= 0),    -- jumlah SELESAI (baik) yang ditambahkan (bukan kumulatif)
+  reject    NUMERIC NOT NULL DEFAULT 0 CHECK (reject >= 0), -- jumlah reject di langkah ini; tidak lanjut, dibuat ulang
   oleh      TEXT,                                      -- email pencatat
   ket       TEXT,
+  CONSTRAINT produksi_log_ada_isi CHECK (qty > 0 OR reject > 0),
   data      JSONB NOT NULL DEFAULT '{}'::jsonb          -- bidang tambahan aplikasi (created_by dan sejenisnya)
 );
 CREATE INDEX IF NOT EXISTS produksi_log_spk ON public.produksi_log (spk_id, item_idx);

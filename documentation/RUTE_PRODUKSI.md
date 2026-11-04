@@ -138,3 +138,31 @@ Isi sekali (dapat berubah); yang tidak diisi mengikuti rute produk.
 | Banyak kondisi, tim tidak boleh repot | Rute otomatis dari produk dan aturan bentuk; tim hanya mengisi hasil di mesinnya; usulan langkah dari kejadian nyata bagian 2 |
 
 Yang belum dibangun (menunggu keputusan bagian 7 dan 8): tampilan pengecualian rute per item di editor SPK, tabel aturan khusus yang bisa diubah dari aplikasi (sementara aturan Cover dan rute standar tertanam di kode dan dapat ditimpa lewat `master/rute_produksi`), usulan "Tambahkan ke rute", tombol Mulai untuk waktu proses riil, dan impor ke produksi (migration 14 serta tayang).
+
+## 11. Keputusan konsep pelacakan (2026-11-04)
+
+Contoh kasus Cable Tray: Shearing → Punching → Bending → vendor finishing → Gudang barang jadi → surat jalan customer.
+
+| Keputusan | Isi |
+|---|---|
+| Siapa mencatat | Operator hanya di mesin internal (Shearing, Punching, Bending, dan sejenisnya). Tahap vendor, Gudang BJ, dan surat jalan otomatis dari dokumen yang sudah ada, tanpa input ganda |
+| Cara input | **Selesai hari ini** (jumlah baru, bukan total). Total, sisa, dan posisi dihitung otomatis; tombol Semua mengisi seluruh yang siap |
+| Urutan mesin | Hasil mesin berikutnya tidak boleh melebihi yang sudah selesai di mesin sebelumnya (ditolak) |
+| Reject di mesin | Dicatat di kolom Reject pada langkah itu. Reject tidak lanjut, batangnya dicabut dari hitungan langkah sebelumnya sehingga muncul lagi di antrian awal untuk dibuat ulang. Progres item hanya menghitung yang baik |
+| Reject vendor | Dari dokumen Terima dari Vendor (sudah ada) |
+
+Teknis: tabel `produksi_log` mendapat kolom `reject` (draf migration 14 diperbarui, `qty` boleh 0 selama `qty` atau `reject` lebih dari 0). Uji unit R-70 sampai R-74 dan e2e M-15, M-16.
+
+## 12. Vendor sebagai langkah rute (2026-11-04)
+
+| Bagian | Isi |
+|---|---|
+| Rute | Finishing dibaca dari judul section: ELECTRO = Vendor ELG, HOTDIP = Vendor HDG, POWDER atau PDC = Vendor PDC; NON FINISHING tanpa vendor. Contoh Cable Tray ELECTRO: Shearing, Punching, Bending, Vendor ELG. Rute yang diatur pada item tidak ditambah vendor |
+| Batas kirim | Form Kirim ke vendor hanya menawarkan sebatas hasil langkah mesin terakhir (sudah dikurangi yang pernah dikirim) untuk item yang sudah punya catatan produksi per mesin. Melebihi ditolak dengan pesan jelas; kirim ulang atau rework tetap bisa dengan centang dan keterangan. Item tanpa catatan produksi per mesin tidak dibatasi (kompatibel) |
+| Posisi | Langkah vendor mengambil angka dari dokumen Kirim ke Vendor (dikirim) dan Terima dari Vendor (kembali OK); posisi SPK menyebut di vendor mana dan hari ke berapa |
+| Dashboard | Catatan Siap dikirim ke Vendor X: batang yang sudah selesai produksi tetapi belum ada surat jalan vendor |
+| Beban mesin | Langkah vendor tidak dihitung sebagai antrian mesin dan tidak butuh kapasitas |
+
+Uji unit R-80 sampai R-85 dan e2e M-17 sampai M-19c.
+
+Belum dibangun: pengecualian rute per item (centang langkah yang dilewati), reject vendor yang otomatis kembali ke antrian produksi, serta QC atau packing setelah vendor bila diperlukan.

@@ -24,21 +24,52 @@ const produkDari = (judul) => {
   return Object.keys(RUTE_STANDAR).sort((a, b) => b.length - a.length).find((p) => H.startsWith(p)) || '';
 };
 
+// Langkah vendor (subcon) bernama "Vendor ELG", "Vendor HDG", "Vendor PDC": bukan work center, tidak punya kapasitas atau antrian mesin.
+export const langkahVendor = (w) => /^vendor/i.test(String(w || ''));
+
+// Finishing yang dikerjakan vendor, dibaca dari judul section (ELECTRO = ELG, HOTDIP = HDG, POWDER atau PDC = PDC). Non finishing: tanpa vendor.
+export function finishingDari(judul) {
+  const H = String(judul || '').toUpperCase();
+  if (/(^|[^A-Z])NON([^A-Z]|$)/.test(H)) return '';
+  if (H.includes('ELECTRO')) return 'ELG';
+  if (H.includes('HOTDIP') || H.includes('HOT DIP')) return 'HDG';
+  if (H.includes('POWDER') || /(^|[^A-Z])PDC([^A-Z]|$)/.test(H)) return 'PDC';
+  return '';
+}
+
 // Rute untuk sebuah item: dari kolom rute item bila sudah diatur (snapshot), selain itu dari aturan khusus, selain itu rute produk.
-export function tentukanRute({ judulSection, deskripsi, ruteItem }, rute = RUTE_STANDAR, aturan = ATURAN_KHUSUS) {
+// opsi.vendor: bila true dan finishing dikenali dari judul section, ditambahkan langkah akhir "Vendor <finishing>" (rute item yang diatur tidak diubah).
+export function tentukanRute({ judulSection, deskripsi, ruteItem }, rute = RUTE_STANDAR, aturan = ATURAN_KHUSUS, opsi = {}) {
   if (Array.isArray(ruteItem) && ruteItem.length) return { rute: ruteItem.slice(), sumber: 'item' };
   const p = produkDari(judulSection);
   const k = aturan.find((a) => a.cocok.test(String(deskripsi || '')) && (!a.produk || a.produk.test(String(judulSection || '').toUpperCase())));
-  if (k) return { rute: k.rute.slice(), sumber: 'aturan', alasan: k.alasan };
-  if (p && rute[p]) return { rute: rute[p].slice(), sumber: 'produk' };
-  return { rute: [], sumber: 'belum' };
+  let hasil = { rute: [], sumber: 'belum' };
+  if (k) hasil = { rute: k.rute.slice(), sumber: 'aturan', alasan: k.alasan };
+  else if (p && rute[p]) hasil = { rute: rute[p].slice(), sumber: 'produk' };
+  const fin = finishingDari(judulSection);
+  if (opsi.vendor && fin && hasil.rute.length) hasil.rute.push('Vendor ' + fin);
+  return hasil;
 }
 
-// Kejadian produksi (append-only): { spk, item, wc, qty (tambahan, bukan kumulatif), tgl, by }
-// Kumulatif per langkah untuk satu item.
+// Hasil langkah internal terakhir (batas maksimal yang boleh dikirim ke vendor). Tanpa langkah vendor di rute: null.
+export function siapKirimVendor(rute, kum) {
+  const iv = rute.findIndex(langkahVendor);
+  if (iv < 1) return null;
+  return kum[rute[iv - 1]];
+}
+
+// Kejadian produksi (append-only): { spk, item, wc, qty (tambahan hari itu, bukan kumulatif), reject (tambahan reject), tgl, by }
+// Kumulatif per langkah untuk satu item. Reject di sebuah langkah tidak lolos ke langkah berikutnya dan harus dibuat ulang:
+// batang itu dicabut dari hitungan langkah-langkah sebelumnya, sehingga antrian langkah pertama bertambah sebanyak reject.
 export function kumulatif(rute, kejadian) {
   const kum = Object.fromEntries(rute.map((w) => [w, 0]));
-  for (const e of kejadian) if (e.wc in kum) kum[e.wc] += Number(e.qty) || 0;
+  for (const e of kejadian) {
+    const i = rute.indexOf(e.wc);
+    if (i < 0) continue;
+    kum[e.wc] += Number(e.qty) || 0;
+    const rej = Number(e.reject) || 0;
+    if (rej > 0) for (let j = 0; j < i; j++) kum[rute[j]] = Math.max(0, kum[rute[j]] - rej);
+  }
   return kum;
 }
 
@@ -52,12 +83,14 @@ export function antrianPerLangkah(rute, kum, qtyTotal) {
 }
 
 // Validasi masukan: qty tambahan di sebuah langkah tidak boleh melebihi yang tersedia (lolos langkah sebelumnya dikurangi yang sudah selesai).
-export function periksaMasukan(rute, kum, qtyTotal, wc, tambah) {
+// Reject ikut dihitung: yang selesai ditambah yang reject tidak boleh melebihi yang tersedia.
+export function periksaMasukan(rute, kum, qtyTotal, wc, tambah, reject = 0) {
   const i = rute.indexOf(wc);
   if (i < 0) return { ok: false, alasan: `${wc} tidak ada di rute item ini (${rute.join(' → ')})` };
-  if (!(tambah > 0)) return { ok: false, alasan: 'Jumlah harus lebih dari 0' };
+  if (!(tambah >= 0) || !(reject >= 0)) return { ok: false, alasan: 'Jumlah tidak boleh negatif' };
+  if (!(tambah + reject > 0)) return { ok: false, alasan: 'Jumlah harus lebih dari 0' };
   const tersedia = (i === 0 ? qtyTotal : kum[rute[i - 1]]) - kum[wc];
-  if (tambah > tersedia) return { ok: false, alasan: `Hanya ${tersedia} yang siap di ${wc}${i ? ' (selesai di ' + rute[i - 1] + ': ' + kum[rute[i - 1]] + ')' : ''}` };
+  if (tambah + reject > tersedia) return { ok: false, alasan: `Hanya ${tersedia} yang siap di ${wc}${i ? ' (selesai di ' + rute[i - 1] + ': ' + kum[rute[i - 1]] + ')' : ''}` };
   return { ok: true, tersedia };
 }
 
@@ -69,11 +102,11 @@ export const progresItem = (rute, kum) => (rute.length ? kum[rute[rute.length - 
 // kejadianHariIni: kejadian pada tanggal hari ini (untuk "selesai hari ini")
 export function bebanWC(itemAktif, kapasitas, kejadianHariIni = []) {
   const out = {};
-  const wcs = new Set([...Object.keys(kapasitas || {}), ...itemAktif.flatMap((it) => it.rute)]);
+  const wcs = new Set([...Object.keys(kapasitas || {}), ...itemAktif.flatMap((it) => it.rute)].filter((w) => !langkahVendor(w)));
   for (const w of wcs) out[w] = { wc: w, antri: 0, spk: new Set(), selesaiHariIni: 0, kapasitas: (kapasitas || {})[w] || 0 };
   for (const it of itemAktif) {
     for (const s of antrianPerLangkah(it.rute, it.kum, it.qty)) {
-      if (s.antri > 0) { out[s.wc].antri += s.antri; out[s.wc].spk.add(it.spk); }
+      if (s.antri > 0 && !langkahVendor(s.wc)) { out[s.wc].antri += s.antri; out[s.wc].spk.add(it.spk); }
     }
   }
   for (const e of kejadianHariIni) if (out[e.wc]) out[e.wc].selesaiHariIni += Number(e.qty) || 0;
@@ -90,7 +123,7 @@ export function bebanWC(itemAktif, kapasitas, kejadianHariIni = []) {
 export function prediksiSelesai(itemAktif, kapasitas) {
   const hariWC = {}; // wc -> { itemKey -> hari selesai antrian item itu di wc }
   const antri = {};
-  itemAktif.forEach((it, idx) => antrianPerLangkah(it.rute, it.kum, it.qty).forEach((s) => { if (s.antri > 0) (antri[s.wc] = antri[s.wc] || []).push({ idx, qty: s.antri, due: it.due || '9999-12-31' }); }));
+  itemAktif.forEach((it, idx) => antrianPerLangkah(it.rute, it.kum, it.qty).forEach((s) => { if (s.antri > 0 && !langkahVendor(s.wc)) (antri[s.wc] = antri[s.wc] || []).push({ idx, qty: s.antri, due: it.due || '9999-12-31' }); }));
   for (const [w, list] of Object.entries(antri)) {
     const kap = (kapasitas || {})[w] || 0;
     list.sort((a, b) => a.due.localeCompare(b.due));
@@ -98,9 +131,9 @@ export function prediksiSelesai(itemAktif, kapasitas) {
     for (const x of list) { cum += x.qty; hariWC[w][x.idx] = kap > 0 ? cum / kap : null; }
   }
   return itemAktif.map((it, idx) => {
-    const hari = it.rute.map((w) => (hariWC[w] && idx in hariWC[w] ? hariWC[w][idx] : 0));
+    const hari = it.rute.filter((w) => !langkahVendor(w)).map((w) => (hariWC[w] && idx in hariWC[w] ? hariWC[w][idx] : 0));
     if (hari.some((h) => h === null)) return { spk: it.spk, item: it.item, hari: null, alasan: 'Kapasitas belum diatur untuk WC di rutenya' };
-    return { spk: it.spk, item: it.item, hari: Math.max(0, ...hari), penentu: it.rute[hari.indexOf(Math.max(...hari))] };
+    return { spk: it.spk, item: it.item, hari: Math.max(0, ...hari), penentu: it.rute.filter((w) => !langkahVendor(w))[hari.indexOf(Math.max(...hari))] };
   });
 }
 

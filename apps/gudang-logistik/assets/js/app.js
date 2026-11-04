@@ -110,7 +110,7 @@ function calc(){
  const spk={};
  for(const s of S.spk){
   let q=0,prod=0,kir=0,vo=0,vb=0;
-  const lines=(s.items||[]).map((it,ix)=>{const v=vIdx[s._id+'|'+it.d]||{out:0,back:0};const k=kIdx[s._id+'|'+it.d]||0;const iq=+it.q||0;const evP=prodFromEvents(s,it,ix);const pe=evP!=null?Math.max(Math.min(evP,iq),Math.min(v.out,iq)):Math.max(Math.min(+it.prod||0,iq),Math.min(v.out,iq));q+=iq;prod+=pe;kir+=Math.min(k,iq);vo+=v.out;vb+=v.back;return {...it,prodEff:pe,vOut:v.out,vBack:v.back,kirim:k}});
+  const lines=(s.items||[]).map((it,ix)=>{const v=vIdx[s._id+'|'+it.d]||{out:0,back:0};const k=kIdx[s._id+'|'+it.d]||0;const iq=+it.q||0;const evP=prodFromEvents(s,it,ix);const pe=evP!=null?Math.max(Math.min(evP,iq),Math.min(v.out,iq)):Math.max(Math.min(+it.prod||0,iq),Math.min(v.out,iq));q+=iq;prod+=pe;kir+=Math.min(k,iq);vo+=v.out;vb+=v.back;const stv=PXL()?itemState(s,it,ix):null;const vSiap=stv&&stv.ev.length?PXL().siapKirimVendor(stv.rute,stv.kum):null;return {...it,prodEff:pe,vOut:v.out,vBack:v.back,kirim:k,vSiap}});
   const pK=pct(kir,q),pP=pct(prod,q);
   let st='Proses',late=0;
   if((s.status||'Terbit')==='Draft')st='Draft';else if(pK>=1)st='Selesai';else if(s.due&&s.due<t){st='Terlambat';late=days(s.due,t)}
@@ -1044,10 +1044,12 @@ function mvForm(g,j,item,prId){
 function linesTable(spkId,mode){
  if(!spkId)return '<div class="note">Pilih SPK untuk menampilkan item.</div>';
  const x=calc().spk[spkId];if(!x)return '';
- return `<div class="tbl-wrap"><table class="lines"><thead><tr><th>Item</th><th class="num">Order</th><th class="num">${mode==='vendor'?'Sudah ke vendor':'Sudah terkirim'}</th><th class="num">Sisa</th><th class="num">Qty ${mode==='vendor'?'kirim ke vendor':'kirim sekarang'}</th></tr></thead><tbody>${x.lines.map((l,i)=>{const done=mode==='vendor'?l.vOut:l.kirim;const sisa=Math.max(0,l.q-done);return `<tr><td>${esc(l.d)}</td><td class="num">${n(l.q)} ${esc(l.u)}</td><td class="num">${n(done)}</td><td class="num"><b>${n(sisa)}</b></td><td class="num"><input class="inp" type="number" min="0" step="any" name="ln_${i}" id="m-ln_${i}" value="${sisa||''}" data-max="${sisa}"></td></tr>`}).join('')}</tbody></table></div><div class="note">Kosongkan item yang tidak ikut. Qty tidak boleh melebihi sisa, kecuali dicentang di bawah.</div>`;
+ return `<div class="tbl-wrap"><table class="lines"><thead><tr><th>Item</th><th class="num">Order</th><th class="num">${mode==='vendor'?'Sudah ke vendor':'Sudah terkirim'}</th><th class="num">Sisa</th><th class="num">Qty ${mode==='vendor'?'kirim ke vendor':'kirim sekarang'}</th></tr></thead><tbody>${x.lines.map((l,i)=>{const done=mode==='vendor'?l.vOut:l.kirim;const sisa=sisaLine(l,mode);return `<tr><td>${esc(l.d)}</td><td class="num">${n(l.q)} ${esc(l.u)}</td><td class="num">${n(done)}</td><td class="num"><b>${n(sisa)}</b>${mode==='vendor'&&l.vSiap!=null&&l.vSiap-l.vOut<l.q-l.vOut?`<div class="note">siap ${n(Math.max(0,l.vSiap-l.vOut))} (hasil produksi)</div>`:''}</td><td class="num"><input class="inp" type="number" min="0" step="any" name="ln_${i}" id="m-ln_${i}" value="${sisa||''}" data-max="${sisa}"></td></tr>`}).join('')}</tbody></table></div><div class="note">Kosongkan item yang tidak ikut. Qty tidak boleh melebihi sisa, kecuali dicentang di bawah.</div>`;
 }
+/* Sisa yang boleh dikirim. Ke vendor juga dibatasi hasil langkah produksi terakhir (item yang sudah punya catatan produksi per mesin). */
+const sisaLine=(l,mode)=>{const s=Math.max(0,l.q-(mode==='vendor'?l.vOut:l.kirim));return mode==='vendor'&&l.vSiap!=null?Math.min(s,Math.max(0,l.vSiap-l.vOut)):s};
 const pickLines=(spkId,d)=>calc().spk[spkId].lines.map((l,i)=>({d:l.d,u:l.u,q:num0(d['ln_'+i])})).filter(l=>l.q>0);
-function checkCap(spkId,d,mode){if(d.over)return;const x=calc().spk[spkId];x.lines.forEach((l,i)=>{const q=num0(d['ln_'+i]);const sisa=Math.max(0,l.q-(mode==='vendor'?l.vOut:l.kirim));if(q>sisa)throw new Error(`"${l.d}": ${n(q)} melebihi sisa ${n(sisa)}. Centang ${mode==='vendor'?'kirim ulang / rework':'kirim lebih'} bila memang disengaja.`)})}
+function checkCap(spkId,d,mode){if(d.over)return;const x=calc().spk[spkId];x.lines.forEach((l,i)=>{const q=num0(d['ln_'+i]);const sisa=sisaLine(l,mode);if(q>sisa)throw new Error(`"${l.d}": ${n(q)} melebihi ${mode==='vendor'&&l.vSiap!=null&&sisa<Math.max(0,l.q-l.vOut)?'hasil produksi yang siap dikirim':'sisa'} ${n(sisa)}. Centang ${mode==='vendor'?'kirim ulang / rework':'kirim lebih'} bila memang disengaja.`)})}
 function vendorForm(spk){
  openModal('Kirim barang setengah jadi ke vendor',
   fld('Vendor finishing',inp('vendor','','text','list="dl-ven" required autocomplete="off" placeholder="Pilih dari master vendor"'))+fld('Proses',inp('proses','','text','list="dl-pro" placeholder="HDG / ELG / Powder Coating"'))+
@@ -1516,21 +1518,25 @@ let EVX=null;
 const PXL=()=>window.MNIProduksi||null;
 function evIdx(){if(EVX)return EVX;EVX={};for(const e of (S.produksi_log||[])){const k=e.spk_id+'|'+e.item_idx;(EVX[k]=EVX[k]||[]).push(e)}return EVX}
 const ruteStd=()=>{const m=byId('master','rute_produksi');return (m&&m.rute)||PXL().RUTE_STANDAR};
-function itemRute(it){const P=PXL();if(!P)return [];return P.tentukanRute({judulSection:it.g,deskripsi:it.d,ruteItem:it.rute},ruteStd(),P.ATURAN_KHUSUS).rute}
+function itemRute(it){const P=PXL();if(!P)return [];return P.tentukanRute({judulSection:it.g,deskripsi:it.d,ruteItem:it.rute},ruteStd(),P.ATURAN_KHUSUS,{vendor:true}).rute}
 /* Keadaan item: rute, kumulatif per langkah, qty. Tanpa kejadian: progres lama (item.prod) dianggap sudah melewati semua langkah. */
 function itemState(s,it,idx){
  const P=PXL();if(!P)return null;const r=itemRute(it);if(!r.length)return null;
  const ev=evIdx()[s._id+'|'+idx]||[];const qty=+it.q||0;
- const kum=ev.length?P.kumulatif(r,ev.map(e=>({wc:e.wc,qty:+e.qty||0}))):Object.fromEntries(r.map(w=>[w,Math.min(+it.prod||0,qty)]));
- return {rute:r,kum,qty,ev};
+ const kum=ev.length?P.kumulatif(r,ev.map(e=>({wc:e.wc,qty:+e.qty||0,reject:+e.reject||0}))):Object.fromEntries(r.map(w=>[w,Math.min(+it.prod||0,qty)]));
+ /* Langkah vendor: kum = yang sudah kembali OK dari vendor, vendorKirim = yang sudah dikirim (dari dokumen Kirim ke Vendor dan Terima dari Vendor) */
+ const vendorKirim={};const vs=r.find(P.langkahVendor);
+ if(vs){let out=0,back=0;for(const v of S.vendor){if(v.status==='Batal'||v.spk!==s._id)continue;for(const i of v.items||[])if(i.d===it.d){out+=+i.q||0;back+=+i.kembali||0}}
+  kum[vs]=Math.min(back,qty);vendorKirim[vs]=out}
+ return {rute:r,kum,qty,ev,vendorKirim};
 }
-function prodFromEvents(s,it,idx){const ev=evIdx()[s._id+'|'+idx];if(!ev||!ev.length||!PXL())return null;const r=itemRute(it);if(!r.length)return null;return PXL().progresItem(r,PXL().kumulatif(r,ev.map(e=>({wc:e.wc,qty:+e.qty||0}))))}
+function prodFromEvents(s,it,idx){const ev=evIdx()[s._id+'|'+idx];if(!ev||!ev.length||!PXL())return null;const r=itemRute(it);if(!r.length)return null;return PXL().progresItem(r,PXL().kumulatif(r,ev.map(e=>({wc:e.wc,qty:+e.qty||0,reject:+e.reject||0}))))}
 const kapWC=()=>Object.fromEntries(S.mwc.filter(w=>w.aktif!==false&&+w.kapasitas>0).map(w=>[w.nama,+w.kapasitas]));
 const wcInternal=()=>S.mwc.filter(w=>w.aktif!==false&&w.tipe!=='Subcont').sort((a,b)=>a.urutan-b.urutan);
 function wcAktifItems(){
  const c=calc();const out=[];
  S.spk.forEach(s=>{const x=c.spk[s._id];if(!x||x.st==='Selesai'||x.st==='Draft'||s.status==='Batal')return;
-  (s.items||[]).forEach((it,idx)=>{const st=itemState(s,it,idx);if(st)out.push({spk:s.no,spkId:s._id,customer:s.customer,item:it.d,satuan:it.u,idx,kategori:it.g,qty:st.qty,rute:st.rute,kum:st.kum,due:s.due||''})})});
+  (s.items||[]).forEach((it,idx)=>{const st=itemState(s,it,idx);if(st)out.push({spk:s.no,spkId:s._id,customer:s.customer,item:it.d,satuan:it.u,idx,kategori:it.g,qty:st.qty,rute:st.rute,kum:st.kum,vendorKirim:st.vendorKirim,due:s.due||''})})});
  return out;
 }
 const evTgl=e=>e.tgl||String(e.at||'').slice(0,10);
@@ -1544,11 +1550,11 @@ const stWcCls={Kosong:'plain',Normal:'ok',Padat:'warn',Overload:'crit','Kapasita
 /* Posisi batang sebuah SPK: di mesin mana (menunggu atau dikerjakan), di vendor, atau selesai produksi */
 function posisiSpkHtml(s){
  const P=PXL();if(!P)return '';const its=[];
- (s.items||[]).forEach((it,idx)=>{const st=itemState(s,it,idx);if(st)its.push({rute:st.rute,kum:st.kum,qty:st.qty})});
+ (s.items||[]).forEach((it,idx)=>{const st=itemState(s,it,idx);if(st)its.push({rute:st.rute,kum:st.kum,qty:st.qty,vendorKirim:st.vendorKirim})});
  if(!its.length)return '';
- const pos=P.posisiSPK(its).slice(0,4);
  const vend=calc().vend.filter(x=>x.v.spk===s._id&&(x.st==='Di Vendor'||x.st==='Kembali Sebagian'));
  const vtxt=vend.length?vend.map(x=>`di ${esc(x.v.vendor)} ${n(x.sisa)} (hari ke-${x.age})`).join(' · '):'';
+  const pos=P.posisiSPK(its).filter(p=>!(vend.length&&p.tempat.endsWith('(di vendor)'))).slice(0,4);
  return `<div class="note" style="margin-top:3px;white-space:normal">${pos.map(p=>`${esc(p.tempat)} <b>${n(p.qty)}</b>`).join(' · ')}${vtxt?' · '+vtxt:''}</div>`;
 }
 
@@ -1574,7 +1580,8 @@ function wcPanelBaru(){
  const pred=P.prediksiSelesai(items,kap);const perSpk={};
  pred.forEach(p=>{if(p.hari==null)return;const o=perSpk[p.spk]||(perSpk[p.spk]={hari:0,penentu:'',spk:p.spk});if(p.hari>=o.hari){o.hari=p.hari;o.penentu=p.penentu}});
  const risiko=Object.values(perSpk).map(o=>{const s=S.spk.find(x=>x.no===o.spk);const tgl=P.tambahHariKerja(t,o.hari);return {...o,tgl,due:s&&s.due,telat:!!(s&&s.due&&tgl>s.due)}}).filter(o=>o.telat);
- const bar=[pen&&pen.hariHabis>=1?`<div class="wc-note crit">Penahan: <b>${esc(pen.wc)}</b>, antrian ${n(pen.antri)} butuh ${fHari(pen.hariHabis)} hari kerja untuk habis</div>`:'',
+ const siapV={};items.forEach(it=>P.posisiItem(it.rute,it.kum,it.qty,it.vendorKirim).filter(p=>p.jenis==='vendor-siap-kirim').forEach(p=>{const o=siapV[p.tempat]||(siapV[p.tempat]={qty:0,spk:new Set()});o.qty+=p.qty;o.spk.add(it.spk)}));
+ const bar=[...Object.entries(siapV).map(([w,o])=>`<div class="wc-note warn">Siap dikirim ke ${esc(w)}: <b>${n(o.qty)}</b> dari ${o.spk.size} SPK (selesai produksi, belum ada surat jalan vendor)</div>`),pen&&pen.hariHabis>=1?`<div class="wc-note crit">Penahan: <b>${esc(pen.wc)}</b>, antrian ${n(pen.antri)} butuh ${fHari(pen.hariHabis)} hari kerja untuk habis</div>`:'',
   ...risiko.slice(0,4).map(o=>`<div class="wc-note warn">SPK ${esc(String(o.spk))} berisiko telat: perkiraan selesai ${fd(o.tgl)}, due ${fd(o.due)} · penahan ${esc(o.penentu)}</div>`)].join('');
  return `<div class="pbody" style="padding:0 0 8px 0"><div class="dw-section-title" style="margin:0 0 6px 0">Beban per work center</div>
   ${adaKap?'':'<div class="note" style="padding:0 0 8px">Isi kapasitas per hari tiap work center di Master Data, Work Centre, agar hari habis dan status terhitung.</div>'}
@@ -1611,19 +1618,22 @@ B.mesin=()=>{
  const antri=rows.reduce((a,r)=>a+r.a.antri,0);
  const kp=`<div class="kpi-row"><div class="kpi info"><span class="lb">Antrian ${esc(cur)}</span><span class="v">${n(antri)}</span><span class="s">${rows.length} item</span></div><div class="kpi ok"><span class="lb">Selesai hari ini</span><span class="v">${n(hariIni)}</span><span class="s">${kap?'kapasitas '+n(kap)+' per hari':'kapasitas belum diatur'}</span></div></div>`;
  const chips=(it)=>it.rute.map(w=>`<span class="rchip${w===cur?' on':''}">${esc(w)}</span>`).join('<span class="rarr">›</span>');
- const body=rows.length?`<div class="tbl-wrap"><table id="mesin-antri"><thead><tr><th>SPK</th><th>Item</th><th>Rute</th><th class="num">Siap</th><th>Due</th><th class="num">Selesai</th><th></th></tr></thead><tbody>${rows.map(({it,a})=>{const k=it.spkId+'|'+it.idx;return `<tr data-k="${esc(k)}"><td><b>${esc(String(it.spk))}</b><div class="note">${esc(it.customer||'')}</div></td><td>${esc(it.item)}<div class="note">total ${n(it.qty)} ${esc(it.satuan||'')}</div></td><td>${chips(it)}</td><td class="num"><b>${n(a.antri)}</b></td><td>${it.due?fd(it.due):'–'}</td>
-  <td class="num"><input class="inp num" type="number" min="0" step="any" max="${a.antri}" data-mq="${esc(k)}" placeholder="0" style="width:90px" inputmode="decimal"></td><td class="act"><button class="btn sm primary" data-act="mesinsimpan" data-k="${esc(k)}">Simpan</button> <button class="btn sm ghost" data-act="mesinsemua" data-k="${esc(k)}" title="Isi semua yang siap">Semua</button></td></tr>`}).join('')}</tbody></table></div>`
+ const body=rows.length?`<div class="tbl-wrap"><table id="mesin-antri"><thead><tr><th>SPK</th><th>Item</th><th>Rute</th><th class="num">Siap dikerjakan</th><th>Due</th><th class="num">Selesai hari ini</th><th class="num">Reject</th><th></th></tr></thead><tbody>${rows.map(({it,a})=>{const k=it.spkId+'|'+it.idx;return `<tr data-k="${esc(k)}"><td><b>${esc(String(it.spk))}</b><div class="note">${esc(it.customer||'')}</div></td><td>${esc(it.item)}<div class="note">total ${n(it.qty)} ${esc(it.satuan||'')} · sudah selesai di sini ${n(a.selesai)}</div></td><td>${chips(it)}</td><td class="num"><b>${n(a.antri)}</b></td><td>${it.due?fd(it.due):'–'}</td>
+  <td class="num"><input class="inp num" type="number" min="0" step="any" max="${a.antri}" data-mq="${esc(k)}" placeholder="0" style="width:90px" inputmode="decimal"></td>
+  <td class="num"><input class="inp num" type="number" min="0" step="any" max="${a.antri}" data-mr="${esc(k)}" placeholder="0" style="width:70px" inputmode="decimal"></td><td class="act"><button class="btn sm primary" data-act="mesinsimpan" data-k="${esc(k)}">Simpan</button> <button class="btn sm ghost" data-act="mesinsemua" data-k="${esc(k)}" title="Isi semua yang siap">Semua</button></td></tr>`}).join('')}</tbody></table></div>`
   :empty('Tidak ada antrian di '+esc(cur),'Item muncul di sini begitu langkah sebelumnya selesai atau SPK terbit. Pastikan judul section SPK memuat produk (mis. CABLE TRAY TYPE STU) agar rute dikenali.');
- return kp+`<section class="panel"><div class="pbody note">Isi jumlah yang selesai di mesin ini lalu Simpan. Item otomatis pindah ke mesin berikutnya di rutenya. Urut menurut due date terdekat.</div>${body}</section>`;
+ return kp+`<section class="panel"><div class="pbody note">Isi <b>berapa yang selesai hari ini</b> (jumlah baru, bukan total), lalu Simpan. Bila ada yang rusak isi kolom Reject; reject tidak lanjut ke mesin berikutnya dan muncul lagi di antrian awal untuk dibuat ulang. Item otomatis pindah ke mesin berikutnya. Urut menurut due date terdekat.</div>${body}</section>`;
 };
 async function mesinSimpan(k,semua){
  const [sid,ix]=k.split('|');const s=byId('spk',sid);const it=s&&(s.items||[])[+ix];if(!it)return;
  const st=itemState(s,it,+ix);if(!st)return;const wc=F.mesin.wc;
  const a=PXL().antrianPerLangkah(st.rute,st.kum,st.qty).find(x=>x.wc===wc);
- const inp=document.querySelector(`[data-mq="${CSS.escape(k)}"]`);const q=semua?(a?a.antri:0):num0(inp&&inp.value);
- const chk=PXL().periksaMasukan(st.rute,st.kum,st.qty,wc,q);if(!chk.ok){toast(chk.alasan);return}
- try{await addDoc('produksi_log',{spk_id:s._id,item_idx:+ix,item_desc:it.d,wc,qty:q,tgl:today(),oleh:ME||null});try{localStorage.setItem('mni-wc',wc)}catch(_){}
-  const next=st.rute[st.rute.indexOf(wc)+1];toast(`${wc}: ${n(q)} ${it.u||''} selesai${next?' · lanjut ke '+next:' · selesai produksi'}`)}catch(e){toast(e.message||'Gagal menyimpan')}
+ const inp=document.querySelector(`[data-mq="${CSS.escape(k)}"]`);const rinp=document.querySelector(`[data-mr="${CSS.escape(k)}"]`);
+ const rej=semua?0:num0(rinp&&rinp.value);const q=semua?(a?a.antri:0):num0(inp&&inp.value);
+ const chk=PXL().periksaMasukan(st.rute,st.kum,st.qty,wc,q,rej);if(!chk.ok){toast(chk.alasan);return}
+ try{await addDoc('produksi_log',{spk_id:s._id,item_idx:+ix,item_desc:it.d,wc,qty:q,reject:rej,tgl:today(),oleh:ME||null});try{localStorage.setItem('mni-wc',wc)}catch(_){}
+  const next=st.rute[st.rute.indexOf(wc)+1];
+  toast(`${wc}: ${n(q)} ${it.u||''} selesai${rej?' · '+n(rej)+' reject, perlu dibuat ulang':''}${q>0?(next?' · lanjut ke '+next:' · selesai produksi'):''}`)}catch(e){toast(e.message||'Gagal menyimpan')}
 }
 
 function wcForm(id){

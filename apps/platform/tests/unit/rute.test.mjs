@@ -1,5 +1,5 @@
 // Uji mesin rute produksi multi work center.  node tests/unit/rute.test.mjs
-import { usulanLangkah, tentukanRute, kumulatif, antrianPerLangkah, periksaMasukan, progresItem, bebanWC, prediksiSelesai, tambahHariKerja, throughputAktual } from '../../src/lib/produksi/rute.js';
+import { finishingDari, langkahVendor, siapKirimVendor, usulanLangkah, tentukanRute, kumulatif, antrianPerLangkah, periksaMasukan, progresItem, bebanWC, prediksiSelesai, tambahHariKerja, throughputAktual } from '../../src/lib/produksi/rute.js';
 
 const R = []; const ok = (id, pass, info = '') => R.push((pass ? 'PASS ' : 'FAIL ') + id + (info ? ' · ' + info : ''));
 const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -54,6 +54,27 @@ ok('R-50 throughput aktual: shearing 100 per hari (2 hari aktif)', th.Shearing.t
 
 // Belajar dari kejadian: welding dicatat untuk item yang rutenya tidak memuat welding -> usul sisip menurut urutan mesin
 const us = usulanLangkah(['Shearing', 'Bending'], [{ wc: 'Welding', qty: 2 }, { wc: 'Bending', qty: 1 }], ['Shearing', 'Punching', 'Bending', 'Welding']);
+// Reject di mesin: tidak lanjut dan dibuat ulang (Cable Tray 100 btg; Bending 55 baik + 5 reject)
+const evR = [{ wc: 'Shearing', qty: 100 }, { wc: 'Punching', qty: 100 }, { wc: 'Bending', qty: 55, reject: 5 }];
+const kumR = kumulatif(rute, evR);
+ok('R-70 reject mencabut batang dari langkah sebelumnya', eq(kumR, { Shearing: 95, Punching: 95, Bending: 55 }), JSON.stringify(kumR));
+const aqR = antrianPerLangkah(rute, kumR, 100);
+ok('R-71 reject muncul lagi di antrian awal, sisa Bending 40', aqR[0].antri === 5 && aqR[1].antri === 0 && aqR[2].antri === 40, JSON.stringify(aqR.map((x) => x.antri)));
+ok('R-72 progres item hanya menghitung yang baik', progresItem(rute, kumR) === 55);
+ok('R-73 reject saja boleh, selesai plus reject tidak boleh melebihi yang siap', periksaMasukan(rute, kumR, 100, 'Bending', 0, 3).ok === true && periksaMasukan(rute, kumR, 100, 'Bending', 38, 3).ok === false && periksaMasukan(rute, kumR, 100, 'Bending', 0, 0).ok === false);
+ok('R-74 reject di langkah pertama tetap di antrian awal', eq(kumulatif(rute, [{ wc: 'Shearing', qty: 40, reject: 2 }]), { Shearing: 40, Punching: 0, Bending: 0 }));
+
+// Langkah vendor di rute: finishing dari judul section, batas kirim, tidak dihitung sebagai beban mesin
+const rv = (j) => tentukanRute({ judulSection: j, deskripsi: 'Cable Tray W100' }, undefined, undefined, { vendor: true }).rute;
+ok('R-80 ELECTRO, HOTDIP, POWDER menambah langkah vendor; NON FINISHING tidak', eq(rv('CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED'), [...rute, 'Vendor ELG']) && eq(rv('CABLE TRAY TYPE STU 1.2 HOTDIP GALVANIZED'), [...rute, 'Vendor HDG']) && eq(rv('CABLE TRAY TYPE STU 1.2 POWDER COATING WHITE'), [...rute, 'Vendor PDC']) && eq(rv('CABLE TRAY TYPE STU NON FINISHING'), rute));
+ok('R-81 tanpa opsi vendor rute tetap tiga mesin (kompatibel)', eq(tentukanRute({ judulSection: 'CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED', deskripsi: 'x' }).rute, rute));
+ok('R-82 rute yang diatur pada item tidak ditambah vendor', eq(tentukanRute({ judulSection: 'CABLE TRAY ELECTRO', deskripsi: 'x', ruteItem: ['Shearing', 'Bending'] }, undefined, undefined, { vendor: true }).rute, ['Shearing', 'Bending']));
+const rVen = [...rute, 'Vendor ELG'];
+const kV = { Shearing: 100, Punching: 100, Bending: 60, 'Vendor ELG': 0 };
+ok('R-83 batas kirim vendor = hasil langkah mesin terakhir', siapKirimVendor(rVen, kV) === 60 && siapKirimVendor(rute, kV) === null);
+ok('R-84 beban mesin mengabaikan langkah vendor', !('Vendor ELG' in bebanWC([{ spk: 1, item: 'x', qty: 100, rute: rVen, kum: kV, due: '2026-12-01' }], { Bending: 40 })));
+ok('R-85 prediksi tidak butuh kapasitas vendor', prediksiSelesai([{ spk: 1, item: 'x', qty: 100, rute: rVen, kum: kV, due: '2026-12-01' }], { Shearing: 100, Punching: 100, Bending: 40 })[0].hari === 1, JSON.stringify(prediksiSelesai([{ spk: 1, item: 'x', qty: 100, rute: rVen, kum: kV, due: '2026-12-01' }], { Shearing: 100, Punching: 100, Bending: 40 })));
+
 ok('R-60 usulan langkah dari kejadian nyata', us.length === 1 && us[0].wc === 'Welding' && JSON.stringify(us[0].ruteBaru) === JSON.stringify(['Shearing', 'Bending', 'Welding']), JSON.stringify(us));
 
 const fail = R.filter((x) => x.startsWith('FAIL')).length;

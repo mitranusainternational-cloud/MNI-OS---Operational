@@ -49,7 +49,7 @@ export async function runProduksi(page, base) {
   await go('mesin');
   ok('M-01 Antrian Mesin tampil untuk Shearing dengan item SPK baru', (await page.textContent('#mesin-antri')).includes('Cable Tray W100xH100xL3000'));
   const rute = await page.$$eval('#mesin-antri tbody tr:first-child .rchip', (a) => a.map((x) => x.textContent));
-  ok('M-02 rute Cable Tray: Shearing, Punching, Bending', JSON.stringify(rute) === JSON.stringify(['Shearing', 'Punching', 'Bending']), rute.join(','));
+  ok('M-02 rute Cable Tray ELECTRO: tiga mesin lalu Vendor ELG', JSON.stringify(rute) === JSON.stringify(['Shearing', 'Punching', 'Bending', 'Vendor ELG']), rute.join(','));
 
   await simpanMesin('Shearing', 20);
   const ev1 = await tab('produksi_log');
@@ -79,6 +79,39 @@ export async function runProduksi(page, base) {
   ok('M-12 tombol Semua mengisi seluruh yang siap (Bending 8)', evs.length === 3 && evs[2].wc === 'Bending' && Number(evs[2].qty) === 8);
   await go('produksi');
   ok('M-13 antrian Bending kosong setelah selesai', (await antri('Bending')) === 0 && (await antri('Punching')) === 12);
+
+  // Reject di Punching (2 rusak): tercatat, tidak lanjut, dan muncul lagi di antrian Shearing untuk dibuat ulang
+  await go('mesin'); await page.selectOption('#f-mesin', 'Punching'); await page.waitForTimeout(500);
+  await page.fill('#mesin-antri [data-mr]', '2');
+  await page.click('#mesin-antri [data-act="mesinsimpan"]'); await page.waitForTimeout(1500);
+  const evr = await tab('produksi_log');
+  ok('M-15 reject 2 di Punching tercatat tanpa menambah selesai', evr.length === 4 && evr[3].wc === 'Punching' && Number(evr[3].reject) === 2 && Number(evr[3].qty) === 0, JSON.stringify(evr.slice(3).map((e) => [e.wc, e.qty, e.reject])));
+  await go('produksi');
+  const ar = { s: await antri('Shearing'), p: await antri('Punching') };
+  ok('M-16 reject kembali ke antrian Shearing (2) dan Punching berkurang jadi 10', ar.s === 2 && ar.p === 10, JSON.stringify(ar));
+
+  // Vendor: yang siap dikirim = hasil Bending (8); kirim melebihi hasil produksi ditolak, sebesar hasil diterima
+  await go('produksi');
+  ok('M-17 dashboard menyebut siap dikirim ke Vendor ELG (8)', /Siap dikirim ke Vendor ELG: 8/.test(await page.evaluate(() => document.getElementById('body').innerText)));
+  await go('vendor');
+  const nv0 = (await tab('vendor')).length;
+  await page.click('#tools [data-act="newvendor"]'); await page.waitForTimeout(500);
+  await page.fill('#m-vendor', 'Vendor Rute'); await page.fill('#m-proses', 'ELG');
+  const optV = await page.evaluate(() => [...document.querySelectorAll('#m-spk option')].find((o) => /Customer Rute/.test(o.textContent))?.value || '');
+  await page.selectOption('#m-spk', optV); await page.waitForTimeout(500);
+  const valV = await page.inputValue('#m-ln_0');
+  ok('M-18 kolom kirim vendor terisi sebatas hasil produksi (8 dari 20)', valV === '8', valV);
+  await page.fill('#m-ln_0', '10');
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(800);
+  const errV = await page.evaluate(() => (document.getElementById('merr') || { textContent: '' }).textContent);
+  ok('M-19 kirim 10 melebihi hasil produksi ditolak', (await tab('vendor')).length === nv0 && /hasil produksi/.test(errV), errV);
+  await page.fill('#m-ln_0', '8');
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(800);
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500); // vendor baru: klik kedua mendaftarkannya ke master
+  ok('M-19b kirim 8 diterima', (await tab('vendor')).length === nv0 + 1, await page.evaluate(() => (document.getElementById('merr') || { textContent: '' }).textContent));
+  await go('produksi');
+  const bodyV = await page.evaluate(() => document.getElementById('body').innerText);
+  ok('M-19c sesudah dikirim tidak lagi siap kirim, posisi SPK menyebut di vendor', !/Siap dikirim ke Vendor ELG/.test(bodyV) && /di Vendor Rute 8/.test(bodyV), bodyV.slice(0, 0));
 
   // Vendor: kecepatan dan kualifikasi dari riwayat kiriman (4 selesai: TAT 4, 4, 3, 8 hari kerja; 1 masih di vendor)
   await page.evaluate(() => {
