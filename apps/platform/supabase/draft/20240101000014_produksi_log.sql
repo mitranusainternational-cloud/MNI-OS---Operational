@@ -12,12 +12,23 @@ CREATE TABLE IF NOT EXISTS public.produksi_log (
   spk_id    UUID NOT NULL REFERENCES public.spk (id),
   item_idx  INTEGER NOT NULL CHECK (item_idx >= 0),    -- urutan item pada SPK
   item_desc TEXT NOT NULL,                             -- salinan deskripsi (tahan terhadap revisi urutan)
-  wc        TEXT NOT NULL,                             -- nama work center (mwc.nama)
+  wc        TEXT NOT NULL,                             -- nama work center (mwc.nama) tempat pekerjaan sebenarnya dilakukan
+  jenis     TEXT NOT NULL DEFAULT 'hasil' CHECK (jenis IN ('hasil', 'mulai', 'batal')), -- mulai = timer jalan di mesin; hasil = selesai; batal = timer dibatalkan
+  mesin     TEXT,                                      -- nama mesin di dalam work center (mis. Punching 20 Ton)
+  operator  TEXT,                                      -- nama operator di mesin (bukan akun login)
+  mulai     TIMESTAMPTZ,                               -- waktu mulai (hasil: dari timer atau diisi manual)
+  selesai   TIMESTAMPTZ,
+  menit     NUMERIC CHECK (menit IS NULL OR menit >= 0),   -- durasi pengerjaan
+  berat     NUMERIC,                                   -- kg per pcs saat dicatat (dari SPK atau kalkulator berat)
+  tonase    NUMERIC,                                   -- qty x berat (kg)
+  spk_no    TEXT,                                      -- salinan nomor SPK, customer, tebal agar laporan tahan revisi
+  customer  TEXT,
+  tebal     TEXT,
   qty       NUMERIC NOT NULL DEFAULT 0 CHECK (qty >= 0),    -- jumlah SELESAI (baik) yang ditambahkan (bukan kumulatif)
   reject    NUMERIC NOT NULL DEFAULT 0 CHECK (reject >= 0), -- jumlah reject di langkah ini; tidak lanjut, dibuat ulang
   oleh      TEXT,                                      -- email pencatat
   ket       TEXT,
-  CONSTRAINT produksi_log_ada_isi CHECK (qty > 0 OR reject > 0),
+  CONSTRAINT produksi_log_ada_isi CHECK (jenis <> 'hasil' OR qty > 0 OR reject > 0),
   data      JSONB NOT NULL DEFAULT '{}'::jsonb          -- bidang tambahan aplikasi (created_by dan sejenisnya)
 );
 CREATE INDEX IF NOT EXISTS produksi_log_spk ON public.produksi_log (spk_id, item_idx);

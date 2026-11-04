@@ -618,3 +618,14 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .wc-notes{display:flex;flex-direction:column;gap:6px;margin-top:10px}.wc-note{padding:8px 12px;border-radius:8px;font-size:13px}.wc-note.crit{background:var(--crit-soft);color:var(--crit)}.wc-note.warn{background:var(--warn-soft);color:var(--warn)}
 .c-w{white-space:nowrap}.wtag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.03em;vertical-align:middle}
 .wtag.kalkulator{background:var(--accent-soft);color:var(--accent)}.wtag.manual{background:var(--warn-soft);color:var(--warn)}
+
+/* Antrian Mesin: sesi berjalan, laporan produksi, jejak item */
+.mesin-run{border-left:4px solid var(--warn)}.mesin-run-h{display:flex;align-items:center;gap:8px;font-size:15px}.mesin-run-i{margin:4px 0 2px;font-weight:600}
+.mesin-run-f{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin-top:10px}.mesin-run-f label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}.mesin-run-f .inp{width:110px}
+.mesin-idle{padding:10px 2px 12px}.mesin-jalan{background:var(--warn-soft)}
+.lap-kepala{display:flex;flex-wrap:wrap;gap:8px 28px;margin:0 0 10px}.lap-kepala span{display:block;font-size:11px;color:var(--muted)}.lap-kepala b{font-size:14px}
+#lap-tabel th,#lap-tabel td{white-space:nowrap}#lap-tabel td:nth-child(7){white-space:normal;min-width:180px}
+.jejak-item{padding:12px 0;border-bottom:1px solid var(--line)}.jejak-item:last-child{border-bottom:0}.jejak-h{margin-bottom:8px}
+.jejak-row{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}.jejak-row .rarr{align-self:center}
+.jstep{min-width:118px;max-width:190px;flex:1 1 118px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}.jstep.run{border-color:var(--warn)}.jstep.ok{border-color:var(--ok);background:var(--ok-soft)}
+.jn{font-size:12px;font-weight:600}.jb{height:6px;background:var(--line);border-radius:3px;margin:6px 0 4px;overflow:hidden}.jb i{display:block;height:6px;background:var(--accent);border-radius:3px}.jstep.ok .jb i{background:var(--ok)}.jstep.run .jb i{background:var(--warn)}.jq{font-size:12px;font-weight:600}.jstep .note{margin-top:3px;font-size:11px;white-space:normal}

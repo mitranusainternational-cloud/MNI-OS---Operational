@@ -21,10 +21,16 @@ export async function runProduksi(page, base) {
     await page.waitForTimeout(800);
   };
   const antri = (wc) => page.evaluate((w) => { const r = document.querySelector(`#wc-beban tr[data-wc="${w}"]`); return r ? +r.dataset.antri : null; }, wc);
-  const simpanMesin = async (wc, nilai) => {
+  const hasilEv = async () => (await tab('produksi_log')).filter((e) => (e.jenis || 'hasil') === 'hasil');
+  // Catat hasil lewat dialog (jam mulai dan selesai wajib): baris pertama di antrian work center itu
+  const simpanMesin = async (wc, nilai, { reject = '', baris = 1, semua = false } = {}) => {
     await page.selectOption('#f-mesin', wc); await page.waitForTimeout(500);
-    await page.fill('#mesin-antri [data-mq]', String(nilai));
-    await page.click('#mesin-antri [data-act="mesinsimpan"]'); await page.waitForTimeout(1500);
+    await page.click(`#mesin-antri tbody tr:nth-child(${baris}) [data-act="mesincatat"]`); await page.waitForTimeout(400);
+    if (semua) await page.check('#mform [name="semua"]');
+    else { await page.fill('#m-qty', String(nilai)); await page.fill('#m-reject', String(reject)); }
+    await page.fill('#m-mulai', '08:00'); await page.fill('#m-selesai', '09:00');
+    await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500);
+    await closeAll();
   };
 
   await page.goto(base); await page.evaluate(() => localStorage.clear());
@@ -32,8 +38,9 @@ export async function runProduksi(page, base) {
   // work center standar dengan kapasitas per hari (disuntik ke mock)
   await page.evaluate(() => {
     const s = JSON.parse(localStorage.getItem('mni-local-mock-db')); const now = new Date().toISOString();
-    s.tables.mwc = [['WC-1', 'Shearing', 1, 100], ['WC-2', 'Punching', 2, 50], ['WC-3', 'Bending', 3, 40], ['WC-4', 'CNC Laser', 4, 60], ['WC-5', 'Welding', 5, 30]]
-      .map(([kode, nama, urutan, kap]) => ({ id: crypto.randomUUID(), kode, nama, tipe: 'Internal', urutan, aktif: true, created_at: now, updated_at: now, created_by: 'seed', updated_by: 'seed', data: { kapasitas: kap } }));
+    const dua = [{ nama: 'Punching 1 (20 Ton)', operator: ['Operator C'], kapasitas: 25 }, { nama: 'Punching 2 (40 Ton)', operator: ['Operator D'], kapasitas: 25 }];
+    s.tables.mwc = [['WC-1', 'Shearing', 1, 100, []], ['WC-2', 'Punching', 2, 50, dua], ['WC-3', 'Bending', 3, 40, []], ['WC-4', 'CNC Laser', 4, 60, []], ['WC-5', 'Welding', 5, 30, []]]
+      .map(([kode, nama, urutan, kap, mesin]) => ({ id: crypto.randomUUID(), kode, nama, tipe: 'Internal', urutan, aktif: true, created_at: now, updated_at: now, created_by: 'seed', updated_by: 'seed', data: { kapasitas: kap, mesin } }));
     localStorage.setItem('mni-local-mock-db', JSON.stringify(s));
   });
   await page.reload(); await page.waitForTimeout(3500);
@@ -52,15 +59,19 @@ export async function runProduksi(page, base) {
   ok('M-02 rute Cable Tray ELECTRO: tiga mesin lalu Vendor ELG', JSON.stringify(rute) === JSON.stringify(['Shearing', 'Punching', 'Bending', 'Vendor ELG']), rute.join(','));
 
   await simpanMesin('Shearing', 20);
-  const ev1 = await tab('produksi_log');
+  const ev1 = await hasilEv();
   ok('M-03 hasil Shearing 20 tercatat sebagai kejadian', ev1.length === 1 && ev1[0].wc === 'Shearing' && Number(ev1[0].qty) === 20, JSON.stringify(ev1.map((e) => [e.wc, e.qty])));
+  ok('M-03b kejadian membawa mesin, durasi 60 menit, nomor SPK, customer, dan tonase dari berat per pcs', ev1[0].mesin === 'Shearing' && Number(ev1[0].menit) === 60 && ev1[0].customer === 'Customer Rute' && !!ev1[0].spk_no && !!ev1[0].mulai, JSON.stringify([ev1[0].mesin, ev1[0].menit, ev1[0].customer, ev1[0].spk_no, ev1[0].tonase]));
 
   await page.selectOption('#f-mesin', 'Punching'); await page.waitForTimeout(500);
   ok('M-04 item pindah otomatis ke antrian Punching (siap 20)', /20/.test(await page.textContent('#mesin-antri tbody tr:first-child td:nth-child(4)')));
+  const msnOpsi = await page.$$eval('#f-mesin-msn option', (a) => a.map((x) => x.textContent));
+  ok('M-04b Punching punya dua mesin untuk dipilih', msnOpsi.length === 2 && msnOpsi[1] === 'Punching 2 (40 Ton)', msnOpsi.join(','));
   await simpanMesin('Punching', 25);
-  ok('M-05 melebihi yang siap ditolak (tidak tercatat)', (await tab('produksi_log')).length === 1);
+  ok('M-05 melebihi yang siap ditolak (tidak tercatat)', (await hasilEv()).length === 1);
   await simpanMesin('Punching', 8);
-  ok('M-06 Punching 8 tercatat', (await tab('produksi_log')).length === 2);
+  const e6 = await hasilEv();
+  ok('M-06 Punching 8 tercatat di mesin Punching 1', e6.length === 2 && e6[1].mesin === 'Punching 1 (20 Ton)', e6.map((e) => e.mesin).join(','));
 
   await page.selectOption('#f-mesin', 'Bending'); await page.waitForTimeout(500);
   ok('M-07 Bending hanya melihat 8 yang selesai Punching', /8/.test(await page.textContent('#mesin-antri tbody tr:first-child td:nth-child(4)')));
@@ -73,18 +84,24 @@ export async function runProduksi(page, base) {
   const txt = await page.textContent('#wc-beban');
   ok('M-11 hari habis dan status terhitung dari kapasitas (Punching 12/50, Bending 8/40)', /Normal/.test(txt) && /Kosong/.test(txt));
 
+  // Timer: Mulai, kartu sesi berjalan, Semua, Selesai dan simpan
   await go('mesin'); await page.selectOption('#f-mesin', 'Bending'); await page.waitForTimeout(500);
-  await page.click('#mesin-antri [data-act="mesinsemua"]'); await page.waitForTimeout(1500);
-  const evs = await tab('produksi_log');
-  ok('M-12 tombol Semua mengisi seluruh yang siap (Bending 8)', evs.length === 3 && evs[2].wc === 'Bending' && Number(evs[2].qty) === 8);
+  await page.click('#mesin-antri tbody tr:first-child [data-act="mesinmulai"]'); await page.waitForTimeout(1200);
+  ok('M-11b sesudah Mulai tampil kartu sedang dikerjakan dan tombol Mulai terkunci', !!(await page.$('#mesin-run')) && (await page.$$eval('#mesin-antri [data-act="mesinmulai"]', (a) => a.length)) === 0);
+  ok('M-11c peristiwa mulai tercatat dan belum mengubah antrian', (await tab('produksi_log')).filter((e) => e.jenis === 'mulai').length === 1 && (await hasilEv()).length === 2);
+  await page.click('#mesin-run [data-act="mesinsemua"]');
+  ok('M-11d tombol Semua mengisi jumlah yang siap (8)', (await page.inputValue('#mr-qty')) === '8');
+  await page.click('#mesin-run [data-act="mesinselesai"]'); await page.waitForTimeout(1500);
+  const evs = await hasilEv();
+  ok('M-12 Selesai dan simpan: Bending 8 dengan jam mulai dan durasi dari timer', evs.length === 3 && evs[2].wc === 'Bending' && Number(evs[2].qty) === 8 && !!evs[2].mulai && !!evs[2].selesai && evs[2].menit != null, JSON.stringify([evs[2].qty, evs[2].menit]));
+  ok('M-12b sesudah selesai kartu sesi hilang', !(await page.$('#mesin-run')));
   await go('produksi');
   ok('M-13 antrian Bending kosong setelah selesai', (await antri('Bending')) === 0 && (await antri('Punching')) === 12);
 
   // Reject di Punching (2 rusak): tercatat, tidak lanjut, dan muncul lagi di antrian Shearing untuk dibuat ulang
-  await go('mesin'); await page.selectOption('#f-mesin', 'Punching'); await page.waitForTimeout(500);
-  await page.fill('#mesin-antri [data-mr]', '2');
-  await page.click('#mesin-antri [data-act="mesinsimpan"]'); await page.waitForTimeout(1500);
-  const evr = await tab('produksi_log');
+  await go('mesin');
+  await simpanMesin('Punching', '', { reject: 2 });
+  const evr = await hasilEv();
   ok('M-15 reject 2 di Punching tercatat tanpa menambah selesai', evr.length === 4 && evr[3].wc === 'Punching' && Number(evr[3].reject) === 2 && Number(evr[3].qty) === 0, JSON.stringify(evr.slice(3).map((e) => [e.wc, e.qty, e.reject])));
   await go('produksi');
   const ar = { s: await antri('Shearing'), p: await antri('Punching') };
@@ -127,6 +144,48 @@ export async function runProduksi(page, base) {
   ok('M-20 kualifikasi vendor tampil: Berkah Jaya, rata-rata 4,8 hk, tepat waktu 75%, nilai B', /Berkah Jaya/.test(vk) && /4,8 hk/.test(vk) && /75%/.test(vk) && vk.trim().endsWith('B'), JSON.stringify(vk).slice(0, 500));
   const kembali = await page.evaluate(() => document.getElementById('body').innerText);
   ok('M-21 perkiraan kembali kiriman yang masih di vendor ditampilkan dengan dasarnya', /perkiraan kembali/.test(kembali) && /median riwayat vendor/.test(kembali));
+
+  // Mesin alternatif: SPK berisi Cover (10), dipotong di Laser (4) lalu sisanya di Shearing
+  await go('spk');
+  await page.click('#tools [data-act="newspk"]'); await page.waitForTimeout(700);
+  await page.fill('#ed-cust', 'Customer Cover'); await page.fill('#ed-due', '2026-12-20');
+  await page.fill('#ed-h-0', 'CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED'); await page.dispatchEvent('#ed-h-0', 'change'); await page.waitForTimeout(300);
+  await page.fill('#ed-d-0-0', 'COVER TRAY W 200 L 3000'); await page.fill('#ed-q-0-0', '10'); await page.fill('#ed-u-0-0', 'Btg');
+  await page.click('#editor button:has-text("Terbitkan SPK")'); await page.waitForTimeout(1800);
+  await go('mesin'); await page.selectOption('#f-mesin', 'CNC Laser'); await page.waitForTimeout(500);
+  const altTxt = await page.evaluate(() => (document.getElementById('mesin-antri') || { innerText: '' }).innerText);
+  ok('M-40 Cover muncul di antrian CNC Laser sebagai mesin alternatif untuk Shearing', /COVER TRAY/.test(altTxt) && /mesin alternatif/.test(altTxt), altTxt.slice(0, 120));
+  const nHasil = (await hasilEv()).length;
+  await page.click('#mesin-antri tbody tr:first-child [data-act="mesincatat"]'); await page.waitForTimeout(400);
+  await page.fill('#m-qty', '4'); await page.fill('#m-mulai', '10:00'); await page.fill('#m-selesai', '10:40');
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500); await closeAll();
+  const eAlt = (await hasilEv()).slice(nHasil);
+  ok('M-41 hasil tercatat atas nama CNC Laser (mesin sebenarnya) dengan menit per pcs 10', eAlt.length === 1 && eAlt[0].wc === 'CNC Laser' && Number(eAlt[0].menit) === 40, JSON.stringify(eAlt.map((e) => [e.wc, e.menit])));
+  await page.selectOption('#f-mesin', 'Shearing'); await page.waitForTimeout(500);
+  const sisaCover = await page.evaluate(() => { const r = [...document.querySelectorAll('#mesin-antri tbody tr')].find((x) => /COVER TRAY/.test(x.innerText)); return r ? r.querySelector('td:nth-child(4)').innerText.trim() : null; });
+  ok('M-42 langkah Shearing untuk Cover berkurang jadi 6 (dibagi dua mesin alternatif)', sisaCover === '6', String(sisaCover));
+  await page.selectOption('#f-mesin', 'Bending'); await page.waitForTimeout(500);
+  const bendCover = await page.evaluate(() => { const r = [...document.querySelectorAll('#mesin-antri tbody tr')].find((x) => /COVER TRAY/.test(x.innerText)); return r ? r.querySelector('td:nth-child(4)').innerText.trim() : null; });
+  ok('M-43 hasil Laser 4 langsung siap di Bending', bendCover === '4', String(bendCover));
+
+  // Laporan produksi: kolom form Excel, total, rekap per mesin, waktu per jenis item
+  await go('laporan-produksi');
+  const lap = await page.evaluate(() => ({ rows: document.querySelectorAll('#lap-tabel tbody tr').length, txt: document.getElementById('lap-tabel').innerText, rekap: document.getElementById('lap-rekap').innerText, jenis: document.getElementById('lap-jenis').innerText, head: document.getElementById('lap-tabel').querySelector('thead').innerText }));
+  ok('M-50 laporan harian memuat semua hasil hari ini dengan kolom form (SPK, customer, deskripsi, tonase, menit per pcs)', lap.rows === (await hasilEv()).length && /Customer Rute/.test(lap.txt) && /Cable Tray W100xH100xL3000/.test(lap.txt) && /Tonase/i.test(lap.head) && /Menit.pcs/i.test(lap.head), String(lap.rows));
+  ok('M-51 rekap per mesin menyebut Punching 1 (20 Ton) dan Laser (CNC Laser)', /Punching 1 \(20 Ton\)/.test(lap.rekap) && /CNC Laser/.test(lap.rekap));
+  ok('M-52 waktu per jenis item terisi dari hasil berwaktu', /Shearing/.test(lap.jenis) && !/Belum ada hasil berwaktu/.test(lap.jenis));
+  await page.selectOption('#f-lap-wc', 'Punching'); await page.waitForTimeout(500);
+  const lapP = await page.evaluate(() => ({ rows: document.querySelectorAll('#lap-tabel tbody tr').length, tbl: document.getElementById('lap-tabel').innerText }));
+  ok('M-53 filter work center Punching: hanya baris Punching', lapP.rows === 2 && !/Shearing/.test(lapP.tbl.replace(/Selesai/g, '')) , String(lapP.rows));
+  ok('M-54 tombol Unduh CSV dan Cetak tersedia', !!(await page.$('#tools [data-act="lapcsv"]')) && !!(await page.$('#tools [data-act="lapprint"]')));
+
+  // Jejak produksi di lembar SPK
+  await go('spk');
+  await page.click('#body tr:has-text("Customer Rute")'); await page.waitForTimeout(800);
+  await page.click('.dw-tab[data-tab="jejak"]'); await page.waitForTimeout(400);
+  const jej = await page.evaluate(() => document.getElementById('dw-pane-jejak').innerText);
+  ok('M-60 jejak item: tiap langkah, vendor, dan terkirim ke customer dengan mesin yang dipakai', /Shearing/.test(jej) && /Punching/.test(jej) && /Bending/.test(jej) && /Vendor ELG/.test(jej) && /Terkirim ke customer/.test(jej) && /Punching 1 \(20 Ton\)/.test(jej) && /dikirim 0 . kembali 0/.test(jej), jej.replace(/\n/g, ' ').slice(0, 200));
+  await closeAll();
 
   // Data contoh untuk tinjauan: /?demo=produksi mengisi WC, SPK berrute, kejadian, dan riwayat vendor
   await page.evaluate(() => { localStorage.clear(); });

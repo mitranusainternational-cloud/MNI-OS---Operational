@@ -166,3 +166,39 @@ Teknis: tabel `produksi_log` mendapat kolom `reject` (draf migration 14 diperbar
 Uji unit R-80 sampai R-85 dan e2e M-17 sampai M-19c.
 
 Belum dibangun: pengecualian rute per item (centang langkah yang dilewati), reject vendor yang otomatis kembali ke antrian produksi, serta QC atau packing setelah vendor bila diperlukan.
+
+## 13. Pengganti form laporan harian produksi (2026-11-04)
+
+Sumber: `form laporan harian produksi September 2026.xlsx` (15 lembar: Shearing 3 lembar, Punching 5 mesin, Bending 3, Laser 2, Welding 2). Kolom form: tanggal, jam mulai dan selesai, durasi, No SPK, customer, deskripsi, tebal, qty, berat per pcs, tonase, menit per pcs, keterangan (lembar bahan), supplier; kepala lembar: work center, nomor mesin, operator, shift.
+
+Keputusan pemilik:
+
+| Hal | Keputusan |
+|---|---|
+| Pengisi | Operator di mesinnya |
+| Cover, Jointing, Clamp kecil | Mesin alternatif Shearing atau Laser, dipilih operator; sistem mencatat mesin yang dipakai |
+| Cable Ladder | Selalu Shearing, Punching, Bending, Welding |
+| Jam mulai dan selesai | Wajib, lewat tombol Mulai dan Selesai |
+
+Rancangan, berurutan (tahap 1 sampai 4 sudah dibangun di lokal 2026-11-04; tahap 5 sebagian):
+1. **Mesin di bawah work center**: master Mesin (induk WC, operator bawaan, kapasitas per mesin); kejadian produksi mencatat mesin.
+2. **Mulai dan Selesai**: item diambil dari antrian, customer, deskripsi, tebal, berat per pcs, dan tonase otomatis dari SPK dan kalkulator berat; durasi dan menit per pcs dihitung.
+3. **Mesin alternatif di rute** (langkah berisi pilihan, mis. Shearing atau Laser).
+4. **Laporan harian per mesin** berkolom sama dengan form, cetak dan ekspor; rekap tonase, jam mesin, dan waktu per pcs per jenis item (dasar kapasitas dan prediksi).
+5. **Keterangan bahan** dari mutasi bahan baku SPK, dan **SPK Stok** bulanan untuk pekerjaan tanpa SPK (mis. Jointing 150 pcs, SPK STOCK).
+
+Temuan kasar dari data (klasifikasi nama deskripsi, perlu konfirmasi): baris Laser sekitar 864, termasuk Cover sekitar 277 dan Jointing sekitar 44; Ladder hampir tidak tercatat di Bending (kemungkinan penamaan, belum dipastikan).
+
+## 14. Yang dibangun dari form laporan (lokal, 2026-11-04)
+
+| Bagian | Isi |
+|---|---|
+| Mesin di work center | Master Data, Work Centre: kolom Mesin (satu per baris: nama | operator | kapasitas). Tombol **Isi mesin sesuai form laporan** mengisi nama mesin (tanpa nama operator) dari 15 lembar form. Kapasitas work center otomatis jumlah kapasitas mesinnya bila kolom kapasitas WC kosong |
+| Antrian Mesin | Pilih work center, mesin, dan operator (diingat di perangkat). **Mulai** menyalakan timer di mesin itu (satu item per mesin); **Selesai dan simpan** mengisi jumlah selesai dan reject; durasi, menit per pcs, dan tonase dihitung. **Catat** untuk hasil yang lupa di-Mulai (jam mulai dan selesai wajib). Kejadian menyimpan mesin, operator, jam, durasi, berat per pcs, tonase, serta salinan nomor SPK, customer, tebal |
+| Mesin alternatif | Cover: Shearing atau Laser; Jointing: Shearing atau Laser lalu Punching; Clamp dan Hanger: Laser atau Shearing lalu Bending. Item tampil di antrian kedua mesin; hasil di mesin mana pun dihitung ke langkahnya, mesin sebenarnya tercatat |
+| Laporan Produksi | Menu baru: laporan harian per mesin atau work center dengan kolom form Excel dan total, cetak dan unduh CSV, rekap bulanan per mesin (hasil, reject, tonase, jam mesin, menit per pcs), dan waktu per pcs menurut jenis item |
+| Jejak produksi | Tab baru di lembar SPK: per item, tiap langkah mesin (dengan mesin yang dipakai dan reject), Vendor, dan Terkirim ke customer |
+
+Asumsi yang perlu dikonfirmasi: aturan Jointing dan Clamp (hanya Cover yang dikonfirmasi pemilik), serta dasar waktu standar dari data nyata. Draf migration 14 mendapat kolom jenis, mesin, operator, mulai, selesai, menit, berat, tonase, spk_no, customer, dan tebal. Uji: unit laporan 19 skenario, e2e produksi 39, total e2e 195.
+
+Belum dibangun: keterangan bahan dari mutasi bahan baku SPK (belum ada tautan data mutasi ke SPK), pengecualian rute per item, dan reject vendor otomatis kembali ke antrian.

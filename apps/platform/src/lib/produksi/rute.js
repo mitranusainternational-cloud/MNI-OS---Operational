@@ -15,9 +15,19 @@ export const RUTE_STANDAR = {
 };
 
 // Pengecualian berdasarkan kata di deskripsi (dicek berurutan, yang pertama cocok menang): bentuk tertentu tidak melewati semua mesin.
+// alt: mesin alternatif per langkah, { Shearing: ['CNC Laser'] } = langkah Shearing boleh dikerjakan di CNC Laser (operator memilih; sistem mencatat mesin sebenarnya).
 export const ATURAN_KHUSUS = [
-  { cocok: /cover/i, produk: /LADDER|TRAY|DUCT/, rute: ['Shearing', 'Bending'], alasan: 'Cover: tanpa punching dan welding' },
+  { cocok: /clamp|hanger/i, rute: ['CNC Laser', 'Bending'], alt: { 'CNC Laser': ['Shearing'] }, alasan: 'Clamp dan hanger: potong di Laser atau Shearing, lalu Bending' },
+  { cocok: /jointing|splice/i, rute: ['Shearing', 'Punching'], alt: { Shearing: ['CNC Laser'] }, alasan: 'Jointing: potong di Shearing atau Laser, lalu Punching' },
+  { cocok: /cover/i, produk: /LADDER|TRAY|DUCT/, rute: ['Shearing', 'Bending'], alt: { Shearing: ['CNC Laser'] }, alasan: 'Cover: tanpa punching dan welding; potong di Shearing atau Laser' },
 ];
+
+// Langkah rute yang dipenuhi oleh sebuah mesin: langkahnya sendiri, atau langkah yang menjadikannya mesin alternatif. Tidak ada: -1.
+export function indeksLangkah(rute, alt, wc) {
+  const i = rute.indexOf(wc);
+  if (i >= 0) return i;
+  return rute.findIndex((w) => ((alt || {})[w] || []).includes(wc));
+}
 
 const produkDari = (judul) => {
   const H = String(judul || '').toUpperCase();
@@ -44,7 +54,7 @@ export function tentukanRute({ judulSection, deskripsi, ruteItem }, rute = RUTE_
   const p = produkDari(judulSection);
   const k = aturan.find((a) => a.cocok.test(String(deskripsi || '')) && (!a.produk || a.produk.test(String(judulSection || '').toUpperCase())));
   let hasil = { rute: [], sumber: 'belum' };
-  if (k) hasil = { rute: k.rute.slice(), sumber: 'aturan', alasan: k.alasan };
+  if (k) hasil = { rute: k.rute.slice(), sumber: 'aturan', alasan: k.alasan, alt: k.alt || {} };
   else if (p && rute[p]) hasil = { rute: rute[p].slice(), sumber: 'produk' };
   const fin = finishingDari(judulSection);
   if (opsi.vendor && fin && hasil.rute.length) hasil.rute.push('Vendor ' + fin);
@@ -61,12 +71,12 @@ export function siapKirimVendor(rute, kum) {
 // Kejadian produksi (append-only): { spk, item, wc, qty (tambahan hari itu, bukan kumulatif), reject (tambahan reject), tgl, by }
 // Kumulatif per langkah untuk satu item. Reject di sebuah langkah tidak lolos ke langkah berikutnya dan harus dibuat ulang:
 // batang itu dicabut dari hitungan langkah-langkah sebelumnya, sehingga antrian langkah pertama bertambah sebanyak reject.
-export function kumulatif(rute, kejadian) {
+export function kumulatif(rute, kejadian, alt = {}) {
   const kum = Object.fromEntries(rute.map((w) => [w, 0]));
   for (const e of kejadian) {
-    const i = rute.indexOf(e.wc);
+    const i = indeksLangkah(rute, alt, e.wc);
     if (i < 0) continue;
-    kum[e.wc] += Number(e.qty) || 0;
+    kum[rute[i]] += Number(e.qty) || 0;
     const rej = Number(e.reject) || 0;
     if (rej > 0) for (let j = 0; j < i; j++) kum[rute[j]] = Math.max(0, kum[rute[j]] - rej);
   }
@@ -84,12 +94,12 @@ export function antrianPerLangkah(rute, kum, qtyTotal) {
 
 // Validasi masukan: qty tambahan di sebuah langkah tidak boleh melebihi yang tersedia (lolos langkah sebelumnya dikurangi yang sudah selesai).
 // Reject ikut dihitung: yang selesai ditambah yang reject tidak boleh melebihi yang tersedia.
-export function periksaMasukan(rute, kum, qtyTotal, wc, tambah, reject = 0) {
-  const i = rute.indexOf(wc);
+export function periksaMasukan(rute, kum, qtyTotal, wc, tambah, reject = 0, alt = {}) {
+  const i = indeksLangkah(rute, alt, wc);
   if (i < 0) return { ok: false, alasan: `${wc} tidak ada di rute item ini (${rute.join(' → ')})` };
   if (!(tambah >= 0) || !(reject >= 0)) return { ok: false, alasan: 'Jumlah tidak boleh negatif' };
   if (!(tambah + reject > 0)) return { ok: false, alasan: 'Jumlah harus lebih dari 0' };
-  const tersedia = (i === 0 ? qtyTotal : kum[rute[i - 1]]) - kum[wc];
+  const tersedia = (i === 0 ? qtyTotal : kum[rute[i - 1]]) - kum[rute[i]];
   if (tambah + reject > tersedia) return { ok: false, alasan: `Hanya ${tersedia} yang siap di ${wc}${i ? ' (selesai di ' + rute[i - 1] + ': ' + kum[rute[i - 1]] + ')' : ''}` };
   return { ok: true, tersedia };
 }

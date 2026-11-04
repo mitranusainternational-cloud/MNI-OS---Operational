@@ -100,8 +100,12 @@ const levelOf = (u, m) => {
 function demoProduksi(state) {
   const now = iso();
   const tb = state.tables;
-  tb.mwc = [['WC-1', 'Shearing', 1, 100], ['WC-2', 'Punching', 2, 50], ['WC-3', 'Bending', 3, 40], ['WC-4', 'CNC Laser', 4, 60], ['WC-5', 'Welding', 5, 30]]
-    .map(([kode, nama, urutan, kap]) => ({ id: uid(), kode, nama, tipe: 'Internal', urutan, aktif: true, created_at: now, updated_at: now, created_by: 'seed', updated_by: 'seed', data: { kapasitas: kap } }));
+  const mesin = (...a) => a.map(([nama, op, kapasitas]) => ({ nama, operator: op, kapasitas }));
+  tb.mwc = [['WC-1', 'Shearing', 1, 100, mesin(['Shearing 3 Meter', ['Operator A', 'Operator B'], 100])],
+    ['WC-2', 'Punching', 2, 50, mesin(['Punching 1 (20 Ton)', ['Operator C'], 25], ['Punching 2 (40 Ton)', ['Operator D'], 25])],
+    ['WC-3', 'Bending', 3, 40, mesin(['Bending 3 Mtr #1', ['Operator E'], 20], ['Bending 3 Mtr #2', ['Operator F'], 20])],
+    ['WC-4', 'CNC Laser', 4, 60, mesin(['Laser Cutting 1', ['Operator G'], 60])], ['WC-5', 'Welding', 5, 30, mesin(['Welding 1', ['Operator H'], 30])]]
+    .map(([kode, nama, urutan, kap, ms]) => ({ id: uid(), kode, nama, tipe: 'Internal', urutan, aktif: true, created_at: now, updated_at: now, created_by: 'seed', updated_by: 'seed', data: { kapasitas: kap, mesin: ms } }));
   const spk = tb.spk[0];
   spk.items = [
     { d: 'Cable Tray W100xH100xL3000 1.2', g: 'CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED', q: 100, u: 'Btg', w: 8.2, prod: 0 },
@@ -109,9 +113,17 @@ function demoProduksi(state) {
     { d: 'Horizontal Elbow Ladder W300xH100xR600 mm', g: 'ACCS LADDER TYPE SLW 2.0 HOTDIP GALVANIZED', q: 20, u: 'Btg', w: 9.4, prod: 0 },
   ];
   const hari = (n) => { const x = new Date(); x.setDate(x.getDate() - n); return x.toISOString(); };
-  const ev = (item, wc, qty, n) => ({ at: hari(n), tgl: hari(n).slice(0, 10), spk_id: spk.id, item_idx: item, item_desc: spk.items[item].d, wc, qty, oleh: 'operator@mni.local', data: {} });
-  tb.produksi_log = [ev(0, 'Shearing', 60, 4), ev(0, 'Shearing', 40, 3), ev(0, 'Punching', 50, 3), ev(0, 'Punching', 20, 2), ev(0, 'Bending', 30, 0),
-    ev(1, 'Shearing', 60, 2), ev(1, 'Punching', 20, 1), ev(2, 'CNC Laser', 12, 1), ev(2, 'Bending', 5, 0)].map((e, i) => ({ id: i + 1, ...e }));
+  // Kejadian hasil dengan mesin, operator, jam mulai, durasi, dan tonase seperti yang dicatat operator lewat Mulai dan Selesai
+  const ev = (item, wc, qty, n, msn, menit, op, rej = 0) => {
+    const mulai = new Date(hari(n)); mulai.setHours(8, 0, 0, 0); const selesai = new Date(mulai.getTime() + menit * 60000);
+    const it = spk.items[item];
+    return { at: selesai.toISOString(), jenis: 'hasil', tgl: hari(n).slice(0, 10), spk_id: spk.id, spk_no: String(spk.no), customer: spk.customer, item_idx: item, item_desc: it.d, wc, mesin: msn, operator: op,
+      mulai: mulai.toISOString(), selesai: selesai.toISOString(), menit, berat: it.w, tonase: Math.round(qty * it.w * 100) / 100, qty, reject: rej, oleh: 'operator@mni.local', data: {} };
+  };
+  tb.produksi_log = [ev(0, 'Shearing', 60, 4, 'Shearing 3 Meter', 75, 'Operator A'), ev(0, 'Shearing', 40, 3, 'Shearing 3 Meter', 55, 'Operator B'), ev(0, 'Punching', 50, 3, 'Punching 1 (20 Ton)', 330, 'Operator C'), ev(0, 'Punching', 20, 2, 'Punching 2 (40 Ton)', 150, 'Operator D'), ev(0, 'Bending', 30, 0, 'Bending 3 Mtr #1', 180, 'Operator E', 1),
+    ev(1, 'Shearing', 60, 2, 'Shearing 3 Meter', 90, 'Operator A'), ev(1, 'Punching', 20, 1, 'Punching 1 (20 Ton)', 120, 'Operator C'), ev(2, 'CNC Laser', 12, 1, 'Laser Cutting 1', 140, 'Operator G'), ev(2, 'Bending', 5, 0, 'Bending 3 Mtr #2', 60, 'Operator F')].map((e, i) => ({ id: i + 1, ...e }));
+  // Bending 3 Mtr #2 sedang mengerjakan Cable Ladder (timer berjalan)
+  tb.produksi_log.push({ id: 10, at: new Date(Date.now() - 40 * 60000).toISOString(), jenis: 'mulai', tgl: iso().slice(0, 10), spk_id: spk.id, spk_no: String(spk.no), customer: spk.customer, item_idx: 1, item_desc: spk.items[1].d, wc: 'Bending', mesin: 'Bending 3 Mtr #2', operator: 'Operator F', mulai: new Date(Date.now() - 40 * 60000).toISOString(), qty: 0, reject: 0, oleh: 'operator@mni.local', data: {} });
   const mk = (tgl, balik, q, rej) => ({ id: uid(), created_at: now, updated_at: now, data: { vendor: 'Berkah Jaya Plating', proses: 'HDG', tgl, noSJ: 'SJ-V/' + tgl, spk: '', status: balik ? 'Selesai' : 'Di Vendor',
     items: [{ d: 'Cable Tray', g: '', q, u: 'Btg', kembali: balik ? q - rej : 0, reject: balik ? rej : 0 }], riwayat: balik ? [{ tgl: balik, qty: q - rej, rej }] : [] } });
   const d = (n) => hari(n).slice(0, 10);

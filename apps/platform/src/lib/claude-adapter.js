@@ -567,7 +567,8 @@ window.MNIBerat = {
 // Mesin rute produksi multi work center: rute, antrian, beban, kapasitas, posisi, vendor (fungsi murni)
 import * as _rute from './produksi/rute.js';
 import * as _kinerja from './produksi/kinerja.js';
-window.MNIProduksi = { ..._rute, ..._kinerja };
+import * as _laporan from './produksi/laporan.js';
+window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan };
 
 window.claude = CLAUDE_SHIM;
 window.__supabase = supabase;
