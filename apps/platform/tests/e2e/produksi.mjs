@@ -10,7 +10,7 @@ export async function runProduksi(page, base) {
     await page.evaluate(() => { document.querySelector('#modal [data-act="closemodal"]')?.click(); document.querySelector('#drawer [data-act="closedrawer"]')?.click(); document.querySelector('#sheet [data-act="sheet-close"]')?.click(); });
     await page.waitForTimeout(300);
   };
-  const go = async (r) => { await closeAll(); await page.click(`#nav a[href="#${r}"]`); await page.waitForTimeout(700); };
+  const go = async (r) => { await closeAll(); { const l = await page.$(`#nav a[href="#${r}"]`); if (l) await l.click(); else await page.evaluate((h) => { location.hash = h; }, r); await page.waitForTimeout(300); if (r === 'spk') { const b = await page.$('#tools [data-view="spk"][data-val="list"]'); if (b) await b.click(); } if (r === 'produksi') { const b = await page.$('#tools [data-view="produksi"][data-val="wc"]'); if (b) await b.click(); } } await page.waitForTimeout(700); };
   const login = async (email) => {
     await page.evaluate(() => localStorage.removeItem('mni-local-mock-session'));
     await page.goto(base); await page.reload();
@@ -128,7 +128,9 @@ export async function runProduksi(page, base) {
   ok('M-19b kirim 8 diterima', (await tab('vendor')).length === nv0 + 1, await page.evaluate(() => (document.getElementById('merr') || { textContent: '' }).textContent));
   await go('produksi');
   const bodyV = await page.evaluate(() => document.getElementById('body').innerText);
-  ok('M-19c sesudah dikirim tidak lagi siap kirim, posisi SPK menyebut di vendor', !/Siap dikirim ke Vendor ELG/.test(bodyV) && /di Vendor Rute 8/.test(bodyV), bodyV.slice(0, 0));
+  await go('spk'); await page.click('#tools [data-view="spk"][data-val="berjalan"]'); await page.waitForTimeout(400);
+  const bodySpk = await page.evaluate(() => document.getElementById('body').innerText);
+  ok('M-19c sesudah dikirim tidak lagi siap kirim, jalur SPK menyebut kiriman ke vendor', !/Siap dikirim ke Vendor ELG/.test(bodyV) && /dikirim 8/.test(bodySpk), bodySpk.slice(0, 0));
 
   // Vendor: kecepatan dan kualifikasi dari riwayat kiriman (4 selesai: TAT 4, 4, 3, 8 hari kerja; 1 masih di vendor)
   await page.evaluate(() => {
@@ -140,6 +142,7 @@ export async function runProduksi(page, base) {
   });
   await page.reload(); await page.waitForTimeout(3500);
   await page.evaluate(() => { location.hash = '#produksi'; }); await page.waitForTimeout(1200);
+  await page.click('#tools [data-view="produksi"][data-val="vendor"]'); await page.waitForTimeout(400);
   const vk = await page.evaluate(() => (document.getElementById('vendor-kual') || { innerText: '' }).innerText);
   ok('M-20 kualifikasi vendor tampil: Berkah Jaya, rata-rata 4,8 hk, tepat waktu 75%, nilai B', /Berkah Jaya/.test(vk) && /4,8 hk/.test(vk) && /75%/.test(vk) && vk.trim().endsWith('B'), JSON.stringify(vk).slice(0, 500));
   const kembali = await page.evaluate(() => document.getElementById('body').innerText);
@@ -305,13 +308,35 @@ export async function runProduksi(page, base) {
   await page.setViewportSize({ width: 1280, height: 800 });
   await closeAll();
 
+  // Tahap 1 skema baru: menu produksi tiga pintu, SPK Berjalan, Kinerja & Analisa
+  const menuProd = await page.evaluate(() => { const hs = [...document.querySelectorAll('#nav a')].map((a) => a.getAttribute('href')); return { hs, teks: document.getElementById('nav').innerText }; });
+  ok('M-99 menu Produksi hanya tiga pintu: SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa', ['#spk', '#mesin', '#produksi'].every((h) => menuProd.hs.includes(h)) && !menuProd.hs.includes('#papan') && !menuProd.hs.includes('#laporan-produksi') && /SPK Berjalan/.test(menuProd.teks) && /Produksi Hari Ini/.test(menuProd.teks) && /Kinerja & Analisa/.test(menuProd.teks), menuProd.hs.join(','));
+  await go('spk'); await page.click('#tools [data-view="spk"][data-val="berjalan"]'); await page.waitForTimeout(500);
+  const sb = await page.evaluate(() => ({ kartu: document.querySelectorAll('.sb-card').length, txt: document.getElementById('body').innerText, kpi: document.querySelectorAll('.kpi').length, jalur: document.querySelectorAll('.sb-card .jstep').length }));
+  ok('M-100 SPK Berjalan: kartu per SPK dengan status, progres, dan jalur tiap item sampai barang jadi', sb.kartu >= 3 && sb.kpi === 4 && sb.jalur > 5 && /Jalur tiap item/.test(sb.txt) && /%/.test(sb.txt), JSON.stringify({ k: sb.kartu, j: sb.jalur }));
+  await page.click('#tools [data-view="spk"][data-key="fl"][data-val="telat"]'); await page.waitForTimeout(400);
+  const telat = await page.evaluate(() => ({ kartu: [...document.querySelectorAll('.sb-card')].map((c) => c.innerText), kpiTelat: Number(document.querySelectorAll('.kpi')[1].querySelector('.v').textContent) }));
+  ok('M-101 filter Telat menampilkan SPK lewat due (Customer Kartu) dan jumlahnya sama dengan ringkasan', telat.kartu.length === telat.kpiTelat && telat.kartu.some((x) => /Customer Kartu/.test(x)) && telat.kartu.every((x) => /Telat/.test(x)), JSON.stringify([telat.kartu.length, telat.kpiTelat]));
+  await page.click('.sb-card .sb-h'); await page.waitForTimeout(600);
+  ok('M-102 klik kepala kartu membuka rincian SPK', !!(await page.$('#drawer.open, #drawer:not([hidden])')) && /SPK/.test(await page.evaluate(() => (document.getElementById('drawer') || { innerText: '' }).innerText)));
+  await closeAll();
+  await go('produksi'); await page.click('#tools [data-view="produksi"][data-val="laporan"]'); await page.waitForTimeout(500);
+  ok('M-103 Kinerja & Analisa punya tab Laporan harian (tabel, unduh CSV, cetak)', !!(await page.$('#lap-tabel')) && !!(await page.$('#tools [data-act="lapcsv"]')) && !!(await page.$('#tools [data-act="lapprint"]')));
+  await page.click('#tools [data-view="produksi"][data-val="wc"]'); await page.waitForTimeout(400);
+  ok('M-104 tab Work Center memuat beban dan kapasitas per work center', !!(await page.$('#wc-beban')) && !(await page.$('#vendor-kual')));
+  await closeAll();
+
   // Data contoh untuk tinjauan: /?demo=produksi mengisi WC, SPK berrute, kejadian, dan riwayat vendor
   await page.evaluate(() => { localStorage.clear(); });
   await page.goto(base + '?demo=produksi'); await page.waitForTimeout(500);
   await login('admin@mni.local');
   await page.evaluate(() => { location.hash = '#produksi'; }); await page.waitForTimeout(1500);
-  const demo = await page.evaluate(() => ({ wc: document.querySelectorAll('#wc-beban tbody tr[data-wc]').length, vendor: !!document.getElementById('vendor-kual'), posisi: /Shearing|Punching|Bending|CNC Laser/.test(document.getElementById('body').innerText) }));
+  const wcInfo = await page.evaluate(() => ({ n: document.querySelectorAll('#wc-beban tbody tr[data-wc]').length, posisi: /Shearing|Punching|Bending|CNC Laser/.test(document.getElementById('body').innerText) }));
+  await page.click('#tools [data-view="produksi"][data-val="vendor"]'); await page.waitForTimeout(400);
+  const demo = await page.evaluate((wi) => ({ wc: wi.n, vendor: !!document.getElementById('vendor-kual'), posisi: wi.posisi }), wcInfo);
   ok('M-30 data contoh produksi memuat 5 work center, kualifikasi vendor, dan posisi SPK', demo.wc === 5 && demo.vendor && demo.posisi, JSON.stringify(demo));
+  await page.evaluate(() => { location.hash = '#spk'; }); await page.waitForTimeout(1200);
+  ok('M-105 membuka SPK langsung menampilkan SPK Berjalan (bukan tabel daftar) sebagai tampilan awal', (await page.$$eval('.sb-card', (a) => a.length)) >= 2 && !!(await page.$('#tools [data-view="spk"][data-val="berjalan"].on')));
 
   ok('M-14 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;

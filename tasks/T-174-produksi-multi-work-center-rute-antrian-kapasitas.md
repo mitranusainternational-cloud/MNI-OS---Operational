@@ -43,6 +43,8 @@ Bergantung pada: T-167
 
 - [x] Layar operator berbasis kartu (tombol besar, + dan −, satu tombol Selesai) dan Papan Produksi untuk supervisor; uji M-91 sampai M-98, total e2e 221 lulus
 
+- [x] Tinjauan pemilik 2026-11-04: tampilan masih membingungkan, skema disederhanakan menjadi tiga menu ([[T-177-skema-produksi-tiga-pintu-spk-berjalan]]); tahap berikut [[T-178-kinerja-dan-analisa-produksi-tahap-2]]
+
 ## Catatan
 
 Dibangun lokal sesuai permintaan pemilik ("jangan ditayangkan dulu"). Catatan alur kerja: perubahan ada di branch lokal `fitur/produksi-multi-wc`, tidak di `development`, agar tidak ikut tergabung ke `main` tanpa persetujuan.

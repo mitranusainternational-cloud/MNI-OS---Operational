@@ -242,3 +242,15 @@ Dasar: pengamatan papan Operations Kanban (Antlia) pada 2026-11-04. Antlia memak
 | Papan Produksi | Untuk supervisor, hanya lihat: kolom per work center dan langkah vendor, berjalan di atas lalu antri, ringkasan sedang berjalan, antri, lewat due, selesai hari ini; ketuk judul kolom membuka Antrian Mesin work center itu |
 
 Aturan angka, mesin alternatif, vendor, banyak sesi, dan pembatalan tidak berubah (bagian 11 sampai 16). Uji e2e M-91 sampai M-98 (kartu, tombol +/−, batas jumlah siap, Papan, tampilan HP 390 px).
+
+## 18. Skema menu tiga pintu (menggantikan bagian 17 sebagai tampilan utama)
+
+Pemilik menilai papan dan layar sebelumnya masih membingungkan. Skema akhir (kebutuhan di [[PRD_PRODUKSI]]):
+
+| Menu | Isi | Catatan |
+|---|---|---|
+| SPK Berjalan | Kartu SPK dengan status, progres, sedang dikerjakan di mesin mana, dan jalur tiap item (Shearing, Punching, Bending, vendor, terkirim); filter Berjalan, Telat, Di vendor, Siap kirim, Selesai | Tampilan awal menu SPK; tab Daftar SPK dan KPI & Analisa tetap ada untuk membuat dan menelusuri SPK |
+| Produksi Hari Ini | Kartu per mesin; Mulai lalu Selesai (bagian 17) | Satu-satunya tempat input produksi |
+| Kinerja & Analisa | Tab Work Center (beban, kapasitas, hari habis), Vendor (kualifikasi), Laporan harian | Tahap 2: tab Produk dan Pengiriman |
+
+Rute `papan` dan `laporan-produksi` tetap bisa dibuka lewat alamat tetapi tidak muncul di menu. Uji e2e M-99 sampai M-105.

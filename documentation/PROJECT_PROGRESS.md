@@ -415,3 +415,15 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 ### 2026-11-03 — Kesiapan pilot (T-170)
 
 Menjawab penilaian kesiapan: data uji dibersihkan, cadangan dan pemulihan (unduh JSON, peringatan dashboard, skrip pulih, runbook), impor CSV master dan stok awal (templat, pratinjau, tanpa menimpa), akun saya dan ganti password, dashboard baru. Sisa tugas pemilik: SMTP kustom, admin kedua, jadwal cadangan dan latihan pulih, keputusan repo. Sisa yang butuh tim: walkthrough, sumber data resmi, peserta pilot. Lihat [[RENCANA_ADOPSI]] bagian status gerbang.
+
+### 2026-11-04 — Stok barang jadi diimpor ke production (T-175)
+
+Stok awal 92 item barang jadi (1.382 batang) dari file Stock Barang 2026 dimasukkan ke tabel `fg` di Supabase production, hanya data. Sumber: sheet Straight; sheet transaksi tidak diimpor agar tidak terhitung dua kali. Cut-off 2026-10-17 (asumsi, menunggu konfirmasi pemilik). Cocok dengan file per kategori. Bukti: `verified in database`. Detail di [[T-175-impor-stok-barang-jadi-oktober-2026]].
+
+### 2026-11-04 — Filter Type di Gudang Barang Jadi tayang (T-176)
+
+Dropdown Type (STU, STC, SLU, SLW, SLHD, lainnya, Tanpa type) mengikuti kategori. PR 14 digabung ke `main` oleh pemilik; production memuat kode filter. Regresi 150 lulus di mock. Detail di [[T-176-filter-type-gudang-barang-jadi]].
+
+### 2026-11-04 — Skema produksi tiga pintu (T-177, lokal)
+
+Hasil tinjauan pemilik: tampilan produksi membingungkan karena terlalu banyak menu dan tempat input. Pembanding: Operations Kanban Antlia. Skema baru: **SPK Berjalan**, **Produksi Hari Ini** (satu-satunya input produksi), dan **Kinerja & Analisa**. Kebutuhan lengkap di [[PRD_PRODUKSI]]; rancangan di [[RUTE_PRODUKSI]] bagian 17 dan 18. Uji e2e mock lulus (produksi 68, regresi 42, role 12, akses 34, tampilan 71). Belum ditayangkan; migration 14 tetap draf. Langkah berikut: tinjauan pemilik, lalu Tahap 2 ([[T-178-kinerja-dan-analisa-produksi-tahap-2]]).

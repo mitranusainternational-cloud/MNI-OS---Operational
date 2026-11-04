@@ -26,7 +26,7 @@ export async function runRegression(page, base) {
     });
     await page.waitForTimeout(350);
   };
-  const go = async (r) => { await closeAll(); await page.click(`#nav a[href="#${r}"]`); await page.waitForTimeout(550); };
+  const go = async (r) => { await closeAll(); { const l = await page.$(`#nav a[href="#${r}"]`); if (l) await l.click(); else await page.evaluate((h) => { location.hash = h; }, r); await page.waitForTimeout(300); if (r === 'spk') { const b = await page.$('#tools [data-view="spk"][data-val="list"]'); if (b) await b.click(); } } await page.waitForTimeout(550); };
   const opt = (sel, n) => page.evaluate(([s, n]) => [...document.querySelector(s).options].find((o) => o.text.includes(n))?.value, [sel, n]);
   const submit = async () => { await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(900); };
   const rowOpen = async (no) => {
@@ -46,7 +46,7 @@ export async function runRegression(page, base) {
   ok('F-01 login + nama', (await page.evaluate(() => document.getElementById('who').innerText)).includes('Admin Lokal'));
 
   // Smoke 10 modul
-  const mods = [['dashboard', 'Dashboard'], ['bahan-baku', 'Gudang Bahan Baku'], ['barang-jadi', 'Gudang Barang Jadi'], ['bongkar-muat', 'Bongkar Muat'], ['vendor', 'Kirim ke Vendor'], ['pengiriman', 'Kirim ke Customer'], ['spk', 'Monitoring SPK'], ['produksi', 'Dashboard Produksi'], ['cek-data', 'Cek Data'], ['master-data', 'Master Data']];
+  const mods = [['dashboard', 'Dashboard'], ['bahan-baku', 'Gudang Bahan Baku'], ['barang-jadi', 'Gudang Barang Jadi'], ['bongkar-muat', 'Bongkar Muat'], ['vendor', 'Kirim ke Vendor'], ['pengiriman', 'Kirim ke Customer'], ['spk', 'SPK Berjalan'], ['produksi', 'Kinerja & Analisa'], ['cek-data', 'Cek Data'], ['master-data', 'Master Data']];
   for (const [r, l] of mods) {
     const e0 = errors.length; await go(r);
     const t = await page.evaluate(() => document.getElementById('ttl').textContent.trim());

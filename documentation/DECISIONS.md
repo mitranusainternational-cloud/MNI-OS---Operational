@@ -89,3 +89,11 @@ updated: 2026-11-02
 - **Keputusan:** label `source-level`, `verified in browser`, dan `verified in database` dipakai terpisah; screenshot aktual menunggu akses preview yang dapat diverifikasi.
 - **Alasan:** mencegah inventaris kode atau screenshot UI dianggap sebagai bukti transaksi/persistence.
 - **Rujukan:** [[PROJECT_PROGRESS|Progress proyek]] dan [[apps/gudang-logistik/docs/DATA_INVENTORY|inventaris data indikatif]].
+
+## 2026-11-04 — Produksi dengan tiga menu dan input di tiga tempat
+
+- **Konteks:** pemilik menilai menu produksi (Monitoring SPK, Dashboard Produksi, Antrian Mesin, Papan Produksi, Laporan Produksi, tombol Input per SPK) membingungkan; kebutuhan intinya hanya SPK yang berjalan, progres per item dan output per work center, serta posisi SPK.
+- **Keputusan:** menu Produksi menjadi SPK Berjalan, Produksi Hari Ini, dan Kinerja & Analisa. Input hanya di Produksi Hari Ini (operator), Kirim ke Vendor, dan Bongkar Muat atau Kirim ke Customer; layar lain hanya untuk dilihat.
+- **Alasan:** satu tempat input per jenis kejadian menghindari data ganda dan kebingungan operator; manajemen membaca semuanya dari kejadian yang sama.
+- **Konsekuensi:** Papan Produksi dan Laporan Produksi menjadi rute tersembunyi (laporan harian pindah ke tab Kinerja & Analisa); tombol Input di tabel SPK dihapus. Tahap 2 menambah analisa per produk, vendor, dan pengiriman.
+- **Rujukan:** [[PRD_PRODUKSI]], [[T-177-skema-produksi-tiga-pintu-spk-berjalan]].

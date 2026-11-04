@@ -124,3 +124,14 @@ Migration: file di `apps/platform/supabase/migrations/` (Git) lalu dipasang ke S
 | 2026-11-03 | Repo GitHub | `MNI-OS---Operational` | `mni-gudang` |
 | 2026-11-03 | Project Vercel | `mni-os-operational` | `mni-gudang` (domain baru `mni-gudang.vercel.app`) |
 | 2026-11-03 | Project Supabase production | "MNI-OS - Operational" | "MNI Gudang - Production" |
+
+## Peta menu aplikasi (2026-11-04, lokal)
+
+| Menu | Rute | Jenis | Sumber data |
+|---|---|---|---|
+| SPK Berjalan | `#spk` | Lihat dan buat SPK | `spk`, `produksi_log`, `vendor`, `kirim` |
+| Produksi Hari Ini | `#mesin` | **Input** produksi | `produksi_log`, `mwc` |
+| Kinerja & Analisa | `#produksi` | Lihat | `produksi_log`, `mwc`, `vendor` |
+| Papan Produksi, Laporan Produksi | `#papan`, `#laporan-produksi` | Lihat (tersembunyi) | `produksi_log` |
+
+Kebutuhan dan pemetaan data: [[PRD_PRODUKSI]]. Nama menu lama (Monitoring SPK, Dashboard Produksi, Antrian Mesin) sudah digantikan.

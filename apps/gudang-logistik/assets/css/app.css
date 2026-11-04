@@ -651,4 +651,9 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .pk-h{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px}.pk-i{margin:3px 0;font-size:13px;line-height:1.3}.pk-kosong{padding:6px 2px}
 .mq-wrap{margin-bottom:14px}.mq-help summary{padding:12px 16px;cursor:pointer;font-weight:600;font-size:13px}.mq-help .pbody{padding-top:0}
 @media(max-width:640px){.mq-grid{grid-template-columns:1fr}.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi-row .kpi{padding:10px 12px}.kpi-row .kpi .v{font-size:22px}.kpi-row .kpi .s{display:none}.mr-step .mr-q{font-size:38px}.pk-col{flex-basis:84vw}}
+/* SPK Berjalan */
+.sb-card{margin-bottom:12px}.sb-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;cursor:pointer}.sb-no{font-size:17px}.sb-cust{font-size:14px;font-weight:600}.sb-chips{display:flex;gap:6px;flex-wrap:wrap}
+.sb-bar{display:flex;align-items:center;gap:10px;margin:10px 0 4px}.sb-bar .jb{flex:1;margin:0;height:8px}.sb-bar .jb i{height:8px}.sb-bar b{font-size:15px;min-width:42px;text-align:right}
+.sb-det .dw-section-title{display:none}.sb-now{margin:6px 0;font-size:13px}.sb-det{margin-top:8px}.sb-det summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);padding:6px 0}
+@media(max-width:640px){.sb-no{font-size:16px}}
 @media print{.no-print{display:none}}

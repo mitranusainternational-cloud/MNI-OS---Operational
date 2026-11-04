@@ -6,9 +6,9 @@ release: v0.9
 theme: Fondasi
 priority: P0
 status: active
-progress: 22
-tasks_total: 14
-tasks_done: 5
+progress: 18
+tasks_total: 16
+tasks_done: 6
 updated: 2026-11-04
 ---
 
@@ -40,6 +40,8 @@ Docker belum aktif di mesin kerja (T-010).
 - [ ] [[tasks/T-173-berat-otomatis-pada-spk-dari-kalkulator|T-173]] Berat otomatis pada SPK dari kalkulator penghitung berat · doing · P1 · 3 hari
 - [ ] [[tasks/T-174-produksi-multi-work-center-rute-antrian-kapasitas|T-174]] Produksi multi work center: rute, antrian mesin, kapasitas, posisi, dan kualifikasi vendor · doing · P1 · 4 hari
 - [x] [[tasks/T-175-impor-stok-barang-jadi-oktober-2026|T-175]] Impor stok barang jadi dari Stock Barang 2026 ke production (data saja) · done · P1 · 0.5 hari
-- [ ] [[tasks/T-176-filter-type-gudang-barang-jadi|T-176]] Filter Type di Gudang Barang Jadi (STU, STC, SLU, SLW, SLHD) · review · P2 · 0.25 hari
+- [x] [[tasks/T-176-filter-type-gudang-barang-jadi|T-176]] Filter Type di Gudang Barang Jadi (STU, STC, SLU, SLW, SLHD) · done · P2 · 0.25 hari
+- [ ] [[tasks/T-177-skema-produksi-tiga-pintu-spk-berjalan|T-177]] Skema produksi tiga pintu: SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa (Tahap 1) · review · P1 · 1.5 hari
+- [ ] [[tasks/T-178-kinerja-dan-analisa-produksi-tahap-2|T-178]] Kinerja & Analisa produksi (Tahap 2): per work center, produk, vendor, dan pengiriman · todo · P1 · 3 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

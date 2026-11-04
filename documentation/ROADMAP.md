@@ -130,3 +130,9 @@ Checklist ini menjelaskan urutan kerja antar-tools. Status hanya dicentang jika 
 - **Discovery Operasional:** validasi proses langsung dari tim MNI dan pemilik proses belum dilakukan; backlog/pilot yang ada masih hipotesis.
 - **Google Sheets:** koneksi Composio OAuth belum selesai; data workbook belum dibaca.
 - **Backend aplikasi:** source bergantung pada adapter `window.claude`; server/database bersama belum diverifikasi.
+
+## Produksi dan tracking (2026-11-04, lokal)
+
+- [x] Skema tiga pintu: SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa ([[T-177-skema-produksi-tiga-pintu-spk-berjalan]])
+- [ ] Analisa per work center, produk, vendor, dan pengiriman termasuk loading dan unloading ([[T-178-kinerja-dan-analisa-produksi-tahap-2]])
+- [ ] Penayangan: migration 14, push, PR ke `main` setelah persetujuan pemilik. Kebutuhan: [[PRD_PRODUKSI]]
