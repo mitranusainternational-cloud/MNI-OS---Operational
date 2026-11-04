@@ -131,7 +131,7 @@ Migration: file di `apps/platform/supabase/migrations/` (Git) lalu dipasang ke S
 |---|---|---|---|
 | SPK Berjalan | `#spk` | Lihat dan buat SPK | `spk`, `produksi_log`, `vendor`, `kirim` |
 | Produksi Hari Ini | `#mesin` | **Input** produksi | `produksi_log`, `mwc` |
-| Kinerja & Analisa | `#produksi` | Lihat | `produksi_log`, `mwc`, `vendor` |
+| Kinerja & Analisa | `#produksi` | Lihat (tab Work Center, Produk, Vendor, Pengiriman, Laporan harian) | `produksi_log`, `mwc`, `vendor`, `kirim`, `bongkar` |
 | Papan Produksi, Laporan Produksi | `#papan`, `#laporan-produksi` | Lihat (tersembunyi) | `produksi_log` |
 
 Kebutuhan dan pemetaan data: [[PRD_PRODUKSI]]. Nama menu lama (Monitoring SPK, Dashboard Produksi, Antrian Mesin) sudah digantikan.

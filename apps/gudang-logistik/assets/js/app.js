@@ -59,7 +59,7 @@ const F={ /* per-view filters, kept for the session */
  'vendor':{st:'aktif',vendor:'',q:''},
  'pengiriman':{st:'',q:''},
  'spk':{st:'aktif',q:'',tab:'berjalan',fl:'jalan'},
- 'produksi':{wc:'',p:'aktif',tab:'wc'}
+ 'produksi':{wc:'',p:'aktif',tab:'wc',hari:'30'}
 };
 const ROLE_ON=false; /* login & peran per user: ditunda, aktifkan nanti */
 const VIEWS=[
@@ -460,8 +460,100 @@ function spkBerjalan(){
 }
 
 /* ---------- Kinerja & Analisa (dulu Dashboard Produksi): Work Center, Vendor, Laporan harian ---------- */
-const tabKinerja=()=>segBtns('produksi','tab',[['wc','Work Center'],['vendor','Vendor'],['laporan','Laporan harian']]);
-T['produksi']=()=>{const f=F['produksi'];if(f.tab==='laporan')return tabKinerja()+'<span class="grow"></span>'+T['laporan-produksi']();return tabKinerja()+'<span class="grow"></span><button class="btn ghost" data-act="csv" data-what="prodlog">'+ic('dl')+' CSV Log</button>'};
+/* ---------- Kinerja & Analisa (Tahap 2): work center, produk, vendor, pengiriman ---------- */
+const fdpA=d=>String(fd(d)).replace(/&nbsp;/g,' ');
+const pctA=v=>v==null?'–':Math.round(v*100)+'%';
+const hrA=v=>v==null?'–':String(v).replace('.',',')+' hr';
+const mnA=v=>v==null?'–':v<60?v+' mnt':Math.floor(v/60)+' j '+(v%60)+' mnt';
+const sparkBar=(tren,mx)=>`<span class="spark">${tren.map(t=>`<i style="height:${mx>0?Math.max(t.qty>0?8:2,Math.round(t.qty/mx*100)):2}%" title="${fdpA(t.tgl)}: ${n(t.qty)}"></i>`).join('')}</span>`;
+const kpiA=(cls,lb,v,s)=>`<div class="kpi ${cls}"><span class="lb">${lb}</span><span class="v">${v}</span><span class="s">${s}</span></div>`;
+const hariPilih=()=>+((F.produksi||{}).hari)||30;
+
+function analisaWC(){
+ const P=PXL();const hari=hariPilih();const kap=kapWC();
+ const rows=P.outputWC({kejadian:S.produksi_log||[],wcList:wcInternal().map(w=>({nama:w.nama,kapasitas:kap[w.nama]||0})),sampai:today(),hari});
+ const tot=rows.reduce((a,r)=>a+r.qty,0),ton=rows.reduce((a,r)=>a+r.tonase,0);
+ const padat=rows.filter(r=>r.utilisasi!=null).sort((a,b)=>b.utilisasi-a.utilisasi)[0];
+ const rj=rows.filter(r=>r.rejectPct!=null&&r.qty>0).sort((a,b)=>b.rejectPct-a.rejectPct)[0];
+ const kp=`<div class="kpi-row">${kpiA('info','Output total',n(tot),`${hari} hari terakhir`)}${kpiA('info','Tonase',n(Math.round(ton))+' kg','dari hasil bertimbang')}${kpiA(padat&&padat.utilisasi>=0.9?'crit':'ok','Paling padat',padat?esc(padat.wc):'–',padat?`utilisasi ${pctA(padat.utilisasi)}`:'isi kapasitas di Master Data')}${kpiA(rj&&rj.rejectPct>=0.03?'warn':'ok','Reject tertinggi',rj?esc(rj.wc):'–',rj?pctA(rj.rejectPct):'tidak ada reject')}</div>`;
+ const warna=u=>u==null?'plain':u>=0.9?'crit':u>=0.5?'ok':'info';
+ const teks=u=>u==null?'kapasitas kosong':u>=0.9?'padat':u>=0.5?'sehat':'longgar';
+ const tr=rows.map(r=>{const mx=Math.max(0,...r.tren.map(t=>t.qty));
+  return `<tr data-wc="${esc(r.wc)}"><td><b>${esc(r.wc)}</b>${r.mesin.length>1?`<div class="note">${r.mesin.map(m=>esc(m.nama)+' '+n(m.qty)).join(' · ')}</div>`:''}</td><td class="num">${r.kapasitas?n(r.kapasitas):'–'}</td><td class="num"><b>${n(r.rataHari)}</b><div class="note">${r.hariAktif} hari aktif</div></td><td style="min-width:150px">${r.utilisasi==null?'<span class="muted">–</span>':`<div class="jb"><i style="width:${Math.min(100,Math.round(r.utilisasi*100))}%"></i></div>${chip(pctA(r.utilisasi)+' · '+teks(r.utilisasi),warna(r.utilisasi))}`}</td><td class="num">${n(r.puncak)}${r.utilisasiPuncak&&r.utilisasiPuncak>1?` <span class="note">${pctA(r.utilisasiPuncak)}</span>`:''}</td><td class="num">${pctA(r.rejectPct)}</td><td class="num">${r.menitPerPcs==null?'–':String(r.menitPerPcs).replace('.',',')}</td><td class="num">${n(Math.round(r.tonase))}</td><td>${sparkBar(r.tren,mx)}</td></tr>`}).join('');
+ return `<section class="panel"><div class="pbody" style="padding:0 0 8px 0">${kp}<div class="dw-section-title" style="margin:8px 0 6px 0">Output dan kapasitas per work center (${hari} hari terakhir)</div>
+  <div class="tbl-wrap"><table id="wc-output"><thead><tr><th>Work center</th><th class="num">Kapasitas/hari</th><th class="num">Rata-rata/hari</th><th>Utilisasi</th><th class="num">Puncak</th><th class="num">Reject</th><th class="num">Menit/pcs</th><th class="num">Tonase (kg)</th><th>Tren harian</th></tr></thead><tbody>${tr}</tbody></table></div>
+  <div class="note" style="padding:6px 16px 0">Rata-rata dihitung per hari yang ada hasilnya. Utilisasi = rata-rata per hari dibagi kapasitas per hari; 90% ke atas padat. Batang tren: tinggi menurut output harian.</div></div></section><section class="panel">${wcPanelBaru()}</section>`;
+}
+
+/* Satu baris per item SPK untuk analisa lama proses: kapan mulai, selesai produksi, ke vendor, kembali, dan terkirim */
+function recordsProduk(hari){
+ const P=PXL();const c=calc();const dari=addDays(today(),-(hari-1));const out=[];
+ const ev=evData().filter(e=>(e.jenis||'hasil')==='hasil');
+ S.spk.forEach(s=>{const x=c.spk[s._id];if(!x||x.st==='Draft'||x.st==='Batal'||(s.tgl&&s.tgl<dari))return;
+  (s.items||[]).forEach((it,ix)=>{const st=itemState(s,it,ix);if(!st)return;const q=+it.q||0;
+   const evi=ev.filter(e=>e.spk_id===s._id&&+e.item_idx===ix);
+   const waktu=e=>e.mulai||e.at;
+   const mulai=evi.length?evi.map(waktu).sort()[0]:null;
+   const intern=st.rute.filter(w=>!P.langkahVendor(w));const akhir=intern[intern.length-1];const iAkhir=st.rute.indexOf(akhir);
+   const selesaiProduksi=q>0&&(st.kum[akhir]||0)>=q?(evi.filter(e=>P.indeksLangkah(st.rute,st.alt,e.wc)===iAkhir).map(e=>e.selesai||e.at).sort().slice(-1)[0]||null):null;
+   const vs=c.vend.filter(v=>v.v.spk===s._id&&v.v.status!=='Batal'&&(v.v.items||[]).some(i=>i.d===it.d));
+   const vendorKirim=vs.length?vs.map(v=>v.v.tgl).filter(Boolean).sort()[0]:null;
+   const vendorKembali=vs.length&&vs.every(v=>v.st==='Selesai')?vs.map(v=>{const l=(v.v.riwayat||[]).slice(-1)[0];return (l&&l.tgl)||String(v.v.updAt||'').slice(0,10)}).filter(Boolean).sort().slice(-1)[0]:null;
+   const ks=S.kirim.filter(k=>k.spk===s._id&&k.status!=='Batal'&&(k.items||[]).some(i=>i.d===it.d));
+   const terkirim=ks.length&&((x.lines[ix]||{}).kirim||0)>=q&&ks.every(k=>k.status==='Diterima')?ks.map(k=>k.tglTerima||k.tgl).filter(Boolean).sort().slice(-1)[0]:null;
+   out.push({produk:P.produkDari(it.d),desc:it.d,spk:s.no,qty:q,spkTgl:s.tgl,mulai,selesaiProduksi,vendorKirim,vendorKembali,terkirim});
+  })});
+ return out;
+}
+function analisaProduk(){
+ const P=PXL();const hari=hariPilih();const rec=recordsProduk(hari);const lp=P.lamaPerProduk(rec);
+ if(!lp.length)return `<section class="panel">${empty('Belum ada SPK pada periode ini','Perpanjang periode di atas, atau terbitkan SPK dengan rute produksi.')}</section>`;
+ const selesai=rec.filter(r=>r.terkirim).length;
+ const kp=`<div class="kpi-row">${kpiA('info','Item dianalisa',rec.length,`SPK terbit ${hari} hari terakhir`)}${kpiA('ok','Sudah terkirim',selesai,'sampai customer')}${kpiA('info','Selesai produksi',rec.filter(r=>r.selesaiProduksi).length,'semua langkah internal')}${kpiA('warn','Masih berjalan',rec.length-selesai,'belum sampai customer')}</div>`;
+ const seg=[['tunggu','Tunggu mulai','s-a'],['produksi','Produksi','s-b'],['tungguVendor','Tunggu kirim vendor','s-c'],['vendor','Di vendor','s-d'],['kirim','Ke customer','s-e']];
+ const tr=lp.map(o=>{const tot=seg.reduce((a,[k])=>a+(o[k]||0),0);
+  const bar=tot>0?`<div class="stk">${seg.map(([k,l,c])=>o[k]?`<i class="${c}" style="width:${(o[k]/tot*100).toFixed(1)}%" title="${l}: ${hrA(o[k])}"></i>`:'').join('')}</div>`:'<span class="muted">belum ada tahap selesai</span>';
+  return `<tr data-produk="${esc(o.produk)}"><td><b>${esc(o.produk)}</b><div class="note">${o.item} item · ${n(o.qty)} pcs</div></td><td class="num">${hrA(o.tunggu)}</td><td class="num">${hrA(o.produksi)}</td><td class="num">${hrA(o.tungguVendor)}</td><td class="num">${hrA(o.vendor)}</td><td class="num">${hrA(o.kirim)}</td><td class="num"><b>${hrA(o.total)}</b><div class="note">${o.terkirim} terkirim</div></td><td style="min-width:220px">${bar}</td></tr>`}).join('');
+ const legend=seg.map(([,l,c])=>`<span class="lg"><i class="${c}"></i>${l}</span>`).join('');
+ const lambat=rec.filter(r=>r.terkirim).map(r=>({...r,tot:Math.round((new Date(r.terkirim)-new Date(r.spkTgl))/864e5)})).sort((a,b)=>b.tot-a.tot).slice(0,5);
+ return `<section class="panel"><div class="pbody" style="padding:0 0 8px 0">${kp}<div class="dw-section-title" style="margin:8px 0 6px 0">Lama proses per produk, dari SPK terbit sampai terkirim</div>
+  <div class="tbl-wrap"><table id="produk-tabel"><thead><tr><th>Produk</th><th class="num">Tunggu mulai</th><th class="num">Produksi</th><th class="num">Tunggu kirim vendor</th><th class="num">Di vendor</th><th class="num">Ke customer</th><th class="num">Total</th><th>Komposisi waktu</th></tr></thead><tbody>${tr}</tbody></table></div>
+  <div class="lgd">${legend}</div>
+  ${lambat.length?`<div class="dw-section-title" style="margin:12px 0 6px 0">Item paling lama sampai customer</div><ul class="note" style="margin:0 0 0 18px;padding:0">${lambat.map(r=>`<li>SPK ${esc(String(r.spk))} · ${esc(r.desc)} · <b>${r.tot} hari</b></li>`).join('')}</ul>`:''}
+  <div class="note" style="padding:8px 16px 0">Rata-rata per tahap hanya dari item yang tahapnya sudah terjadi. Waktu dihitung dari catatan Mulai dan Selesai, surat jalan vendor, dan surat jalan customer; tidak ada input tambahan.</div></div></section>`;
+}
+
+const pengVendor=()=>calc().vend.filter(x=>x.v.status!=='Batal').map(x=>{const v=x.v;const selesai=x.st==='Selesai';const last=(v.riwayat||[]).slice(-1)[0];
+ return {vendor:v.vendor,proses:vKey(v.proses).toUpperCase(),tglKirim:v.tgl,tglKembali:selesai?((last&&last.tgl)||String(v.updAt||'').slice(0,10)||null):null,qty:(v.items||[]).reduce((a,i)=>a+(+i.q||0),0),reject:(v.items||[]).reduce((a,i)=>a+(+i.reject||0),0),noSJ:v.noSJ,sisa:x.sisa}});
+function analisaVendor(){
+ const P=PXL();const peng=pengVendor();const rv=P.ringkasVendor(peng,today());
+ if(!rv.baris.length)return `<section class="panel"><div class="pbody note">Belum ada pengiriman ke vendor. Catat lewat menu Kirim ke Vendor.</div></section>`;
+ const keluar=rv.baris.reduce((a,r)=>a+r.keluar,0),masuk=rv.baris.reduce((a,r)=>a+r.masuk,0),sisa=rv.baris.reduce((a,r)=>a+r.sisa,0);
+ const tat=rv.baris.filter(r=>r.rataTAT!=null);const rataTat=tat.length?Math.round(tat.reduce((a,r)=>a+r.rataTAT,0)/tat.length*10)/10:null;
+ const kp=`<div class="kpi-row">${kpiA('info','Barang keluar',n(keluar),'ke semua vendor')}${kpiA('ok','Sudah kembali',n(masuk),'diterima dari vendor')}${kpiA(sisa?'warn':'ok','Masih di vendor',n(sisa),rv.terbuka.length+' surat jalan terbuka')}${kpiA('info','Rata-rata TAT',rataTat==null?'–':String(rataTat).replace('.',','),'hari kerja per kiriman')}</div>`;
+ const tr=rv.baris.map(r=>`<tr data-vendor="${esc(r.vendor)}"><td><b>${esc(r.vendor)}</b></td><td>${esc(r.proses||'–')}</td><td class="num">${r.kiriman}</td><td class="num">${n(r.keluar)}</td><td class="num">${n(r.masuk)}</td><td class="num">${r.sisa?`<b>${n(r.sisa)}</b>`:'–'}</td><td class="num">${r.rataTAT==null?'–':String(r.rataTAT).replace('.',',')+' hk'}</td><td class="num">${r.tercepat==null?'–':r.tercepat+' / '+r.terlama+' hk'}</td><td class="num">${pctA(r.rejectPct)}</td></tr>`).join('');
+ const buka=rv.terbuka.length?`<div class="dw-section-title" style="margin:12px 0 6px 0">Sedang di vendor sekarang</div><div class="tbl-wrap"><table id="vendor-terbuka"><thead><tr><th>Surat jalan</th><th>Vendor</th><th>Proses</th><th>Dikirim</th><th class="num">Sisa</th><th class="num">Sudah</th></tr></thead><tbody>${rv.terbuka.map(t=>`<tr><td class="mono">${esc(t.noSJ||'–')}</td><td>${esc(t.vendor)}</td><td>${esc(t.proses||'–')}</td><td>${fd(t.tglKirim)}</td><td class="num"><b>${n(t.sisa)}</b></td><td class="num">${t.umur} hk${t.umur>=5?' '+chip('lama','crit'):''}</td></tr>`).join('')}</tbody></table></div>`:'';
+ return `<section class="panel"><div class="pbody" style="padding:0 0 8px 0">${kp}<div class="dw-section-title" style="margin:8px 0 6px 0">Barang keluar dan masuk per vendor</div>
+  <div class="tbl-wrap"><table id="vendor-aliran"><thead><tr><th>Vendor</th><th>Proses</th><th class="num">Kiriman</th><th class="num">Keluar</th><th class="num">Masuk</th><th class="num">Sisa</th><th class="num">Rata-rata TAT</th><th class="num">Tercepat / terlama</th><th class="num">Reject</th></tr></thead><tbody>${tr}</tbody></table></div>${buka}</div></section>
+  <section class="panel">${vendorPanelBaru()}</section>`;
+}
+
+function analisaKirim(){
+ const P=PXL();const hari=hariPilih();const dari=addDays(today(),-(hari-1));
+ const ad=P.analisaDock(S.bongkar||[],dari,today());
+ if(!ad.perJenis.length)return `<section class="panel">${empty('Belum ada Loading atau Unloading pada periode ini','Catat lewat Bongkar Muat; jam masuk, mulai, dan selesai dipakai untuk analisa.')}</section>`;
+ const kp=`<div class="kpi-row">${kpiA('ok','Selesai',ad.selesai,`${hari} hari terakhir`)}${kpiA(ad.proses?'warn':'info','Sedang proses',ad.proses,'di dock sekarang')}${kpiA(ad.antri?'warn':'info','Antri',ad.antri,'menunggu giliran')}${kpiA('info','Jenis aktivitas',ad.perJenis.length,'loading dan unloading')}</div>`;
+ const tj=ad.perJenis.map(r=>`<tr><td>${chip(r.jenis,r.jenis==='Loading'?'info':'warn')}</td><td>${esc(r.muatan)}</td><td class="num">${r.n}<div class="note">${r.selesai} selesai</div></td><td class="num">${mnA(r.rataTunggu)}</td><td class="num"><b>${mnA(r.rataProses)}</b></td><td class="num">${mnA(r.terlama)}</td></tr>`).join('');
+ const tp=ad.perPihak.map(r=>`<tr><td>${chip(r.jenis,r.jenis==='Loading'?'info':'warn')}</td><td>${esc(r.pihak||'–')}</td><td class="num">${r.n}</td><td class="num">${mnA(r.rataTunggu)}</td><td class="num"><b>${mnA(r.rataProses)}</b></td></tr>`).join('');
+ return `<section class="panel"><div class="pbody" style="padding:0 0 8px 0">${kp}<div class="dw-section-title" style="margin:8px 0 6px 0">Loading dan unloading per jenis muatan</div>
+  <div class="tbl-wrap"><table id="dock-jenis"><thead><tr><th>Jenis</th><th>Muatan</th><th class="num">Jumlah</th><th class="num">Rata-rata tunggu</th><th class="num">Rata-rata proses</th><th class="num">Terlama</th></tr></thead><tbody>${tj}</tbody></table></div>
+  <div class="dw-section-title" style="margin:12px 0 6px 0">Per customer, vendor, dan supplier (10 teratas)</div>
+  <div class="tbl-wrap"><table id="dock-pihak"><thead><tr><th>Jenis</th><th>Pihak</th><th class="num">Jumlah</th><th class="num">Rata-rata tunggu</th><th class="num">Rata-rata proses</th></tr></thead><tbody>${tp}</tbody></table></div>
+  <div class="note" style="padding:8px 16px 0">Tunggu = jam masuk sampai jam mulai; proses = jam mulai sampai jam selesai. Diambil dari antrian Bongkar Muat; loading barang jadi ke customer, unloading dan loading barang setengah jadi ke vendor, dan unloading bahan baku.</div></div></section>`;
+}
+
+const tabKinerja=()=>segBtns('produksi','tab',[['wc','Work Center'],['produk','Produk'],['vendor','Vendor'],['kirim','Pengiriman'],['laporan','Laporan harian']]);
+T['produksi']=()=>{const f=F['produksi'];if(f.tab==='laporan')return tabKinerja()+'<span class="grow"></span>'+T['laporan-produksi']();const per=['wc','produk','kirim'].includes(f.tab)?segBtns('produksi','hari',[['7','7 hari'],['14','14 hari'],['30','30 hari'],['90','90 hari']]):'';return tabKinerja()+per+'<span class="grow"></span>'+(f.tab==='wc'?'<button class="btn ghost" data-act="csv" data-what="prodlog">'+ic('dl')+' CSV Log</button>':'')};
 const _tProdLama=()=>{
  const f=F['produksi']||(F['produksi']={wc:'',p:'aktif'});
  const wcOpts=[['','Semua WC'],...S.mwc.filter(x=>x.aktif!==false).sort((a,b)=>a.urutan-b.urutan).map(w=>[w.kode,w.nama])];
@@ -478,8 +570,10 @@ B['produksi']=()=>{
  const f0=F['produksi']||(F['produksi']={wc:'',p:'aktif',tab:'wc'});
  if(f0.tab==='laporan')return B['laporan-produksi']();
  if(!PXL())return empty('Belum siap','Muat ulang halaman.');
- if(f0.tab==='vendor')return `<section class="panel">${vendorPanelBaru()||'<div class="pbody note">Belum ada pengiriman vendor yang bisa dinilai.</div>'}</section>`;
- return `<section class="panel">${wcPanelBaru()}</section>`;
+ if(f0.tab==='vendor')return analisaVendor();
+ if(f0.tab==='produk')return analisaProduk();
+ if(f0.tab==='kirim')return analisaKirim();
+ return analisaWC();
 };
 const _bProduksiLama=()=>{
  const c=calc(),f=F['produksi']||(F['produksi']={wc:'',p:'aktif'});

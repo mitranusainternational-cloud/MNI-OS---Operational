@@ -133,4 +133,4 @@ v0.9 Fondasi ──► v1.0 Pilot go-live ──► v1.1 Stabilisasi ──► v
 
 ## 10. Catatan pembaruan: modul produksi (2026-11-04)
 
-Modul produksi multi work center dibangun **lokal saja** (ditahan dari penayangan). Skema tiga pintu (SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa) selesai di Tahap 1 ([[T-177-skema-produksi-tiga-pintu-spk-berjalan]]); Tahap 2 menambah analisa per work center, produk, vendor, dan pengiriman ([[T-178-kinerja-dan-analisa-produksi-tahap-2]]). Kebutuhan di [[PRD_PRODUKSI]]. Penayangan menunggu persetujuan pemilik: migration 14, push, lalu PR ke `main`.
+Modul produksi multi work center dibangun **lokal saja** (ditahan dari penayangan). Skema tiga pintu (SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa) selesai di Tahap 1 ([[T-177-skema-produksi-tiga-pintu-spk-berjalan]]); Tahap 2 (analisa per work center, produk, vendor, dan pengiriman, [[T-178-kinerja-dan-analisa-produksi-tahap-2]]) selesai di lokal pada 2026-11-04. Kebutuhan di [[PRD_PRODUKSI]]. Penayangan menunggu persetujuan pemilik: migration 14, push, lalu PR ke `main`.

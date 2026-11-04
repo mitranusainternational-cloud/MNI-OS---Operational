@@ -656,4 +656,9 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .sb-bar{display:flex;align-items:center;gap:10px;margin:10px 0 4px}.sb-bar .jb{flex:1;margin:0;height:8px}.sb-bar .jb i{height:8px}.sb-bar b{font-size:15px;min-width:42px;text-align:right}
 .sb-det .dw-section-title{display:none}.sb-now{margin:6px 0;font-size:13px}.sb-det{margin-top:8px}.sb-det summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);padding:6px 0}
 @media(max-width:640px){.sb-no{font-size:16px}}
+/* Kinerja & Analisa */
+.spark{display:inline-flex;align-items:flex-end;gap:2px;height:30px;min-width:120px}.spark i{display:block;flex:1;min-width:3px;background:var(--accent);border-radius:2px 2px 0 0;opacity:.85}
+.stk{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line)}.stk i{display:block;height:14px}
+.s-a{background:#94a3b8}.s-b{background:var(--accent)}.s-c{background:#f59e0b}.s-d{background:#a855f7}.s-e{background:var(--ok)}
+.lgd{display:flex;flex-wrap:wrap;gap:6px 16px;padding:8px 16px 0;font-size:12px;color:var(--muted)}.lg{display:inline-flex;align-items:center;gap:6px}.lg i{display:inline-block;width:12px;height:12px;border-radius:3px}
 @media print{.no-print{display:none}}

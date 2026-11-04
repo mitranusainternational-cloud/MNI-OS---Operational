@@ -5,7 +5,7 @@ title: "Kinerja & Analisa produksi (Tahap 2): per work center, produk, vendor, d
 phase: P2
 epic: E-02
 release: v0.9
-status: todo
+status: review
 priority: P1
 env: dev
 effort_days: 3
@@ -25,11 +25,12 @@ Kebutuhan: [[PRD_PRODUKSI]]
 
 ## Kriteria selesai
 
-- [ ] Tab **Work Center**: output per hari, kapasitas, utilisasi, menit per pcs, dan tren
-- [ ] Tab **Produk**: lama proses dari work center awal sampai selesai per jenis produk, termasuk waktu di vendor dan waktu kirim
-- [ ] Tab **Vendor**: lama proses, tepat waktu, reject, dan barang keluar dan masuk per vendor (perluasan kualifikasi yang sudah ada)
-- [ ] Tab **Pengiriman**: lama loading dan unloading ke customer; cek apakah Bongkar Muat dan Kirim ke Customer menyimpan jam mulai dan selesai, bila belum tambah isian jam sederhana
-- [ ] Uji e2e dan unit untuk hitungan baru; dokumen dan PRD diperbarui
+- [x] Tab **Work Center**: output per hari, kapasitas, utilisasi, reject, menit per pcs, tonase, dan tren harian; periode 7, 14, 30, 90 hari; beban antrian tetap di bawahnya
+- [x] Tab **Produk**: lama proses per jenis produk dari SPK terbit sampai terkirim, dipecah tunggu mulai, produksi, tunggu kirim vendor, di vendor, ke customer, dengan bilah komposisi waktu
+- [x] Tab **Vendor**: barang keluar, masuk, dan sisa per vendor dan proses; rata-rata, tercepat, dan terlama (hari kerja); reject; daftar surat jalan yang masih di vendor; kualifikasi yang sudah ada tetap di bawahnya
+- [x] Tab **Pengiriman**: lama tunggu dan proses loading dan unloading per jenis muatan dan per pihak. Hasil cek: antrian Bongkar Muat sudah menyimpan jam masuk, mulai, dan selesai, jadi **tidak perlu isian baru**
+- [x] Uji unit analisa 21 lulus; e2e produksi 74, regresi 42, role 12, akses 34, tampilan 71 (mock, `verified in browser`, bukan bukti Supabase); PRD dan dokumen diperbarui
+- [ ] Ditinjau pemilik di pratinjau lokal
 
 ## Catatan
 

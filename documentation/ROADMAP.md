@@ -134,5 +134,5 @@ Checklist ini menjelaskan urutan kerja antar-tools. Status hanya dicentang jika 
 ## Produksi dan tracking (2026-11-04, lokal)
 
 - [x] Skema tiga pintu: SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa ([[T-177-skema-produksi-tiga-pintu-spk-berjalan]])
-- [ ] Analisa per work center, produk, vendor, dan pengiriman termasuk loading dan unloading ([[T-178-kinerja-dan-analisa-produksi-tahap-2]])
+- [x] Analisa per work center, produk, vendor, dan pengiriman termasuk loading dan unloading ([[T-178-kinerja-dan-analisa-produksi-tahap-2]]), lokal
 - [ ] Penayangan: migration 14, push, PR ke `main` setelah persetujuan pemilik. Kebutuhan: [[PRD_PRODUKSI]]

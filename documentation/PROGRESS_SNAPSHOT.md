@@ -101,6 +101,7 @@ generated: 2026-11-04
 - [[tasks/T-170-kesiapan-pilot-cadangan-dan-impor-csv|T-170]] Kesiapan pilot: cadangan data dan impor CSV master dan stok awal · dev + pemilik
 - [[tasks/T-171-logo-perusahaan-di-sistem-dan-dokumen|T-171]] Logo PT Mitra Nusa Internasional di sistem dan semua dokumen · dev
 - [[tasks/T-177-skema-produksi-tiga-pintu-spk-berjalan|T-177]] Skema produksi tiga pintu: SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa (Tahap 1) · dev + pemilik
+- [[tasks/T-178-kinerja-dan-analisa-produksi-tahap-2|T-178]] Kinerja & Analisa produksi (Tahap 2): per work center, produk, vendor, dan pengiriman · dev + pemilik
 
 ## Tugas P0 yang belum selesai
 

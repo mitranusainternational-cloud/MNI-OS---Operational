@@ -254,3 +254,16 @@ Pemilik menilai papan dan layar sebelumnya masih membingungkan. Skema akhir (keb
 | Kinerja & Analisa | Tab Work Center (beban, kapasitas, hari habis), Vendor (kualifikasi), Laporan harian | Tahap 2: tab Produk dan Pengiriman |
 
 Rute `papan` dan `laporan-produksi` tetap bisa dibuka lewat alamat tetapi tidak muncul di menu. Uji e2e M-99 sampai M-105.
+
+## 19. Analisa untuk manajemen (Kinerja & Analisa)
+
+Mesin hitung murni `src/lib/produksi/analisa.js` (uji unit A-01 sampai A-21). Tidak ada input baru; semua dari kejadian yang sudah dicatat.
+
+| Tab | Hitungan |
+|---|---|
+| Work Center | Output per work center dalam periode; rata-rata per hari yang ada hasilnya; utilisasi = rata-rata per hari dibagi kapasitas per hari (90% ke atas padat, 50% sampai 90% sehat, di bawahnya longgar); puncak, reject persen, menit per pcs, tonase, dan tren harian |
+| Produk | Per jenis produk (dua kata pertama deskripsi): tunggu mulai (SPK terbit ke Mulai pertama), produksi (Mulai pertama ke langkah internal terakhir selesai), tunggu kirim vendor, di vendor (kirim ke kembali), ke customer, dan total SPK terbit sampai terkirim; tiap tahap dirata-rata hanya dari item yang tahapnya sudah terjadi |
+| Vendor | Per vendor dan proses: kiriman, keluar, masuk (keluar dikurangi sisa), sisa, rata-rata, tercepat, terlama (hari kerja), reject persen; daftar surat jalan yang masih di vendor dengan umurnya |
+| Pengiriman | Dari antrian Bongkar Muat: per jenis (Loading atau Unloading) dan muatan, serta per pihak: jumlah, rata-rata tunggu (jam masuk ke mulai), rata-rata proses (mulai ke selesai), dan terlama |
+
+Uji e2e M-106 sampai M-111. Data contoh `?demo=produksi` ditambah satu SPK yang sudah sampai customer, satu vendor ELG, dan sepuluh aktivitas dock.

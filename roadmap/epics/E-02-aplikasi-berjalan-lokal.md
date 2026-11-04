@@ -42,6 +42,6 @@ Docker belum aktif di mesin kerja (T-010).
 - [x] [[tasks/T-175-impor-stok-barang-jadi-oktober-2026|T-175]] Impor stok barang jadi dari Stock Barang 2026 ke production (data saja) · done · P1 · 0.5 hari
 - [x] [[tasks/T-176-filter-type-gudang-barang-jadi|T-176]] Filter Type di Gudang Barang Jadi (STU, STC, SLU, SLW, SLHD) · done · P2 · 0.25 hari
 - [ ] [[tasks/T-177-skema-produksi-tiga-pintu-spk-berjalan|T-177]] Skema produksi tiga pintu: SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa (Tahap 1) · review · P1 · 1.5 hari
-- [ ] [[tasks/T-178-kinerja-dan-analisa-produksi-tahap-2|T-178]] Kinerja & Analisa produksi (Tahap 2): per work center, produk, vendor, dan pengiriman · todo · P1 · 3 hari
+- [ ] [[tasks/T-178-kinerja-dan-analisa-produksi-tahap-2|T-178]] Kinerja & Analisa produksi (Tahap 2): per work center, produk, vendor, dan pengiriman · review · P1 · 3 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

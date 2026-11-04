@@ -427,3 +427,7 @@ Dropdown Type (STU, STC, SLU, SLW, SLHD, lainnya, Tanpa type) mengikuti kategori
 ### 2026-11-04 — Skema produksi tiga pintu (T-177, lokal)
 
 Hasil tinjauan pemilik: tampilan produksi membingungkan karena terlalu banyak menu dan tempat input. Pembanding: Operations Kanban Antlia. Skema baru: **SPK Berjalan**, **Produksi Hari Ini** (satu-satunya input produksi), dan **Kinerja & Analisa**. Kebutuhan lengkap di [[PRD_PRODUKSI]]; rancangan di [[RUTE_PRODUKSI]] bagian 17 dan 18. Uji e2e mock lulus (produksi 68, regresi 42, role 12, akses 34, tampilan 71). Belum ditayangkan; migration 14 tetap draf. Langkah berikut: tinjauan pemilik, lalu Tahap 2 ([[T-178-kinerja-dan-analisa-produksi-tahap-2]]).
+
+### 2026-11-04 — Kinerja & Analisa lengkap (T-178, lokal)
+
+Tahap 2 selesai di lokal: empat tab analisa baru di Kinerja & Analisa (Work Center, Produk, Vendor, Pengiriman) di samping Laporan harian. Pemeriksaan data: antrian Bongkar Muat sudah menyimpan jam masuk, mulai, dan selesai, sehingga loading dan unloading dianalisa tanpa input baru. Bukti: uji unit analisa 21 lulus; e2e produksi 74, regresi 42, role 12, akses 34, tampilan 71 (mock, bukan bukti Supabase). Kebutuhan dipetakan di [[PRD_PRODUKSI]] bagian 10; hitungan di [[RUTE_PRODUKSI]] bagian 19. Belum ditayangkan; migration 14 tetap draf. Langkah berikut: tinjauan pemilik, konfirmasi aturan rute Jointing dan Clamp serta kapasitas per mesin.

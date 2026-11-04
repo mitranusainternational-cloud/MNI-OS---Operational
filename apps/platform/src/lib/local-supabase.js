@@ -128,6 +128,24 @@ function demoProduksi(state) {
     items: [{ d: 'Cable Tray', g: '', q, u: 'Btg', kembali: balik ? q - rej : 0, reject: balik ? rej : 0 }], riwayat: balik ? [{ tgl: balik, qty: q - rej, rej }] : [] } });
   const d = (n) => hari(n).slice(0, 10);
   tb.vendor = [mk(d(35), d(30), 30, 0), mk(d(28), d(23), 30, 1), mk(d(21), d(17), 40, 0), mk(d(14), d(6), 20, 0), mk(d(2), null, 15, 0)];
+  // SPK lama yang sudah sampai customer (untuk analisa lama proses per produk) dan aktivitas loading dan unloading
+  const sid = uid();
+  const itemSel = { d: 'Cable Tray W200xH50xL3000 1.2', g: 'CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED', q: 20, u: 'Btg', w: 5.5, prod: 20 };
+  tb.spk.push({ id: sid, no: '1000', tgl: d(22), customer: 'Customer Contoh C', po: 'PO-CONTOH-00', due: d(8), status: 'Terbit', rev: 0, material: 'SPCC', tebal: '1.2', items: [itemSel], prod_log: [], catatan: 'Data contoh sudah terkirim', terbit_at: now, terbit_by: 'admin@mni.local', created_at: now, updated_at: now, created_by: 'seed', updated_by: 'seed', data: {} });
+  const evS = (wc, n, msn, menit, op) => {
+    const mulai = new Date(hari(n)); mulai.setHours(8, 0, 0, 0); const selesai = new Date(mulai.getTime() + menit * 60000);
+    return { at: selesai.toISOString(), jenis: 'hasil', tgl: hari(n).slice(0, 10), spk_id: sid, spk_no: '1000', customer: 'Customer Contoh C', item_idx: 0, item_desc: itemSel.d, wc, mesin: msn, operator: op,
+      mulai: mulai.toISOString(), selesai: selesai.toISOString(), menit, berat: itemSel.w, tonase: Math.round(20 * itemSel.w * 100) / 100, qty: 20, reject: 0, oleh: 'operator@mni.local', data: {} };
+  };
+  tb.produksi_log.push(evS('Shearing', 20, 'Shearing 3 Meter', 40, 'Operator A'), evS('Punching', 19, 'Punching 1 (20 Ton)', 110, 'Operator C'), evS('Bending', 18, 'Bending 3 Mtr #1', 90, 'Operator E'));
+  tb.vendor.push({ id: uid(), created_at: now, updated_at: now, data: { vendor: 'Elektro Mandiri Contoh', proses: 'ELG', tgl: d(17), noSJ: 'SJ-V/' + d(17), spk: sid, status: 'Selesai', items: [{ d: itemSel.d, g: '', q: 20, u: 'Btg', kembali: 20, reject: 0 }], riwayat: [{ tgl: d(13), qty: 20, rej: 0 }] } });
+  tb.kirim.push({ id: uid(), created_at: now, updated_at: now, data: { spk: sid, customer: 'Customer Contoh C', tgl: d(12), tglTerima: d(11), noSJ: 'SJ/' + d(12), status: 'Diterima', kendaraan: 'Truk', nopol: 'B 1000 UJI', driver: 'Contoh', items: [{ d: itemSel.d, q: 20, u: 'Btg', w: 5.5 }] } });
+  const bk = (n, jenis, muatan, pihak, masuk, mulai, selesai, status = 'Selesai') => ({ id: uid(), created_at: now, updated_at: now, data: { jenis, muatan, pihak, tgl: d(n), jamMasuk: masuk, jamMulai: mulai, jamSelesai: selesai, status, nopol: 'B 2000 UJI', kendaraan: 'Truk', driver: 'Contoh' } });
+  tb.bongkar = [bk(12, 'Loading', 'Barang Jadi', 'Customer Contoh C', '08:00', '08:20', '09:05'), bk(6, 'Loading', 'Barang Jadi', 'Customer Contoh A', '10:00', '10:40', '11:30'), bk(3, 'Loading', 'Barang Jadi', 'Customer Contoh A', '13:00', '13:05', '13:40'),
+    bk(17, 'Loading', 'Barang Setengah Jadi', 'Elektro Mandiri Contoh', '14:00', '14:15', '14:55'), bk(2, 'Loading', 'Barang Setengah Jadi', 'Berkah Jaya Plating', '09:00', '09:10', '09:50'),
+    bk(13, 'Unloading', 'Barang Setengah Jadi', 'Elektro Mandiri Contoh', '08:30', '08:45', '09:15'), bk(6, 'Unloading', 'Barang Setengah Jadi', 'Berkah Jaya Plating', '08:30', '08:45', '09:15'),
+    bk(10, 'Unloading', 'Bahan Baku', 'Supplier Contoh A', '07:30', '08:10', '09:40'), bk(4, 'Unloading', 'Bahan Baku', 'Supplier Contoh A', '07:45', '07:50', '08:50'),
+    bk(0, 'Loading', 'Barang Jadi', 'Customer Contoh B', '', '', '', 'Antri')];
 }
 
 export function createLocalClient() {

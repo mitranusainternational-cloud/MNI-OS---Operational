@@ -568,7 +568,8 @@ window.MNIBerat = {
 import * as _rute from './produksi/rute.js';
 import * as _kinerja from './produksi/kinerja.js';
 import * as _laporan from './produksi/laporan.js';
-window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan };
+import * as _analisa from './produksi/analisa.js';
+window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan, ..._analisa };
 
 window.claude = CLAUDE_SHIM;
 window.__supabase = supabase;

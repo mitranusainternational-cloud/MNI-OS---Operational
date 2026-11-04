@@ -313,7 +313,7 @@ export async function runProduksi(page, base) {
   ok('M-99 menu Produksi hanya tiga pintu: SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa', ['#spk', '#mesin', '#produksi'].every((h) => menuProd.hs.includes(h)) && !menuProd.hs.includes('#papan') && !menuProd.hs.includes('#laporan-produksi') && /SPK Berjalan/.test(menuProd.teks) && /Produksi Hari Ini/.test(menuProd.teks) && /Kinerja & Analisa/.test(menuProd.teks), menuProd.hs.join(','));
   await go('spk'); await page.click('#tools [data-view="spk"][data-val="berjalan"]'); await page.waitForTimeout(500);
   const sb = await page.evaluate(() => ({ kartu: document.querySelectorAll('.sb-card').length, txt: document.getElementById('body').innerText, kpi: document.querySelectorAll('.kpi').length, jalur: document.querySelectorAll('.sb-card .jstep').length }));
-  ok('M-100 SPK Berjalan: kartu per SPK dengan status, progres, dan jalur tiap item sampai barang jadi', sb.kartu >= 3 && sb.kpi === 4 && sb.jalur > 5 && /Jalur tiap item/.test(sb.txt) && /%/.test(sb.txt), JSON.stringify({ k: sb.kartu, j: sb.jalur }));
+  ok('M-100 SPK Berjalan: kartu per SPK dengan status, progres, dan jalur tiap item sampai barang jadi', sb.kartu >= 3 && sb.kpi === 4 && sb.jalur > 5 && /jalur tiap item/i.test(sb.txt) && /%/.test(sb.txt), JSON.stringify({ k: sb.kartu, j: sb.jalur }));
   await page.click('#tools [data-view="spk"][data-key="fl"][data-val="telat"]'); await page.waitForTimeout(400);
   const telat = await page.evaluate(() => ({ kartu: [...document.querySelectorAll('.sb-card')].map((c) => c.innerText), kpiTelat: Number(document.querySelectorAll('.kpi')[1].querySelector('.v').textContent) }));
   ok('M-101 filter Telat menampilkan SPK lewat due (Customer Kartu) dan jumlahnya sama dengan ringkasan', telat.kartu.length === telat.kpiTelat && telat.kartu.some((x) => /Customer Kartu/.test(x)) && telat.kartu.every((x) => /Telat/.test(x)), JSON.stringify([telat.kartu.length, telat.kpiTelat]));
@@ -337,6 +337,29 @@ export async function runProduksi(page, base) {
   ok('M-30 data contoh produksi memuat 5 work center, kualifikasi vendor, dan posisi SPK', demo.wc === 5 && demo.vendor && demo.posisi, JSON.stringify(demo));
   await page.evaluate(() => { location.hash = '#spk'; }); await page.waitForTimeout(1200);
   ok('M-105 membuka SPK langsung menampilkan SPK Berjalan (bukan tabel daftar) sebagai tampilan awal', (await page.$$eval('.sb-card', (a) => a.length)) >= 2 && !!(await page.$('#tools [data-view="spk"][data-val="berjalan"].on')));
+  // Tahap 2: Kinerja & Analisa lengkap (data contoh)
+  const tabK = async (v) => { await page.evaluate(() => { location.hash = '#produksi'; }); await page.waitForTimeout(500); await page.click('#tools [data-view="produksi"][data-key="tab"][data-val="' + v + '"]'); await page.waitForTimeout(500); };
+  await tabK('wc');
+  const aw = await page.evaluate(() => ({ rows: [...document.querySelectorAll('#wc-output tbody tr')].map((r) => ({ wc: r.dataset.wc, txt: r.innerText })), spark: document.querySelectorAll('#wc-output .spark i').length, beban: !!document.getElementById('wc-beban'), kpi: document.querySelectorAll('.kpi').length }));
+  const sh = aw.rows.find((r) => r.wc === 'Shearing'), pn = aw.rows.find((r) => r.wc === 'Punching');
+  ok('M-106 tab Work Center: output per work center dengan kapasitas, utilisasi, reject, menit per pcs, dan tren; beban antrian tetap ada', aw.rows.length === 5 && /100/.test(sh.txt) && /%/.test(pn.txt) && aw.spark > 50 && aw.beban && aw.kpi >= 4, JSON.stringify(aw.rows.map((r) => r.wc)));
+  await page.click('#tools [data-view="produksi"][data-key="hari"][data-val="7"]'); await page.waitForTimeout(400);
+  const sp7 = await page.evaluate(() => document.querySelectorAll('#wc-output tbody tr:first-child .spark i').length);
+  ok('M-107 mengganti periode ke 7 hari mengubah jumlah batang tren', sp7 === 7, String(sp7));
+  await page.click('#tools [data-view="produksi"][data-key="hari"][data-val="30"]');
+  await tabK('produk');
+  const ap = await page.evaluate(() => ({ rows: [...document.querySelectorAll('#produk-tabel tbody tr')].map((r) => ({ p: r.dataset.produk, txt: r.innerText, stk: r.querySelectorAll('.stk i').length })), lg: document.querySelectorAll('.lgd .lg').length }));
+  const ct = ap.rows.find((r) => r.p === 'CABLE TRAY');
+  ok('M-108 tab Produk: lama proses per produk dengan tahap dan komposisi waktu; Cable Tray yang sudah terkirim punya total hari', !!ct && /hr/.test(ct.txt) && ct.stk >= 3 && /1 terkirim/.test(ct.txt) && ap.lg === 5, JSON.stringify(ap.rows.map((r) => [r.p, r.stk])));
+  await tabK('vendor');
+  const av = await page.evaluate(() => ({ aliran: [...document.querySelectorAll('#vendor-aliran tbody tr')].map((r) => r.innerText), terbuka: document.querySelectorAll('#vendor-terbuka tbody tr').length, kual: !!document.getElementById('vendor-kual') }));
+  ok('M-109 tab Vendor: barang keluar dan masuk per vendor dan proses, daftar masih di vendor, dan kualifikasi', av.aliran.length === 2 && av.aliran.some((x) => /Berkah Jaya/.test(x)) && av.aliran.some((x) => /Elektro Mandiri/.test(x)) && av.terbuka === 1 && av.kual, JSON.stringify(av.aliran.map((x) => x.replace(/\s+/g, ' ').slice(0, 40))));
+  await tabK('kirim');
+  const ak = await page.evaluate(() => ({ jenis: [...document.querySelectorAll('#dock-jenis tbody tr')].map((r) => r.innerText.replace(/\s+/g, ' ')), pihak: document.querySelectorAll('#dock-pihak tbody tr').length }));
+  const lj = ak.jenis.find((x) => /Loading/.test(x) && /Barang Jadi/.test(x));
+  ok('M-110 tab Pengiriman: loading dan unloading per jenis muatan dengan rata-rata tunggu dan proses; per pihak', ak.jenis.length === 4 && !!lj && /mnt/.test(lj) && ak.pihak >= 5, JSON.stringify(ak.jenis));
+  await tabK('laporan');
+  ok('M-111 lima tab di Kinerja & Analisa: Work Center, Produk, Vendor, Pengiriman, Laporan harian', (await page.$$eval('#tools [data-view="produksi"][data-key="tab"]', (a) => a.map((x) => x.textContent))).join('|') === 'Work Center|Produk|Vendor|Pengiriman|Laporan harian');
 
   ok('M-14 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;

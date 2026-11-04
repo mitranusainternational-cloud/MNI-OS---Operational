@@ -40,7 +40,7 @@ Form Excel menyulitkan: tidak terlihat SPK mana yang sedang jalan, item sudah sa
 |---|---|---|---|
 | **SPK Berjalan** | Kartu per SPK: status, progres, jalur tiap item dari work center awal sampai terkirim; filter Berjalan, Telat, Di vendor, Siap kirim, Selesai | Lihat | Kebutuhan 1 dan 3, sebagian 2 |
 | **Produksi Hari Ini** | Kartu pekerjaan per mesin; Mulai, jumlah selesai (+ dan −), Selesai | **Input** | Sumber data semua menu |
-| **Kinerja & Analisa** | Tab Work Center (beban dan kapasitas), Vendor (kualifikasi), Laporan harian; Tahap 2: Produk, Pengiriman | Lihat | Kebutuhan 2, analisa |
+| **Kinerja & Analisa** | Lima tab: Work Center (output, kapasitas, utilisasi, tren, beban antrian), Produk (lama proses per tahap), Vendor (keluar, masuk, kecepatan, kualifikasi), Pengiriman (loading dan unloading), Laporan harian | Lihat | Kebutuhan 2 dan analisa (Tahap 2 selesai di lokal) |
 
 Rute tersembunyi (masih bisa dibuka lewat alamat): Papan Produksi dan Laporan Produksi. Menu lama Monitoring SPK, Dashboard Produksi, dan Antrian Mesin digantikan tiga menu di atas.
 
@@ -53,7 +53,7 @@ Rute tersembunyi (masih bisa dibuka lewat alamat): Papan Produksi dan Laporan Pr
 | Output dan kapasitas per work center | Hasil per mesin per hari, kapasitas di master | `produksi_log`, `mwc` (`kapasitas`, `mesin`) |
 | Kecepatan vendor | Tanggal kirim dan kembali per surat jalan, reject | `vendor` (`tgl`, `riwayat`, `items`) |
 | Lama proses per produk | Waktu mulai dan selesai per langkah | `produksi_log` (`mulai`, `selesai`, `menit`) |
-| Loading dan unloading | Jam mulai dan selesai muat atau bongkar | `bongkar`, `kirim` (perlu dicek; kemungkinan butuh isian jam, T-178) |
+| Loading dan unloading | Jam masuk, mulai, dan selesai di antrian Bongkar Muat (sudah ada; Loading dan Unloading, jenis muatan, pihak) | `bongkar` (`jenis`, `muatan`, `pihak`, `jamMasuk`, `jamMulai`, `jamSelesai`); **tidak perlu input baru** |
 
 Migration 14 (`produksi_log`) masih **draf** dan belum diterapkan ke Supabase mana pun.
 
@@ -71,3 +71,16 @@ Break atau hold per operasi, reversal material, issue material per operasi (ada 
 
 - Aturan rute Jointing dan Clamp (hanya Cover yang dikonfirmasi), kapasitas per mesin, dan nama mesin pada seed perlu konfirmasi pemilik.
 - Apakah loading dan unloading perlu dicatat per kendaraan atau per pengiriman.
+
+## 10. Status pemenuhan (2026-11-04)
+
+| Kebutuhan | Status | Bukti |
+|---|---|---|
+| 1. SPK mana yang sedang dikerjakan | Selesai lokal | SPK Berjalan, [[T-177-skema-produksi-tiga-pintu-spk-berjalan]] |
+| 2. Progres item, output dan kapasitas per work center | Selesai lokal | SPK Berjalan dan tab Work Center, [[T-178-kinerja-dan-analisa-produksi-tahap-2]] |
+| 3. Posisi SPK keseluruhan | Selesai lokal | SPK Berjalan (jalur tiap item, filter status) |
+| Tracking vendor keluar, masuk, kecepatan | Selesai lokal | Tab Vendor |
+| Analisa per produk dari awal sampai customer | Selesai lokal | Tab Produk |
+| Loading dan unloading | Selesai lokal | Tab Pengiriman, dari antrian Bongkar Muat |
+
+Semua `verified in browser` pada mock; belum diuji di Supabase. Migration 14 masih draf.
