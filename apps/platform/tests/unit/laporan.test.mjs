@@ -1,5 +1,5 @@
 // Uji mesin dan laporan harian per mesin.  node tests/unit/laporan.test.mjs
-import { parseMesin, tulisMesin, sesiBerjalan, menitAntara, gabungWaktu, jamLokal, barisLaporan, totalLaporan, rekapMesin, waktuPerJenis, csvLaporan } from '../../src/lib/produksi/laporan.js';
+import { sesiAktif, sesiAktifSemua, tanpaVoid, parseMesin, tulisMesin, sesiBerjalan, menitAntara, gabungWaktu, jamLokal, barisLaporan, totalLaporan, rekapMesin, waktuPerJenis, csvLaporan } from '../../src/lib/produksi/laporan.js';
 import { tentukanRute, kumulatif, indeksLangkah, periksaMasukan, antrianPerLangkah } from '../../src/lib/produksi/rute.js';
 
 const R = []; const ok = (id, pass, info = '') => R.push((pass ? 'PASS ' : 'FAIL ') + id + (info ? ' · ' + info : ''));
@@ -16,7 +16,7 @@ const ev = [
   { id: 4, at: '2026-11-04T03:10:00.000Z', jenis: 'mulai', mesin: 'Punching 40 Ton', wc: 'Punching', spk_id: 'c', item_idx: 0 },
 ];
 ok('L-10 sesi berjalan: kejadian terakhir mesin itu bila berjenis mulai', sesiBerjalan(ev, 'Punching 20 Ton').spk_id === 'b' && sesiBerjalan(ev, 'Punching 40 Ton').spk_id === 'c');
-ok('L-11 selesai atau batal mengakhiri sesi', sesiBerjalan(ev.slice(0, 2), 'Punching 20 Ton') === null && sesiBerjalan([...ev.slice(0, 3), { id: 9, at: '2026-11-04T03:30:00.000Z', jenis: 'batal', mesin: 'Punching 20 Ton' }], 'Punching 20 Ton') === null);
+ok('L-11 selesai atau batal mengakhiri sesi', sesiBerjalan(ev.slice(0, 2), 'Punching 20 Ton') === null && sesiBerjalan([...ev.slice(0, 3), { id: 9, at: '2026-11-04T03:30:00.000Z', jenis: 'batal', mesin: 'Punching 20 Ton', spk_id: 'b', item_idx: 1 }], 'Punching 20 Ton') === null);
 ok('L-12 menit antara dua waktu', menitAntara('2026-11-04T01:00:00.000Z', '2026-11-04T02:45:30.000Z') === 105.5 && menitAntara('2026-11-04T02:00:00.000Z', '2026-11-04T01:00:00.000Z') === null);
 const w = gabungWaktu('2026-11-04', '08:30');
 ok('L-13 jam lokal bolak-balik', jamLokal(w) === '08:30' && gabungWaktu('2026-11-04', 'x') === null);
@@ -51,6 +51,22 @@ const kc = kumulatif(rc, [{ wc: 'CNC Laser', qty: 30 }, { wc: 'Shearing', qty: 2
 ok('L-54 hasil di Laser dan Shearing sama-sama dihitung ke langkah pertama', eq(kc, { Shearing: 50, Bending: 10, 'Vendor ELG': 0 }), JSON.stringify(kc));
 ok('L-55 operator Laser boleh mencatat untuk langkah Shearing, batas tetap dari qty SPK', periksaMasukan(rc, kc, 60, 'CNC Laser', 10, 0, altc).ok === true && periksaMasukan(rc, kc, 60, 'CNC Laser', 11, 0, altc).ok === false);
 ok('L-56 antrian langkah pertama dibagi dua mesin alternatif', antrianPerLangkah(rc, kc, 60)[0].antri === 10);
+
+// Beberapa sesi sekaligus: dua item di satu mesin, satu item di dua mesin
+const par = [
+  { id: 1, at: '2026-11-04T01:00:00.000Z', jenis: 'mulai', mesin: 'Punching 1', wc: 'Punching', spk_id: 'a', item_idx: 0, target: 30 },
+  { id: 2, at: '2026-11-04T01:05:00.000Z', jenis: 'mulai', mesin: 'Punching 1', wc: 'Punching', spk_id: 'b', item_idx: 0, target: 5 },
+  { id: 3, at: '2026-11-04T01:10:00.000Z', jenis: 'mulai', mesin: 'Punching 2', wc: 'Punching', spk_id: 'a', item_idx: 0, target: 10 },
+];
+ok('L-60 satu mesin boleh mengerjakan dua item sekaligus; satu item boleh di dua mesin', sesiAktif(par, 'Punching 1').length === 2 && sesiAktif(par, 'Punching 2').length === 1 && sesiAktifSemua(par).length === 3);
+const par2 = [...par, { id: 4, at: '2026-11-04T02:00:00.000Z', jenis: 'hasil', mesin: 'Punching 1', wc: 'Punching', spk_id: 'a', item_idx: 0, qty: 10 }];
+ok('L-61 hasil menutup hanya sesi item itu di mesin itu', sesiAktif(par2, 'Punching 1').length === 1 && sesiAktif(par2, 'Punching 1')[0].spk_id === 'b' && sesiAktif(par2, 'Punching 2').length === 1);
+const par3 = [...par2, { id: 5, at: '2026-11-04T02:00:01.000Z', jenis: 'mulai', mesin: 'Punching 1', wc: 'Punching', spk_id: 'a', item_idx: 0, target: 20 }];
+ok('L-62 selesai sebagian lalu lanjut: sesi baru terbuka untuk sisanya', sesiAktif(par3, 'Punching 1').length === 2);
+// Pembatalan catatan
+const evv = [{ id: 'x1', jenis: 'hasil', qty: 8, wc: 'Shearing' }, { id: 'x2', jenis: 'hasil', qty: 5, wc: 'Shearing' }, { id: 'v1', jenis: 'void', ref: 'x1', wc: 'Shearing' }];
+ok('L-63 catatan yang dibatalkan dan catatan pembatalnya dibuang dari hitungan', eq(tanpaVoid(evv).map((e) => e.id), ['x2']));
+ok('L-64 pembatalan membuat kumulatif kembali', kumulatif(['Shearing', 'Punching'], tanpaVoid(evv)).Shearing === 5 && kumulatif(['Shearing', 'Punching'], evv).Shearing === 13);
 
 const fail = R.filter((x) => x.startsWith('FAIL')).length;
 console.log(R.join('\n') + `\n${R.length - fail} PASS, ${fail} FAIL`);

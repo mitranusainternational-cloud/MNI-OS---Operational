@@ -214,3 +214,18 @@ Masukan tinjauan: isian "Total diproduksi s/d sekarang" dan pilihan "Work Center
 | Total manual selalu tampil | Total manual hanya untuk item tanpa rute dikenali atau SPK lama yang belum punya catatan mesin (di dalam "SPK lama: isi total manual") |
 
 Perbaikan terkait: progres produksi item tidak lagi menghitung langkah vendor (produksi = hasil mesin terakhir), supaya persentase produksi tidak nol selama barang menunggu finishing. Uji unit R-86, e2e M-70 sampai M-72; total e2e 198.
+
+## 16. Input fleksibel: berjalan bersamaan (2026-11-04)
+
+Kasus: Cable Tray berjalan Shearing, Punching, Bending, lalu subcon finishing; operator dan antrian mesin kadang bekerja bersamaan pada item yang sama.
+
+| Situasi | Perilaku |
+|---|---|
+| Dua mesin satu item (mis. Punching 1 dan Punching 2) | Mulai memesan **target** = batang yang siap dan belum dipesan sesi lain. Mesin lain melihat "Sedang dikerjakan di mesin lain" dan sisa **bebas**; Mulai terkunci bila bebas nol. Catat manual tetap bisa |
+| Satu mesin beberapa item | Boleh; tiap sesi punya kartu sendiri |
+| Baru sebagian yang jadi | **Simpan sebagian, lanjut**: hasil tersimpan dengan jam sesuai, sesi baru terbuka untuk sisa target |
+| Salah input | **Batalkan** pada Catatan terakhir (Antrian Mesin) atau baris Laporan Produksi. Dibuat peristiwa void; catatan asli tetap sebagai riwayat. Ditolak bila hasilnya sudah dipakai langkah berikutnya atau sudah dikirim ke vendor |
+| Operator dan PPIC mencatat hal yang sama | Pelindung dobel: catatan identik (SPK, item, mesin, jumlah) dalam 15 menit meminta konfirmasi |
+| Posisi terkini | Lembar Update produksi dan tab Jejak produksi menyebut mesin dan operator yang sedang mengerjakan |
+
+Skema: kolom `target` dan `ref`, jenis kejadian `void` (draf migration 14, belum diterapkan). Uji unit L-60 sampai L-64; e2e M-80 sampai M-90.

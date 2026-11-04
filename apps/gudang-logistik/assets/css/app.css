@@ -629,3 +629,5 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .jejak-row{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}.jejak-row .rarr{align-self:center}
 .jstep{min-width:118px;max-width:190px;flex:1 1 118px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}.jstep.run{border-color:var(--warn)}.jstep.ok{border-color:var(--ok);background:var(--ok-soft)}
 .jn{font-size:12px;font-weight:600}.jb{height:6px;background:var(--line);border-radius:3px;margin:6px 0 4px;overflow:hidden}.jb i{display:block;height:6px;background:var(--accent);border-radius:3px}.jstep.ok .jb i{background:var(--ok)}.jstep.run .jb i{background:var(--warn)}.jq{font-size:12px;font-weight:600}.jstep .note{margin-top:3px;font-size:11px;white-space:normal}
+.mesin-run{margin-bottom:10px}
+@media print{.no-print{display:none}}

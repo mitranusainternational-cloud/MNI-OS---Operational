@@ -87,14 +87,14 @@ export async function runProduksi(page, base) {
   // Timer: Mulai, kartu sesi berjalan, Semua, Selesai dan simpan
   await go('mesin'); await page.selectOption('#f-mesin', 'Bending'); await page.waitForTimeout(500);
   await page.click('#mesin-antri tbody tr:first-child [data-act="mesinmulai"]'); await page.waitForTimeout(1200);
-  ok('M-11b sesudah Mulai tampil kartu sedang dikerjakan dan tombol Mulai terkunci', !!(await page.$('#mesin-run')) && (await page.$$eval('#mesin-antri [data-act="mesinmulai"]', (a) => a.length)) === 0);
+  ok('M-11b sesudah Mulai tampil kartu sedang dikerjakan dan tombol Mulai terkunci', !!(await page.$('.mesin-run')) && (await page.$$eval('#mesin-antri [data-act="mesinmulai"]', (a) => a.length)) === 0);
   ok('M-11c peristiwa mulai tercatat dan belum mengubah antrian', (await tab('produksi_log')).filter((e) => e.jenis === 'mulai').length === 1 && (await hasilEv()).length === 2);
-  await page.click('#mesin-run [data-act="mesinsemua"]');
-  ok('M-11d tombol Semua mengisi jumlah yang siap (8)', (await page.inputValue('#mr-qty')) === '8');
-  await page.click('#mesin-run [data-act="mesinselesai"]'); await page.waitForTimeout(1500);
+  await page.click('.mesin-run [data-act="mesinsemua"]');
+  ok('M-11d tombol Semua mengisi jumlah yang siap (8)', (await page.inputValue('.mesin-run [data-mrq]')) === '8');
+  await page.click('.mesin-run [data-act="mesinselesai"]'); await page.waitForTimeout(1500);
   const evs = await hasilEv();
   ok('M-12 Selesai dan simpan: Bending 8 dengan jam mulai dan durasi dari timer', evs.length === 3 && evs[2].wc === 'Bending' && Number(evs[2].qty) === 8 && !!evs[2].mulai && !!evs[2].selesai && evs[2].menit != null, JSON.stringify([evs[2].qty, evs[2].menit]));
-  ok('M-12b sesudah selesai kartu sesi hilang', !(await page.$('#mesin-run')));
+  ok('M-12b sesudah selesai kartu sesi hilang', !(await page.$('.mesin-run')));
   await go('produksi');
   ok('M-13 antrian Bending kosong setelah selesai', (await antri('Bending')) === 0 && (await antri('Punching')) === 12);
 
@@ -199,6 +199,74 @@ export async function runProduksi(page, base) {
   await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500); await closeAll();
   const hNew = (await hasilEv()).slice(nH);
   ok('M-72 hasil dari lembar SPK tercatat dengan operator dan mesin', hNew.length === 1 && hNew[0].operator === 'Operator Uji' && Number(hNew[0].qty) === 2 && Number(hNew[0].menit) === 30, JSON.stringify(hNew.map((e) => [e.wc, e.mesin, e.operator, e.qty])));
+
+  // Berjalan bersamaan: satu item di dua mesin, selesai sebagian lalu lanjut, pembatalan catatan, dan pelindung dobel
+  const klikBaris = (cust, act) => page.evaluate(([c, a]) => { const r = [...document.querySelectorAll('#mesin-antri tbody tr')].find((x) => x.innerText.includes(c)); const b = r && r.querySelector('[data-act="' + a + '"]'); if (b && !b.disabled) { b.click(); return true; } return false; }, [cust, act]);
+  const barisInfo = (cust) => page.evaluate((c) => { const r = [...document.querySelectorAll('#mesin-antri tbody tr')].find((x) => x.innerText.includes(c)); return r ? { txt: r.innerText, mulaiDisabled: !!(r.querySelector('[data-act="mesinmulai"]') || {}).disabled } : null; }, cust);
+  const catatBaris = async (cust, qty, mulai, selesai) => {
+    await klikBaris(cust, 'mesincatat'); await page.waitForTimeout(400);
+    await page.fill('#m-qty', String(qty)); await page.fill('#m-mulai', mulai); await page.fill('#m-selesai', selesai);
+    await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1300);
+  };
+  await go('spk');
+  await page.click('#tools [data-act="newspk"]'); await page.waitForTimeout(700);
+  await page.fill('#ed-cust', 'Customer Paralel'); await page.fill('#ed-due', '2026-12-22');
+  await page.fill('#ed-h-0', 'CABLE TRAY TYPE STU 1.2 NON FINISHING'); await page.dispatchEvent('#ed-h-0', 'change'); await page.waitForTimeout(300);
+  await page.fill('#ed-d-0-0', 'Cable Tray W150xH50xL3000 1.2'); await page.fill('#ed-q-0-0', '30'); await page.fill('#ed-u-0-0', 'Btg');
+  await page.click('#editor button:has-text("Terbitkan SPK")'); await page.waitForTimeout(1800);
+  await go('mesin'); await page.selectOption('#f-mesin', 'Shearing'); await page.waitForTimeout(500);
+  await catatBaris('Customer Paralel', 30, '07:00', '08:00'); await closeAll();
+  await page.selectOption('#f-mesin', 'Punching'); await page.waitForTimeout(500);
+  await klikBaris('Customer Paralel', 'mesinmulai'); await page.waitForTimeout(1200);
+  const mu = (await tab('produksi_log')).filter((e) => e.jenis === 'mulai' && e.item_desc.includes('W150xH50'));
+  ok('M-80 Mulai di Punching 1 memesan seluruh yang siap sebagai target (30)', mu.length === 1 && Number(mu[0].target) === 30 && mu[0].mesin === 'Punching 1 (20 Ton)', JSON.stringify(mu.map((e) => [e.mesin, e.target])));
+  await page.selectOption('#f-mesin-msn', 'Punching 2 (40 Ton)'); await page.waitForTimeout(500);
+  const b2 = await barisInfo('Customer Paralel');
+  ok('M-81 di Punching 2 item yang sama tampil sedang dikerjakan di mesin lain dan Mulai terkunci', !!b2 && b2.mulaiDisabled && /Sedang dikerjakan di mesin lain/.test(b2.txt) && /Punching 1/.test(b2.txt), b2 && b2.txt.replace(/\n/g, ' ').slice(0, 160));
+  await page.selectOption('#f-mesin-msn', 'Punching 1 (20 Ton)'); await page.waitForTimeout(500);
+  await page.fill('.mesin-run [data-mrq]', '10');
+  await page.click('.mesin-run [data-act="mesinsebagian"]'); await page.waitForTimeout(1600);
+  const evP = (await tab('produksi_log')).filter((e) => e.item_desc.includes('W150xH50') && e.wc === 'Punching');
+  ok('M-82 Simpan sebagian: hasil 10 tercatat dan sesi baru terbuka dengan target sisa 20', evP.filter((e) => e.jenis === 'hasil').length === 1 && Number(evP.find((e) => e.jenis === 'hasil').qty) === 10 && evP.filter((e) => e.jenis === 'mulai').length === 2 && Number(evP.filter((e) => e.jenis === 'mulai')[1].target) === 20 && !!(await page.$('.mesin-run')), JSON.stringify(evP.map((e) => [e.jenis, e.qty, e.target])));
+  await page.fill('.mesin-run [data-mrq]', '5');
+  await page.click('.mesin-run [data-act="mesinselesai"]'); await page.waitForTimeout(1600);
+  ok('M-83 Selesai dan simpan: sesi tertutup', !(await page.$('.mesin-run')));
+  await page.selectOption('#f-mesin-msn', 'Punching 2 (40 Ton)'); await page.waitForTimeout(500);
+  const b3 = await barisInfo('Customer Paralel');
+  ok('M-84 sesudah sesi Punching 1 ditutup, Punching 2 bebas mengerjakan sisa 15', !!b3 && !b3.mulaiDisabled && /15/.test(b3.txt), b3 && b3.txt.replace(/\n/g, ' ').slice(0, 140));
+  await klikBaris('Customer Paralel', 'mesinmulai'); await page.waitForTimeout(1200);
+  const mu2 = (await tab('produksi_log')).filter((e) => e.jenis === 'mulai' && e.mesin === 'Punching 2 (40 Ton)' && e.item_desc.includes('W150xH50'));
+  ok('M-85 dua mesin Punching berjalan bersamaan untuk satu item (Punching 2 target 15)', mu2.length === 1 && Number(mu2[0].target) === 15 && !!(await page.$('.mesin-run')));
+  await page.click('.mesin-run [data-act="mesinbatal"]'); await page.waitForTimeout(1200);
+  ok('M-86 Batalkan mulai menutup sesi tanpa hasil', !(await page.$('.mesin-run')) && (await tab('produksi_log')).some((e) => e.jenis === 'batal' && e.mesin === 'Punching 2 (40 Ton)'));
+
+  // Pembatalan catatan hasil
+  await page.selectOption('#f-mesin-msn', 'Punching 1 (20 Ton)'); await page.waitForTimeout(500);
+  const rwBefore = await page.$$eval('#mesin-riwayat tbody tr', (a) => a.length);
+  await go('produksi'); const aP0 = await antri('Punching'); await go('mesin'); await page.selectOption('#f-mesin', 'Punching'); await page.waitForTimeout(500);
+  page.once('dialog', (d) => d.accept());
+  await page.evaluate(() => { const r = [...document.querySelectorAll('#mesin-riwayat tbody tr')].find((x) => x.innerText.includes('W150xH50') && /\b5\b/.test(x.cells[3].innerText)); r.querySelector('[data-act="mesinvoid"]').click(); });
+  await page.waitForTimeout(1500);
+  const hv = (await tab('produksi_log')).filter((e) => e.item_desc.includes('W150xH50') && e.wc === 'Punching');
+  ok('M-87 catatan salah (5) dibatalkan: peristiwa void tersimpan dan riwayat berkurang', hv.some((e) => e.jenis === 'void') && (await page.$$eval('#mesin-riwayat tbody tr', (a) => a.length)) === rwBefore - 1, String(rwBefore));
+  await go('produksi');
+  const aP1 = await antri('Punching');
+  ok('M-88 sesudah pembatalan, 5 batang kembali ke antrian Punching', aP1 === aP0 + 5, aP0 + ' -> ' + aP1);
+  // Bending memakai 3 dari hasil Punching 10, lalu membatalkan Punching 10 harus ditolak
+  await go('mesin'); await page.selectOption('#f-mesin', 'Bending'); await page.waitForTimeout(500);
+  await catatBaris('Customer Paralel', 3, '09:00', '09:30'); await closeAll();
+  await page.selectOption('#f-mesin', 'Punching'); await page.waitForTimeout(500);
+  const nVoid = (await tab('produksi_log')).filter((e) => e.jenis === 'void').length;
+  const setuju = (d) => d.accept(); page.on('dialog', setuju);
+  await page.evaluate(() => { const r = [...document.querySelectorAll('#mesin-riwayat tbody tr')].find((x) => x.innerText.includes('W150xH50') && /\b10\b/.test(x.cells[3].innerText)); if (r) r.querySelector('[data-act="mesinvoid"]').click(); });
+  await page.waitForTimeout(1200); page.off('dialog', setuju);
+  ok('M-89 pembatalan hasil Punching yang sudah dipakai Bending ditolak', (await tab('produksi_log')).filter((e) => e.jenis === 'void').length === nVoid && /Tidak bisa dibatalkan/.test(await page.evaluate(() => document.getElementById('toast').textContent)));
+  // Pelindung dobel: Bending 3 yang sama dalam 15 menit dibatalkan (dialog konfirmasi ditolak otomatis)
+  await page.selectOption('#f-mesin', 'Bending'); await page.waitForTimeout(500);
+  const nB = (await hasilEv()).length;
+  await catatBaris('Customer Paralel', 3, '09:40', '10:00');
+  ok('M-90 catatan yang sama dalam 15 menit ditahan sebagai kemungkinan dobel', (await hasilEv()).length === nB && /dobel/.test(await page.evaluate(() => (document.getElementById('merr') || { textContent: '' }).textContent)));
+  await closeAll();
 
   // Data contoh untuk tinjauan: /?demo=produksi mengisi WC, SPK berrute, kejadian, dan riwayat vendor
   await page.evaluate(() => { localStorage.clear(); });

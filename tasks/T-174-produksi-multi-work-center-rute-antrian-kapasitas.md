@@ -31,6 +31,7 @@ Bergantung pada: T-167
 - [x] Konsep pelacakan disepakati 2026-11-04 (input harian, ditolak bila melebihi mesin sebelumnya, reject dicatat dan dibuat ulang); kolom reject, uji unit R-70 sampai R-74, e2e M-15 dan M-16, total e2e 169 lulus
 - [x] Vendor sebagai langkah rute: batas kirim dari hasil mesin terakhir, posisi di vendor, catatan siap dikirim; uji unit R-80 sampai R-85, e2e M-17 sampai M-19c, total e2e 174 lulus
 - [x] Pengganti form laporan harian: mesin di work center, Mulai dan Selesai, mesin alternatif, Laporan Produksi, jejak item di lembar SPK; unit 19 skenario laporan, total e2e 195 lulus
+- [x] Input fleksibel berjalan bersamaan: banyak sesi, target, simpan sebagian, pembatalan catatan, pelindung dobel; unit 24 laporan, e2e produksi 53
 - [ ] Keputusan pemilik: daftar WC, aturan khusus per bentuk, satuan kapasitas, siapa yang mengisi
 - [ ] Pengecualian rute per item di editor SPK, tabel aturan dari aplikasi, usulan langkah dari kejadian
 - [ ] Tinjau bersama PPIC dan operator dengan data contoh

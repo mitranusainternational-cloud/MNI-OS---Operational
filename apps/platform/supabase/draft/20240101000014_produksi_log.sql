@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS public.produksi_log (
   item_idx  INTEGER NOT NULL CHECK (item_idx >= 0),    -- urutan item pada SPK
   item_desc TEXT NOT NULL,                             -- salinan deskripsi (tahan terhadap revisi urutan)
   wc        TEXT NOT NULL,                             -- nama work center (mwc.nama) tempat pekerjaan sebenarnya dilakukan
-  jenis     TEXT NOT NULL DEFAULT 'hasil' CHECK (jenis IN ('hasil', 'mulai', 'batal')), -- mulai = timer jalan di mesin; hasil = selesai; batal = timer dibatalkan
+  jenis     TEXT NOT NULL DEFAULT 'hasil' CHECK (jenis IN ('hasil', 'mulai', 'batal', 'void')), -- mulai = timer jalan di mesin; hasil = selesai; batal = timer dibatalkan; void = membatalkan catatan hasil lain (ref)
+  target    NUMERIC,                                   -- jumlah yang dipesan sesi Mulai (agar mesin lain tidak mengerjakan batang yang sama)
+  ref       TEXT,                                      -- jenis void: id kejadian yang dibatalkan
   mesin     TEXT,                                      -- nama mesin di dalam work center (mis. Punching 20 Ton)
   operator  TEXT,                                      -- nama operator di mesin (bukan akun login)
   mulai     TIMESTAMPTZ,                               -- waktu mulai (hasil: dari timer atau diisi manual)

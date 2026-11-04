@@ -3,7 +3,7 @@
 // STRICT_COLS: kolom bertipe DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID yang menolak string kosong ("") di Postgres.
 // Dipakai bersama oleh adapter Supabase dan klien mock agar keduanya berperilaku sama.
 export const TABLE_COLS = {
-  "produksi_log": ["id", "at", "tgl", "spk_id", "item_idx", "item_desc", "wc", "jenis", "mesin", "operator", "mulai", "selesai", "menit", "berat", "tonase", "spk_no", "customer", "tebal", "qty", "reject", "oleh", "ket", "data"],
+  "produksi_log": ["id", "at", "tgl", "spk_id", "item_idx", "item_desc", "wc", "jenis", "target", "ref", "mesin", "operator", "mulai", "selesai", "menit", "berat", "tonase", "spk_no", "customer", "tebal", "qty", "reject", "oleh", "ket", "data"],
   "mwc": [
     "id",
     "kode",
@@ -320,7 +320,7 @@ export const TABLE_COLS = {
 };
 
 export const STRICT_COLS = {
-  "produksi_log": { "tgl": "DATE", "spk_id": "UUID", "item_idx": "INTEGER", "qty": "NUMERIC", "reject": "NUMERIC", "mulai": "TIMESTAMPTZ", "selesai": "TIMESTAMPTZ", "menit": "NUMERIC", "berat": "NUMERIC", "tonase": "NUMERIC" },
+  "produksi_log": { "tgl": "DATE", "spk_id": "UUID", "item_idx": "INTEGER", "qty": "NUMERIC", "reject": "NUMERIC", "mulai": "TIMESTAMPTZ", "selesai": "TIMESTAMPTZ", "menit": "NUMERIC", "berat": "NUMERIC", "tonase": "NUMERIC", "target": "NUMERIC" },
   "mwc": {
     "id": "UUID",
     "urutan": "INTEGER",

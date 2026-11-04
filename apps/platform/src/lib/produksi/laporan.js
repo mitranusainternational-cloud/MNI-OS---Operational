@@ -17,12 +17,23 @@ export const tulisMesin = (mesin) => (mesin || []).map((m) => [m.nama, (m.operat
 
 const urut = (a, b) => String(a.at || '').localeCompare(String(b.at || '')) || (Number(a.id) || 0) - (Number(b.id) || 0);
 
-// Sesi yang sedang berjalan di sebuah mesin: kejadian terakhir mesin itu berjenis 'mulai'. Satu mesin mengerjakan satu item pada satu waktu.
-export function sesiBerjalan(kejadian, mesin) {
-  const ev = kejadian.filter((e) => e.mesin === mesin && ['mulai', 'hasil', 'batal'].includes(e.jenis || 'hasil')).sort(urut);
-  const last = ev[ev.length - 1];
-  return last && last.jenis === 'mulai' ? last : null;
+// Kejadian yang dibatalkan: jenis 'void' menunjuk (ref) id kejadian lain. Keduanya dibuang dari hitungan, riwayat tetap tersimpan.
+const idEv = (e) => String(e._id != null ? e._id : e.id);
+export function tanpaVoid(kejadian) {
+  const dibatalkan = new Set(kejadian.filter((e) => e.jenis === 'void').map((e) => String(e.ref)));
+  return kejadian.filter((e) => e.jenis !== 'void' && !dibatalkan.has(idEv(e)));
 }
+
+// Sesi yang sedang terbuka: per mesin dan item (spk + urutan item), kejadian terakhirnya berjenis 'mulai'.
+// Satu mesin boleh mengerjakan beberapa item sekaligus, dan satu item boleh dikerjakan beberapa mesin sekaligus.
+export function sesiAktifSemua(kejadian) {
+  const akhir = {};
+  for (const e of kejadian.filter((x) => ['mulai', 'hasil', 'batal'].includes(x.jenis || 'hasil')).sort(urut)) akhir[(e.mesin || e.wc) + '|' + e.spk_id + '|' + e.item_idx] = e;
+  return Object.values(akhir).filter((e) => e.jenis === 'mulai').sort((a, b) => String(a.mulai || a.at).localeCompare(String(b.mulai || b.at)));
+}
+export const sesiAktif = (kejadian, mesin) => sesiAktifSemua(kejadian).filter((e) => (e.mesin || e.wc) === mesin);
+// Sesi pertama sebuah mesin (kompatibel dengan pemakaian lama), null bila tidak ada
+export const sesiBerjalan = (kejadian, mesin) => sesiAktif(kejadian, mesin)[0] || null;
 
 // Selisih menit antara dua waktu ISO (1 desimal)
 export function menitAntara(mulai, selesai) {
@@ -46,7 +57,7 @@ export function barisLaporan(kejadian, { tgl, mesin, wc }) {
     .sort((a, b) => String(a.mulai || a.at || '').localeCompare(String(b.mulai || b.at || '')))
     .map((e, i) => {
       const qty = Number(e.qty) || 0, menit = e.menit == null || e.menit === '' ? null : Number(e.menit);
-      return { no: i + 1, tgl: e.tgl, mulai: e.mulai ? jamLokal(e.mulai) : '', selesai: e.selesai ? jamLokal(e.selesai) : '', menit, jam: menit == null ? null : Math.round((menit / 60) * 100) / 100,
+      return { id: idEv(e), no: i + 1, tgl: e.tgl, mulai: e.mulai ? jamLokal(e.mulai) : '', selesai: e.selesai ? jamLokal(e.selesai) : '', menit, jam: menit == null ? null : Math.round((menit / 60) * 100) / 100,
         spk: e.spk_no || '', customer: e.customer || '', deskripsi: e.item_desc || '', tebal: e.tebal || '', qty, reject: Number(e.reject) || 0,
         beratPcs: e.berat == null || e.berat === '' ? null : Number(e.berat), tonase: e.tonase == null || e.tonase === '' ? null : Number(e.tonase),
         menitPerPcs: menit != null && qty > 0 ? Math.round((menit / qty) * 100) / 100 : null, mesin: e.mesin || '', operator: e.operator || '', wc: e.wc, ket: e.ket || '' };
