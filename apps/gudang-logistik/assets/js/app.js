@@ -72,6 +72,7 @@ const VIEWS=[
  {id:'spk',t:'Monitoring SPK',ic:'spk',sec:'Produksi'},
  {id:'produksi',t:'Dashboard Produksi',ic:'prod'},
  {id:'mesin',t:'Antrian Mesin',ic:'dock'},
+ {id:'papan',t:'Papan Produksi',ic:'prod'},
  {id:'laporan-produksi',t:'Laporan Produksi',ic:'file'},
  {id:'cek-data',t:'Cek Data',ic:'shield',sec:'Data'},
  {id:'master-data',t:'Master Data',ic:'db'},
@@ -79,7 +80,7 @@ const VIEWS=[
  {id:'pengguna',t:'Pengguna & Akses',ic:'users'}
 ];
 /* modul yang menjadi dasar hak tiap tampilan; dashboard terbuka untuk semua pengguna terdaftar, tampilan tim khusus admin */
-const VIEW_MOD={'mesin':'spk','laporan-produksi':'spk','bahan-baku':'bahan-baku','barang-jadi':'barang-jadi','bongkar-muat':'bongkar-muat','vendor':'vendor','pengiriman':'pengiriman','spk':'spk','produksi':'spk'};
+const VIEW_MOD={'papan':'spk','mesin':'spk','laporan-produksi':'spk','bahan-baku':'bahan-baku','barang-jadi':'barang-jadi','bongkar-muat':'bongkar-muat','vendor':'vendor','pengiriman':'pengiriman','spk':'spk','produksi':'spk'};
 const ADMIN_VIEWS=['cek-data','kinerja','pengguna'];
 function viewOk(v){const id=v.id||v;
  if(!ME_P)return !['kinerja','pengguna'].includes(id);
@@ -184,6 +185,7 @@ function route(){
   'master-data':'Daftar resmi vendor, customer, supplier, dan armada yang dipakai semua form',
   'kinerja':'Siapa mencatat apa, seberapa aktif, dan seberapa tepat waktu input data tiap anggota tim',
   'mesin':'Mulai dan Selesai di mesin Anda; item pindah ke mesin berikutnya otomatis',
+  'papan':'Posisi semua item per work center: yang sedang berjalan dan yang antri',
   'laporan-produksi':'Laporan harian per mesin, rekap, dan waktu proses nyata (pengganti form Excel)',
   'pengguna':'Akun tim, peran, dan hak akses per modul'}[VIEW];
  renderNav();renderTools();renderBody();window.scrollTo(0,0);
@@ -1659,6 +1661,26 @@ function reservasi(c){
 const dipesan=(c,i,kecuali)=>((reservasi(c)[i])||[]).filter(r=>r.mesin!==kecuali).reduce((a,r)=>a+r.target,0);
 const teksReservasi=c=>Object.values(reservasi(c)).flat().map(r=>`${esc(r.mesin)}${r.operator?' ('+esc(r.operator)+')':''} ${r.target?'target '+n(r.target):''}`.trim()).join(' · ');
 
+/* Papan Produksi: satu kolom per langkah rute, kartu per item. Berjalan di atas, antri di bawah; ketuk judul kolom untuk membuka layar operator work center itu. */
+function papanKolom(){
+ const P=PXL();const intern=wcInternal().map(w=>w.nama);const vendor=[];
+ wcAktifItems().forEach(it=>it.rute.forEach(w=>{if(P.langkahVendor(w)&&!vendor.includes(w))vendor.push(w)}));
+ return [...intern,...vendor];
+}
+T.papan=()=>'';
+B.papan=()=>{
+ const P=PXL();if(!P)return empty('Papan belum siap','Muat ulang halaman.');
+ const t=today();const kol=papanKolom();const ses=P.sesiAktifSemua(S.produksi_log||[]);
+ const hasilHari=evHasil().filter(e=>(e.tgl||P.tanggalLokal(e.at))===t).reduce((a,e)=>a+(+e.qty||0),0);
+ const data=kol.map(wc=>({wc,vendor:!!P.langkahVendor(wc),jalan:ses.filter(e=>e.wc===wc),antri:antrianMesin(wc)}));
+ const telat=new Set();data.forEach(d=>d.antri.forEach(r=>{if(r.it.due&&r.it.due<t)telat.add(mesinKey(r.it))}));
+ const kp=`<div class="kpi-row"><div class="kpi warn"><span class="lb">Sedang berjalan</span><span class="v">${ses.length}</span><span class="s">sesi di semua mesin</span></div><div class="kpi info"><span class="lb">Item antri</span><span class="v">${n(data.reduce((a,d)=>a+d.antri.length,0))}</span><span class="s">di semua langkah</span></div><div class="kpi ${telat.size?'crit':'ok'}"><span class="lb">Lewat due</span><span class="v">${telat.size}</span><span class="s">item masih antri</span></div><div class="kpi ok"><span class="lb">Selesai hari ini</span><span class="v">${n(hasilHari)}</span><span class="s">dicatat di semua mesin</span></div></div>`;
+ const kartu=(r)=>{const it=r.it;const d=it.due;return `<div class="pk-card"><div class="pk-h"><b>SPK ${esc(String(it.spk))}</b>${d&&d<t?chip('Telat','crit'):''}</div><div class="pk-i">${esc(it.item)}</div><div class="note">${esc(it.customer||'')} · <b>${n(r.a.antri)}</b> ${esc(it.satuan||'')} ${r.langkah&&P.langkahVendor(r.langkah)?'siap kirim':'siap'}${d?' · due '+fd(d):''}</div></div>`};
+ const kolom=data.map(d=>{const MAKS=8;const j=d.jalan.map(e=>{const c=mesinCtx(sesiKey(e));return `<div class="pk-card run"><div class="pk-h"><b>SPK ${esc(String(e.spk_no||(c&&c.s.no)||''))}</b>${chip('Berjalan','warn')}</div><div class="pk-i">${esc(e.item_desc||'')}</div><div class="note">${esc(e.mesin||e.wc)}${e.operator?' · '+esc(e.operator):''} · sejak ${esc(P.jamLokal(e.mulai))}${+e.target?' · target '+n(+e.target):''}</div></div>`}).join('');
+  const q=d.antri.slice(0,MAKS).map(kartu).join('');const lebih=d.antri.length-MAKS;
+  return `<section class="pk-col${d.vendor?' vend':''}"><button class="pk-head" data-act="papanbuka" data-wc="${esc(d.wc)}" ${d.vendor?'disabled':''}><span>${esc(d.wc)}</span><span class="pk-n">${d.jalan.length?`<i class="warn">${d.jalan.length} jalan</i>`:''}<i>${d.antri.length} antri</i></span></button><div class="pk-body">${j}${q||(j?'':'<div class="note pk-kosong">Kosong</div>')}${lebih>0?`<div class="note">+${lebih} item lagi</div>`:''}</div></section>`}).join('');
+ return kol.length?`${kp}<div class="pk-board">${kolom}</div><div class="note" style="margin-top:8px">Papan ini hanya untuk dilihat. Operator mencatat di Antrian Mesin; ketuk nama work center untuk membukanya.</div>`:empty('Belum ada work center internal','Isi work center di Master Data.');
+};
 B.mesin=()=>{
  const P=PXL();if(!P)return empty('Mesin produksi belum siap','Muat ulang halaman.');
  const p=mesinPilih();const t=today();const kap=(mesinWC(p.wc).find(m=>m.nama===p.mesin)||{}).kapasitas||kapWC()[p.wc]||0;
@@ -1671,23 +1693,34 @@ B.mesin=()=>{
  /* sesi yang sedang berjalan di mesin ini (boleh lebih dari satu) */
  const sesiHtml=sesAll.length?sesAll.map(ses=>{const key=sesiKey(ses);const c=mesinCtx(key);const sedia=c?siapDiMesin(c,p.wc):0;const mn=P.menitAntara(ses.mulai,new Date().toISOString());
   return `<section class="panel mesin-run" data-k="${esc(key)}"><div class="pbody">
-   <div class="mesin-run-h">${chip('Sedang dikerjakan','warn')} <b>SPK ${esc(String(ses.spk_no||(c&&c.s.no)||''))}</b> · ${esc(ses.customer||(c&&c.s.customer)||'')}</div>
+   <div class="mr-top">${chip('Sedang dikerjakan','warn')}<b class="mr-time" data-elapsed="${esc(ses.mulai)}">${fDur(mn)}</b></div>
+   <div class="mr-spk">SPK ${esc(String(ses.spk_no||(c&&c.s.no)||''))} · ${esc(ses.customer||(c&&c.s.customer)||'')}</div>
    <div class="mesin-run-i">${esc(ses.item_desc||'')}</div>
-   <div class="note">Mulai ${esc(P.jamLokal(ses.mulai))} · <b data-elapsed="${esc(ses.mulai)}">${fDur(mn)}</b> berjalan · siap dikerjakan ${n(sedia)} ${esc((c&&c.it.u)||'')}${+ses.target?` · target ${n(+ses.target)}`:''} · operator ${esc(ses.operator||'–')}</div>
-   <div class="mesin-run-f"><label>Selesai<input class="inp num" data-mrq type="number" min="0" step="any" max="${sedia}" placeholder="0" inputmode="decimal"></label><label>Reject<input class="inp num" data-mrr type="number" min="0" step="any" placeholder="0" inputmode="decimal"></label>
-    <button class="btn ghost" data-act="mesinsemua" data-k="${esc(key)}" data-max="${sedia}">Semua (${n(sedia)})</button><button class="btn" data-act="mesinsebagian" data-k="${esc(key)}" title="Simpan jumlah ini dan lanjut mengerjakan sisanya">Simpan sebagian, lanjut</button><button class="btn primary" data-act="mesinselesai" data-k="${esc(key)}">Selesai dan simpan</button><button class="btn ghost danger" data-act="mesinbatal" data-k="${esc(key)}">Batalkan mulai</button></div></div></section>`}).join('')
-  :`<div class="note mesin-idle">${esc(p.mesin)} tidak sedang mengerjakan item. Tekan Mulai pada item di bawah, atau Catat bila hasil sudah selesai dikerjakan.</div>`;
+   <div class="note">Mulai ${esc(P.jamLokal(ses.mulai))} · siap dikerjakan ${n(sedia)} ${esc((c&&c.it.u)||'')}${+ses.target?` · target ${n(+ses.target)}`:''} · operator ${esc(ses.operator||'–')}</div>
+   <div class="mr-lbl">Berapa yang selesai?</div>
+   <div class="mr-step"><button class="btn mr-b" data-act="mrstep" data-k="${esc(key)}" data-d="-1" aria-label="Kurangi satu">−</button><input class="inp num mr-q" data-mrq type="number" min="0" step="any" max="${sedia}" placeholder="0" inputmode="decimal"><button class="btn mr-b" data-act="mrstep" data-k="${esc(key)}" data-d="1" aria-label="Tambah satu">+</button></div>
+   <div class="mr-quick"><button class="btn" data-act="mrstep" data-k="${esc(key)}" data-d="5">+5</button><button class="btn" data-act="mrstep" data-k="${esc(key)}" data-d="10">+10</button><button class="btn" data-act="mesinsemua" data-k="${esc(key)}" data-max="${sedia}">Semua (${n(sedia)})</button></div>
+   <label class="mr-rej">Reject, bila ada<input class="inp num" data-mrr type="number" min="0" step="any" placeholder="0" inputmode="decimal"></label>
+   <button class="btn primary mr-go" data-act="mesinselesai" data-k="${esc(key)}">Selesai</button>
+   <div class="mr-sec"><button class="btn" data-act="mesinsebagian" data-k="${esc(key)}" title="Simpan jumlah ini dan lanjut mengerjakan sisanya">Simpan sebagian, lanjut</button><button class="btn ghost danger" data-act="mesinbatal" data-k="${esc(key)}">Batalkan mulai</button></div></div></section>`}).join('')
+  :`<div class="note mesin-idle">${esc(p.mesin)} sedang kosong. Pilih item di bawah lalu tekan Mulai. Kalau pekerjaannya sudah selesai, tekan Catat.</div>`;
  const chips=(it,langkah)=>it.rute.map(w=>`<span class="rchip${w===langkah?' on':''}">${esc(w)}</span>`).join('<span class="rarr">›</span>');
- const body=rows.length?`<div class="tbl-wrap"><table id="mesin-antri"><thead><tr><th>SPK</th><th>Item</th><th>Rute</th><th class="num">Siap dikerjakan</th><th>Due</th><th></th></tr></thead><tbody>${rows.map(({it,a,langkah,alt})=>{const k=mesinKey(it);const jalan=sesAll.some(e=>sesiKey(e)===k);const c=mesinCtx(k);
-  const ii=P.indeksLangkah(c.st.rute,c.st.alt,p.wc);const lain=dipesan(c,ii,p.mesin);const bebas=Math.max(0,a.antri-lain-(jalan?0:0));const lainTeks=((reservasi(c)[ii])||[]).filter(r=>r.mesin!==p.mesin);
-  const blok=!jalan&&bebas<=0;
-  return `<tr data-k="${esc(k)}"${jalan?' class="mesin-jalan"':''}><td><b>${esc(String(it.spk))}</b><div class="note">${esc(it.customer||'')}</div></td><td>${esc(it.item)}<div class="note">total ${n(it.qty)} ${esc(it.satuan||'')} · sudah selesai di langkah ini ${n(a.selesai)}${alt?` · <b>mesin alternatif</b> untuk ${esc(langkah)}`:''}</div>${lainTeks.length?`<div class="note">Sedang dikerjakan di mesin lain: ${lainTeks.map(r=>`${esc(r.mesin)}${r.operator?' ('+esc(r.operator)+')':''} ${r.target?n(r.target):''}`).join(' · ')}</div>`:''}</td><td>${chips(it,langkah)}</td><td class="num"><b>${n(a.antri)}</b>${lain>0?`<div class="note">bebas ${n(bebas)}</div>`:''}</td><td>${it.due?fd(it.due):'–'}</td>
-  <td class="act">${jalan?chip('berjalan','warn'):`<button class="btn sm primary" data-act="mesinmulai" data-k="${esc(k)}"${blok?' disabled title="Semua yang siap sedang dikerjakan di mesin lain"':''}>Mulai</button>`} <button class="btn sm ghost" data-act="mesincatat" data-k="${esc(k)}">Catat</button></td></tr>`}).join('')}</tbody></table></div>`
+ const fdp=d=>String(fd(d)).replace(/&nbsp;/g,' ');const dueChip=d=>!d?'':d<t?chip('Telat · '+fdp(d),'crit'):d===t?chip('Due hari ini','warn'):chip('Due '+fdp(d),'plain');
+ const body=rows.length?`<div id="mesin-antri" class="mq-grid">${rows.map(({it,a,langkah,alt})=>{const k=mesinKey(it);const jalan=sesAll.some(e=>sesiKey(e)===k);const c=mesinCtx(k);
+  const ii=P.indeksLangkah(c.st.rute,c.st.alt,p.wc);const lain=dipesan(c,ii,p.mesin);const bebas=Math.max(0,a.antri-lain);const lainTeks=((reservasi(c)[ii])||[]).filter(r=>r.mesin!==p.mesin);
+  const blok=!jalan&&bebas<=0;const pct=it.qty>0?Math.min(100,Math.round(a.selesai/it.qty*100)):0;
+  return `<div class="mcard${jalan?' jalan':''}" data-k="${esc(k)}"><div class="mc-h"><span><b>SPK ${esc(String(it.spk))}</b> <span class="note">${esc(it.customer||'')}</span></span>${dueChip(it.due)}</div>
+   <div class="mc-item">${esc(it.item)}</div>
+   <div class="mc-rute">${chips(it,langkah)}</div>
+   <div class="mc-siap"><span class="mq-siap">${n(a.antri)}</span><span class="mc-u">siap dikerjakan${lain>0?' · bebas '+n(bebas):''}</span></div>
+   <div class="jb"><i style="width:${pct}%"></i></div><div class="note">${n(a.selesai)} dari ${n(it.qty)} ${esc(it.satuan||'')} selesai di langkah ini${alt?' · <b>mesin alternatif</b> untuk '+esc(langkah):''}</div>
+   ${lainTeks.length?`<div class="note mc-lain">Sedang dikerjakan di mesin lain: ${lainTeks.map(r=>`${esc(r.mesin)}${r.operator?' ('+esc(r.operator)+')':''} ${r.target?n(r.target):''}`).join(' · ')}</div>`:''}
+   <div class="mc-act">${jalan?chip('Sedang berjalan','warn'):`<button class="btn primary mc-go" data-act="mesinmulai" data-k="${esc(k)}"${blok?' disabled title="Semua yang siap sedang dikerjakan di mesin lain"':''}>Mulai</button>`}<button class="btn mc-cat" data-act="mesincatat" data-k="${esc(k)}">Catat</button></div></div>`}).join('')}</div>`
   :empty('Tidak ada antrian di '+esc(p.wc),'Item muncul di sini begitu langkah sebelumnya selesai atau SPK terbit. Pastikan judul section SPK memuat produk (mis. CABLE TRAY TYPE STU) agar rute dikenali.');
  /* catatan terakhir di mesin ini, bisa dibatalkan bila salah input */
  const terakhir=hari.slice().sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,6);
  const riwayat=terakhir.length?`<section class="panel"><div class="pbody" style="padding:0 0 8px 0"><div class="dw-section-title" style="margin:0 0 6px 0">Catatan terakhir di ${esc(p.mesin)} hari ini</div><div class="tbl-wrap"><table id="mesin-riwayat"><thead><tr><th>Jam</th><th>SPK</th><th>Item</th><th class="num">Selesai</th><th class="num">Reject</th><th>Operator</th><th></th></tr></thead><tbody>${terakhir.map(e=>`<tr><td>${esc(e.selesai?P.jamLokal(e.selesai):'')}</td><td>${esc(String(e.spk_no||''))}</td><td>${esc(e.item_desc||'')}</td><td class="num">${n(+e.qty||0)}</td><td class="num">${+e.reject?n(+e.reject):''}</td><td>${esc(e.operator||'')}</td><td class="act"><button class="btn sm ghost danger" data-act="mesinvoid" data-id="${esc(idEv(e))}">Batalkan</button></td></tr>`).join('')}</tbody></table></div><div class="note" style="margin-top:6px">Salah input? Batalkan catatan lalu catat ulang. Catatan yang dibatalkan tetap tersimpan sebagai riwayat dan tidak dihitung.</div></div></section>`:'';
- return kp+sesiHtml+`<section class="panel"><div class="pbody note">Alur: tekan <b>Mulai</b> saat mengerjakan item, lalu <b>Selesai dan simpan</b> dengan jumlah yang jadi dan reject, atau <b>Simpan sebagian, lanjut</b> bila baru sebagian yang jadi. Satu mesin boleh mengerjakan beberapa item sekaligus, dan satu item boleh dikerjakan beberapa mesin sekaligus; batang yang sedang dikerjakan mesin lain tidak ditawarkan lagi. Durasi, menit per pcs, dan tonase dihitung otomatis. Lupa menekan Mulai: pakai <b>Catat</b> dan isi jam mulai dan selesai. Reject tidak lanjut ke mesin berikutnya dan muncul lagi di antrian awal. Urut menurut due date terdekat.</div>${body}</section>`+riwayat;
+ return sesiHtml+`<div class="mq-wrap">${body}</div>`+kp+`<details class="panel mq-help"><summary>Cara pakai</summary><div class="pbody note">Tekan <b>Mulai</b> saat mengerjakan item. Isi jumlah yang selesai dengan tombol + dan −, lalu <b>Selesai</b>. Kalau baru sebagian yang jadi, pakai <b>Simpan sebagian, lanjut</b>. Lupa menekan Mulai: pakai <b>Catat</b> dan isi jam mulai dan selesai. Satu mesin boleh mengerjakan beberapa item, dan satu item boleh dikerjakan beberapa mesin; batang yang sedang dikerjakan mesin lain tidak ditawarkan lagi. Reject tidak lanjut ke mesin berikutnya dan muncul lagi di antrian awal. Urut menurut due date terdekat.</div></details>`+riwayat;
 };
 
 const dasarKejadian=(c,p,opO)=>{const op=opO||($('#f-op')&&$('#f-op').value.trim())||opNow(p.mesin);lsSet(opKey(p.mesin),op);
@@ -3945,6 +3978,8 @@ document.addEventListener('click',async e=>{
   case 'mesinbatal':await mesinBatal(ds.k);break;
   case 'mesinvoid':await mesinVoid(ds.id);break;
   case 'mesincatat':mesinCatatForm(ds.k);break;
+  case 'papanbuka':{F.mesin.wc=ds.wc;F.mesin.mesin='';lsSet('mni-wc',ds.wc);lsSet('mni-mesin','');location.hash='mesin';break}
+  case 'mrstep':{const q=document.querySelector(`.mesin-run[data-k="${CSS.escape(ds.k)}"] [data-mrq]`);if(q){const mx=q.max===''?Infinity:+q.max;const v=Math.max(0,Math.min(mx,(+q.value||0)+(+ds.d)));q.value=String(Math.round(v*1000)/1000)}break}
   case 'mesinsemua':{const q=document.querySelector(`.mesin-run[data-k="${CSS.escape(ds.k)}"] [data-mrq]`);if(q)q.value=ds.max;break}
   case 'lapcsv':await lapCsv();break;
   case 'lapprint':lapPrint();break;

@@ -41,6 +41,8 @@ Bergantung pada: T-167
 
 - Mock (verified in browser, bukan bukti Supabase) dan unit. Belum di-push ke GitHub dan belum ada migration di database mana pun.
 
+- [x] Layar operator berbasis kartu (tombol besar, + dan −, satu tombol Selesai) dan Papan Produksi untuk supervisor; uji M-91 sampai M-98, total e2e 221 lulus
+
 ## Catatan
 
 Dibangun lokal sesuai permintaan pemilik ("jangan ditayangkan dulu"). Catatan alur kerja: perubahan ada di branch lokal `fitur/produksi-multi-wc`, tidak di `development`, agar tidak ikut tergabung ke `main` tanpa persetujuan.

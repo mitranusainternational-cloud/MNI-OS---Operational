@@ -229,3 +229,16 @@ Kasus: Cable Tray berjalan Shearing, Punching, Bending, lalu subcon finishing; o
 | Posisi terkini | Lembar Update produksi dan tab Jejak produksi menyebut mesin dan operator yang sedang mengerjakan |
 
 Skema: kolom `target` dan `ref`, jenis kejadian `void` (draf migration 14, belum diterapkan). Uji unit L-60 sampai L-64; e2e M-80 sampai M-90.
+
+## 17. Layar operator berbasis kartu dan Papan Produksi
+
+Dasar: pengamatan papan Operations Kanban (Antlia) pada 2026-11-04. Antlia memakai satu kartu per operasi dengan tujuh tombol; kita menyederhanakannya.
+
+| Bagian | Cara kerja |
+|---|---|
+| Antrian Mesin | Satu kartu per item: SPK, customer, lencana Telat atau Due, rantai rute, angka **siap dikerjakan** yang besar, bilah progres, tombol **Mulai** besar dan **Catat** |
+| Kartu berjalan | Waktu berjalan, jumlah selesai dengan tombol **−** dan **+**, pintasan +5, +10, **Semua**, reject opsional, satu tombol **Selesai**; Simpan sebagian dan Batalkan mulai di bawahnya |
+| Urutan layar | Kartu berjalan, antrian, ringkasan, cara pakai (dilipat), catatan terakhir; tombol minimal 44 px dan satu kolom di HP |
+| Papan Produksi | Untuk supervisor, hanya lihat: kolom per work center dan langkah vendor, berjalan di atas lalu antri, ringkasan sedang berjalan, antri, lewat due, selesai hari ini; ketuk judul kolom membuka Antrian Mesin work center itu |
+
+Aturan angka, mesin alternatif, vendor, banyak sesi, dan pembatalan tidak berubah (bagian 11 sampai 16). Uji e2e M-91 sampai M-98 (kartu, tombol +/−, batas jumlah siap, Papan, tampilan HP 390 px).

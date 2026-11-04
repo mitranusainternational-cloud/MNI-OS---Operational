@@ -630,4 +630,25 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .jstep{min-width:118px;max-width:190px;flex:1 1 118px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}.jstep.run{border-color:var(--warn)}.jstep.ok{border-color:var(--ok);background:var(--ok-soft)}
 .jn{font-size:12px;font-weight:600}.jb{height:6px;background:var(--line);border-radius:3px;margin:6px 0 4px;overflow:hidden}.jb i{display:block;height:6px;background:var(--accent);border-radius:3px}.jstep.ok .jb i{background:var(--ok)}.jstep.run .jb i{background:var(--warn)}.jq{font-size:12px;font-weight:600}.jstep .note{margin-top:3px;font-size:11px;white-space:normal}
 .mesin-run{margin-bottom:10px}
+/* Layar operator berbasis kartu dan Papan Produksi */
+.mr-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.mr-time{font-size:20px;font-variant-numeric:tabular-nums}.mr-spk{margin-top:6px;font-size:13px;color:var(--muted)}
+.mr-lbl{margin:14px 0 6px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.mr-step{display:flex;align-items:stretch;gap:10px}.mr-step .mr-q{flex:1;min-width:0;height:64px;font-size:34px;font-weight:700;text-align:center}.mr-b{width:72px;height:64px;font-size:30px;line-height:1;padding:0;justify-content:center}
+.mr-quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.mr-quick .btn{flex:1 1 90px;min-height:46px}
+.mr-rej{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:13px;color:var(--muted)}.mr-rej .inp{width:110px;height:44px;font-size:18px}
+.mr-go{display:flex;width:100%;min-height:58px;margin-top:14px;font-size:20px;justify-content:center}
+.mr-sec{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.mr-sec .btn{flex:1 1 140px;min-height:44px;justify-content:center}
+.mq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.mcard{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.mcard.jalan{border-color:var(--warn);background:var(--warn-soft)}
+.mc-h{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.mc-item{font-weight:600;font-size:15px;line-height:1.3}.mc-rute{display:flex;flex-wrap:wrap;gap:4px 0;align-items:center}
+.mc-siap{display:flex;align-items:baseline;gap:8px}.mq-siap{font-size:34px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}.mc-u{font-size:13px;color:var(--muted)}
+.mcard .jb{margin:2px 0}.mc-lain{color:var(--warn)}
+.mc-act{display:flex;gap:8px;margin-top:4px}.mc-go{flex:1;min-height:54px;font-size:18px;justify-content:center}.mc-cat{min-height:54px;padding:0 18px;justify-content:center}
+.pk-board{display:flex;gap:12px;overflow-x:auto;align-items:flex-start;padding-bottom:8px}.pk-col{flex:0 0 260px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;overflow:hidden}.pk-col.vend{background:var(--accent-soft)}
+.pk-head{display:flex;width:100%;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;font:inherit;font-weight:700;text-align:left;cursor:pointer;color:var(--text)}.pk-head[disabled]{cursor:default}
+.pk-n{display:flex;gap:6px;font-weight:600;font-size:11px}.pk-n i{font-style:normal;padding:2px 7px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}.pk-n i.warn{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.pk-body{display:flex;flex-direction:column;gap:8px;padding:10px;max-height:62vh;overflow-y:auto}.pk-card{padding:9px 10px;background:var(--surface);border:1px solid var(--line);border-radius:8px}.pk-card.run{border-color:var(--warn);background:var(--warn-soft)}
+.pk-h{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px}.pk-i{margin:3px 0;font-size:13px;line-height:1.3}.pk-kosong{padding:6px 2px}
+.mq-wrap{margin-bottom:14px}.mq-help summary{padding:12px 16px;cursor:pointer;font-weight:600;font-size:13px}.mq-help .pbody{padding-top:0}
+@media(max-width:640px){.mq-grid{grid-template-columns:1fr}.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi-row .kpi{padding:10px 12px}.kpi-row .kpi .v{font-size:22px}.kpi-row .kpi .s{display:none}.mr-step .mr-q{font-size:38px}.pk-col{flex-basis:84vw}}
 @media print{.no-print{display:none}}
