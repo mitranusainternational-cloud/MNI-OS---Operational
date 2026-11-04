@@ -141,6 +141,22 @@ function demoProduksi(state) {
   tb.vendor.push({ id: uid(), created_at: now, updated_at: now, data: { vendor: 'Elektro Mandiri Contoh', proses: 'ELG', tgl: d(17), noSJ: 'SJ-V/' + d(17), spk: sid, status: 'Selesai', items: [{ d: itemSel.d, g: '', q: 20, u: 'Btg', kembali: 20, reject: 0 }], riwayat: [{ tgl: d(13), qty: 20, rej: 0 }] } });
   tb.kirim.push({ id: uid(), created_at: now, updated_at: now, data: { spk: sid, customer: 'Customer Contoh C', tgl: d(12), tglTerima: d(11), noSJ: 'SJ/' + d(12), status: 'Diterima', kendaraan: 'Truk', nopol: 'B 1000 UJI', driver: 'Contoh', items: [{ d: itemSel.d, q: 20, u: 'Btg', w: 5.5 }] } });
   const bk = (n, jenis, muatan, pihak, masuk, mulai, selesai, status = 'Selesai') => ({ id: uid(), created_at: now, updated_at: now, data: { jenis, muatan, pihak, tgl: d(n), jamMasuk: masuk, jamMulai: mulai, jamSelesai: selesai, status, nopol: 'B 2000 UJI', kendaraan: 'Truk', driver: 'Contoh' } });
+  // Riwayat produksi beberapa bulan ke belakang (tanpa SPK aktif) agar laporan mingguan, bulanan, dan tahunan terisi
+  const opMesin = [['Shearing', 'Shearing 3 Meter', 'Operator A', 100], ['Punching', 'Punching 1 (20 Ton)', 'Operator C', 50], ['Punching', 'Punching 2 (40 Ton)', 'Operator D', 50], ['Bending', 'Bending 3 Mtr #1', 'Operator E', 40], ['Bending', 'Bending 3 Mtr #2', 'Operator F', 40], ['CNC Laser', 'Laser Cutting 1', 'Operator G', 60], ['Welding', 'Welding 1', 'Operator H', 30]];
+  const prodH = [['Cable Tray', 'STU', 'ELG', 8.2, 'Cable Tray W200xH50xL3000 1.2'], ['Cable Tray', 'STC', 'HDG', 9.5, 'Cable Tray W100xH100xL3000 1.8'], ['Cable Ladder', 'SLW', 'HDG', 17.5, 'Cable Ladder W300xH100xL3000 mm'], ['Cable Ladder', 'SLU', 'ELG', 12.1, 'Cable Ladder W200xH100xL3000 mm'],
+    ['Cable Duct', 'STU', '', 11.2, 'Cable Duct W400xH100xL3000 1.5'], ['Aksesoris', 'SLW', 'HDG', 9.4, 'Horizontal Elbow Ladder W300xH100xR600 mm'], ['Cover', '', 'ELG', 4.1, 'Cover Cable Tray W200xL3000']];
+  let seed = 7; const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  for (let dn = 5; dn <= 330; dn++) {
+    const hd = hari(dn); if ([0, 6].includes(new Date(hd).getDay())) continue;
+    const jml = 2 + Math.floor(rnd() * 3);
+    for (let j = 0; j < jml; j++) {
+      const om = opMesin[Math.floor(rnd() * opMesin.length)], pr = prodH[Math.floor(rnd() * prodH.length)];
+      const qty = Math.max(1, Math.round((0.3 + rnd() * 0.7) * om[3])), menit = Math.round(qty * (1 + rnd() * 5));
+      const mulai = new Date(hd); mulai.setHours(8 + j * 2, 0, 0, 0); const selesai = new Date(mulai.getTime() + menit * 60000);
+      tb.produksi_log.push({ at: selesai.toISOString(), jenis: 'hasil', tgl: hd.slice(0, 10), spk_id: 'riwayat', spk_no: 'H' + dn, customer: ['PT Contoh A', 'PT Contoh B', 'PT Contoh C'][Math.floor(rnd() * 3)], item_idx: 0, item_desc: pr[4], wc: om[0], mesin: om[1], operator: om[2],
+        kelompok: pr[0], tipe: pr[1], material: 'SPCC', finishing: pr[2], mulai: mulai.toISOString(), selesai: selesai.toISOString(), menit, berat: pr[3], tonase: Math.round(qty * pr[3] * 100) / 100, qty, reject: rnd() < 0.1 ? 1 : 0, oleh: 'operator@mni.local', data: {} });
+    }
+  }
   tb.bongkar = [bk(12, 'Loading', 'Barang Jadi', 'Customer Contoh C', '08:00', '08:20', '09:05'), bk(6, 'Loading', 'Barang Jadi', 'Customer Contoh A', '10:00', '10:40', '11:30'), bk(3, 'Loading', 'Barang Jadi', 'Customer Contoh A', '13:00', '13:05', '13:40'),
     bk(17, 'Loading', 'Barang Setengah Jadi', 'Elektro Mandiri Contoh', '14:00', '14:15', '14:55'), bk(2, 'Loading', 'Barang Setengah Jadi', 'Berkah Jaya Plating', '09:00', '09:10', '09:50'),
     bk(13, 'Unloading', 'Barang Setengah Jadi', 'Elektro Mandiri Contoh', '08:30', '08:45', '09:15'), bk(6, 'Unloading', 'Barang Setengah Jadi', 'Berkah Jaya Plating', '08:30', '08:45', '09:15'),

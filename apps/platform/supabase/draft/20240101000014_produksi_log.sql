@@ -16,6 +16,10 @@ CREATE TABLE IF NOT EXISTS public.produksi_log (
   jenis     TEXT NOT NULL DEFAULT 'hasil' CHECK (jenis IN ('hasil', 'mulai', 'batal', 'void')), -- mulai = timer jalan di mesin; hasil = selesai; batal = timer dibatalkan; void = membatalkan catatan hasil lain (ref)
   target    NUMERIC,                                   -- jumlah yang dipesan sesi Mulai (agar mesin lain tidak mengerjakan batang yang sama)
   ref       TEXT,                                      -- jenis void: id kejadian yang dibatalkan
+  kelompok  TEXT,                                      -- kelompok produk (Cable Tray, Cable Ladder, Cable Duct, Cover, Aksesoris), dibaca dari judul section SPK
+  tipe      TEXT,                                      -- type (STU, STC, SLU, SLW, SLHD)
+  material  TEXT,                                      -- material SPK (SPCC, SUS304, dan lain-lain)
+  finishing TEXT,                                      -- ELG, HDG, PDC, atau Non finishing
   mesin     TEXT,                                      -- nama mesin di dalam work center (mis. Punching 20 Ton)
   operator  TEXT,                                      -- nama operator di mesin (bukan akun login)
   mulai     TIMESTAMPTZ,                               -- waktu mulai (hasil: dari timer atau diisi manual)

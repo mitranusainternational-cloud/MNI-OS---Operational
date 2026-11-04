@@ -28,7 +28,7 @@ export async function runProduksi(page, base) {
     await page.click(`#mesin-antri .mcard:nth-child(${baris}) [data-act="mesincatat"]`); await page.waitForTimeout(400);
     if (semua) await page.check('#mform [name="semua"]');
     else { await page.fill('#m-qty', String(nilai)); await page.fill('#m-reject', String(reject)); }
-    await page.fill('#m-mulai', '08:00'); await page.fill('#m-selesai', '09:00');
+    await page.evaluate(() => { const d = document.querySelector('#modal details'); if (d) d.open = true; }); await page.fill('#m-mulai', '08:00'); await page.fill('#m-selesai', '09:00');
     await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500);
     await closeAll();
   };
@@ -160,7 +160,7 @@ export async function runProduksi(page, base) {
   ok('M-40 Cover muncul di antrian CNC Laser sebagai mesin alternatif untuk Shearing', /COVER TRAY/.test(altTxt) && /mesin alternatif/.test(altTxt), altTxt.slice(0, 120));
   const nHasil = (await hasilEv()).length;
   await page.click('#mesin-antri .mcard:first-child [data-act="mesincatat"]'); await page.waitForTimeout(400);
-  await page.fill('#m-qty', '4'); await page.fill('#m-mulai', '10:00'); await page.fill('#m-selesai', '10:40');
+  await page.fill('#m-qty', '4'); await page.evaluate(() => { const d = document.querySelector('#modal details'); if (d) d.open = true; }); await page.fill('#m-mulai', '10:00'); await page.fill('#m-selesai', '10:40');
   await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500); await closeAll();
   const eAlt = (await hasilEv()).slice(nHasil);
   ok('M-41 hasil tercatat atas nama CNC Laser (mesin sebenarnya) dengan menit per pcs 10', eAlt.length === 1 && eAlt[0].wc === 'CNC Laser' && Number(eAlt[0].menit) === 40, JSON.stringify(eAlt.map((e) => [e.wc, e.menit])));
@@ -198,7 +198,7 @@ export async function runProduksi(page, base) {
   const nH = (await hasilEv()).length;
   await page.click('#modal [data-act="prodcatat"]'); await page.waitForTimeout(500);
   ok('M-71 tombol Catat hasil membuka dialog dengan pilihan mesin dan operator', !!(await page.$('#mform [name="operator"]')) && /Catat hasil/.test(await page.textContent('#modal h3')));
-  await page.fill('#m-qty', '2'); await page.fill('#m-operator', 'Operator Uji'); await page.fill('#m-mulai', '13:00'); await page.fill('#m-selesai', '13:30');
+  await page.fill('#m-qty', '2'); await page.fill('#m-operator', 'Operator Uji'); await page.evaluate(() => { const d = document.querySelector('#modal details'); if (d) d.open = true; }); await page.fill('#m-mulai', '13:00'); await page.fill('#m-selesai', '13:30');
   await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500); await closeAll();
   const hNew = (await hasilEv()).slice(nH);
   ok('M-72 hasil dari lembar SPK tercatat dengan operator dan mesin', hNew.length === 1 && hNew[0].operator === 'Operator Uji' && Number(hNew[0].qty) === 2 && Number(hNew[0].menit) === 30, JSON.stringify(hNew.map((e) => [e.wc, e.mesin, e.operator, e.qty])));
@@ -208,7 +208,7 @@ export async function runProduksi(page, base) {
   const barisInfo = (cust) => page.evaluate((c) => { const r = [...document.querySelectorAll('#mesin-antri .mcard')].find((x) => x.innerText.includes(c)); return r ? { txt: r.innerText, mulaiDisabled: !!(r.querySelector('[data-act="mesinmulai"]') || {}).disabled } : null; }, cust);
   const catatBaris = async (cust, qty, mulai, selesai) => {
     await klikBaris(cust, 'mesincatat'); await page.waitForTimeout(400);
-    await page.fill('#m-qty', String(qty)); await page.fill('#m-mulai', mulai); await page.fill('#m-selesai', selesai);
+    await page.fill('#m-qty', String(qty)); await page.evaluate(() => { const d = document.querySelector('#modal details'); if (d) d.open = true; }); await page.fill('#m-mulai', mulai); await page.fill('#m-selesai', selesai);
     await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1300);
   };
   await go('spk');
@@ -320,8 +320,8 @@ export async function runProduksi(page, base) {
   await page.click('.sb-card .sb-h'); await page.waitForTimeout(600);
   ok('M-102 klik kepala kartu membuka rincian SPK', !!(await page.$('#drawer.open, #drawer:not([hidden])')) && /SPK/.test(await page.evaluate(() => (document.getElementById('drawer') || { innerText: '' }).innerText)));
   await closeAll();
-  await go('produksi'); await page.click('#tools [data-view="produksi"][data-val="laporan"]'); await page.waitForTimeout(500);
-  ok('M-103 Kinerja & Analisa punya tab Laporan harian (tabel, unduh CSV, cetak)', !!(await page.$('#lap-tabel')) && !!(await page.$('#tools [data-act="lapcsv"]')) && !!(await page.$('#tools [data-act="lapprint"]')));
+  await go('produksi'); await page.click('#tools [data-view="produksi"][data-val="rincian"]'); await page.waitForTimeout(500);
+  ok('M-103 Kinerja & Analisa punya tab Rincian harian (tabel, unduh CSV, cetak)', !!(await page.$('#lap-tabel')) && !!(await page.$('#tools [data-act="lapcsv"]')) && !!(await page.$('#tools [data-act="lapprint"]')));
   await page.click('#tools [data-view="produksi"][data-val="wc"]'); await page.waitForTimeout(400);
   ok('M-104 tab Work Center memuat beban dan kapasitas per work center', !!(await page.$('#wc-beban')) && !(await page.$('#vendor-kual')));
   await closeAll();
@@ -358,8 +358,78 @@ export async function runProduksi(page, base) {
   const ak = await page.evaluate(() => ({ jenis: [...document.querySelectorAll('#dock-jenis tbody tr')].map((r) => r.innerText.replace(/\s+/g, ' ')), pihak: document.querySelectorAll('#dock-pihak tbody tr').length }));
   const lj = ak.jenis.find((x) => /Loading/.test(x) && /Barang Jadi/.test(x));
   ok('M-110 tab Pengiriman: loading dan unloading per jenis muatan dengan rata-rata tunggu dan proses; per pihak', ak.jenis.length === 4 && !!lj && /mnt/.test(lj) && ak.pihak >= 5, JSON.stringify(ak.jenis));
+  await tabK('rincian');
+  ok('M-111 enam tab di Kinerja & Analisa: Work Center, Laporan Produksi, Produk, Vendor, Pengiriman, Rincian harian', (await page.$$eval('#tools [data-view="produksi"][data-key="tab"]', (a) => a.map((x) => x.textContent))).join('|') === 'Work Center|Laporan Produksi|Produk|Vendor|Pengiriman|Rincian harian');
+  // Laporan Produksi baru: periode, qty atau tonase atau kecepatan, kelompok produk bertingkat, tren, akumulasi operator dan mesin
+  const sbtn = async (key, val) => { await page.click('#body [data-view="produksi"][data-key="' + key + '"][data-val="' + val + '"]'); await page.waitForTimeout(450); };
+  const kpiNum = (idx) => page.evaluate((k) => Number(document.querySelectorAll('.kpi')[k].querySelector('.v').textContent.replace(/[^0-9]/g, '')), idx);
   await tabK('laporan');
-  ok('M-111 lima tab di Kinerja & Analisa: Work Center, Produk, Vendor, Pengiriman, Laporan harian', (await page.$$eval('#tools [data-view="produksi"][data-key="tab"]', (a) => a.map((x) => x.textContent))).join('|') === 'Work Center|Produk|Vendor|Pengiriman|Laporan harian');
+  const lp = await page.evaluate(() => ({ kpi: document.querySelectorAll('.kpi').length, bar: document.querySelectorAll('#lp-trend .lp-col').length, depth: [...document.querySelectorAll('#lp-tabel tbody tr')].map((r) => r.dataset.depth + ':' + r.cells[0].innerText.trim()) }));
+  ok('M-112 Laporan Produksi: 5 ringkasan, tren, dan produk bertingkat kelompok > type > material (Cable Tray, Cable Ladder, Aksesoris)', lp.kpi === 5 && lp.bar >= 1 && lp.depth.includes('0:Cable Tray') && lp.depth.includes('1:STU') && lp.depth.some((x) => /^2:SPCC/.test(x)) && lp.depth.includes('0:Cable Ladder') && lp.depth.includes('0:Aksesoris'), lp.depth.slice(0, 6).join(' | '));
+  await sbtn('lper', 'hari'); const qHari = await kpiNum(0);
+  await sbtn('lper', 'bulan'); const qBulan = await kpiNum(0);
+  await sbtn('lper', 'tahun'); const qTahun = await kpiNum(0); const barTahun = await page.$$eval('#lp-trend .lp-col', (a) => a.length);
+  ok('M-113 periode: hari ini lebih kecil dari bulan ini, lebih kecil dari tahun ini; tren tahun memakai butir bulan (maksimal 13 batang)', qHari <= qBulan && qBulan < qTahun && barTahun >= 6 && barTahun <= 13, JSON.stringify([qHari, qBulan, qTahun, barTahun]));
+  await sbtn('lmet', 'ton');
+  const em = await page.evaluate(() => ({ em: document.querySelectorAll('#lp-tabel td.lp-em').length, judul: document.querySelector('.dw-section-title').textContent }));
+  ok('M-114 analisa by tonase: kolom tonase ditonjolkan dan tren berjudul tonase', em.em > 0, JSON.stringify(em));
+  const tren = await page.evaluate(() => [...document.querySelectorAll('.dw-section-title')].map((x) => x.textContent).join(' | '));
+  ok('M-114b judul tren menyebut tonase (kg)', /Tren .* tonase \(kg\)/.test(tren), tren);
+  await sbtn('lmet', 'kec');
+  const kec = await page.evaluate(() => [...document.querySelectorAll('#lp-tabel thead th')].map((x) => x.textContent).join('|') + ' || ' + document.querySelectorAll('#lp-tabel td.lp-em').length);
+  ok('M-115 analisa by kecepatan: kolom pcs/jam dan kg/jam tersedia dan ditonjolkan', /pcs\/jam\|kg\/jam/.test(kec) && Number(kec.split('||')[1]) > 0, kec);
+  await sbtn('lper', 'tahun'); await sbtn('lmet', 'qty'); await sbtn('lby', 'operator');
+  const ops = await page.evaluate(() => [...document.querySelectorAll('#lp-tabel tbody tr')].map((r) => r.dataset.nama));
+  ok('M-116 kelompok per operator memuat operator contoh', ['Operator A', 'Operator C', 'Operator E'].every((o) => ops.includes(o)), ops.join(','));
+  await sbtn('lby', 'customer');
+  ok('M-117 kelompok per customer memuat PT dan customer SPK', await page.evaluate(() => { const t = [...document.querySelectorAll('#lp-tabel tbody tr')].map((r) => r.dataset.nama).join('|'); return /PT Contoh A/.test(t) && /Customer Contoh A/.test(t); }));
+  await sbtn('lby', 'mesin');
+  ok('M-118 kelompok per mesin memuat mesin work center', await page.evaluate(() => { const t = [...document.querySelectorAll('#lp-tabel tbody tr')].map((r) => r.dataset.nama).join('|'); return /Punching 1/.test(t) && /Bending 3 Mtr #1/.test(t); }));
+  const akmo = await page.evaluate(() => { const rows = [...document.querySelectorAll('#lp-akum tbody tr')]; const num = (c) => Number(c.querySelector('b').textContent.replace(/[^0-9]/g, '')); const e = rows.find((r) => r.dataset.nama === 'Operator E');
+    return { n: rows.length, kolom: document.querySelectorAll('#lp-akum thead th').length, e: e ? [...e.cells].slice(1, 6).map(num) : null, jumlahTotal: num(document.querySelector('#lp-akum tfoot tr').cells[5]), sumTotal: rows.reduce((a, r) => a + num(r.cells[5]), 0), sumHari: rows.reduce((a, r) => a + num(r.cells[1]), 0), jumlahHari: num(document.querySelector('#lp-akum tfoot tr').cells[1]) }; });
+  ok('M-119 akumulasi operator: hari ini, minggu ini, bulan ini, tahun ini, seluruhnya; Operator E hari ini 30 dan naik menurut jendela; jumlah sama dengan penjumlahan baris', akmo.n >= 6 && akmo.kolom === 8 && akmo.e[0] === 30 && akmo.e[0] <= akmo.e[1] && akmo.e[1] <= akmo.e[2] && akmo.e[2] <= akmo.e[3] && akmo.e[3] <= akmo.e[4] && akmo.jumlahTotal === akmo.sumTotal && akmo.jumlahHari === akmo.sumHari, JSON.stringify(akmo));
+  await sbtn('lakm', 'kelompok');
+  ok('M-120 akumulasi per kelompok produk menyebut Cable Tray dan Cable Ladder', await page.evaluate(() => { const t = [...document.querySelectorAll('#lp-akum tbody tr')].map((r) => r.dataset.nama).join('|'); return /Cable Tray/.test(t) && /Cable Ladder/.test(t); }));
+  await sbtn('lakm', 'mesin');
+  ok('M-121 akumulasi per mesin memuat Punching 1 dan Bending 3 Mtr #1', await page.evaluate(() => { const t = [...document.querySelectorAll('#lp-akum tbody tr')].map((r) => r.dataset.nama).join('|'); return /Punching 1/.test(t) && /Bending 3 Mtr #1/.test(t); }));
+  let csvOk = false, csvNama = '';
+  try { const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 5000 }), page.click('#tools [data-act="lapacsv"]')]); csvNama = dl.suggestedFilename(); csvOk = /^Laporan-produksi-.*\.csv$/.test(csvNama); } catch { /* tidak ada unduhan */ }
+  ok('M-122 Unduh CSV laporan produksi', csvOk, csvNama);
+
+  // Produksi Hari Ini: Catat cukup jumlah (tanggal dan jam otomatis), tombol Selesai menyebut yang disimpan, customer tampil di catatan terakhir
+  await go('mesin'); await page.selectOption('#f-mesin', 'Bending'); await page.waitForTimeout(500); await page.selectOption('#f-mesin-msn', 'Bending 3 Mtr #2'); await page.waitForTimeout(500);
+  const hist = await page.evaluate(() => (document.querySelector('#mesin-riwayat tbody tr') || { innerText: '' }).innerText);
+  ok('M-123 catatan terakhir menyebut nama customer (PT), bukan hanya nomor SPK', /Customer Contoh/.test(hist), hist.replace(/\s+/g, ' '));
+  await page.selectOption('#f-mesin', 'Punching'); await page.waitForTimeout(500);
+  const nSblm = (await hasilEv()).length;
+  await page.click('#mesin-antri .mcard:first-child [data-act="mesincatat"]'); await page.waitForTimeout(400);
+  const wkt = await page.evaluate(() => ({ terbuka: document.querySelector('#modal details').open, tgl: document.getElementById('m-tgl').value, selesai: document.getElementById('m-selesai').value, mulai: document.getElementById('m-mulai').value }));
+  ok('M-124 form Catat: tanggal dan jam selesai terisi otomatis, jam mulai kosong, bagian waktu tertutup', !wkt.terbuka && /^\d{4}-\d{2}-\d{2}$/.test(wkt.tgl) && /^\d{2}:\d{2}$/.test(wkt.selesai) && wkt.mulai === '', JSON.stringify(wkt));
+  await page.fill('#m-qty', '1'); await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500);
+  const baru = (await hasilEv()).slice(nSblm);
+  ok('M-125 Catat hanya dengan jumlah tersimpan: lama pengerjaan kosong (bukan nol), hari ini, nomor SPK dan customer terisi, klasifikasi produk terisi', baru.length === 1 && baru[0].menit == null && !baru[0].mulai && baru[0].tgl === new Date().toISOString().slice(0, 10) && !!baru[0].spk_no && !!baru[0].customer && !!baru[0].kelompok, JSON.stringify(baru.map((e) => [e.menit, e.mulai, e.tgl, e.kelompok])));
+  await closeAll();
+  await page.click('#mesin-antri .mcard:first-child [data-act="mesinmulai"]'); await page.waitForTimeout(1200);
+  const lbl0 = await page.textContent('.mesin-run [data-lbl]'); const kand = Number((lbl0.match(/semua (\d+)/) || [])[1]);
+  await page.fill('.mesin-run [data-mrq]', '3'); const lbl1 = await page.textContent('.mesin-run [data-lbl]');
+  await page.click('.mesin-run [data-act="mrstep"][data-d="1"]'); const lbl2 = await page.textContent('.mesin-run [data-lbl]');
+  await page.fill('.mesin-run [data-mrq]', ''); await page.dispatchEvent('.mesin-run [data-mrq]', 'input'); const lbl3 = await page.textContent('.mesin-run [data-lbl]');
+  ok('M-126 tombol Selesai menyebut apa yang disimpan: semua yang siap, lalu jumlah yang diisi, kembali ke semua bila dikosongkan', kand > 0 && lbl1.includes('simpan 3') && lbl2.includes('simpan 4') && lbl3 === lbl0, JSON.stringify([lbl0, lbl1, lbl2, lbl3]));
+  const nSel = (await hasilEv()).length;
+  await page.click('.mesin-run [data-act="mesinselesai"]'); await page.waitForTimeout(1600);
+  const sel = (await hasilEv()).slice(nSel);
+  ok('M-127 menekan Selesai tanpa mengisi menyimpan semua yang siap sekali ketuk (dengan lama pengerjaan dari Mulai)', sel.length === 1 && Number(sel[0].qty) === kand && sel[0].menit != null && !!sel[0].mulai, JSON.stringify([sel.length, sel[0] && sel[0].qty, kand]));
+  await closeAll();
+  await page.setViewportSize({ width: 390, height: 800 });
+  const lebar = {};
+  for (const [h, tab] of [['mesin', null], ['produksi', 'laporan'], ['produksi', 'wc'], ['spk', null]]) {
+    await page.evaluate((x) => { location.hash = '#' + x; }, h); await page.waitForTimeout(500);
+    if (tab) { await page.click('#tools [data-view="produksi"][data-key="tab"][data-val="' + tab + '"]'); await page.waitForTimeout(500); }
+    lebar[h + (tab ? ':' + tab : '')] = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  }
+  ok('M-128 di layar HP (390 px) Produksi Hari Ini, Laporan Produksi, Work Center, dan SPK Berjalan tanpa gulir mendatar', Object.values(lebar).every((v) => v <= 1), JSON.stringify(lebar));
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await closeAll();
 
   ok('M-14 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;

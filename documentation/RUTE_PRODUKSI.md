@@ -267,3 +267,20 @@ Mesin hitung murni `src/lib/produksi/analisa.js` (uji unit A-01 sampai A-21). Ti
 | Pengiriman | Dari antrian Bongkar Muat: per jenis (Loading atau Unloading) dan muatan, serta per pihak: jumlah, rata-rata tunggu (jam masuk ke mulai), rata-rata proses (mulai ke selesai), dan terlama |
 
 Uji e2e M-106 sampai M-111. Data contoh `?demo=produksi` ditambah satu SPK yang sudah sampai customer, satu vendor ELG, dan sepuluh aktivitas dock.
+
+## 20. Produksi Hari Ini v2 dan Laporan Produksi
+
+**Input.** Mulai mencatat tanggal dan jam mulai otomatis. Selesai menyimpan jumlah yang diisi; bila dikosongkan yang disimpan adalah semua yang siap (maksimal target sesi); label tombol menyebut jumlahnya. Catat (tanpa Mulai) hanya meminta jumlah; tanggal hari ini dan jam selesai sekarang terisi otomatis, jam mulai boleh kosong sehingga lama pengerjaan tidak dihitung (kosong, bukan nol). Simpan sebagian wajib mengisi jumlah.
+
+**Laporan Produksi** (`src/lib/produksi/statistik.js`, uji unit S-01 sampai S-34):
+
+| Bagian | Isi |
+|---|---|
+| Periode | Hari ini, minggu ini (Senin sampai hari ini), 30 hari, bulan ini, tahun ini, semua |
+| Analisa | Jumlah (pcs), Tonase (kg), Kecepatan: pcs per jam, kg per jam, menit per pcs (hanya dari catatan berwaktu) |
+| Kelompok | Produk bertingkat (kelompok > type > material dan finishing), work center, mesin, operator, customer |
+| Tren | Per hari (sampai 31 hari), per minggu (sampai sekitar 6 bulan), per bulan |
+| Akumulasi | Hari ini, minggu ini, bulan ini, tahun ini, seluruhnya, rata-rata per hari aktif, hari terbaik; per operator, mesin, work center, atau kelompok produk; jumlah semua baris |
+| Jeda catat | Selisih saat dicatat dan jam selesai, rata-rata per operator atau mesin (disiplin pencatatan) |
+
+Uji e2e M-112 sampai M-128 (termasuk lebar HP 390 px tanpa gulir mendatar).

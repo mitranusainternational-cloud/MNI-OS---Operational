@@ -661,4 +661,36 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 .stk{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line)}.stk i{display:block;height:14px}
 .s-a{background:#94a3b8}.s-b{background:var(--accent)}.s-c{background:#f59e0b}.s-d{background:#a855f7}.s-e{background:var(--ok)}
 .lgd{display:flex;flex-wrap:wrap;gap:6px 16px;padding:8px 16px 0;font-size:12px;color:var(--muted)}.lg{display:inline-flex;align-items:center;gap:6px}.lg i{display:inline-block;width:12px;height:12px;border-radius:3px}
+/* Produksi Hari Ini: dua kolom, ringkasan tipis, kartu rapi */
+.po{display:flex;flex-direction:column;gap:14px}
+.po-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.po-s{padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.po-s .lb{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}.po-s b{font-size:22px;line-height:1.2;font-variant-numeric:tabular-nums}.po-s .s{font-size:12px;color:var(--muted)}.po-s .jb{margin:4px 0 2px;height:6px}.po-s .jb i{height:6px}
+.po-idle{padding:12px 16px;border:1px dashed var(--line);border-radius:12px;font-size:13px;color:var(--muted);background:var(--surface)}
+.po-main{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
+.po-main.has-run{grid-template-columns:minmax(330px,430px) 1fr}
+.po-run{display:flex;flex-direction:column;gap:12px;position:sticky;top:12px}.po-run .mesin-run{margin:0}
+.po-qh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 10px}.po-qh h3{margin:0;font-size:16px}
+.mr-item{margin:8px 0 2px;font-weight:700;font-size:16px;line-height:1.3}.mr-meta{font-size:13px;color:var(--muted);margin-bottom:2px}
+.po-run .mr-step .mr-q{height:60px;font-size:32px;min-width:0}.po-run .mr-b{width:64px;height:60px}
+.po-run .mr-go{min-height:56px;font-size:18px}
+.mr-rej span{font-size:13px}.mr-rej .inp{width:96px;height:42px;font-size:17px;text-align:center}
+.mc-spk{display:flex;flex-direction:column;gap:1px;min-width:0}.mc-cust{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mq-grid{grid-template-columns:repeat(auto-fill,minmax(285px,1fr))}
+.po-main.has-run .mq-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.po-riw .rq{font-weight:700}
+.wkt{border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface-2)}.wkt summary{cursor:pointer;font-size:13px;color:var(--muted)}.wkt-g{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media(max-width:1000px){.po-main.has-run{grid-template-columns:1fr}.po-run{position:static}.po-strip{grid-template-columns:1fr 1fr}.wkt-g{grid-template-columns:1fr}}
+/* Laporan Produksi */
+.lp-ctl{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:flex-end}.lp-g{display:flex;flex-direction:column;gap:4px}.lp-g>span{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+.lp-akh{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:flex-end;justify-content:space-between;padding:0 16px}
+.lp-chart{display:flex;align-items:flex-end;gap:4px;height:190px;padding-top:18px;overflow-x:auto}
+.lp-col{flex:1 1 0;min-width:18px;max-width:64px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;position:relative}
+.lp-col i{display:block;width:100%;background:var(--accent);border-radius:4px 4px 0 0;opacity:.9;min-height:1px}.lp-col:hover i{opacity:1}
+.lp-v{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;height:12px}.lp-l{font-size:10px;color:var(--muted);white-space:nowrap}
+#lp-tabel td,#lp-akum td{vertical-align:middle}.lp-em{font-weight:700;color:var(--accent)}
+.lp-d0 td{background:var(--surface-2);font-size:14px}.lp-d1 td{font-size:13px}.lp-d2 td{font-size:12.5px;color:var(--muted)}
+.lp-nm{display:inline-block}#lp-tabel .jb{margin:0 0 2px;height:6px}#lp-tabel .jb i{height:6px}
+#lp-akum tfoot td{border-top:2px solid var(--line);background:var(--surface-2)}
+@media(max-width:640px){.mq-grid,.po-main.has-run .mq-grid{grid-template-columns:minmax(0,1fr)}.po,.po-main,.po-q,.po-run{min-width:0;max-width:100%}.po-riw .tbl-wrap{overflow-x:auto}.lp-chart{height:150px}.lp-akh{padding:0 12px}}
+.lp-ctl,.lp-akh{min-width:0;max-width:100%}.lp-g{min-width:0;max-width:100%}.lp-g .seg{max-width:100%;overflow-x:auto}
 @media print{.no-print{display:none}}

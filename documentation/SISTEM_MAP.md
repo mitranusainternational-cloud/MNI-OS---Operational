@@ -131,7 +131,9 @@ Migration: file di `apps/platform/supabase/migrations/` (Git) lalu dipasang ke S
 |---|---|---|---|
 | SPK Berjalan | `#spk` | Lihat dan buat SPK | `spk`, `produksi_log`, `vendor`, `kirim` |
 | Produksi Hari Ini | `#mesin` | **Input** produksi | `produksi_log`, `mwc` |
-| Kinerja & Analisa | `#produksi` | Lihat (tab Work Center, Produk, Vendor, Pengiriman, Laporan harian) | `produksi_log`, `mwc`, `vendor`, `kirim`, `bongkar` |
+| Kinerja & Analisa | `#produksi` | Lihat (tab Work Center, Laporan Produksi, Produk, Vendor, Pengiriman, Rincian harian) | `produksi_log`, `mwc`, `vendor`, `kirim`, `bongkar` |
 | Papan Produksi, Laporan Produksi | `#papan`, `#laporan-produksi` | Lihat (tersembunyi) | `produksi_log` |
 
 Kebutuhan dan pemetaan data: [[PRD_PRODUKSI]]. Nama menu lama (Monitoring SPK, Dashboard Produksi, Antrian Mesin) sudah digantikan.
+
+Kolom klasifikasi produk pada `produksi_log` (draf migration 14): `kelompok`, `tipe`, `material`, `finishing`, diisi otomatis dari judul section SPK. Dipakai Laporan Produksi untuk pengelompokan Cable Tray, Cable Ladder, Cable Duct, Cover, dan Aksesoris beserta type dan material.

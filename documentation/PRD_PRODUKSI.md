@@ -84,3 +84,22 @@ Break atau hold per operasi, reversal material, issue material per operasi (ada 
 | Loading dan unloading | Selesai lokal | Tab Pengiriman, dari antrian Bongkar Muat |
 
 Semua `verified in browser` pada mock; belum diuji di Supabase. Migration 14 masih draf.
+
+## 11. Kebutuhan tambahan dari tinjauan (2026-11-04)
+
+1. Tampilan input tidak kaku dan rapi; operator cukup menekan tombol, tanggal dan jam terisi otomatis.
+2. Catatan terakhir menyebut nama customer, bukan hanya nomor SPK.
+3. Laporan Produksi bisa dianalisa by jumlah, by tonase, dan by kecepatan input dan output.
+4. Setiap operator dan setiap mesin terlihat KPI-nya: akumulasi, per hari, per minggu, per bulan, per tahun.
+5. Terlihat sudah memproduksi Cable Tray berapa, Cable Ladder berapa, Aksesoris berapa (kelompok), dan rinciannya per type (STU, STC, SLU, SLW, SLHD), Cable Duct, serta material tertentu.
+6. Prinsip tetap: input paling mudah, hasil analisa paling lengkap.
+
+| Kebutuhan | Pemenuhan | Bukti |
+|---|---|---|
+| 1 | Tata letak dua kolom; Selesai satu ketukan; Catat hanya jumlah | [[T-179-produksi-hari-ini-v2-dan-laporan-produksi]] |
+| 2 | Kolom SPK dan customer pada catatan terakhir | M-123 |
+| 3 | Laporan Produksi: Jumlah, Tonase, Kecepatan | M-114 sampai M-115 |
+| 4 | Akumulasi hari ini, minggu ini, bulan ini, tahun ini, seluruhnya per operator dan mesin | M-119, M-121 |
+| 5 | Pohon produk kelompok > type > material dan finishing, plus akumulasi per kelompok | M-112, M-120 |
+
+Klasifikasi produk tidak diisi operator: dibaca dari judul section SPK (misalnya CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED) dan material SPK, lalu disimpan pada kejadian (kolom `kelompok`, `tipe`, `material`, `finishing` di draf migration 14). Kejadian lama diturunkan dari SPK saat dilaporkan.

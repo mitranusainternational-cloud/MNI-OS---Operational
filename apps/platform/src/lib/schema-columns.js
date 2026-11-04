@@ -3,7 +3,7 @@
 // STRICT_COLS: kolom bertipe DATE/TIMESTAMPTZ/NUMERIC/INTEGER/UUID yang menolak string kosong ("") di Postgres.
 // Dipakai bersama oleh adapter Supabase dan klien mock agar keduanya berperilaku sama.
 export const TABLE_COLS = {
-  "produksi_log": ["id", "at", "tgl", "spk_id", "item_idx", "item_desc", "wc", "jenis", "target", "ref", "mesin", "operator", "mulai", "selesai", "menit", "berat", "tonase", "spk_no", "customer", "tebal", "qty", "reject", "oleh", "ket", "data"],
+  "produksi_log": ["id", "at", "tgl", "spk_id", "item_idx", "item_desc", "wc", "jenis", "target", "ref", "kelompok", "tipe", "material", "finishing", "mesin", "operator", "mulai", "selesai", "menit", "berat", "tonase", "spk_no", "customer", "tebal", "qty", "reject", "oleh", "ket", "data"],
   "mwc": [
     "id",
     "kode",
