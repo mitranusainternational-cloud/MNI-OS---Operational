@@ -75,6 +75,7 @@ ok('R-83 batas kirim vendor = hasil langkah mesin terakhir', siapKirimVendor(rVe
 ok('R-84 beban mesin mengabaikan langkah vendor', !('Vendor ELG' in bebanWC([{ spk: 1, item: 'x', qty: 100, rute: rVen, kum: kV, due: '2026-12-01' }], { Bending: 40 })));
 ok('R-85 prediksi tidak butuh kapasitas vendor', prediksiSelesai([{ spk: 1, item: 'x', qty: 100, rute: rVen, kum: kV, due: '2026-12-01' }], { Shearing: 100, Punching: 100, Bending: 40 })[0].hari === 1, JSON.stringify(prediksiSelesai([{ spk: 1, item: 'x', qty: 100, rute: rVen, kum: kV, due: '2026-12-01' }], { Shearing: 100, Punching: 100, Bending: 40 })));
 
+ok('R-86 progres item tidak menghitung langkah vendor (produksi = hasil mesin terakhir)', progresItem(rVen, { Shearing: 100, Punching: 100, Bending: 70, 'Vendor ELG': 0 }) === 70);
 ok('R-60 usulan langkah dari kejadian nyata', us.length === 1 && us[0].wc === 'Welding' && JSON.stringify(us[0].ruteBaru) === JSON.stringify(['Shearing', 'Bending', 'Welding']), JSON.stringify(us));
 
 const fail = R.filter((x) => x.startsWith('FAIL')).length;

@@ -202,3 +202,15 @@ Temuan kasar dari data (klasifikasi nama deskripsi, perlu konfirmasi): baris Las
 Asumsi yang perlu dikonfirmasi: aturan Jointing dan Clamp (hanya Cover yang dikonfirmasi pemilik), serta dasar waktu standar dari data nyata. Draf migration 14 mendapat kolom jenis, mesin, operator, mulai, selesai, menit, berat, tonase, spk_no, customer, dan tebal. Uji: unit laporan 19 skenario, e2e produksi 39, total e2e 195.
 
 Belum dibangun: keterangan bahan dari mutasi bahan baku SPK (belum ada tautan data mutasi ke SPK), pengecualian rute per item, dan reject vendor otomatis kembali ke antrian.
+
+## 15. Lembar Update produksi disederhanakan (2026-11-04)
+
+Masukan tinjauan: isian "Total diproduksi s/d sekarang" dan pilihan "Work Center saat ini" membingungkan karena bertabrakan dengan pencatatan per mesin. Perubahan:
+
+| Sebelum | Sesudah |
+|---|---|
+| Per item: isian total manual dan pilihan work center | Per item: rantai langkah dengan angka tiap langkah (mis. Shearing 100/100, Punching 70/100), posisi batang, dan tombol **Catat hasil di <mesin berikutnya>** |
+| Satu cara input di dua tempat (lembar SPK dan mesin) | Hasil produksi hanya dicatat per mesin (Mulai dan Selesai di Antrian Mesin, atau Catat dengan jam manual); lembar SPK hanya membuka dialog Catat yang sama, lengkap dengan pilihan mesin dan operator |
+| Total manual selalu tampil | Total manual hanya untuk item tanpa rute dikenali atau SPK lama yang belum punya catatan mesin (di dalam "SPK lama: isi total manual") |
+
+Perbaikan terkait: progres produksi item tidak lagi menghitung langkah vendor (produksi = hasil mesin terakhir), supaya persentase produksi tidak nol selama barang menunggu finishing. Uji unit R-86, e2e M-70 sampai M-72; total e2e 198.

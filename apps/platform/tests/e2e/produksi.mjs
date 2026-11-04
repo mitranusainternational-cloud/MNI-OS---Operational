@@ -187,6 +187,19 @@ export async function runProduksi(page, base) {
   ok('M-60 jejak item: tiap langkah, vendor, dan terkirim ke customer dengan mesin yang dipakai', /Shearing/.test(jej) && /Punching/.test(jej) && /Bending/.test(jej) && /Vendor ELG/.test(jej) && /Terkirim ke customer/.test(jej) && /Punching 1 \(20 Ton\)/.test(jej) && /dikirim 0 . kembali 0/.test(jej), jej.replace(/\n/g, ' ').slice(0, 200));
   await closeAll();
 
+  // Lembar Update produksi: posisi per item dari catatan mesin, catat hasil langsung dari sini
+  await go('spk'); await page.click('#body tr:has-text("Customer Rute")'); await page.waitForTimeout(800);
+  await page.click('#drawer [data-act="prod"]'); await page.waitForTimeout(600);
+  const up = await page.evaluate(() => document.getElementById('modal').innerText);
+  ok('M-70 Update produksi menampilkan rantai langkah per item dan posisinya, bukan isian total', up.includes('Shearing 18') && up.includes('Posisi:') && !up.includes('Total diproduksi'), up.split(String.fromCharCode(10)).join(' ').slice(120, 360));
+  const nH = (await hasilEv()).length;
+  await page.click('#modal [data-act="prodcatat"]'); await page.waitForTimeout(500);
+  ok('M-71 tombol Catat hasil membuka dialog dengan pilihan mesin dan operator', !!(await page.$('#mform [name="operator"]')) && /Catat hasil/.test(await page.textContent('#modal h3')));
+  await page.fill('#m-qty', '2'); await page.fill('#m-operator', 'Operator Uji'); await page.fill('#m-mulai', '13:00'); await page.fill('#m-selesai', '13:30');
+  await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500); await closeAll();
+  const hNew = (await hasilEv()).slice(nH);
+  ok('M-72 hasil dari lembar SPK tercatat dengan operator dan mesin', hNew.length === 1 && hNew[0].operator === 'Operator Uji' && Number(hNew[0].qty) === 2 && Number(hNew[0].menit) === 30, JSON.stringify(hNew.map((e) => [e.wc, e.mesin, e.operator, e.qty])));
+
   // Data contoh untuk tinjauan: /?demo=produksi mengisi WC, SPK berrute, kejadian, dan riwayat vendor
   await page.evaluate(() => { localStorage.clear(); });
   await page.goto(base + '?demo=produksi'); await page.waitForTimeout(500);

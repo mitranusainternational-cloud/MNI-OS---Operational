@@ -105,7 +105,8 @@ export function periksaMasukan(rute, kum, qtyTotal, wc, tambah, reject = 0, alt 
 }
 
 // Progres item = yang lolos langkah terakhir (kompatibel dengan kolom lama item.prod).
-export const progresItem = (rute, kum) => (rute.length ? kum[rute[rute.length - 1]] : 0);
+// Langkah vendor tidak dihitung: produksi selesai di langkah mesin terakhir (finishing vendor dilacak terpisah lewat dokumen vendor).
+export const progresItem = (rute, kum) => { const r = rute.filter((w) => !langkahVendor(w)); return r.length ? kum[r[r.length - 1]] : 0; };
 
 // Beban per work center dari semua item aktif.
 // itemAktif: [{ spk, item, kategori, qty, rute, kum, due }]; kapasitas: { 'Shearing': 200, ... } (pcs per hari kerja)

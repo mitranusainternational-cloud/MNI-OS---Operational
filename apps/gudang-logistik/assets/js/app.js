@@ -666,58 +666,48 @@ function prodForm(id){
    <div style="font-size:10px;color:var(--muted)">${lastLog?esc(lastLog.by||'–'):''}</div>
   </div>
  </div>`;
- // Per-item cards — TIAP ITEM punya WC selector sendiri
- const wcOpts=(lastWc='')=>wcList.map(w=>`<option value="${esc(w)}" ${lastWc===w?'selected':''}>${esc(w)}</option>`).join('');
+ /* Tiap item: rantai langkah dari catatan mesin (baca saja) dan tombol Catat di mesin. Isian total manual hanya untuk item tanpa rute dan SPK lama. */
+ const P=PXL();
  const itemRows=s.items.map((i,k)=>{
-  const prod=+i.prod||0;const sisa=Math.max(0,+i.q-prod);const done=sisa===0;
-  const pct=+i.q>0?Math.round(prod/+i.q*100):0;
-  const itemLastWc=lastWcPerItem[i.d]||'';
-  const progColor=done?'ok':pct>0?'accent':'line-2';
-  return `<div style="border:1px solid var(--${done?'ok':'line'});border-radius:10px;padding:12px;margin-bottom:10px;background:var(--surface);position:relative">
-   ${done?`<div style="position:absolute;top:10px;right:10px;background:var(--ok-soft);color:var(--ok);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700">✓ Selesai</div>`:''}
-   <div style="font-weight:700;font-size:13px;margin-bottom:6px;padding-right:${done?'70px':'0'}">${esc(i.d)}</div>
-   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-    <div style="flex:1;height:7px;background:var(--line);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--${progColor});border-radius:4px;transition:width .3s"></div></div>
-    <span style="font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums">${n(prod)} / ${n(i.q)} ${esc(i.u||'')} · ${pct}%</span>
-   </div>
-   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end">
-    <div>
-     <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Total diproduksi s/d sekarang</label>
-     <input class="inp" type="number" min="0" max="${+i.q}" step="any" name="p_${k}" id="m-p_${k}" value="${prod}" style="width:100%;font-size:18px;font-weight:700;text-align:center;padding:8px 6px">
-    </div>
-    <div>
-     <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">Work Center saat ini</label>
-     <select class="sel" name="wc_${k}" style="width:100%;font-size:13px">
-      <option value="">– Pilih WC –</option>
-      ${wcOpts(itemLastWc)}
-     </select>
-    </div>
-   </div>
-   ${!done&&sisa>0?`<div style="font-size:11px;color:var(--muted);margin-top:6px">Sisa: <b>${n(sisa)} ${esc(i.u||'')}</b></div>`:''}
+  const st=P?itemState(s,i,k):null;const adaEv=!!(st&&st.ev.length);const prod=+i.prod||0;const q=+i.q||0;
+  const eff=(x.lines&&x.lines[k]&&x.lines[k].prodEff)||0;const pct=q>0?Math.round(Math.min(1,eff/q)*100):0;const done=q>0&&eff>=q;
+  const inpManual=`<input class="inp" type="number" min="0" max="${q}" step="any" name="p_${k}" id="m-p_${k}" value="${prod}" style="width:140px;font-size:16px;font-weight:700;text-align:center">`;
+  let rantai='',posisi='',aksi='',manual='';
+  if(st){
+   const aq=P.antrianPerLangkah(st.rute,st.kum,q);const now=aq.findIndex((a,ii)=>a.antri>0&&!P.langkahVendor(st.rute[ii]));
+   rantai=`<div style="margin:6px 0">${st.rute.map((w,ii)=>`<span class="rchip${ii===now?' on':''}">${esc(w)} ${n(st.kum[w]||0)}/${n(q)}</span>`).join('<span class="rarr">›</span>')}</div>`;
+   const tx={wc:p=>`${esc(p.tempat)} ${n(p.qty)}`,'vendor-siap-kirim':p=>`siap kirim ke ${esc(p.tempat)} ${n(p.qty)}`,'di-vendor':p=>`di ${esc(p.tempat)} ${n(p.qty)}`,selesai:p=>`selesai produksi ${n(p.qty)}`};
+   const pos=P.posisiItem(st.rute,st.kum,q,st.vendorKirim);
+   posisi=pos.length?`<div class="note">Posisi: ${pos.map(p=>(tx[p.jenis]||tx.wc)(p)).join(' · ')}</div>`:'';
+   aksi=now>=0?`<button type="button" class="btn sm primary" data-act="prodcatat" data-k="${esc(s._id+'|'+k)}">Catat hasil di ${esc(st.rute[now])}</button>`:'';
+   manual=adaEv?'':`<details class="prod-manual"${prod>0?' open':''}><summary>SPK lama: isi total manual</summary><div style="margin-top:6px">${inpManual}</div></details>`;
+  }else manual=`<div class="note" style="margin-bottom:4px">Rute produk belum dikenali (judul section tanpa nama produk). Isi total manual.</div>${inpManual}`;
+  return `<div style="border:1px solid var(--${done?'ok':'line'});border-radius:10px;padding:12px;margin-bottom:10px;background:var(--surface)">
+   <div style="font-weight:700;font-size:13px">${esc(i.d)}${done?' <span class="chip ok">selesai</span>':''}</div>
+   <div style="display:flex;align-items:center;gap:8px;margin:6px 0 0"><div style="flex:1;height:7px;background:var(--line);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--${done?'ok':'accent'});border-radius:4px"></div></div><span style="font-size:12px;color:var(--muted);white-space:nowrap">${n(eff)} / ${n(q)} ${esc(i.u||'')} · ${pct}%</span></div>
+   ${rantai}${posisi}<div style="margin-top:8px">${aksi}</div>${manual}
   </div>`;
  }).join('');
+ const adaManual=s.items.some((i,k)=>{const st=P?itemState(s,i,k):null;return !st||!st.ev.length});
  openModal(`Update produksi · SPK ${s.no}`,
   summaryBar+
-  `<div class="full" style="display:flex;gap:8px;margin-bottom:10px">
-   <button type="button" class="btn sm" data-act="prodall" style="flex:1">✓ Set semua item selesai</button>
-  </div>`+
-  `<div class="full" style="margin-bottom:6px;font-weight:600;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px">Progress & Work Center per item</div>`+
+  `<div class="note full" style="margin-bottom:10px">Hasil produksi dicatat <b>per mesin</b>: operator memakai Mulai dan Selesai di <a href="#mesin" data-act="closemodal">Antrian Mesin</a>. Di sini Anda melihat posisi tiap item, dan bisa mencatat hasil langsung lewat tombol <b>Catat hasil</b> di bawah item.</div>`+
+  (adaManual?`<div class="full" style="display:flex;gap:8px;margin-bottom:10px"><button type="button" class="btn sm ghost" data-act="prodall" style="flex:1">Set semua isian manual selesai</button></div>`:'')+
   `<div class="full">${itemRows}</div>`+
   `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">`+
-  fld('Tanggal produksi',inp('tgl',todayS,'date','required'))+
+  fld('Tanggal',inp('tgl',todayS,'date','required'))+
   fld('Catatan / kendala',`<input class="inp" name="alasan" value="${esc(s.alasan||'')}" placeholder="Opsional: kendala, estimasi…">`)+
-  `</div>`+
-  `<div class="note full" style="margin-top:4px">Tiap item bisa berada di Work Center berbeda · tersinkron realtime</div>`,
+  `</div>`,
   async d=>{
-   const items=s.items.map((i,k)=>({...i,prod:Math.min(+i.q,num0(d['p_'+k]))}));
    const tgl=d.tgl||todayS;
-   if(tgl>todayS)throw new Error('Tanggal produksi tidak boleh di masa depan.');
-   if(tgl<s.tgl)throw new Error('Tanggal produksi sebelum tanggal SPK.');
-   // Schema baru: setiap item punya field wc masing-masing
-   const logItems=items.map((i,k)=>({d:i.d,q:+i.prod||0,wc:d['wc_'+k]||''}));
-   const prodLog=[...(s.prodLog||[]),{tgl,at:new Date().toISOString(),by:ME||null,ket:d.alasan||'',items:logItems}];
-   await updDoc('spk',id,{items,alasan:d.alasan||'',prodLog});
-  },{submit:'Simpan progres'});
+   if(tgl>todayS)throw new Error('Tanggal tidak boleh di masa depan.');
+   if(tgl<s.tgl)throw new Error('Tanggal sebelum tanggal SPK.');
+   const items=s.items.map((i,k)=>('p_'+k) in d?{...i,prod:Math.min(+i.q,num0(d['p_'+k]))}:i);
+   const berubah=items.some((i,k)=>(+i.prod||0)!==(+s.items[k].prod||0));
+   const patch={alasan:d.alasan||''};
+   if(berubah){patch.items=items;patch.prodLog=[...(s.prodLog||[]),{tgl,at:new Date().toISOString(),by:ME||null,ket:d.alasan||'',items:items.map(i=>({d:i.d,q:+i.prod||0,wc:''}))}]}
+   await updDoc('spk',id,patch);
+  },{submit:'Simpan'});
 }
 /* Form khusus input kendala / alasan keterlambatan — tanpa update qty produksi */
 function kendalForm(id){
@@ -1681,7 +1671,7 @@ B.mesin=()=>{
  return kp+sesiHtml+`<section class="panel"><div class="pbody note">Alur: tekan <b>Mulai</b> saat mengerjakan item, lalu <b>Selesai dan simpan</b> dengan jumlah yang jadi dan reject. Durasi, menit per pcs, dan tonase dihitung otomatis. Lupa menekan Mulai: pakai <b>Catat</b> dan isi jam mulai dan selesai. Reject tidak lanjut ke mesin berikutnya dan muncul lagi di antrian awal untuk dibuat ulang. Urut menurut due date terdekat.</div>${body}</section>`;
 };
 
-const dasarKejadian=(c,p)=>{const op=($('#f-op')&&$('#f-op').value.trim())||opNow(p.mesin);lsSet(opKey(p.mesin),op);
+const dasarKejadian=(c,p,opO)=>{const op=opO||($('#f-op')&&$('#f-op').value.trim())||opNow(p.mesin);lsSet(opKey(p.mesin),op);
  return {spk_id:c.s._id,item_idx:c.ix,item_desc:c.it.d,spk_no:String(c.s.no),customer:c.s.customer||'',tebal:thkOf(c.it.g)||'',wc:p.wc,mesin:p.mesin,operator:op,oleh:ME||null}};
 async function mesinMulai(k){
  const P=PXL();const c=mesinCtx(k);if(!c)return;const p=mesinPilih();
@@ -1690,11 +1680,11 @@ async function mesinMulai(k){
  try{await addDoc('produksi_log',{...dasarKejadian(c,p),jenis:'mulai',qty:0,reject:0,tgl:today(),mulai:new Date().toISOString()});lsSet('mni-wc',p.wc);lsSet('mni-mesin',F.mesin.mesin);toast(`Mulai: SPK ${c.s.no} di ${p.mesin}`)}catch(e){toast(e.message||'Gagal menyimpan')}
 }
 /* Simpan satu hasil (dari timer atau catat manual) setelah divalidasi terhadap yang siap di langkah itu */
-async function mesinHasil(c,p,{qty,reject,mulai,selesai}){
+async function mesinHasil(c,p,{qty,reject,mulai,selesai,operator}){
  const chk=PXL().periksaMasukan(c.st.rute,c.st.kum,c.st.qty,p.wc,qty,reject,c.st.alt);if(!chk.ok)throw new Error(chk.alasan);
  const menit=PXL().menitAntara(mulai,selesai);if(menit==null)throw new Error('Jam selesai tidak boleh sebelum jam mulai.');
  const berat=+c.it.w>0?+c.it.w:null;
- await addDoc('produksi_log',{...dasarKejadian(c,p),jenis:'hasil',qty,reject,tgl:PXL().tanggalLokal(selesai),mulai,selesai,menit,berat,tonase:berat?Math.round(qty*berat*100)/100:null});
+ await addDoc('produksi_log',{...dasarKejadian(c,p,operator),jenis:'hasil',qty,reject,tgl:PXL().tanggalLokal(selesai),mulai,selesai,menit,berat,tonase:berat?Math.round(qty*berat*100)/100:null});
  lsSet('mni-wc',p.wc);lsSet('mni-mesin',F.mesin.mesin);
  const i=PXL().indeksLangkah(c.st.rute,c.st.alt,p.wc);const next=c.st.rute[i+1];
  toast(`${p.mesin}: ${n(qty)} ${c.it.u||''} selesai${reject?' · '+n(reject)+' reject, perlu dibuat ulang':''}${qty>0?(next?' · lanjut ke '+next:' · selesai produksi'):''} · ${fDur(menit)}`);
@@ -1711,11 +1701,12 @@ function mesinCatatForm(k){
  const c=mesinCtx(k);if(!c)return;const p=mesinPilih();const sedia=siapDiMesin(c,p.wc);
  openModal(`Catat hasil · SPK ${esc(String(c.s.no))}`,`<div class="full note">${esc(c.it.d)} · siap dikerjakan ${n(sedia)} ${esc(c.it.u||'')} di ${esc(p.mesin)}</div>`+
   fld('Selesai',inp('qty','','number','min="0" step="any" inputmode="decimal" placeholder="0"'))+fld('Reject',inp('reject','','number','min="0" step="any" inputmode="decimal" placeholder="0"'))+
+  (p.daftar.length?fld('Mesin',`<select class="sel" name="mesin">${p.daftar.map(m=>`<option ${m.nama===p.mesin?'selected':''}>${esc(m.nama)}</option>`).join('')}</select>`):'')+fld('Operator',inp('operator',opNow(p.mesin),'text','placeholder="Nama operator" autocomplete="off"'))+
   fld('Tanggal',inp('tgl',today(),'date','required'))+fld('Jam mulai',inp('mulai','','time','required'))+fld('Jam selesai',inp('selesai','','time','required'))+
   `<label class="ck full"><input type="checkbox" name="semua"> Isi semua yang siap (${n(sedia)})</label>`,
   async d=>{const qty=d.semua?sedia:num0(d.qty);const mulai=PXL().gabungWaktu(d.tgl,d.mulai),selesai=PXL().gabungWaktu(d.tgl,d.selesai);
    if(!mulai||!selesai)throw new Error('Isi tanggal, jam mulai, dan jam selesai.');
-   await mesinHasil(c,p,{qty,reject:d.semua?0:num0(d.reject),mulai,selesai})},{submit:'Simpan hasil',done:' '});
+   await mesinHasil(c,{...p,mesin:d.mesin||p.mesin},{qty,reject:d.semua?0:num0(d.reject),mulai,selesai,operator:String(d.operator||'').trim()})},{submit:'Simpan hasil',done:' '});
 }
 setInterval(()=>{document.querySelectorAll('[data-elapsed]').forEach(el=>{const m=PXL()&&PXL().menitAntara(el.dataset.elapsed,new Date().toISOString());if(m!=null)el.textContent=fDur(m)})},30000);
 
@@ -3854,6 +3845,7 @@ document.addEventListener('click',async e=>{
   case 'ed-up':case 'ed-down':{const i=+ds.s,j=a==='ed-up'?i-1:i+1;if(j>=0&&j<ED.sections.length){[ED.sections[i],ED.sections[j]]=[ED.sections[j],ED.sections[i]];EDDIRTY=true;rerenderSecs()}break}
   case 'openspk':spkDrawer(ds.id);break;
   case 'prod':prodForm(ds.id);break;
+  case 'prodcatat':{const c=mesinCtx(ds.k);if(!c)break;const aq=PXL().antrianPerLangkah(c.st.rute,c.st.kum,c.st.qty);const w=c.st.rute[aq.findIndex((a,ii)=>a.antri>0&&!PXL().langkahVendor(c.st.rute[ii]))];if(!w)break;F.mesin.wc=w;F.mesin.mesin='';lsSet('mni-wc',w);lsSet('mni-mesin','');mesinCatatForm(ds.k);break}
   case 'prodall':document.querySelectorAll('#mform [name^="p_"]').forEach(inpEl=>{const q=parseFloat(inpEl.max);if(q>0)inpEl.value=q});break; /* B-006: sebelumnya membaca sel tabel (closest('tr')) yang tidak ada di form kartu, sehingga melempar galat */
   case 'railtg':railToggle();break;
   case 'void':voidForm(ds.c,ds.id);break;

@@ -128,7 +128,7 @@ export async function runRegression(page, base) {
   ok('B-013 SPK tanpa due tersimpan (due null)', (await tab('spk')).length === n + 1 && !!noDue && noDue.due === null);
   await closeAll();
   await go('spk'); await rowOpen('1002'); await page.click('#drawer [data-act="prod"]'); await page.waitForTimeout(600);
-  await page.click('#modal [data-act="prodall"]'); await page.click('#modal button:has-text("Simpan progres")'); await page.waitForTimeout(900);
+  await page.click('#modal [data-act="prodall"]'); await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(900);
   ok('F-20/21 produksi + set semua selesai', (await tab('spk')).find((s) => s.no === '1002').items.every((i) => Number(i.prod) === Number(i.q)));
   await closeAll();
 
