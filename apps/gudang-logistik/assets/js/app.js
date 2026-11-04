@@ -54,7 +54,7 @@ const S={};COLS.forEach(c=>S[c]=[]);
 const loaded=new Set();
 let DB=null,USER=null,DLS=null,ME=null,CAN=true,LIVE='wait',LAST=null,C=null;
 const F={ /* per-view filters, kept for the session */
- 'barang-jadi':{q:'',kat:'',fin:'',tab:'stok'},
+ 'barang-jadi':{q:'',kat:'',type:'',fin:'',tab:'stok'},
  'bongkar-muat':{range:'7',jenis:''},
  'vendor':{st:'aktif',vendor:'',q:''},
  'pengiriman':{st:'',q:''},
@@ -356,10 +356,12 @@ B.dashboard=()=>{
 };
 
 /* ---------- WAREHOUSE (shared by RM & FG) ---------- */
+const TYPE_URUT=['STU','STC','SLU','SLW','SLHD'];
+const fgTypes=kat=>{const xs=S.fg.filter(r=>!kat||r.kategori===kat);const ada=[...new Set(xs.map(r=>(r.type||'').trim()).filter(Boolean))];ada.sort((a,b)=>{const i=TYPE_URUT.indexOf(a),j=TYPE_URUT.indexOf(b);return (i<0?99:i)-(j<0?99:j)||a.localeCompare(b)});return{types:ada,tanpa:xs.some(r=>!(r.type||'').trim())}};
 function whTools(view,g){
  const f=F[view];
  const filt=g==='rm'?`<select class="sel" data-act="filtsel" data-view="${view}" data-key="grade" id="f-grade"><option value="">Semua material</option>${['SPHC','SPCC','SS304','SS316','Aluminium'].map(x=>`<option ${f.grade===x?'selected':''}>${x}</option>`).join('')}</select>`
-  :`<select class="sel" data-act="filtsel" data-view="${view}" data-key="kat" id="f-kat"><option value="">Semua kategori</option>${[...new Set(S.fg.map(x=>x.kategori))].sort().map(x=>`<option ${f.kat===x?'selected':''}>${esc(x)}</option>`).join('')}</select><select class="sel" data-act="filtsel" data-view="${view}" data-key="fin" id="f-fin"><option value="">Semua finishing</option>${[...new Set(S.fg.map(x=>x.finishing))].sort().map(x=>`<option ${f.fin===x?'selected':''}>${esc(x)}</option>`).join('')}</select>`;
+  :`<select class="sel" data-act="filtsel" data-view="${view}" data-key="kat" id="f-kat"><option value="">Semua kategori</option>${[...new Set(S.fg.map(x=>x.kategori))].sort().map(x=>`<option ${f.kat===x?'selected':''}>${esc(x)}</option>`).join('')}</select>${(()=>{const o=fgTypes(f.kat);return `<select class="sel" data-act="filtsel" data-view="${view}" data-key="type" id="f-type"><option value="">Semua type</option>${o.types.map(x=>`<option value="${esc(x)}" ${f.type===x?'selected':''}>${esc(x)}</option>`).join('')}${o.tanpa?`<option value="__none" ${f.type==='__none'?'selected':''}>Tanpa type</option>`:''}</select>`})()}<select class="sel" data-act="filtsel" data-view="${view}" data-key="fin" id="f-fin"><option value="">Semua finishing</option>${[...new Set(S.fg.map(x=>x.finishing))].sort().map(x=>`<option ${f.fin===x?'selected':''}>${esc(x)}</option>`).join('')}</select>`;
  return `<input class="inp search" id="q-${view}" placeholder="${g==='rm'?'Cari material / ukuran…':'Cari ukuran, type, finishing…'}" value="${esc(f.q)}" data-act="q" data-view="${view}">${filt}
  <span class="grow"></span>
  <button class="btn primary" data-act="mv" data-g="${g}" data-j="masuk">${ic('inb')}${g==='rm'?'Terima material':'Barang masuk'}</button>
@@ -373,7 +375,7 @@ function whRows(g){
  const view=g==='rm'?'bahan-baku':'barang-jadi',f=F[view],c=calc();const q=f.q.toLowerCase();
  return S[g].filter(r=>{const lbl=(g==='rm'?rmLabel(r):fgLabel(r)).toLowerCase();if(q&&!lbl.includes(q))return false;
   if(g==='rm'){if(f.grade&&grade(r)!==f.grade)return false;if(f.low&&!(r.buffer>0&&c.stock.rm[r._id]<r.buffer)&&c.stock.rm[r._id]>0)return false}
-  else{if(f.kat&&r.kategori!==f.kat)return false;if(f.fin&&r.finishing!==f.fin)return false}return true})
+  else{if(f.kat&&r.kategori!==f.kat)return false;if(f.type&&(f.type==='__none'?(r.type||'').trim():(r.type||'').trim()!==f.type))return false;if(f.fin&&r.finishing!==f.fin)return false}return true})
  .sort((a,b)=>a._id.localeCompare(b._id));
 }
 function whBody(g){
@@ -3657,7 +3659,7 @@ document.addEventListener('click',async e=>{
  }}catch(err){toast(err.message||('Gagal: '+err.code))}
 });
 document.addEventListener('input',e=>{const el=e.target;if(el.dataset.act==='q'){F[el.dataset.view].q=el.value;renderBody()}});
-document.addEventListener('change',e=>{const el=e.target;if(el.dataset.act==='filtsel'){F[el.dataset.view][el.dataset.key]=el.value;renderBody()}});
+document.addEventListener('change',e=>{const el=e.target;if(el.dataset.act==='filtsel'){const fv=F[el.dataset.view];fv[el.dataset.key]=el.value;if(el.dataset.key==='kat'&&'type' in fv){const o=fgTypes(el.value);if(fv.type&&!(fv.type==='__none'?o.tanpa:o.types.includes(fv.type)))fv.type='';renderTools()}renderBody()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#modal').hidden)closeModal();else if(ED)return;else if(SHEET)closeSheet();else if(DRAWER)closeDrawer()}});
 $('#editor').addEventListener('input',edInput);$('#editor').addEventListener('change',edInput);$('#editor').addEventListener('paste',edPaste);
 $('#editor').addEventListener('keydown',e=>{if(e.target.id==='ed-distnew'&&e.key==='Enter'){e.preventDefault();const v=e.target.value.trim();if(v&&ED){ED.dist=[...new Set([...ED.dist,v])];EDDIRTY=true;const keep=ED;renderEditor()}}});
