@@ -570,7 +570,8 @@ import * as _kinerja from './produksi/kinerja.js';
 import * as _laporan from './produksi/laporan.js';
 import * as _analisa from './produksi/analisa.js';
 import * as _statistik from './produksi/statistik.js';
-window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan, ..._analisa, ..._statistik };
+import * as _jadwal from './produksi/jadwal.js';
+window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan, ..._analisa, ..._statistik, ..._jadwal };
 
 window.claude = CLAUDE_SHIM;
 window.__supabase = supabase;

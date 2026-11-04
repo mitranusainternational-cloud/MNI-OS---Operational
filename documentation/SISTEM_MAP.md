@@ -137,3 +137,5 @@ Migration: file di `apps/platform/supabase/migrations/` (Git) lalu dipasang ke S
 Kebutuhan dan pemetaan data: [[PRD_PRODUKSI]]. Nama menu lama (Monitoring SPK, Dashboard Produksi, Antrian Mesin) sudah digantikan.
 
 Kolom klasifikasi produk pada `produksi_log` (draf migration 14): `kelompok`, `tipe`, `material`, `finishing`, diisi otomatis dari judul section SPK. Dipakai Laporan Produksi untuk pengelompokan Cable Tray, Cable Ladder, Cable Duct, Cover, dan Aksesoris beserta type dan material.
+
+Tab Jadwal pada SPK Berjalan (`#spk`): bagan Gantt per SPK dari data yang sudah ada (SPK, `produksi_log`, vendor, kirim); mesin hitung `src/lib/produksi/jadwal.js`; tanpa tabel baru.

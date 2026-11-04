@@ -103,3 +103,17 @@ Semua `verified in browser` pada mock; belum diuji di Supabase. Migration 14 mas
 | 5 | Pohon produk kelompok > type > material dan finishing, plus akumulasi per kelompok | M-112, M-120 |
 
 Klasifikasi produk tidak diisi operator: dibaca dari judul section SPK (misalnya CABLE TRAY TYPE STU 1.2 ELECTRO GALVANIZED) dan material SPK, lalu disimpan pada kejadian (kolom `kelompok`, `tipe`, `material`, `finishing` di draf migration 14). Kejadian lama diturunkan dari SPK saat dilaporkan.
+
+## 12. Jadwal SPK (Gantt) (2026-11-04)
+
+Permintaan pemilik: papan jadwal seperti timeline proyek untuk SPK yang berjalan, dari tanggal sampai tanggal, dengan bagan Gantt, tetap dengan input yang semudah mungkin.
+
+| Kebutuhan | Pemenuhan | Bukti |
+|---|---|---|
+| Lihat SPK berjalan sebagai garis waktu | Tab Jadwal pada SPK Berjalan: batang rencana, produksi, vendor, pengiriman, due date, hari ini | M-129 |
+| Mudah dibaca | Status warna (Telat, Berisiko telat), perkiraan selesai, skala minggu dan bulan | M-130, M-132 |
+| Rincian per item | Ketuk nama SPK untuk jadwal tiap item | M-131 |
+| Input tetap mudah | Tidak ada kolom isian di jadwal; batang mengikuti Mulai, Selesai, Catat, vendor, dan pengiriman | M-129, M-135 |
+| Nyaman di HP | Garis waktu bergulir di kotaknya sendiri, kolom nama menempel | M-136 |
+
+Mesin hitung: `src/lib/produksi/jadwal.js` (uji J-01 sampai J-17). Rancangan: [[RUTE_PRODUKSI]] bagian 21; tugas [[T-180-jadwal-spk-gantt]].

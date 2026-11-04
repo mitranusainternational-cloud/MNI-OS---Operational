@@ -136,4 +136,5 @@ Checklist ini menjelaskan urutan kerja antar-tools. Status hanya dicentang jika 
 - [x] Skema tiga pintu: SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa ([[T-177-skema-produksi-tiga-pintu-spk-berjalan]])
 - [x] Analisa per work center, produk, vendor, dan pengiriman termasuk loading dan unloading ([[T-178-kinerja-dan-analisa-produksi-tahap-2]]), lokal
 - [x] Produksi Hari Ini v2 dan Laporan Produksi (input otomatis, analisa jumlah, tonase, kecepatan, produk bertingkat, KPI operator dan mesin) ([[T-179-produksi-hari-ini-v2-dan-laporan-produksi]]), lokal
+- [x] Jadwal SPK (Gantt): garis waktu SPK berjalan dari terbit sampai due date ([[T-180-jadwal-spk-gantt]]), lokal
 - [ ] Penayangan: migration 14, push, PR ke `main` setelah persetujuan pemilik. Kebutuhan: [[PRD_PRODUKSI]]

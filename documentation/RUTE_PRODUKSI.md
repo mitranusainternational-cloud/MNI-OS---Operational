@@ -284,3 +284,17 @@ Uji e2e M-106 sampai M-111. Data contoh `?demo=produksi` ditambah satu SPK yang 
 | Jeda catat | Selisih saat dicatat dan jam selesai, rata-rata per operator atau mesin (disiplin pencatatan) |
 
 Uji e2e M-112 sampai M-128 (termasuk lebar HP 390 px tanpa gulir mendatar).
+
+## 21. Jadwal SPK (Gantt)
+
+Semua batang diturunkan dari data yang sudah tercatat; tidak ada tabel atau kolom baru.
+
+| Batang | Sumber |
+|---|---|
+| Rencana | Tanggal terbit SPK sampai due date |
+| Produksi | Kejadian hasil dan mulai SPK (tanggal pertama sampai terakhir; bila belum selesai sampai hari ini); isi = persen produksi SPK |
+| Vendor | Dokumen Kirim ke Vendor: tanggal kirim sampai tanggal kembali (arsir bila masih di vendor, sampai hari ini) |
+| Pengiriman | Dokumen Kirim ke Customer: tanggal kirim sampai terima |
+| Perkiraan selesai | Laju sejauh ini: hari berjalan dikali sisa dibagi progres; ditandai merah bila melewati due date |
+
+Status: Selesai, Telat (due date lewat), Berisiko telat (perkiraan selesai melewati due date), Berjalan, Belum mulai. Hasil yang dibatalkan (void) tidak dihitung. Uji unit J-01 sampai J-17; uji e2e M-129 sampai M-136.

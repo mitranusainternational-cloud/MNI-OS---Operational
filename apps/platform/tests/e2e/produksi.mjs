@@ -431,6 +431,49 @@ export async function runProduksi(page, base) {
   await page.setViewportSize({ width: 1280, height: 800 });
   await closeAll();
 
+  // Jadwal SPK (Gantt): garis waktu SPK dari data yang sudah ada, tanpa input baru
+  const gtTab = async () => { await page.evaluate(() => { location.hash = '#spk'; }); await page.waitForTimeout(500); await page.click('#tools [data-view="spk"][data-key="tab"][data-val="jadwal"]'); await page.waitForTimeout(700); };
+  const gtProd = () => page.evaluate(() => [...document.querySelectorAll('.gt-row:not(.gt-hd):not(.gt-it)')].map((r) => (r.querySelector('.gt-nmw b') || {}).textContent + ':' + ((r.querySelector('.gt-b.prod') || {}).title || '-')).join(' | '));
+  await gtTab();
+  const g1 = await page.evaluate(() => ({ tab: !!document.querySelector('#tools [data-val="jadwal"].on'), baris: document.querySelectorAll('.gt-row:not(.gt-hd):not(.gt-it)').length, nama: [...document.querySelectorAll('.gt-nmw b')].map((b) => b.textContent), bar: document.querySelectorAll('.gt-b.plan').length, now: document.querySelectorAll('.gt-now').length, due: document.querySelectorAll('.gt-due').length, inputs: document.querySelectorAll('#body input, #body select, #body textarea').length }));
+  ok('M-129 tab Jadwal di SPK Berjalan: satu baris per SPK aktif dengan batang rencana, due date, dan garis hari ini; halaman tanpa kolom isian', g1.tab && g1.baris >= 2 && g1.nama.some((x) => /1001/.test(x)) && g1.bar >= 2 && g1.due >= 2 && g1.now === 1 && g1.inputs === 0, JSON.stringify(g1));
+  const g2 = await page.evaluate(() => [...document.querySelectorAll('.gt-row:not(.gt-hd):not(.gt-it)')].map((r) => r.querySelector('.gt-nmw b').textContent + '=' + r.querySelector('.gt-info .chip').textContent));
+  ok('M-130 status per SPK: 1002 Telat (due lewat), 1001 dan 1003 tidak telat', g2.some((x) => /1002=Telat/.test(x)) && !g2.some((x) => /1001=Telat/.test(x)) && !g2.some((x) => /1003=Telat/.test(x)), g2.join(' | '));
+  const antar = await page.evaluate(() => document.querySelectorAll('.gt-row.gt-it').length);
+  await page.click('.gt-nm[data-act="jdbuka"]'); await page.waitForTimeout(400);
+  const sesudah = await page.evaluate(() => document.querySelectorAll('.gt-row.gt-it').length);
+  await page.click('.gt-nm[data-act="jdbuka"]'); await page.waitForTimeout(400);
+  const tutup = await page.evaluate(() => document.querySelectorAll('.gt-row.gt-it').length);
+  ok('M-131 ketuk nama SPK membuka lalu menutup jadwal tiap item', antar === 0 && sesudah >= 2 && tutup === 0, JSON.stringify([antar, sesudah, tutup]));
+  const lebarHari = () => page.evaluate(() => document.querySelector('.gt-ov').getBoundingClientRect().width);
+  const wMinggu = await lebarHari();
+  await page.click('#tools [data-view="spk"][data-key="skala"][data-val="bulan"]'); await page.waitForTimeout(500);
+  const wBulan = await lebarHari();
+  await page.click('#tools [data-view="spk"][data-key="skala"][data-val="minggu"]'); await page.waitForTimeout(400);
+  ok('M-132 skala per bulan memadatkan garis waktu (lebih sempit dari per minggu)', wBulan > 0 && wBulan < wMinggu, JSON.stringify([wMinggu, wBulan]));
+  await page.click('#tools [data-view="spk"][data-key="fl"][data-val="semua"]'); await page.waitForTimeout(500);
+  const semuaNama = await page.evaluate(() => [...document.querySelectorAll('.gt-nmw b')].map((b) => b.textContent).join(','));
+  ok('M-133 filter Semua memuat SPK selesai (1000) dengan batang vendor dan pengiriman', /1000/.test(semuaNama) && await page.evaluate(() => { const r = [...document.querySelectorAll('.gt-row')].find((x) => /1000/.test(x.textContent)); return !!r && !!r.querySelector('.gt-b.vend') && !!r.querySelector('.gt-b.kirim'); }), semuaNama);
+  await page.click('#tools [data-view="spk"][data-key="fl"][data-val="jalan"]'); await page.waitForTimeout(400);
+  await page.fill('#q-spk', '1001'); await page.dispatchEvent('#q-spk', 'input'); await page.waitForTimeout(500);
+  const cari = await page.evaluate(() => [...document.querySelectorAll('.gt-nmw b')].map((b) => b.textContent));
+  ok('M-134 pencarian menyaring baris jadwal', cari.length === 1 && /1001/.test(cari[0]), cari.join(','));
+  await page.fill('#q-spk', ''); await page.dispatchEvent('#q-spk', 'input'); await page.waitForTimeout(400);
+  // input operator langsung tampak di jadwal tanpa langkah tambahan: tekan Mulai di Produksi Hari Ini
+  await go('mesin'); await page.selectOption('#f-mesin', 'Punching'); await page.waitForTimeout(500);
+  await page.click('#mesin-antri .mcard:first-child [data-act="mesinmulai"]'); await page.waitForTimeout(1200);
+  const jalan = await page.evaluate(() => { const m = (document.querySelector('.mesin-run') || { innerText: '' }).innerText.match(/mnt\s+(.+?)\s+SPK (\d+)/s); return m ? { item: m[1].trim(), spk: m[2] } : { raw: (document.querySelector('.mesin-run') || { innerText: 'tidak ada kartu berjalan' }).innerText.slice(0, 160) }; });
+  await gtTab();
+  const tampil = jalan && jalan.spk ? await page.evaluate(async (j) => { const nm = [...document.querySelectorAll('.gt-row:not(.gt-it) .gt-nm')].find((x) => x.innerText.includes('SPK ' + j.spk)); if (!nm) return 'baris SPK tidak ada'; nm.click(); await new Promise((r) => setTimeout(r, 400)); const r = [...document.querySelectorAll('.gt-row.gt-it')].find((x) => x.innerText.includes(j.item)); return r ? !!r.querySelector('.gt-b.prod.live') : 'baris item tidak ada'; }, jalan) : 'tidak ada sesi';
+  ok('M-135 menekan Mulai di Produksi Hari Ini langsung menandai item yang dikerjakan di jadwal (batang bertanda sedang dikerjakan), tanpa input di halaman jadwal', tampil === true, JSON.stringify([jalan, tampil]));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await gtTab();
+  const swHp = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  const gulirDalam = await page.evaluate(() => { const g = document.getElementById('gt-scroll'); return g.scrollWidth > g.clientWidth; });
+  ok('M-136 di HP (390 px) halaman tanpa gulir mendatar; garis waktu bergulir di dalam kotaknya sendiri', swHp <= 1 && gulirDalam, JSON.stringify([swHp, gulirDalam]));
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await closeAll();
+
   ok('M-14 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;
   return { pass: R.length - fail, fail, detail: R };
