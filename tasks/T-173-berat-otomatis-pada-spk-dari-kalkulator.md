@@ -37,6 +37,7 @@ Bergantung pada: tidak ada
 
 ## Bukti
 
+- Production (verified in browser, hanya baca): PR #13 digabung (b7f661f), mesin dan tombol Katalog berat tampil, tidak ada rumus di berkas publik; lihat [[TEST_MATRIX]].
 - Unit (source-level): mesin dan parser lulus uji terhadap nilai tersimpan workbook.
 - Mock (verified in browser): alur isi otomatis, timpa manual, hitung ulang, dan item tak dikenali; total e2e 38 + 12 + 34 + 62 lulus.
 

@@ -163,6 +163,30 @@ export async function runRegression(page, base) {
   await page.fill('#m-nopol_m', 'B 7777 UJI'); await submit();
   ok('F-13 bongkar muat dicatat', (await tab('bongkar')).length === n + 1);
 
+  // Filter Type di Gudang Barang Jadi: mengikuti kategori, urutan baku, kombinasi dengan finishing
+  await go('barang-jadi');
+  const baris = () => page.$$eval('#body tbody tr', (a) => a.length);
+  const opsi = (id) => page.$$eval(`#${id} option`, (a) => a.map((o) => o.value));
+  const total = await baris();
+  const dataFg = await tab('fg');
+  const typeAda = [...new Set(dataFg.map((r) => (r.type || '').trim()).filter(Boolean))];
+  const tipeUrut = (await opsi('f-type')).filter(Boolean);
+  ok('F-15 filter Type ada, opsi sesuai data dan urutan baku (STU, STC, SLU, SLW, SLHD dulu)', tipeUrut.length === typeAda.length && typeAda.every((x) => tipeUrut.includes(x)) && tipeUrut.join() === [...tipeUrut].sort((a, b) => { const o = ['STU', 'STC', 'SLU', 'SLW', 'SLHD']; return (o.indexOf(a) < 0 ? 99 : o.indexOf(a)) - (o.indexOf(b) < 0 ? 99 : o.indexOf(b)) || a.localeCompare(b); }).join(), tipeUrut.join());
+  if (tipeUrut.length) {
+    const t1 = tipeUrut[0];
+    await page.selectOption('#f-type', t1); await page.waitForTimeout(300);
+    const nFilter = await baris();
+    ok('F-16 memilih Type menyaring baris sesuai type', nFilter === dataFg.filter((r) => (r.type || '').trim() === t1).length && nFilter < total, `${nFilter}/${total}`);
+    const katSemua = (await opsi('f-kat')).filter(Boolean);
+    const katLain = katSemua.find((k) => !dataFg.some((r) => r.kategori === k && (r.type || '').trim() === t1));
+    if (katLain) {
+      await page.selectOption('#f-kat', katLain); await page.waitForTimeout(400);
+      ok('F-17 ganti kategori yang tidak punya type itu: type kembali Semua dan opsi menyesuaikan kategori', (await page.inputValue('#f-type')) === '' && !(await opsi('f-type')).includes(t1) && (await baris()) === dataFg.filter((r) => r.kategori === katLain).length);
+    } else ok('F-17 (dilewati: semua kategori memiliki type itu)', true);
+    await page.selectOption('#f-kat', ''); await page.selectOption('#f-type', ''); await page.waitForTimeout(300);
+    ok('F-18 mengosongkan filter mengembalikan semua baris', (await baris()) === total);
+  }
+
   // Ekspor CSV
   const dl = {};
   for (const r of ['bahan-baku', 'barang-jadi', 'spk', 'bongkar-muat', 'vendor', 'pengiriman', 'produksi', 'cek-data', 'master-data']) {
