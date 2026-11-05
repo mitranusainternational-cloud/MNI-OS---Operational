@@ -439,3 +439,7 @@ Tinjauan pemilik: layout kaku, input masih merepotkan, catatan terakhir tanpa na
 ### 2026-11-04 — Jadwal SPK (Gantt) (T-180, lokal)
 
 Permintaan pemilik: papan jadwal seperti timeline proyek untuk SPK berjalan, dengan input tetap mudah. Hasil: tab Jadwal di SPK Berjalan dengan batang rencana, produksi, vendor, pengiriman, due date, perkiraan selesai, dan garis hari ini; status Telat dan Berisiko telat; jadwal tiap item; skala minggu dan bulan; nyaman di HP. Tanpa input baru dan tanpa perubahan skema. Bukti: unit jadwal 17 (total unit 142); e2e produksi 100, regresi 42, role 12, akses 34, tampilan 71 (mock, bukan bukti Supabase). Kebutuhan di [[PRD_PRODUKSI]] bagian 12; rancangan di [[RUTE_PRODUKSI]] bagian 21. Belum ditayangkan.
+
+### 2026-11-05 — Uji alur lengkap SPK dengan tangkapan layar (T-181, lokal)
+
+Permintaan pemilik: uji dari SPK sampai akhir, ambil tangkapan layar, dan dokumentasikan. Hasil: skrip `alur-spk.mjs` menjalankan satu SPK dari terbit, Shearing, Punching, Bending, kirim dan terima kembali vendor, surat jalan customer, sampai Diterima, dengan 27 tangkapan layar. 15 PASS, 0 FAIL. Bukti: `verified in browser` (mock), bukan bukti Supabase. Temuan: Jadwal berfilter awal Berjalan sehingga SPK selesai tidak tampil sampai filter Selesai dipilih; seluruh alur satu hari sehingga batang pendek. Dokumen: [[UJI_ALUR_SPK]]; tugas [[T-181-uji-alur-spk-awal-sampai-akhir]].

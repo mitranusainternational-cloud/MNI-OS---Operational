@@ -9,7 +9,7 @@ status: planned
 progress: 0
 tasks_total: 4
 tasks_done: 0
-updated: 2026-11-04
+updated: 2026-11-05
 ---
 
 # E-07 Dokumentasi dan situs Docs
