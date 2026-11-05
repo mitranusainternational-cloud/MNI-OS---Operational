@@ -27,6 +27,8 @@ Rancangan: [[documentation/ERP_QUOTATION_ANALISIS]]
 
 - [ ] Menu Penawaran dengan hak modul sendiri; tampilan lama tidak berubah bagi yang tidak berhak
 - [ ] Lembar penawaran: kepala, item dari katalog dengan pratinjau harga dan berat, subtotal, diskon, PPN, catatan, status (Draft, Terkirim, Revisi, Disetujui, Ditolak, Kedaluwarsa)
+- [ ] Varian per penawaran (A, B, C) dengan pemilihan satu varian oleh customer; SPK dimuat dari varian terpilih
+- [ ] Batas diskon per peran dan status Menunggu persetujuan bila melewati batas (nilai batas dan penyetuju ditetapkan pemilik); nomor otomatis format lama dengan kunci atomik
 - [ ] Revisi bernomor, cetak rapi (PDF atau cetak), harga hanya terlihat peran yang berhak
 - [ ] Tabel baru sebagai migration draf; mock dan adapter diperluas sesuai kontrak
 - [ ] Regresi penuh 0 FAIL dan tangkapan layar desktop dan HP

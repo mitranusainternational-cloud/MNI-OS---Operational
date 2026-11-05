@@ -42,6 +42,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ## Log kerja
 
+### 2026-11-06 — Cakupan modul Penawaran diputuskan pemilik
+
+Enam pertanyaan di [[ERP_QUOTATION_ANALISIS]] dijawab pemilik: sistem ini menangani penawaran sampai produksi (akuntansi dan faktur di sistem lain); Sales membuat dengan nomor format lama; beberapa varian per penawaran; katalog awal 6 keluarga; batas diskon per peran dengan persetujuan; uji emas memakai workbook. Dicatat di [[documentation/DECISIONS]] dan tugas T-189 dan T-190. Langkah berikut: T-189 (mesin harga dan uji emas). Belum ada kode; production tidak disentuh.
+
 ### 2026-11-05 — Workbook penawaran dibedah dan skill serta agen ERP dibuat (T-187, T-188)
 
 Pemilik menyerahkan workbook penawaran Cable Tray dan Ladder dan ingin penawaran menjadi hulu (SPK, material, monitoring turun darinya), dikerjakan sebagai modul terpisah, lokal dulu. Hasil pembacaan: tiga sheet = tiga skenario dengan tata letak sama; 192 produk per sheet (6 keluarga × 32 bentuk) dengan perhitungan estimasi dan real berdampingan; harga satuan = berat estimasi × harga per kg (dibulatkan) ditambah baut; total dengan diskon dan PPN; blok biaya saat PO. Strukturnya sama dengan kalkulator berat, sehingga fondasi sekitar 70% sudah ada. Dibuat: [[ERP_QUOTATION_ANALISIS]], epic [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring|E-16]] dengan tugas T-187 sampai T-193, empat skill dan empat agen ERP di .claude, keputusan di [[documentation/DECISIONS]]. Bukti: source-level (isi workbook); belum ada kode. Production dan Vercel tidak disentuh. Langkah berikut: jawaban pemilik atas pertanyaan di analisis, lalu T-189 (mesin harga dan uji emas).

@@ -105,3 +105,10 @@ updated: 2026-11-02
 - **Alasan:** fondasi sekitar 70% sudah ada; satu mesin untuk berat dan harga menghindari rumus ganda; modul terpisah menjaga sistem live tetap aman.
 - **Konsekuensi:** katalog rumus dan harga disimpan di database setelah login (rumus dan harga adalah aset perusahaan, repo publik); angka komersial tidak masuk Git. Jalur pilot (T-030 dan seterusnya) tetap prioritas dan tidak boleh tertahan. Aturan lingkup 2026-11-03 dikecualikan hanya untuk jalur lokal paralel ini atas permintaan pemilik.
 - **Rujukan:** [[ERP_QUOTATION_ANALISIS]], [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring|E-16]].
+
+## 2026-11-06 — Jawaban pemilik untuk cakupan modul Penawaran
+
+- **Konteks:** enam pertanyaan di [[ERP_QUOTATION_ANALISIS]] bagian 9.
+- **Keputusan:** (1) sistem ini menangani penawaran sampai produksi, akuntansi dan faktur tetap di sistem lain; (2) Sales membuat penawaran, nomor mengikuti format lama, revisi bernomor Rev.; (3) satu penawaran boleh punya beberapa varian yang dipilih customer; (4) katalog awal 6 keluarga di workbook, produk lain menyusul; (5) batas diskon per peran dengan persetujuan di atas batas; (6) workbook ini menjadi pembanding uji emas.
+- **Konsekuensi:** E-16 tidak memuat faktur atau piutang; T-190 memuat varian, status Menunggu persetujuan, dan batas diskon per peran; T-189 memakai nilai hitung workbook sebagai pembanding.
+- **Rujukan:** [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring|E-16]].

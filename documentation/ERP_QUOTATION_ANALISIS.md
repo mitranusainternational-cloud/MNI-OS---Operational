@@ -85,13 +85,17 @@ Penawaran menjadi sumber SPK: item, spesifikasi, berat, customer, PO, dan due da
 | Angka tidak cocok dengan Excel | Uji emas per bentuk sebelum modul dipakai |
 | Pengguna menolak layar yang rumit | Isian minimal, katalog otomatis, pratinjau, cetak rapi; tinjau dengan tangkapan layar |
 
-## 9. Pertanyaan untuk pemilik
+## 9. Jawaban pemilik (2026-11-06)
 
-1. Batas dengan sistem lain yang sudah dipakai (mis. Antlia): bagian mana yang ditangani sistem ini dan mana yang tetap di sana?
-2. Siapa yang membuat penawaran (sales, PPIC)? Format nomor penawaran dan aturan revisi?
-3. Apakah satu penawaran boleh memuat beberapa skenario (varian tebal atau harga) untuk dipilih customer?
-4. Produk di luar workbook (cable duct, hanger, support, aksesori lain, stainless, aluminium): ikut dalam penawaran sekarang atau menyusul?
-5. Aturan diskon dan persetujuan (batas diskon, siapa menyetujui)?
-6. Data untuk uji: beranikah memakai beberapa penawaran lama sebagai pembanding (angka tetap di folder privat)?
+| # | Pertanyaan | Jawaban | Konsekuensi |
+|---|---|---|---|
+| 1 | Batas dengan Antlia | Sistem ini menangani penawaran sampai produksi (penawaran, estimasi, SPK, material, produksi, vendor, kirim, monitoring); akuntansi dan faktur tetap di sistem lain | Tidak ada modul faktur atau piutang di E-16 |
+| 2 | Pembuat dan nomor | Sales membuat; nomor otomatis mengikuti format lama (urutan.KODE/bulan/tahun); revisi bernomor Rev. tanpa mengubah nomor dasar | Hak modul penawaran untuk peran Sales; penomoran dengan kunci atomik seperti dokumen lain |
+| 3 | Skenario per penawaran | Boleh beberapa varian (A, B, C) dalam satu penawaran; customer memilih satu; SPK dimuat dari varian terpilih | Tabel varian di penawaran; status dan pemilihan varian |
+| 4 | Produk di luar workbook | Mulai dari 6 keluarga di workbook; produk lain menyusul setelah rumusnya ada | Katalog awal 192 bentuk; baris bebas bukan bagian tahap awal |
+| 5 | Diskon dan persetujuan | Batas diskon per peran; di atas batas perlu persetujuan sebelum penawaran dikirim | Tabel batas diskon per peran; status Menunggu persetujuan; penyetuju tercatat |
+| 6 | Data uji | Nilai hitung workbook ini menjadi pembanding (uji emas); angka nyata tetap di folder privat | Tidak perlu penawaran lama tambahan pada tahap E0 |
+
+Pertanyaan yang masih terbuka: nilai batas diskon per peran dan siapa penyetujunya (diisi saat T-190), serta kode pada nomor penawaran (diambil dari format lama).
 
 Tugas: [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring|E-16]], [[T-187-bedah-workbook-quotation-dan-rancang-modul-erp]].

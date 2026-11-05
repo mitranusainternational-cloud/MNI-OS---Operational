@@ -23,7 +23,7 @@ Penawaran menjadi hulu sistem: harga dan estimasi (berat, kebutuhan material, bi
 
 ## Risiko dan asumsi
 
-Bukan jalur pilot; tidak boleh menahan tugas go-live (T-030 dan seterusnya). Rumus dan harga adalah aset perusahaan dan repo bersifat publik, sehingga katalog dan harga di database. Cakupan awal bukan ERP penuh (tanpa akuntansi, pajak, penggajian). Menunggu jawaban pemilik atas pertanyaan di analisis (batas dengan sistem lain, nomor dan revisi penawaran, skenario, produk lain, diskon).
+Bukan jalur pilot; tidak boleh menahan tugas go-live (T-030 dan seterusnya). Rumus dan harga adalah aset perusahaan dan repo bersifat publik, sehingga katalog dan harga di database. Cakupan awal bukan ERP penuh (tanpa akuntansi, pajak, penggajian). Pemilik sudah menjawab (2026-11-06): akuntansi dan faktur di luar cakupan, Sales membuat dengan nomor format lama, beberapa varian per penawaran, katalog awal 6 keluarga, batas diskon per peran dengan persetujuan, uji emas memakai workbook. Masih terbuka: nilai batas diskon dan penyetuju.
 
 ## Tugas
 

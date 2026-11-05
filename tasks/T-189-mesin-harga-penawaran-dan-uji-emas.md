@@ -29,6 +29,7 @@ Rancangan: [[documentation/ERP_QUOTATION_ANALISIS]]
 - [ ] Lapisan harga murni di src/lib/erp: harga satuan, baut, subtotal, diskon, PPN, total, kebutuhan kg
 - [ ] Skenario harga (satu model, banyak skenario) menggantikan tiga sheet salinan
 - [ ] Uji emas per bentuk terhadap nilai Excel; uji skenario, total, dan masukan tidak dikenali (null, bukan 0)
+- [ ] Pembanding uji adalah nilai hitung workbook penawaran (keputusan pemilik 2026-11-06); katalog awal 6 keluarga, 192 bentuk
 - [ ] Fixture nyata hanya di data/private-sources; uji CI memakai fixture sintetis
 
 ## Bukti
