@@ -42,6 +42,12 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ## Log kerja
 
+### 2026-11-05 — Audit progres proyek
+
+- Selesai: audit silang vault, git, GitHub, dan Supabase production; laporan di [[AUDIT_PROGRESS_2026-11-05]]. Posisi: tugas selesai 29 dari 105 (28%), effort 16%, jalur kritis sisa 26,5 hari kerja menuju go-live.
+- Temuan utama: jalur proses dan data (T-030 sampai T-036) belum mulai; fitur produksi multi-WC (T-174 sampai T-183) selesai di lokal tetapi belum tayang, 110 commit di depan `main`; aturan lingkup 3 Nov terlewati; 13 tugas menunggu tinjauan pemilik.
+- Langkah berikut: keputusan pemilik pada tujuh butir di laporan audit.
+
 ### 2026-11-05 — Data bahan baku Oktober dimuat ke production (T-184)
 
 - Selesai: data uji RM dicadangkan ke skema `arsip_20261105` lalu dihapus; 23 item plat dari workbook 27 Oktober dimuat (stok awal 2026-10-27, total 408). Aplikasi tidak diubah.
