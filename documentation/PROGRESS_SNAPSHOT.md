@@ -11,10 +11,10 @@ generated: 2026-11-05
 
 ## Ringkasan
 
-- Tugas selesai: **28 / 104** (27%)
-- Bobot effort selesai: **26.75 / 171.34999999999997 hari kerja** (16%)
+- Tugas selesai: **29 / 105** (28%)
+- Bobot effort selesai: **27.75 / 172.34999999999997 hari kerja** (16%)
 - Sisa effort: **144.60000000000002 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
-- Cakupan go-live (fase P0-P7): **28 / 82** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
+- Cakupan go-live (fase P0-P7): **29 / 83** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
 - Diblokir: **1**, sedang dikerjakan: **4**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
@@ -24,7 +24,7 @@ generated: 2026-11-05
 |---|---|---|---|
 | P0 Workspace dan tracking | 7/7 | 5/5 hari (100%) | selesai |
 | P1 Fondasi lokal | 2/8 | 1.5/4.7 hari (32%) | ada blocker |
-| P2 Aplikasi siap uji | 10/27 | 14.25/42.25 hari (34%) | berjalan |
+| P2 Aplikasi siap uji | 11/28 | 15.25/43.25 hari (35%) | berjalan |
 | P3 Data dan proses | 0/7 | 0/13.5 hari (0%) | belum mulai |
 | P4 Environment cloud | 6/9 | 3.5/6 hari (58%) | berjalan |
 | P5 UAT pilot | 2/12 | 2/15.899999999999999 hari (13%) | berjalan |
@@ -38,7 +38,7 @@ generated: 2026-11-05
 
 | Rilis | Tema | Tugas | Effort | Status |
 |---|---|---|---|---|
-| v0.9 | Fondasi | 13/29 | 8.25/29.45 hari (28%) | active |
+| v0.9 | Fondasi | 14/30 | 9.25/30.45 hari (30%) | active |
 | v1.0 | Pilot go-live | 14/50 | 17.5/69.4 hari (25%) | active |
 | v1.1 | Stabilisasi, akses, kualitas data | 1/11 | 1/24.5 hari (4%) | active |
 | v1.2 | Integrasi dan pelaporan | 0/6 | 0/21 hari (0%) | planned |
@@ -49,7 +49,7 @@ generated: 2026-11-05
 | Epic | Rilis | Tugas | Progress | Status |
 |---|---|---|---|---|
 | [[roadmap/epics/E-01-fondasi-workspace-dan-repo\|E-01]] Fondasi workspace dan repo | v0.9 | 7/8 | 96% | active |
-| [[roadmap/epics/E-02-aplikasi-berjalan-lokal\|E-02]] Aplikasi berjalan lokal | v0.9 | 6/21 | 13% | active |
+| [[roadmap/epics/E-02-aplikasi-berjalan-lokal\|E-02]] Aplikasi berjalan lokal | v0.9 | 7/22 | 17% | active |
 | [[roadmap/epics/E-03-kualitas-aplikasi-dan-keamanan-data\|E-03]] Kualitas aplikasi dan keamanan data | v1.0 | 8/14 | 60% | active |
 | [[roadmap/epics/E-04-proses-data-dan-pilot\|E-04]] Proses, data, dan pilot | v1.0 | 0/7 | 0% | planned |
 | [[roadmap/epics/E-05-environment-cloud-dan-ci-cd\|E-05]] Environment cloud dan CI/CD | v1.0 | 5/10 | 55% | active |

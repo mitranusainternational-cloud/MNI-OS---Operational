@@ -42,6 +42,11 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ## Log kerja
 
+### 2026-11-05 — Data bahan baku Oktober dimuat ke production (T-184)
+
+- Selesai: data uji RM dicadangkan ke skema `arsip_20261105` lalu dihapus; 23 item plat dari workbook 27 Oktober dimuat (stok awal 2026-10-27, total 408). Aplikasi tidak diubah.
+- Bukti: `verified in database`. Tampilan live belum diperiksa. Langkah berikut: pemilik memeriksa Gudang Bahan Baku.
+
 ### 2026-11-02 — Workspace dan dashboard
 
 - Selesai: susun vault Obsidian di root repository beserta panduan workspace, roadmap, progress, riset, template, dan aturan screenshot.
