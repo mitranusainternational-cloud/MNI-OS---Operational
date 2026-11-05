@@ -132,3 +132,17 @@ Masukan pemilik: jadwal masih kaku dan perlu mengikuti standar schedule board ag
 | Target waktu proses jelas | Dua kelompok, keterangan per isian, satuan hari kerja | M-140, M-141 |
 
 Mesin hitung: `langkahItem`, `susunMesin` (uji J-18 sampai J-21). Tugas [[T-182-papan-jadwal-v2-dan-rapikan-layout-spk]].
+
+## 14. Produksi Hari Ini: papan mesin dan kapasitas aktual (2026-11-05)
+
+Tujuan pemilik: mengetahui kapasitas aktual produksi tiap mesin secara realtime, tepat dan akurat, dengan input yang tetap mudah, agar KPI per work center atau mesin dapat disusun dan output aktual per hari dapat dipantau.
+
+| Kebutuhan | Pemenuhan | Bukti |
+|---|---|---|
+| Lihat semua mesin sekilas | Kartu per mesin: Berjalan atau Kosong, pekerjaan, output terhadap kapasitas, laju, pemakaian | M-143, M-147 |
+| Kapasitas aktual tepat | Laju pcs per jam dari catatan berdurasi saja; menit aktif termasuk sesi berjalan | M-144, K-02, K-07 |
+| Dasar KPI | Target laju dari kapasitas per hari / 8 jam; capaian dan proyeksi akhir shift | M-145, K-04, K-06 |
+| Pantau output per hari | Grafik per jam hari ini dan tren 7 hari | M-146, K-05, K-09 |
+| Input tetap mudah | Tidak berubah: Mulai, isi jumlah, Selesai | M-12 |
+
+Keputusan terbuka untuk pemilik: jam kerja standar per mesin dan target KPI (pcs per jam) per work center atau mesin; saat ini 8 jam dan kapasitas per hari dari Master Data. Tugas [[T-183-produksi-hari-ini-papan-mesin-dan-kapasitas-aktual]].

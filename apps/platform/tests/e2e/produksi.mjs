@@ -78,6 +78,21 @@ export async function runProduksi(page, base) {
   await page.selectOption('#f-mesin', 'Shearing'); await page.waitForTimeout(500);
   ok('M-08 Shearing tidak punya antrian lagi', !(await page.$('#mesin-antri')));
 
+  // Papan mesin dan kapasitas aktual (Produksi Hari Ini v3)
+  await page.selectOption('#f-mesin', 'Punching'); await page.waitForTimeout(600);
+  const tl = await page.$$eval('#pm-tiles .pm-tile', (a) => a.map((x) => x.querySelector('b').textContent));
+  await page.click('#pm-tiles .pm-tile:nth-child(2)'); await page.waitForTimeout(500);
+  const msn2 = await page.inputValue('#f-mesin-msn');
+  await page.click('#pm-tiles .pm-tile:nth-child(1)'); await page.waitForTimeout(500);
+  const msn1 = await page.inputValue('#f-mesin-msn');
+  ok('M-143 papan mesin: satu kartu per mesin work center, ketuk kartu memilih mesin tanpa membuka pilihan', tl.length === 2 && tl[1] === 'Punching 2 (40 Ton)' && msn2 === 'Punching 2 (40 Ton)' && msn1 === 'Punching 1 (20 Ton)', JSON.stringify([tl, msn2, msn1]));
+  const kp = await page.$$eval('#pm-kin .pm-st b', (a) => a.map((x) => x.textContent.replace(/\s+/g, '')));
+  ok('M-144 kapasitas aktual Punching 1: output 8, laju 8 pcs/jam (8 pcs dalam 60 menit), mesin dipakai 13% dari 8 jam, proyeksi 64', kp[0] === '8pcs' && kp[1] === '8pcs/jam' && kp[2] === '13%' && kp[3] === '64pcs', JSON.stringify(kp));
+  const sub = await page.evaluate(() => document.getElementById('pm-kin').innerText);
+  ok('M-145 target laju diturunkan dari kapasitas per hari (25 per 8 jam = 3,1 pcs/jam) dan capaian 32% dari kapasitas', /target 3,1 pcs\/jam/.test(sub) && /32% dari kapasitas 25/.test(sub), sub.replace(/\s+/g, ' ').slice(0, 260));
+  const ch = await page.evaluate(() => ({ grafik: document.querySelectorAll('#pm-kin .pm-bars').length, jam: [...document.querySelectorAll('#pm-kin .pm-ch:first-child .pm-c b')].map((x) => x.textContent), tren: document.querySelectorAll('#pm-kin .pm-ch:last-child .pm-c').length }));
+  ok('M-146 grafik output per jam menampilkan 8 di jam selesai dan tren 7 hari tampil', ch.grafik === 2 && ch.jam.join() === '8' && ch.tren === 7, JSON.stringify(ch));
+
   await go('produksi');
   const a = { s: await antri('Shearing'), p: await antri('Punching'), b: await antri('Bending') };
   ok('M-10 beban per work center: Shearing 0, Punching 12, Bending 8', a.s === 0 && a.p === 12 && a.b === 8, JSON.stringify(a));
@@ -89,6 +104,7 @@ export async function runProduksi(page, base) {
   await page.click('#mesin-antri .mcard:first-child [data-act="mesinmulai"]'); await page.waitForTimeout(1200);
   ok('M-11b sesudah Mulai tampil kartu sedang dikerjakan dan tombol Mulai terkunci', !!(await page.$('.mesin-run')) && (await page.$$eval('#mesin-antri [data-act="mesinmulai"]', (a) => a.length)) === 0);
   ok('M-11c peristiwa mulai tercatat dan belum mengubah antrian', (await tab('produksi_log')).filter((e) => e.jenis === 'mulai').length === 1 && (await hasilEv()).length === 2);
+  ok('M-147 kartu mesin berubah Berjalan dan sesi ikut dihitung di menit pakai', (await page.$$eval('#pm-tiles .pm-tile.run', (a) => a.length)) === 1 && /Berjalan/.test(await page.textContent('#pm-tiles .pm-tile.run')) && /sesi berjalan ikut dihitung/.test(await page.textContent('#pm-kin')));
   await page.click('.mesin-run [data-act="mesinsemua"]');
   ok('M-11d tombol Semua mengisi jumlah yang siap (8)', (await page.inputValue('.mesin-run [data-mrq]')) === '8');
   await page.click('.mesin-run [data-act="mesinselesai"]'); await page.waitForTimeout(1500);
@@ -130,7 +146,7 @@ export async function runProduksi(page, base) {
   const bodyV = await page.evaluate(() => document.getElementById('body').innerText);
   await go('spk'); await page.click('#tools [data-view="spk"][data-val="berjalan"]'); await page.waitForTimeout(400);
   const bodySpk = await page.evaluate(() => document.getElementById('body').innerText);
-  ok('M-19c sesudah dikirim tidak lagi siap kirim, jalur SPK menyebut kiriman ke vendor', !/Siap dikirim ke Vendor ELG/.test(bodyV) && /dikirim 8/.test(bodySpk), JSON.stringify([/Siap dikirim ke Vendor ELG/.test(bodyV), /dikirim 8/.test(bodySpk), bodySpk.replace(/s+/g, ' ').slice(0, 400)]));
+  ok('M-19c sesudah dikirim tidak lagi siap kirim, jalur SPK menyebut kiriman ke vendor', !/Siap dikirim ke Vendor ELG/.test(bodyV) && /dikirim 8/.test(bodySpk), JSON.stringify([/Siap dikirim ke Vendor ELG/.test(bodyV), /dikirim 8/.test(bodySpk), bodySpk.replace(/\s+/g, ' ').slice(0, 400)]));
 
   // Vendor: kecepatan dan kualifikasi dari riwayat kiriman (4 selesai: TAT 4, 4, 3, 8 hari kerja; 1 masih di vendor)
   await page.evaluate(() => {

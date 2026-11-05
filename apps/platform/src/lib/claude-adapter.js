@@ -571,7 +571,8 @@ import * as _laporan from './produksi/laporan.js';
 import * as _analisa from './produksi/analisa.js';
 import * as _statistik from './produksi/statistik.js';
 import * as _jadwal from './produksi/jadwal.js';
-window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan, ..._analisa, ..._statistik, ..._jadwal };
+import * as _kapasitas from './produksi/kapasitas.js';
+window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan, ..._analisa, ..._statistik, ..._jadwal, ..._kapasitas };
 
 window.claude = CLAUDE_SHIM;
 window.__supabase = supabase;

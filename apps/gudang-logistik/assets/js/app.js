@@ -1954,8 +1954,32 @@ B.mesin=()=>{
  const hari=evHasil().filter(e=>(e.mesin||e.wc)===p.mesin&&(e.tgl||P.tanggalLokal(e.at))===t).map(evLengkap);
  const qtyHari=hari.reduce((a,e)=>a+(+e.qty||0),0),tonHari=hari.reduce((a,e)=>a+(+e.tonase||0),0),menHari=hari.reduce((a,e)=>a+(+e.menit||0),0);
  const antri=rows.reduce((a,r)=>a+r.a.antri,0);
- const pctKap=kap>0?Math.min(100,Math.round(qtyHari/kap*100)):0;
- const strip=`<div class="po-strip"><div class="po-s"><span class="lb">Selesai hari ini</span><b>${n(qtyHari)}</b>${kap?`<div class="jb"><i style="width:${pctKap}%"></i></div><span class="s">${pctKap}% dari kapasitas ${n(kap)}</span>`:'<span class="s">kapasitas belum diatur</span>'}</div><div class="po-s"><span class="lb">Tonase</span><b>${n(Math.round(tonHari))} kg</b><span class="s">${esc(p.mesin)}</span></div><div class="po-s"><span class="lb">Jam kerja</span><b>${fDur(menHari)}</b><span class="s">dari Mulai dan Selesai</span></div><div class="po-s"><span class="lb">Antrian ${esc(p.wc)}</span><b>${n(antri)}</b><span class="s">${rows.length} item</span></div></div>`;
+ /* Papan mesin dan kapasitas aktual (dari catatan Mulai, Selesai, Catat; tanpa input tambahan) */
+ const sekarang=new Date().toISOString(),SHIFT=480,evAll=evData(),sesSemua=P.sesiAktifSemua(S.produksi_log||[]);
+ const kapDari=nm=>{const m=mesinWC(p.wc).find(x=>x.nama===nm);return +(m&&m.kapasitas)||(mesinWC(p.wc).length?0:(kapWC()[p.wc]||0))};
+ const kin=(nm,kp)=>P.kinerjaMesinHari({kejadian:evAll,sesi:sesSemua,mesin:nm,tgl:t,sekarang,shiftMenit:SHIFT,kapasitasHari:kp});
+ const daftarM=p.daftar.length?p.daftar:[{nama:p.wc,kapasitas:kap}];
+ const pctF=v=>v==null?'–':Math.round(v*100)+'%';
+ const kinPilih=kin(p.mesin,kap);
+ const tiles=daftarM.map(m=>{const kp=+m.kapasitas||(p.daftar.length?0:kap);const k=kin(m.nama,kp);const sj=sesSemua.filter(e=>(e.mesin||e.wc)===m.nama);const jb=sj[0];
+  const kerja=jb?`SPK ${esc(String(jb.spk_no||''))} · ${esc(jb.item_desc||'')}`:'Kosong, siap dipakai';
+  return `<button type="button" class="pm-tile${m.nama===p.mesin?' on':''}${jb?' run':''}" data-act="pmpilih" data-m="${esc(m.nama)}"><span class="pm-top"><i class="pm-dot"></i><b>${esc(m.nama)}</b><em>${jb?'Berjalan':'Kosong'}</em></span><span class="pm-job">${kerja}</span><span class="pm-num"><b>${n(k.qty)}</b>${kp?`<small>/ ${n(kp)} pcs</small>`:'<small>pcs hari ini</small>'}</span><span class="pm-g"><i style="width:${kp?Math.min(100,Math.round(k.qty/kp*100)):0}%"></i></span><span class="pm-sub">${k.lajuPerJam!=null?n(k.lajuPerJam)+' pcs/jam':'laju belum ada'} · pakai ${pctF(k.utilisasi)}</span></button>`}).join('');
+ const jamAda=Object.keys(kinPilih.perJam).map(Number);const j0=Math.min(7,...(jamAda.length?jamAda:[7])),j1=Math.max(16,...(jamAda.length?jamAda:[16]));
+ const jamMaks=Math.max(1,...Object.values(kinPilih.perJam));
+ const jamBar=Array.from({length:j1-j0+1},(_,i)=>j0+i).map(j=>{const v=kinPilih.perJam[j]||0;return `<span class="pm-c${v?'':' nol'}" title="Jam ${String(j).padStart(2,'0')}: ${n(v)} pcs"><i style="height:${Math.round(v/jamMaks*100)}%"></i><em>${String(j).padStart(2,'0')}</em>${v?`<b>${n(v)}</b>`:''}</span>`}).join('');
+ const tr=P.trenMesin({kejadian:evAll,mesin:p.mesin,sampai:t,hari:7});const trMaks=Math.max(1,...tr.map(x=>x.qty));
+ const HRN=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+ const trBar=tr.map(x=>`<span class="pm-c${x.qty?'':' nol'}${x.tgl===t?' now':''}" title="${fdp2(x.tgl)}: ${n(x.qty)} pcs${x.laju!=null?' · '+n(x.laju)+' pcs/jam':''}"><i style="height:${Math.round(x.qty/trMaks*100)}%"></i><em>${HRN[new Date(x.tgl+'T00:00:00Z').getUTCDay()]}</em>${x.qty?`<b>${n(x.qty)}</b>`:''}</span>`).join('');
+ const lv=kinPilih.lajuVsTarget,pv=kinPilih.proyeksiVsTarget;
+ const stat=(lb,v,unit,sub,tone,g)=>`<div class="pm-st ${tone||''}"><span class="lb">${lb}</span><b>${v}${unit?`<small>${unit}</small>`:''}</b><span class="s">${sub}</span>${g!=null?`<div class="pm-g"><i style="width:${Math.max(0,Math.min(100,Math.round(g*100)))}%"></i></div>`:''}</div>`;
+ const toneV=v=>v==null?'':v>=1?'ok':v>=.8?'warn':'crit';
+ const strip=`<section class="pm-tiles" id="pm-tiles">${tiles}</section>
+ <section class="panel pm-kin" id="pm-kin"><header><h2>Kapasitas aktual · ${esc(p.mesin)}</h2><span class="hint">dihitung dari catatan Mulai, Selesai, dan Catat · ${kinPilih.berjalan?'sesi berjalan ikut dihitung':'belum ada sesi berjalan'}</span></header>
+  <div class="pm-stats">${stat('Output hari ini',n(kinPilih.qty),'pcs',kap?`${pctF(kinPilih.capaian)} dari kapasitas ${n(kap)}`+(kinPilih.reject?` · reject ${n(kinPilih.reject)}`:'')+(tonHari?` · ${n(Math.round(tonHari))} kg`:''):'kapasitas belum diatur di Master Data',kinPilih.capaian>=1?'ok':'',kinPilih.capaian)}
+   ${stat('Laju aktual',kinPilih.lajuPerJam==null?'–':n(kinPilih.lajuPerJam),'pcs/jam',kinPilih.targetLaju?`target ${n(kinPilih.targetLaju)} pcs/jam`+(lv!=null?` · ${pctF(lv)} dari target`:''):(kinPilih.lajuPerJam==null?'belum ada catatan berdurasi':'target laju butuh kapasitas'),toneV(lv),lv==null?null:Math.min(1,lv))}
+   ${stat('Mesin dipakai',pctF(kinPilih.utilisasi),'',`${fDur(kinPilih.aktifMenit)} dari ${SHIFT/60} jam kerja`,'',kinPilih.utilisasi)}
+   ${stat('Proyeksi akhir shift',kinPilih.proyeksi==null?'–':n(kinPilih.proyeksi),'pcs',kinPilih.proyeksi==null?'butuh laju dari catatan berdurasi':(kap?`${pctF(pv)} dari kapasitas, bila terus berjalan`:'bila terus berjalan sampai 8 jam'),toneV(pv),pv==null?null:Math.min(1,pv))}</div>
+  <div class="pm-charts"><div class="pm-ch"><h4>Output per jam hari ini</h4><div class="pm-bars">${jamBar}</div></div><div class="pm-ch"><h4>7 hari terakhir</h4><div class="pm-bars">${trBar}</div></div></div></section>`;
  /* sesi yang sedang berjalan di mesin ini (boleh lebih dari satu) */
  const sesiHtml=sesAll.map(ses=>{const key=sesiKey(ses);const c=mesinCtx(key);const sedia=c?siapDiMesin(c,p.wc):0;const mn=P.menitAntara(ses.mulai,new Date().toISOString());
   const kand=Math.max(0,Math.min(+ses.target>0?+ses.target:sedia,sedia));
@@ -4275,6 +4299,7 @@ document.addEventListener('click',async e=>{
   case 'doc':await downloadDoc(ds.kind,ds.ref,ds.fmt);break;
   case 'spktarget':spkTargetForm();break;
   case 'kpivendor':kpiVendor(ds.v);break;
+  case 'pmpilih':{F.mesin.mesin=ds.m;lsSet('mni-mesin',ds.m);renderTools();renderBody();break}
   case 'jdbuka':F.spk.tutup=F.spk.tutup||{};F.spk.tutup[ds.id]=!F.spk.tutup[ds.id];renderBody();break;
   case 'jdhariini':{const g=document.getElementById('gt-scroll');if(g)g.scrollLeft=Math.max(0,(+g.dataset.now)-90);break}
   case 'spkstage':F.spk.stage=ds.st||'';F.spk.tab='list';if(ds.st)F.spk.st='';renderTools();renderBody();break;
