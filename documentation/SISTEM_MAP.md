@@ -67,7 +67,7 @@ Project lain di akun-akun itu (`MNI - Operational`, `MNI OS`, `MNI OS - Operatio
 
 | Item | Nilai |
 |---|---|
-| Folder kerja (repo dan vault) | `D:\Sistem Kerja\01_Kerja\01_Proyek_Aktif\12. Sistem MNI\mni-os\` (akan diganti nama `mni-gudang`; lihat PROJECT_PROGRESS) |
+| Folder kerja (repo dan vault) | `D:\Sistem Kerja\01_Kerja\01_Proyek_Aktif\12. Sistem MNI\mni-gudang\` (nama baku; rujukan lama `mni-os`, penggantian nama lewat skrip `ganti-nama-ke-mni-gudang.ps1` di folder induk, lihat [[T-164-samakan-nama-folder-lokal-ke-mni-gudang]]) |
 | Arsip | `12. Sistem MNI\_Arsip\` (folder lama, tidak dikerjakan) |
 | Server lokal | 5173 mock (data sintetis), 5174 Supabase dev lama, 5175 Supabase production; env di `apps/platform/.env.*.local` (tidak di Git) |
 | Obsidian | vault = folder kerja; mulai dari [[Home]] |

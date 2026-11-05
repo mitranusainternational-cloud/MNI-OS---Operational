@@ -15,7 +15,7 @@ generated: 2026-11-05
 - Bobot effort selesai: **27.75 / 172.34999999999997 hari kerja** (16%)
 - Sisa effort: **144.60000000000002 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
 - Cakupan go-live (fase P0-P7): **29 / 83** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
-- Diblokir: **1**, sedang dikerjakan: **4**
+- Diblokir: **1**, sedang dikerjakan: **5**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
 
 ## Per fase
@@ -78,13 +78,13 @@ generated: 2026-11-05
 - P2 · [[tasks/T-027-uji-sisa-ui-mock-void-koreksi-pr-dan-role|T-027]] Uji sisa UI mock: void, koreksi, PR, dan role · 1.5 hari · dev
 - P2 · [[tasks/T-070-pilih-generator-situs-docs-dan-klasifikasi-materi|T-070]] Pilih generator situs docs dan klasifikasi materi · 1 hari · dev
 - P2 · [[tasks/T-162-selidiki-event-realtime-supabase-tidak-tiba|T-162]] Selidiki event Realtime Supabase yang tidak tiba · 0.5 hari · dev + pemilik akun Supabase
-- P2 · [[tasks/T-164-samakan-nama-folder-lokal-ke-mni-gudang|T-164]] Samakan nama folder lokal ke mni-gudang · 0.2 hari · pemilik + dev
 - P2 · [[tasks/T-165-pensiunkan-project-supabase-dev-lama|T-165]] Pensiunkan project Supabase dev lama · 0.2 hari · pemilik akun Supabase
 
 ## Sedang dikerjakan
 
 - [[tasks/T-044-vercel-preview-dari-development-production-dari-ma|T-044]] Vercel: preview dari development, production dari main · dev
 - [[tasks/T-047-konfigurasi-auth-supabase-produksi|T-047]] Konfigurasi Auth Supabase produksi · dev
+- [[tasks/T-164-samakan-nama-folder-lokal-ke-mni-gudang|T-164]] Samakan nama folder lokal ke mni-gudang · pemilik + dev
 - [[tasks/T-173-berat-otomatis-pada-spk-dari-kalkulator|T-173]] Berat otomatis pada SPK dari kalkulator penghitung berat · dev + pemilik
 - [[tasks/T-174-produksi-multi-work-center-rute-antrian-kapasitas|T-174]] Produksi multi work center: rute, antrian mesin, kapasitas, posisi, dan kualifikasi vendor · dev + pemilik
 
