@@ -112,3 +112,11 @@ updated: 2026-11-02
 - **Keputusan:** (1) sistem ini menangani penawaran sampai produksi, akuntansi dan faktur tetap di sistem lain; (2) Sales membuat penawaran, nomor mengikuti format lama, revisi bernomor Rev.; (3) satu penawaran boleh punya beberapa varian yang dipilih customer; (4) katalog awal 6 keluarga di workbook, produk lain menyusul; (5) batas diskon per peran dengan persetujuan di atas batas; (6) workbook ini menjadi pembanding uji emas.
 - **Konsekuensi:** E-16 tidak memuat faktur atau piutang; T-190 memuat varian, status Menunggu persetujuan, dan batas diskon per peran; T-189 memakai nilai hitung workbook sebagai pembanding.
 - **Rujukan:** [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring|E-16]].
+
+## 2026-11-06 — Rumus sheet utama menjadi baku untuk mesin harga
+
+- **Konteks:** uji emas T-189 menunjukkan dua sheet lain di workbook penawaran memuat versi rumus lebih lama (302 sel berbeda; Straight Reducer hampir dua kali harga sheet utama).
+- **Keputusan:** rumus sheet utama adalah model baku. Dua sheet lain dipakai hanya sebagai sumber parameter skenario (harga per kg, tebal, waste, harga baut). Harga lama di dua sheet itu untuk Straight Reducer, Hold Down Clamp, dan Cover Clamp tidak dipakai.
+- **Alasan:** sheet utama paling baru dan sudah memperbaiki Reducer; satu model rumus mencegah hasil berbeda antar skenario.
+- **Konsekuensi:** katalog harga dibangun dari sheet utama; satu cacat rujukan baris lain diperbaiki dan diuji; bila ada penawaran lama yang harus direproduksi persis dengan rumus lama, perlu versi rumus tersendiri (belum dikerjakan).
+- **Rujukan:** [[ERP_QUOTATION_ANALISIS]] bagian 10, [[T-189-mesin-harga-penawaran-dan-uji-emas]].

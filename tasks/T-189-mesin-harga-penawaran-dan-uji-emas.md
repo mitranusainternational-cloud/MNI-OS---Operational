@@ -5,7 +5,7 @@ title: "Mesin harga penawaran dan uji emas"
 phase: P9
 epic: E-16
 release: v1.2
-status: review
+status: done
 priority: P2
 env: dev
 effort_days: 3
@@ -31,8 +31,8 @@ Rancangan: [[documentation/ERP_QUOTATION_ANALISIS]] (bagian 10)
 - [x] Uji emas terhadap nilai Excel: 192 bentuk, 2.195 nilai rumus, harga satuan, total, dan biaya PO sama; uji skenario, total, dan masukan tidak dikenali (null dengan alasan, bukan 0)
 - [x] Pembanding uji adalah nilai hitung workbook penawaran (keputusan pemilik 2026-11-06)
 - [x] Katalog, skenario, dan nilai pembanding nyata hanya di berkas yang diabaikan Git; uji CI memakai katalog sintetis dan melewati uji emas bila berkas tidak ada
-- [ ] Katalog dan skenario disimpan terkompresi di tabel master dan dimuat setelah login (mengikuti `katalog_berat`); dikerjakan bersama T-190 saat modul membutuhkannya
-- [ ] Keputusan pemilik: rumus sheet utama menjadi baku dan harga lama di dua sheet lain tidak dipakai (lihat analisis bagian 10)
+- [x] Keputusan pemilik (2026-11-06): rumus sheet utama menjadi baku; dua sheet lain hanya sumber parameter skenario, harga lama Reducer, Hold Down Clamp, dan Cover Clamp di sana tidak dipakai
+- [x] Pemuatan katalog dan skenario dari tabel master setelah login dipindah ke [[T-190-modul-penawaran-lokal]] (dibutuhkan saat modul dipakai)
 
 ## Bukti
 

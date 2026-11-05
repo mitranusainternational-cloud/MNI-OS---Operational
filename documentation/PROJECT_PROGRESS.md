@@ -42,6 +42,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ## Log kerja
 
+### 2026-11-06 — Rumus sheet utama dinyatakan baku (T-189 selesai)
+
+Pemilik menetapkan rumus sheet utama workbook penawaran sebagai baku; dua sheet lain hanya sumber parameter skenario. T-189 ditutup (done); pemuatan katalog dari tabel master setelah login dipindah ke T-190. Dicatat di [[documentation/DECISIONS]]. Langkah berikut: T-190 (modul Penawaran lokal). Production tidak disentuh.
+
 ### 2026-11-06 — Mesin harga penawaran dan uji emas (T-189, lokal)
 
 Dibangun mesin murni harga dan estimasi di `apps/platform/src/lib/erp/harga.js` dan pembangun katalog dari workbook. Hasil uji emas terhadap Excel di skenario utama: 192 bentuk dan 2.195 nilai rumus sama (0 selisih), total, PPN, kg, dan biaya saat PO sama. Unit 22 PASS (15 sintetis untuk CI); semua uji unit lain tetap PASS. Temuan workbook: satu cacat rujukan baris lain (diperbaiki dan diuji), angka tetap tersembunyi di Straight Reducer, dua kolom parameter, dan dua sheet lain memuat rumus versi lama (302 sel berbeda; Straight Reducer di sana hampir dua kali harga sheet utama). Katalog, skenario, dan nilai pembanding diabaikan Git. Langkah berikut: pemilik mengonfirmasi rumus sheet utama sebagai baku, lalu T-190 (modul Penawaran lokal) termasuk memuat katalog dari master setelah login. Production tidak disentuh. Rincian di [[ERP_QUOTATION_ANALISIS]] bagian 10.

@@ -11,9 +11,9 @@ generated: 2026-11-05
 
 ## Ringkasan
 
-- Tugas selesai: **32 / 114** (28%)
-- Bobot effort selesai: **31.25 / 192.84999999999997 hari kerja** (16%)
-- Sisa effort: **161.60000000000002 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
+- Tugas selesai: **33 / 114** (29%)
+- Bobot effort selesai: **34.25 / 192.84999999999997 hari kerja** (18%)
+- Sisa effort: **158.60000000000002 hari kerja**; jalur kritis sisa menuju go-live (T-065): **26.5 hari kerja** (T-030 → T-033 → T-034 → T-035 → T-050 → T-051 → T-052 → T-053 → T-063 → T-065)
 - Cakupan go-live (fase P0-P7): **30 / 85** tugas selesai; tugas pasca go-live (P8-P10) sengaja dijadwalkan ulang setelah hypercare.
 - Diblokir: **1**, sedang dikerjakan: **5**
 - Estimasi effort bersifat indikatif dan belum memuat waktu tunggu pihak lain.
@@ -31,7 +31,7 @@ generated: 2026-11-05
 | P6 Hardening dan rilis | 1/7 | 0.5/9.5 hari (5%) | berjalan |
 | P7 Operasi dan dokumentasi | 0/5 | 0/5.5 hari (0%) | belum mulai |
 | P8 v1.1 Stabilisasi, akses, kualitas data | 0/8 | 0/21 hari (0%) | belum mulai |
-| P9 v1.2 Integrasi dan pelaporan | 2/13 | 1.5/38.5 hari (4%) | berjalan |
+| P9 v1.2 Integrasi dan pelaporan | 3/13 | 4.5/38.5 hari (12%) | berjalan |
 | P10 v2.0 Modernisasi dan perluasan | 0/8 | 0/27 hari (0%) | belum mulai |
 
 ## Per rilis
@@ -41,7 +41,7 @@ generated: 2026-11-05
 | v0.9 | Fondasi | 15/32 | 11.25/33.45 hari (34%) | active |
 | v1.0 | Pilot go-live | 14/50 | 17.5/69.4 hari (25%) | active |
 | v1.1 | Stabilisasi, akses, kualitas data | 1/11 | 1/24.5 hari (4%) | active |
-| v1.2 | Integrasi dan pelaporan | 2/13 | 1.5/38.5 hari (4%) | active |
+| v1.2 | Integrasi dan pelaporan | 3/13 | 4.5/38.5 hari (12%) | active |
 | v2.0 | Modernisasi dan perluasan | 0/8 | 0/27 hari (0%) | planned |
 
 ## Per epic
@@ -63,7 +63,7 @@ generated: 2026-11-05
 | [[roadmap/epics/E-13-modernisasi-frontend-dan-pengujian\|E-13]] Modernisasi frontend dan pengujian | v2.0 | 0/4 | 0% | planned |
 | [[roadmap/epics/E-14-multi-site-dan-mobile\|E-14]] Multi-site dan mobile | v2.0 | 0/2 | 0% | planned |
 | [[roadmap/epics/E-15-self-host-vps-dan-layanan-pendamping\|E-15]] Self-host VPS dan layanan pendamping | v2.0 | 0/2 | 0% | planned |
-| [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring\|E-16]] ERP hulu: Penawaran, estimasi, dan monitoring operasional | v1.2 | 2/7 | 9% | active |
+| [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring\|E-16]] ERP hulu: Penawaran, estimasi, dan monitoring operasional | v1.2 | 3/7 | 26% | active |
 
 ## Siap dikerjakan sekarang (dependensi terpenuhi)
 
@@ -80,6 +80,7 @@ generated: 2026-11-05
 - P2 · [[tasks/T-070-pilih-generator-situs-docs-dan-klasifikasi-materi|T-070]] Pilih generator situs docs dan klasifikasi materi · 1 hari · dev
 - P2 · [[tasks/T-162-selidiki-event-realtime-supabase-tidak-tiba|T-162]] Selidiki event Realtime Supabase yang tidak tiba · 0.5 hari · dev + pemilik akun Supabase
 - P2 · [[tasks/T-165-pensiunkan-project-supabase-dev-lama|T-165]] Pensiunkan project Supabase dev lama · 0.2 hari · pemilik akun Supabase
+- P2 · [[tasks/T-190-modul-penawaran-lokal|T-190]] Modul Penawaran lokal (daftar, lembar, revisi, cetak) · 4 hari · dev + pemilik
 
 ## Sedang dikerjakan
 
@@ -109,7 +110,6 @@ generated: 2026-11-05
 - [[tasks/T-182-papan-jadwal-v2-dan-rapikan-layout-spk|T-182]] Papan jadwal v2 (per SPK dan per mesin) dan perapian layout Berjalan, KPI & Analisa, Target waktu proses · dev + pemilik
 - [[tasks/T-183-produksi-hari-ini-papan-mesin-dan-kapasitas-aktual|T-183]] Produksi Hari Ini: papan mesin dan kapasitas aktual (output, laju, pemakaian mesin, proyeksi, tren) · dev + pemilik
 - [[tasks/T-185-papan-jadwal-v3-interaktif-dan-urutan-tab-spk|T-185]] Papan jadwal v3 interaktif (tooltip, panel detail, zoom, geser, buka/lipat semua) dan urutan tab SPK · dev + pemilik
-- [[tasks/T-189-mesin-harga-penawaran-dan-uji-emas|T-189]] Mesin harga penawaran dan uji emas · dev + pemilik
 
 ## Tugas P0 yang belum selesai
 

@@ -116,8 +116,10 @@ Mesin murni `apps/platform/src/lib/erp/harga.js` (memakai evaluator rumus yang s
 3. **Dua kolom parameter.** Sheet utama memakai kolom AW (ladder) dan AY (tray dan aksesori) untuk parameter yang sama; dua sheet lain hanya punya AW. Mesin memakai AW bila AY kosong.
 4. **Dua sheet lain memuat rumus lebih lama.** Dibanding sheet utama, 302 sel rumus berbeda (434 hanya beda rujukan parameter, sisanya konstanta atau bentuk rumus). Bila rumus sheet utama dipakai dengan parameter sheet lain, 6 dari 192 harga satuan berbeda dari Excel sheet itu, dan 5 bentuk (Cover Clamp Heavy Duty) memakai ukuran berbeda. Selisih terbesar sekitar 47%: **Straight Reducer** di dua sheet lama dihitung dua kali lipat berat rel (rumus mengalikan dua pada angka yang sudah dua sisi), sehingga harganya hampir dua kali. Hold Down Clamp (SLW) dan Cover Clamp (SLHD, SLHDC) berbeda 10% sampai 43%.
 
-### Keputusan yang dibutuhkan dari pemilik
+### Keputusan pemilik (2026-11-06): rumus sheet utama baku; keputusan semula yang diminta
 - **Rumus mana yang baku?** Usulan: rumus sheet utama (paling baru, sudah memperbaiki Reducer). Dua sheet lain tetap menjadi sumber **parameter skenario** saja. Mohon konfirmasi bahwa harga Reducer, Hold Down Clamp, dan Cover Clamp di dua sheet lama tidak lagi dipakai.
 - Bila pemilik justru ingin hasil dua sheet lama dipertahankan persis, rumusnya disimpan sebagai versi rumus tersendiri (lebih rumit); belum dilakukan.
 
 Tugas: [[T-189-mesin-harga-penawaran-dan-uji-emas]].
+
+**Keputusan:** pemilik menetapkan rumus sheet utama sebagai baku. Dua sheet lain hanya menjadi sumber parameter skenario; harga lama di sana untuk Straight Reducer, Hold Down Clamp, dan Cover Clamp tidak dipakai. Dicatat di [[documentation/DECISIONS]].
