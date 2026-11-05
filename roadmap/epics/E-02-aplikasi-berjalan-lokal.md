@@ -6,9 +6,9 @@ release: v0.9
 theme: Fondasi
 priority: P0
 status: active
-progress: 15
+progress: 22
 tasks_total: 24
-tasks_done: 7
+tasks_done: 8
 updated: 2026-11-05
 ---
 
@@ -50,6 +50,6 @@ Docker belum aktif di mesin kerja (T-010).
 - [ ] [[tasks/T-183-produksi-hari-ini-papan-mesin-dan-kapasitas-aktual|T-183]] Produksi Hari Ini: papan mesin dan kapasitas aktual (output, laju, pemakaian mesin, proyeksi, tren) · review · P1 · 1 hari
 - [x] [[tasks/T-184-muat-data-bahan-baku-oktober-ke-production|T-184]] Muat data bahan baku (plat) 27 Oktober ke Supabase production · done · P1 · 1 hari
 - [ ] [[tasks/T-185-papan-jadwal-v3-interaktif-dan-urutan-tab-spk|T-185]] Papan jadwal v3 interaktif (tooltip, panel detail, zoom, geser, buka/lipat semua) dan urutan tab SPK · review · P1 · 1 hari
-- [ ] [[tasks/T-186-jadwal-tampilan-progres-matriks-posisi-item|T-186]] Berjalan memuat matriks posisi item; Jadwal menjadi timeline bersih per SPK dengan perkiraan otomatis · review · P1 · 2 hari
+- [x] [[tasks/T-186-jadwal-tampilan-progres-matriks-posisi-item|T-186]] Berjalan memuat matriks posisi item; Jadwal menjadi timeline bersih per SPK dengan perkiraan otomatis · done · P1 · 2 hari
 
 > Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

@@ -5,7 +5,7 @@ title: "Berjalan memuat matriks posisi item; Jadwal menjadi timeline bersih per 
 phase: P2
 epic: E-02
 release: v0.9
-status: review
+status: done
 priority: P1
 env: dev
 effort_days: 2
@@ -36,7 +36,7 @@ Pembedaan: **Berjalan** menjawab "sekarang di mana dan sudah berapa" (matriks po
 - [x] Navigasi minggu (panah, Hari ini), zoom 2 minggu, 1 bulan, 3 bulan
 - [x] Rinci per item (Gantt lama) dan Per mesin tetap tersedia sebagai pilihan
 - [x] Uji e2e M-100, M-142, M-154 sampai M-168 diperbarui atau ditambah; regresi penuh 0 FAIL
-- [ ] Ditinjau pemilik
+- [x] Ditinjau pemilik (Berjalan dan timeline Jadwal dinyatakan sesuai, 2026-11-05)
 
 ## Bukti
 
