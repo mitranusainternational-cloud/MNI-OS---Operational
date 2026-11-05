@@ -5,13 +5,13 @@ title: "Mesin harga penawaran dan uji emas"
 phase: P9
 epic: E-16
 release: v1.2
-status: todo
+status: review
 priority: P2
 env: dev
 effort_days: 3
 depends: [T-187]
 owner: "dev + pemilik"
-updated: 2026-11-05
+updated: 2026-11-06
 ---
 
 <img src="../documentation/assets/logo-mni.png" alt="PT Mitra Nusa Internasional" width="190">
@@ -21,21 +21,25 @@ updated: 2026-11-05
 Epic: [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring|E-16]]
 Fase: P9
 Bergantung pada: T-187
-Rancangan: [[documentation/ERP_QUOTATION_ANALISIS]]
+Rancangan: [[documentation/ERP_QUOTATION_ANALISIS]] (bagian 10)
 
 ## Kriteria selesai
 
-- [ ] Katalog harga diekstrak dari workbook (6 keluarga × 32 bentuk) tanpa menulis ulang rumus manual; disimpan terkompresi di master, dimuat setelah login
-- [ ] Lapisan harga murni di src/lib/erp: harga satuan, baut, subtotal, diskon, PPN, total, kebutuhan kg
-- [ ] Skenario harga (satu model, banyak skenario) menggantikan tiga sheet salinan
-- [ ] Uji emas per bentuk terhadap nilai Excel; uji skenario, total, dan masukan tidak dikenali (null, bukan 0)
-- [ ] Pembanding uji adalah nilai hitung workbook penawaran (keputusan pemilik 2026-11-06); katalog awal 6 keluarga, 192 bentuk
-- [ ] Fixture nyata hanya di data/private-sources; uji CI memakai fixture sintetis
+- [x] Katalog harga diekstrak dari workbook (6 keluarga × 32 bentuk = 192) tanpa menulis ulang rumus manual (pembangun `scripts/build-quote-catalog.mjs`, pembaca xlsx bersama `scripts/lib/xlsx-baca.mjs`)
+- [x] Lapisan harga murni di `src/lib/erp/harga.js`: harga satuan, baut, subtotal, diskon, PPN, total, kebutuhan kg, biaya saat PO
+- [x] Satu model rumus baku dengan parameter per skenario (tiga sheet workbook menjadi tiga skenario parameter); skenario tanpa kolom AY memakai kolom AW
+- [x] Uji emas terhadap nilai Excel: 192 bentuk, 2.195 nilai rumus, harga satuan, total, dan biaya PO sama; uji skenario, total, dan masukan tidak dikenali (null dengan alasan, bukan 0)
+- [x] Pembanding uji adalah nilai hitung workbook penawaran (keputusan pemilik 2026-11-06)
+- [x] Katalog, skenario, dan nilai pembanding nyata hanya di berkas yang diabaikan Git; uji CI memakai katalog sintetis dan melewati uji emas bila berkas tidak ada
+- [ ] Katalog dan skenario disimpan terkompresi di tabel master dan dimuat setelah login (mengikuti `katalog_berat`); dikerjakan bersama T-190 saat modul membutuhkannya
+- [ ] Keputusan pemilik: rumus sheet utama menjadi baku dan harga lama di dua sheet lain tidak dipakai (lihat analisis bagian 10)
 
 ## Bukti
 
-- Belum.
+`verified in browser` tidak berlaku (tanpa UI). Unit: `node tests/unit/erp-harga.test.mjs` 22 PASS, 0 FAIL (15 sintetis tanpa berkas katalog); semua uji unit lain tetap PASS (rencana 11, berat 6 dan 24, jadwal 21, kapasitas 10, dan lainnya). Pembanding: nilai tersimpan Excel pada salinan workbook, termasuk total dengan qty uji di sembilan baris.
+
+Temuan: (1) cacat rujukan baris lain pada SLW Horizontal Cross Equal Cover kolom AJ, diperbaiki dan diuji; (2) angka tetap tersembunyi di Straight Reducer; (3) dua kolom parameter AW dan AY; (4) dua sheet lain memuat rumus versi lama (302 sel berbeda; Straight Reducer di sana hampir dua kali harga sheet utama).
 
 ## Catatan
 
-Dikerjakan agen pricing-engineer dengan skill erp-quotation-engine. Tahap E0. Lokal dulu; tidak menyentuh production sebelum persetujuan eksplisit pemilik.
+Tahap E0 (mesin saja). Tidak ada perubahan pada aplikasi, database, maupun production. Rumus dan harga tidak masuk Git; hanya kode mesin, pembangun, dan uji sintetis.

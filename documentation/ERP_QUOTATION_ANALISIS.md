@@ -15,7 +15,7 @@ Pembacaan workbook penawaran Cable Tray dan Ladder (salinan, hanya baca, makro m
 | Hal | Hasil |
 |---|---|
 | Format dan ukuran | `.xls`, tiga sheet, tanpa VBA. Sheet utama sekitar 2.200 sel berumus. Rentang terpakai sampai baris 1.270 dan kolom 161, tetapi isi nyata hanya di kolom A sampai AZ, baris 1 sampai sekitar 470; sisanya sisa format. |
-| Sheet | `SSM-Cable Support System`, `ketebalan ke DUA`, `ketebalan ke Tiga`: tiga **skenario** (tebal, harga per kg, waste, harga baut berbeda) dengan tata letak sama. |
+| Sheet | `SSM-Cable Support System`, `ketebalan ke DUA`, `ketebalan ke Tiga`: tiga versi dengan tata letak sama. Sheet utama memuat rumus terbaru; dua sheet lain memuat **versi rumus yang lebih lama** dengan parameter (tebal, harga per kg, waste, harga baut) berbeda (lihat bagian 10). |
 | Produk | 192 produk per sheet = 6 keluarga × 32 bentuk: Ladder SLU, SLW, SLHD, SLHDC dan Tray STC, STU. Bentuk: lurus, elbow, tee, cross, riser dalam dan luar, reducer, tutup untuk semuanya, jointing, fish plate horizontal dan vertikal, splice plate, bracket, hanger, U channel, clamp, separator, hold down, end stop, drop out. |
 | Nama rentang | 885 nama, banyak yang rusak (`#REF!`); tidak berguna dan tidak diwarisi. |
 
@@ -51,7 +51,7 @@ Struktur ini **sama dengan kalkulator berat** yang sudah dipakai untuk SPK ([[KA
 
 - Rumus diulang di setiap baris dengan konstanta tertanam; ukuran dan jarak anak tangga tidak punya nama.
 - Parameter ladder dan tray ada di kolom berbeda; mudah tertukar.
-- Tiga sheet adalah salinan yang hanya berbeda parameter: di sistem cukup **satu model, banyak skenario**.
+- Tiga sheet **bukan** sekadar salinan dengan parameter berbeda: rumusnya sudah berbeda di 302 sel (bagian 10). Di sistem cukup **satu model rumus yang baku, banyak skenario parameter**.
 - Acuan harga menurut tebal dan finishing hanya teks; sistem butuh tabel harga yang bisa dicari.
 - Diskon dan PPN tertanam; kolom margin menampilkan galat bagi nol saat qty kosong; tanggal `=NOW()` berubah tiap dibuka; nama rentang rusak.
 - Aluminium dan stainless hanya ada sebagai catatan harga per kg, belum sebagai model berat sendiri.
@@ -99,3 +99,25 @@ Penawaran menjadi sumber SPK: item, spesifikasi, berat, customer, PO, dan due da
 Pertanyaan yang masih terbuka: nilai batas diskon per peran dan siapa penyetujunya (diisi saat T-190), serta kode pada nomor penawaran (diambil dari format lama).
 
 Tugas: [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring|E-16]], [[T-187-bedah-workbook-quotation-dan-rancang-modul-erp]].
+
+## 10. Hasil T-189: mesin harga dan uji emas (2026-11-06)
+
+Mesin murni `apps/platform/src/lib/erp/harga.js` (memakai evaluator rumus yang sama dengan kalkulator berat) dan pembangun katalog `scripts/build-quote-catalog.mjs`. Katalog, skenario, dan nilai pembanding Excel diabaikan Git (rumus dan harga perusahaan). Bukti: unit (22 uji; 15 di antaranya sintetis dan berjalan di CI) dan uji emas terhadap Excel di mesin ini.
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Skenario utama: 192 bentuk, 2.195 nilai rumus (berat estimasi, berat real, harga satuan, dan kolom antara) | **Sama dengan Excel**, 0 selisih |
+| Total: subtotal, diskon, dasar, PPN, total, kg estimasi dan real (qty uji di 9 baris) | Sama dengan Excel |
+| Biaya saat PO: plat, hot dip, labour, modal, rasio modal, selisih, harga titik 85 | Sama dengan Excel |
+
+### Temuan workbook yang harus diketahui
+1. **Cacat rujukan baris lain.** Pada SLW Horizontal Cross Equal Cover, kolom AJ merujuk sel baris lain (J107), bukan radius baris sendiri seperti bentuk setaranya di SLU. Hasil Excel kebetulan benar pada radius 300 dan salah pada radius lain. Mesin kita memperbaikinya (tercatat di katalog dan diuji).
+2. **Angka tetap tersembunyi.** Enam bentuk Straight Reducer memakai angka tetap di kolom AB (di luar kolom ukuran) yang dirujuk rumus; mesin membawanya sebagai konstanta bentuk.
+3. **Dua kolom parameter.** Sheet utama memakai kolom AW (ladder) dan AY (tray dan aksesori) untuk parameter yang sama; dua sheet lain hanya punya AW. Mesin memakai AW bila AY kosong.
+4. **Dua sheet lain memuat rumus lebih lama.** Dibanding sheet utama, 302 sel rumus berbeda (434 hanya beda rujukan parameter, sisanya konstanta atau bentuk rumus). Bila rumus sheet utama dipakai dengan parameter sheet lain, 6 dari 192 harga satuan berbeda dari Excel sheet itu, dan 5 bentuk (Cover Clamp Heavy Duty) memakai ukuran berbeda. Selisih terbesar sekitar 47%: **Straight Reducer** di dua sheet lama dihitung dua kali lipat berat rel (rumus mengalikan dua pada angka yang sudah dua sisi), sehingga harganya hampir dua kali. Hold Down Clamp (SLW) dan Cover Clamp (SLHD, SLHDC) berbeda 10% sampai 43%.
+
+### Keputusan yang dibutuhkan dari pemilik
+- **Rumus mana yang baku?** Usulan: rumus sheet utama (paling baru, sudah memperbaiki Reducer). Dua sheet lain tetap menjadi sumber **parameter skenario** saja. Mohon konfirmasi bahwa harga Reducer, Hold Down Clamp, dan Cover Clamp di dua sheet lama tidak lagi dipakai.
+- Bila pemilik justru ingin hasil dua sheet lama dipertahankan persis, rumusnya disimpan sebagai versi rumus tersendiri (lebih rumit); belum dilakukan.
+
+Tugas: [[T-189-mesin-harga-penawaran-dan-uji-emas]].
