@@ -61,6 +61,8 @@ async function toDbId(id) {
 
 // Kolom spk.no bertipe TEXT di database, tetapi app memperlakukannya sebagai angka
 // (parseInt, perbandingan !==). Tanpa konversi, mengedit SPK dianggap "ganti nomor".
+// Tabel yang boleh belum ada di database (migration draf belum diterapkan): dibaca sebagai kosong, bukan galat.
+const OPSIONAL = new Set(['produksi_log', 'penawaran']);
 const numericNo = (table, row) => {
   if (table === 'spk' && row && row.no !== undefined && row.no !== null && /^\d+$/.test(String(row.no))) row.no = Number(row.no);
   return row;
@@ -208,7 +210,7 @@ function makeCollection(col) {
         let q = supabase.from(table).select('*');
         if (orderCol) q = q.order(orderCol, { ascending: false });
         const { data, error } = await q;
-        if (error && table === 'produksi_log' && /produksi_log|schema cache|does not exist/i.test(error.message || '')) { if (lastSig !== '[]') { lastSig = '[]'; cb({ docs: [] }); } return; }
+        if (error && OPSIONAL.has(table) && new RegExp(table + '|schema cache|does not exist', 'i').test(error.message || '')) { if (lastSig !== '[]') { lastSig = '[]'; cb({ docs: [] }); } return; }
         if (error) { errCb && errCb(error); return; }
         const docs = (data || []).map((r) => (table === 'master' ? masterToDoc(r) : rowToDoc(numericNo(table, r))));
         // Lewati bila isi sama dengan pemuatan sebelumnya agar polling tidak merender ulang UI tanpa perubahan.
@@ -429,7 +431,7 @@ const DB_ADAPTER = {
 
 // ── User adapter (replaces window.claude.use('user')) ────────────────────────
 // Role model aplikasi (ROLES di app.js); sama dengan role_modules di database. viewer tidak menulis.
-const WRITE_ROLES = ['admin', 'ppic', 'gbb', 'gbj', 'logistik', 'produksi'];
+const WRITE_ROLES = ['admin', 'ppic', 'gbb', 'gbj', 'logistik', 'produksi', 'sales'];
 
 // Hak ubah efektif: admin selalu; hak khusus (muser.data.modul) bila ada, selain itu mengikuti peran bawaan.
 const bisaMengubah = (muser) => {
@@ -490,13 +492,13 @@ async function makeUserAdapter() {
     })),
     // Cadangan: semua tabel mentah (urutan aman untuk pemulihan). Hanya super admin yang membaca semuanya (RLS).
     exportAll: async () => {
-      const tables = ['muser', 'role_modules', 'master', 'mwc', 'mvendor', 'mcustomer', 'msupplier', 'marmada', 'rm', 'fg', 'spk', 'rmhist', 'pr', 'opname', 'mutasi', 'vendor', 'kirim', 'bongkar', 'log', 'audit_log'];
+      const tables = ['muser', 'role_modules', 'master', 'mwc', 'mvendor', 'mcustomer', 'msupplier', 'marmada', 'rm', 'fg', 'spk', 'rmhist', 'pr', 'opname', 'mutasi', 'vendor', 'kirim', 'bongkar', 'log', 'audit_log', 'penawaran'];
       const out = {};
       for (const t of tables) {
         const rows = [];
         for (let from = 0; ; from += 1000) {
           const { data, error } = await supabase.from(t).select('*').range(from, from + 999);
-          if (error && t === 'audit_log') break; // migration 13 belum terpasang: lewati
+          if (error && (t === 'audit_log' || t === 'penawaran')) break; // migration 13 belum terpasang: lewati
           if (error) throw new Error('Gagal membaca ' + t + ': ' + error.message);
           rows.push(...data);
           if (data.length < 1000) break;
@@ -573,7 +575,16 @@ import * as _statistik from './produksi/statistik.js';
 import * as _jadwal from './produksi/jadwal.js';
 import * as _kapasitas from './produksi/kapasitas.js';
 import * as _rencana from './produksi/rencana.js';
+import * as _harga from './erp/harga.js';
+import * as _penawaran from './erp/penawaran.js';
 window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan, ..._analisa, ..._statistik, ..._jadwal, ..._kapasitas, ..._rencana };
+// Mesin penawaran (harga, aturan, alur). Katalog dan skenario harga dimuat dari tabel master setelah login (setKatalog).
+window.MNIHarga = {
+  ..._harga, ..._penawaran, katalog: null, skenario: null,
+  setKatalog(k, s) { this.katalog = k; this.skenario = s; },
+  ada() { return !!(this.katalog && this.skenario && this.skenario.length); },
+  info() { return this.katalog ? { bentuk: this.katalog.bentuk.length, keluarga: _penawaran.daftarKeluarga(this.katalog).length, skenario: (this.skenario || []).length } : null; },
+};
 
 window.claude = CLAUDE_SHIM;
 window.__supabase = supabase;

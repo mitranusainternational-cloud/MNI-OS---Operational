@@ -30,7 +30,7 @@ Bukan jalur pilot; tidak boleh menahan tugas go-live (T-030 dan seterusnya). Rum
 - [x] [[tasks/T-187-bedah-workbook-quotation-dan-rancang-modul-erp|T-187]] Bedah workbook quotation dan rancang modul ERP · done · P1 · 1 hari
 - [x] [[tasks/T-188-skill-dan-agen-erp-di-claude|T-188]] Skill dan agen ERP di .claude · done · P1 · 0.5 hari
 - [x] [[tasks/T-189-mesin-harga-penawaran-dan-uji-emas|T-189]] Mesin harga penawaran dan uji emas · done · P2 · 3 hari
-- [ ] [[tasks/T-190-modul-penawaran-lokal|T-190]] Modul Penawaran lokal (daftar, lembar, revisi, cetak) · todo · P2 · 4 hari
+- [ ] [[tasks/T-190-modul-penawaran-lokal|T-190]] Modul Penawaran lokal (daftar, lembar, revisi, cetak) · review · P2 · 4 hari
 - [ ] [[tasks/T-191-muat-dari-penawaran-ke-spk-dan-snapshot-po|T-191]] Muat dari penawaran ke SPK dan snapshot PO · todo · P2 · 3 hari
 - [ ] [[tasks/T-192-kebutuhan-material-dan-reservasi-stok|T-192]] Kebutuhan material dan reservasi stok · todo · P2 · 3 hari
 - [ ] [[tasks/T-193-monitoring-estimasi-lawan-aktual|T-193]] Monitoring estimasi lawan aktual · todo · P2 · 3 hari

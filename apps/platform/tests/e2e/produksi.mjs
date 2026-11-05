@@ -425,7 +425,7 @@ export async function runProduksi(page, base) {
   ok('M-124 form Catat: tanggal dan jam selesai terisi otomatis, jam mulai kosong, bagian waktu tertutup', !wkt.terbuka && /^\d{4}-\d{2}-\d{2}$/.test(wkt.tgl) && /^\d{2}:\d{2}$/.test(wkt.selesai) && wkt.mulai === '', JSON.stringify(wkt));
   await page.fill('#m-qty', '1'); await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1500);
   const baru = (await hasilEv()).slice(nSblm);
-  ok('M-125 Catat hanya dengan jumlah tersimpan: lama pengerjaan kosong (bukan nol), hari ini, nomor SPK dan customer terisi, klasifikasi produk terisi', baru.length === 1 && baru[0].menit == null && !baru[0].mulai && baru[0].tgl === new Date().toISOString().slice(0, 10) && !!baru[0].spk_no && !!baru[0].customer && !!baru[0].kelompok, JSON.stringify(baru.map((e) => [e.menit, e.mulai, e.tgl, e.kelompok])));
+  ok('M-125 Catat hanya dengan jumlah tersimpan: lama pengerjaan kosong (bukan nol), hari ini, nomor SPK dan customer terisi, klasifikasi produk terisi', baru.length === 1 && baru[0].menit == null && !baru[0].mulai && baru[0].tgl === new Date().toLocaleDateString('sv-SE') && !!baru[0].spk_no && !!baru[0].customer && !!baru[0].kelompok, JSON.stringify(baru.map((e) => [e.menit, e.mulai, e.tgl, e.kelompok])));
   await closeAll();
   await page.click('#mesin-antri .mcard:first-child [data-act="mesinmulai"]'); await page.waitForTimeout(1200);
   const lbl0 = await page.textContent('.mesin-run [data-lbl]'); const kand = Number((lbl0.match(/semua (\d+)/) || [])[1]);
@@ -615,7 +615,7 @@ export async function runProduksi(page, base) {
   // Berjalan: penanda item diam
   const sebelum = await page.$$eval('.pg-dm', (a) => a.length);
   await page.evaluate(() => {
-    const s = JSON.parse(localStorage.getItem('mni-local-mock-db')); const d = new Date(); d.setDate(d.getDate() - 5); const tgl = d.toISOString().slice(0, 10);
+    const s = JSON.parse(localStorage.getItem('mni-local-mock-db')); const d = new Date(); d.setDate(d.getDate() - 5); const tgl = d.toLocaleDateString('sv-SE');
     (s.tables.produksi_log || []).forEach((r) => { if ((r.jenis || 'hasil') === 'hasil') { r.tgl = tgl; if (r.data && typeof r.data === 'object') r.data.tgl = tgl; } });
     localStorage.setItem('mni-local-mock-db', JSON.stringify(s));
   });

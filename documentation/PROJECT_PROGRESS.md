@@ -486,3 +486,7 @@ Masukan pemilik: jadwal kaku, layout Berjalan, KPI & Analisa, dan Target waktu p
 ### 2026-11-05 — Produksi Hari Ini: papan mesin dan kapasitas aktual (T-183, lokal)
 
 Masukan pemilik: layar kaku; tujuan mengetahui kapasitas aktual mesin realtime sebagai dasar KPI per work center atau mesin. Hasil: kartu per mesin, panel Kapasitas aktual (output, laju pcs/jam, pemakaian mesin, proyeksi), grafik per jam dan tren 7 hari, kartu antrian lebih lapang; input tidak berubah. Bukti: unit kapasitas 10; e2e regresi 42, role 12, akses 34, produksi 111, tampilan 71 (0 FAIL; mock, bukan bukti Supabase). Keputusan terbuka: jam kerja standar dan target KPI per mesin. Tugas [[T-183-produksi-hari-ini-papan-mesin-dan-kapasitas-aktual]]; kebutuhan [[PRD_PRODUKSI]] bagian 14.
+
+### 2026-11-06 — Modul Penawaran lokal (T-190, lokal)
+
+Hasil: menu Penawaran dengan hak modul sendiri dan peran Sales; lembar penawaran dengan varian A sampai H, harga dan berat dari mesin T-189, diskon dan PPN, batas diskon per peran dengan status Menunggu persetujuan, nomor format lama dengan kunci atomik, revisi bernomor dengan riwayat, cetak untuk customer tanpa berat dan biaya. Tabel penawaran hanya berupa draf migration 15 (belum diterapkan). Bukti: verified in browser (mock); unit 18 PASS, e2e penawaran 27 PASS, regresi penuh 0 FAIL, alur-spk 15 PASS. Perbaikan: tanggal data contoh dan uji produksi memakai waktu lokal. Menunggu pemilik: nilai batas diskon, penyetuju, kode nomor, tinjauan tampilan. Langkah berikut: T-191 (muat dari penawaran ke SPK).

@@ -8,11 +8,12 @@ import { runRoles } from './roles.mjs';
 import { runAccess } from './access.mjs';
 import { runSweep } from './sweep.mjs';
 import { runProduksi } from './produksi.mjs';
+import { runPenawaran } from './penawaran.mjs';
 
 const base = process.argv[2] || 'http://127.0.0.1:5173/';
 const browser = await chromium.launch();
 let totalFail = 0;
-for (const [name, run] of [['regresi', runRegression], ['role', runRoles], ['akses', runAccess], ['produksi', runProduksi], ['tampilan', runSweep]]) {
+for (const [name, run] of [['regresi', runRegression], ['role', runRoles], ['akses', runAccess], ['produksi', runProduksi], ['penawaran', runPenawaran], ['tampilan', runSweep]]) {
   const page = await browser.newPage({ acceptDownloads: true });
   const { pass, fail, detail } = await run(page, base);
   await page.close();
