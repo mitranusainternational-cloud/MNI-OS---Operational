@@ -42,6 +42,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ## Log kerja
 
+### 2026-11-05 — Workbook penawaran dibedah dan skill serta agen ERP dibuat (T-187, T-188)
+
+Pemilik menyerahkan workbook penawaran Cable Tray dan Ladder dan ingin penawaran menjadi hulu (SPK, material, monitoring turun darinya), dikerjakan sebagai modul terpisah, lokal dulu. Hasil pembacaan: tiga sheet = tiga skenario dengan tata letak sama; 192 produk per sheet (6 keluarga × 32 bentuk) dengan perhitungan estimasi dan real berdampingan; harga satuan = berat estimasi × harga per kg (dibulatkan) ditambah baut; total dengan diskon dan PPN; blok biaya saat PO. Strukturnya sama dengan kalkulator berat, sehingga fondasi sekitar 70% sudah ada. Dibuat: [[ERP_QUOTATION_ANALISIS]], epic [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring|E-16]] dengan tugas T-187 sampai T-193, empat skill dan empat agen ERP di .claude, keputusan di [[documentation/DECISIONS]]. Bukti: source-level (isi workbook); belum ada kode. Production dan Vercel tidak disentuh. Langkah berikut: jawaban pemilik atas pertanyaan di analisis, lalu T-189 (mesin harga dan uji emas).
+
 ### 2026-11-05 — Berjalan dan Jadwal dibedakan (T-186, lokal)
 
 Tinjauan pemilik berurutan: Gantt kurang bagus untuk memantau; Jadwal dan Berjalan masih sama; minta papan jadwal seperti Antlia (Production Calendar) tetapi lebih baik; papan per work center terlalu membingungkan; Jadwal cukup timeline bersih dengan nama PT. Hasil: **Berjalan** memuat matriks posisi tiap item per langkah (centang, cincin posisi, strip posisi, penanda Diam N hari, mode Ringkas dan Rinci); **Jadwal** menjadi timeline satu batang per SPK dengan nama customer, status prediksi, bendera due date, perkiraan siap kirim dari mesin baru rencana.js (kapasitas terbatas, urut due date), tanpa rincian work center; Rinci per item dan Per mesin tetap ada. Bukti: unit rencana 11 (semua unit PASS), e2e regresi 42, role 12, akses 34, produksi 134, tampilan 72, alur lengkap 15 (0 FAIL; mock, bukan bukti Supabase). Kebutuhan di [[PRD_PRODUKSI]] bagian 16. Belum ditayangkan; migration 14 tetap draf. Langkah berikut: tinjauan pemilik.

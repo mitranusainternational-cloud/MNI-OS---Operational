@@ -1,0 +1,38 @@
+---
+type: epic
+id: E-16
+title: "ERP hulu: Penawaran, estimasi, dan monitoring operasional"
+release: v1.2
+theme: Integrasi
+priority: P2
+status: active
+progress: 9
+tasks_total: 7
+tasks_done: 2
+updated: 2026-11-05
+---
+
+# E-16 ERP hulu: Penawaran, estimasi, dan monitoring operasional
+
+Rilis target: **v1.2** · Tema: Integrasi · Prioritas: P2
+Induk: [[roadmap/PRODUCT_ROADMAP|Roadmap produk]] · Rancangan: [[documentation/ERP_QUOTATION_ANALISIS]]
+
+## Hasil yang diinginkan
+
+Penawaran menjadi hulu sistem: harga dan estimasi (berat, kebutuhan material, biaya) dihitung dari mesin yang sama dengan kalkulator berat, lalu SPK dibuat dengan **muat dari penawaran**, kebutuhan material tercadangkan, dan monitoring operasional menampilkan estimasi lawan aktual. Dikerjakan sebagai **modul terpisah, lokal dulu**, tanpa menyentuh sistem live, dan ditayangkan bertahap (E0 sampai E5, skill `erp-module-boundary`).
+
+## Risiko dan asumsi
+
+Bukan jalur pilot; tidak boleh menahan tugas go-live (T-030 dan seterusnya). Rumus dan harga adalah aset perusahaan dan repo bersifat publik, sehingga katalog dan harga di database. Cakupan awal bukan ERP penuh (tanpa akuntansi, pajak, penggajian). Menunggu jawaban pemilik atas pertanyaan di analisis (batas dengan sistem lain, nomor dan revisi penawaran, skenario, produk lain, diskon).
+
+## Tugas
+
+- [x] [[tasks/T-187-bedah-workbook-quotation-dan-rancang-modul-erp|T-187]] Bedah workbook quotation dan rancang modul ERP · done · P1 · 1 hari
+- [x] [[tasks/T-188-skill-dan-agen-erp-di-claude|T-188]] Skill dan agen ERP di .claude · done · P1 · 0.5 hari
+- [ ] [[tasks/T-189-mesin-harga-penawaran-dan-uji-emas|T-189]] Mesin harga penawaran dan uji emas · todo · P2 · 3 hari
+- [ ] [[tasks/T-190-modul-penawaran-lokal|T-190]] Modul Penawaran lokal (daftar, lembar, revisi, cetak) · todo · P2 · 4 hari
+- [ ] [[tasks/T-191-muat-dari-penawaran-ke-spk-dan-snapshot-po|T-191]] Muat dari penawaran ke SPK dan snapshot PO · todo · P2 · 3 hari
+- [ ] [[tasks/T-192-kebutuhan-material-dan-reservasi-stok|T-192]] Kebutuhan material dan reservasi stok · todo · P2 · 3 hari
+- [ ] [[tasks/T-193-monitoring-estimasi-lawan-aktual|T-193]] Monitoring estimasi lawan aktual · todo · P2 · 3 hari
+
+> Properti status, progress, dan jumlah tugas serta daftar ini dibuat otomatis oleh `node scripts/progress-report.mjs`. Jangan ubah manual. Tampilan interaktif: [[PROGRESS_DASHBOARD]].

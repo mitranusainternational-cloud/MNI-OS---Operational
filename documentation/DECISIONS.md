@@ -97,3 +97,11 @@ updated: 2026-11-02
 - **Alasan:** satu tempat input per jenis kejadian menghindari data ganda dan kebingungan operator; manajemen membaca semuanya dari kejadian yang sama.
 - **Konsekuensi:** Papan Produksi dan Laporan Produksi menjadi rute tersembunyi (laporan harian pindah ke tab Kinerja & Analisa); tombol Input di tabel SPK dihapus. Tahap 2 menambah analisa per produk, vendor, dan pengiriman.
 - **Rujukan:** [[PRD_PRODUKSI]], [[T-177-skema-produksi-tiga-pintu-spk-berjalan]].
+
+## 2026-11-05 — Penawaran sebagai hulu ERP, modul terpisah dan lokal dulu
+
+- **Konteks:** pemilik menyerahkan workbook penawaran Cable Tray dan Ladder dan ingin penawaran menjadi hulu sistem (SPK dibuat dari penawaran, material dan monitoring mengikuti). Workbook memakai model rumus yang sama dengan kalkulator berat (192 produk, estimasi dan real) ditambah lapisan harga.
+- **Keputusan:** Penawaran dibangun sebagai **modul terpisah** (epic E-16, rilis v1.2) dengan tabel baru, menu baru berhak modul sendiri, dan mesin murni di apps/platform/src/lib/erp yang memakai kembali mesin berat. Dikerjakan **lokal dulu**, tanpa menyentuh Supabase production dan Vercel; ditayangkan bertahap E0 sampai E5, tahap terakhir hanya dengan persetujuan eksplisit. Cakupan awal: penawaran, estimasi, SPK dari penawaran, kebutuhan material, monitoring estimasi lawan aktual. Bukan ERP penuh (tanpa akuntansi, pajak, penggajian) sampai ada keputusan tertulis.
+- **Alasan:** fondasi sekitar 70% sudah ada; satu mesin untuk berat dan harga menghindari rumus ganda; modul terpisah menjaga sistem live tetap aman.
+- **Konsekuensi:** katalog rumus dan harga disimpan di database setelah login (rumus dan harga adalah aset perusahaan, repo publik); angka komersial tidak masuk Git. Jalur pilot (T-030 dan seterusnya) tetap prioritas dan tidak boleh tertahan. Aturan lingkup 2026-11-03 dikecualikan hanya untuk jalur lokal paralel ini atas permintaan pemilik.
+- **Rujukan:** [[ERP_QUOTATION_ANALISIS]], [[roadmap/epics/E-16-erp-penawaran-estimasi-dan-monitoring|E-16]].
