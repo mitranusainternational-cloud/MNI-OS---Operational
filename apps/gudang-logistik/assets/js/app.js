@@ -58,7 +58,7 @@ const F={ /* per-view filters, kept for the session */
  'bongkar-muat':{range:'7',jenis:''},
  'vendor':{st:'aktif',vendor:'',q:''},
  'pengiriman':{st:'',q:''},
- 'spk':{st:'aktif',q:'',tab:'berjalan',fl:'jalan'},
+ 'spk':{st:'aktif',q:'',tab:'list',fl:'jalan'},
  'produksi':{wc:'',p:'aktif',tab:'wc',hari:'30',lper:'bulan',lmet:'qty',lby:'produk',lakm:'operator'}
 };
 const ROLE_ON=false; /* login & peran per user: ditunda, aktifkan nanti */
@@ -421,7 +421,7 @@ B['pengiriman']=()=>{
 };
 
 /* ---------- SPK ---------- */
-T['spk']=()=>F.spk.tab==='jadwal'?`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','vw',[['spk','Per SPK'],['mesin','Per mesin']])}${segBtns('spk','skala',[['minggu','Harian'],['bulan','Ringkas']])}${F.spk.vw==='mesin'?'':segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn ghost" data-act="jdhariini">Ke hari ini</button>`:F.spk.tab==='berjalan'?`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button>`:F.spk.tab==='kpi'?`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','p',[['30','30 hari'],['90','90 hari'],['bln','Bulan ini'],['all','Semua']])}<span class="grow"></span><button class="btn ghost" data-act="spktarget">Atur target</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="xlsx">${ic('dl')}Excel</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="pdf">${ic('file')}PDF</button>`:`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','st',[['aktif','Aktif'],['Terlambat','Terlambat'],['Selesai','Selesai'],['','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button><button class="btn ghost" data-act="csv" data-what="spk">${ic('dl')}CSV</button>`;
+T['spk']=()=>F.spk.tab==='jadwal'?`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','vw',[['spk','Per SPK'],['mesin','Per mesin']])}${segBtns('spk','skala',[['lebar','Detail'],['minggu','Harian'],['bulan','Ringkas']])}${F.spk.vw==='mesin'?'':segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span>${F.spk.vw==='mesin'?'':'<button class="btn ghost" data-act="jdsemua" data-v="buka">Buka semua</button><button class="btn ghost" data-act="jdsemua" data-v="lipat">Lipat semua</button>'}<button class="btn ghost" data-act="jdhariini">Ke hari ini</button>`:F.spk.tab==='berjalan'?`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button>`:F.spk.tab==='kpi'?`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','p',[['30','30 hari'],['90','90 hari'],['bln','Bulan ini'],['all','Semua']])}<span class="grow"></span><button class="btn ghost" data-act="spktarget">Atur target</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="xlsx">${ic('dl')}Excel</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="pdf">${ic('file')}PDF</button>`:`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','st',[['aktif','Aktif'],['Terlambat','Terlambat'],['Selesai','Selesai'],['','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button><button class="btn ghost" data-act="csv" data-what="spk">${ic('dl')}CSV</button>`;
 B['spk']=()=>{
  if(F.spk.tab==='kpi')return spkKpiBody();
  if(F.spk.tab==='berjalan')return spkBerjalan();
@@ -470,6 +470,8 @@ function spkJadwal(){
  const pilih=semua.filter(s=>cocok(s,f.fl||'jalan')&&(!q||(s.no+' '+s.customer+' '+(s.po||'')).toLowerCase().includes(q)))
   .sort((a,b)=>(a.tgl||'').localeCompare(b.tgl||'')||a.no-b.no);
  const mesinView=f.vw==='mesin';
+ const GT=[];const reg=o=>GT.push(o)-1;
+ const ta=(tip,o)=>`data-act="gtbar" data-i="${typeof o==='number'?o:reg(o)}" data-tip="${esc(tip)}" tabindex="0"`;
  if(!pilih.length&&!mesinView)return empty('Tidak ada SPK di filter ini','Ganti filter di atas, atau buat SPK baru.');
  const ses=P.sesiAktifSemua(S.produksi_log||[]);
  const aktifSpk=new Set(ses.map(e=>e.spk_id));
@@ -488,7 +490,7 @@ function spkJadwal(){
  // sumbu waktu
  const titik=[...(mesinView?M.titik:[]),...J.baris.flatMap(b=>[b.terbit,b.due,b.perkiraan,b.prod&&b.prod.dari,b.prod&&b.prod.sampai,b.vendor&&b.vendor.sampai,b.kirim&&b.kirim.sampai]),t,P.geserHari(t,7)].filter(Boolean).sort();
  const awal=P.geserHari(titik[0],-1),akhir=P.geserHari(titik[titik.length-1],2);const hari=P.selisihHari(awal,akhir)+1;
- const bulan=f.skala==='bulan',px=bulan?12:38,lebar=hari*px;
+ const bulan=f.skala==='bulan',px=bulan?12:f.skala==='lebar'?64:38,lebar=hari*px;
  const kiri=d=>P.selisihHari(awal,d)*px,lbr=(a,b)=>(P.selisihHari(a,b)+1)*px;
  const BLNP=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],BLNF=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'],HR=['M','S','S','R','K','J','S'];
  const hariList=Array.from({length:hari},(_,i)=>P.geserHari(awal,i));
@@ -499,20 +501,21 @@ function spkJadwal(){
  const grid=hariList.map((d,i)=>(bulan?d.slice(8)==='01':dow(d)===1)?`<i class="gt-gl" style="left:${i*px}px"></i>`:'').join('');
  const wkend=hariList.map((d,i)=>P.hariKerjaAkhirPekan(d)?`<i class="gt-we" style="left:${i*px}px;width:${px}px"></i>`:'').join('');
  const garisHariIni=`<i class="gt-now" style="left:${kiri(t)+px/2}px" title="Hari ini ${fdp2(t)}"></i>`;
- const bar=(seg,cls,teks,tip)=>seg?`<span class="gt-b ${cls}" style="left:${kiri(seg.dari)}px;width:${Math.max(px,lbr(seg.dari,seg.sampai))}px" title="${esc(tip)}">${teks||''}</span>`:'';
+ const bar=(seg,cls,teks,tip,o)=>seg?`<span class="gt-b ${cls}" style="left:${kiri(seg.dari)}px;width:${Math.max(px,lbr(seg.dari,seg.sampai))}px" ${ta(tip,o)}>${teks||''}</span>`:'';
  const rowH=b=>{
-  const plan=b.due?`<span class="gt-b plan" style="left:${kiri(b.terbit)}px;width:${Math.max(px,lbr(b.terbit,b.due))}px" title="Rencana: ${fdp2(b.terbit)} sampai ${fdp2(b.due)} (due)"></span>`:'';
-  const pr=b.prod?`<span class="gt-b prod${b.sedang?' live':''}" style="left:${kiri(b.prod.dari)}px;width:${Math.max(px,lbr(b.prod.dari,b.prod.sampai))}px" title="Produksi ${fdp2(b.prod.dari)} sampai ${fdp2(b.prod.sampai)} · ${Math.round(b.pP*100)}%"><i style="width:${Math.round(b.pP*100)}%"></i>${lbr(b.prod.dari,b.prod.sampai)>=48?`<em>${Math.round(b.pP*100)}%</em>`:''}</span>`:'';
-  const ve=bar(b.vendor,'vend'+(b.vendor&&b.vendor.terbuka?' open':''),b.vendor&&lbr(b.vendor.dari,b.vendor.sampai)>=70?`<em>${esc(b.vendor.nama)}</em>`:'',`Vendor ${b.vendor?b.vendor.nama:''}: ${b.vendor?fdp2(b.vendor.dari)+' sampai '+fdp2(b.vendor.sampai):''}`);
-  const ki=bar(b.kirim,'kirim',b.kirim&&lbr(b.kirim.dari,b.kirim.sampai)>=60?'<em>Kirim</em>':'',`Pengiriman ${b.kirim?fdp2(b.kirim.dari)+' sampai '+fdp2(b.kirim.sampai):''}`);
-  const dueM=b.due?`<i class="gt-due${b.telat?' late':''}" style="left:${kiri(b.due)+px-2}px" title="Due ${fdp2(b.due)}"></i>`:'';
-  const pk=b.perkiraan?`<i class="gt-est${b.risiko?' risk':''}" style="left:${kiri(b.perkiraan)+px/2}px" title="Perkiraan selesai ${fdp2(b.perkiraan)}${b.risiko?' (melewati due date)':''}"></i>`:'';
+  const si=reg({k:'spk',b,pK:(c.spk[b.id]||{}).pK||0});
+  const plan=b.due?`<span class="gt-b plan" style="left:${kiri(b.terbit)}px;width:${Math.max(px,lbr(b.terbit,b.due))}px" ${ta('Rencana: '+fdp2(b.terbit)+' sampai '+fdp2(b.due)+' (due)',si)}></span>`:'';
+  const pr=b.prod?`<span class="gt-b prod${b.sedang?' live':''}" style="left:${kiri(b.prod.dari)}px;width:${Math.max(px,lbr(b.prod.dari,b.prod.sampai))}px" ${ta('Produksi '+fdp2(b.prod.dari)+' sampai '+fdp2(b.prod.sampai)+' · '+Math.round(b.pP*100)+'%',si)}><i style="width:${Math.round(b.pP*100)}%"></i>${lbr(b.prod.dari,b.prod.sampai)>=48?`<em>${Math.round(b.pP*100)}%</em>`:''}</span>`:'';
+  const ve=bar(b.vendor,'vend'+(b.vendor&&b.vendor.terbuka?' open':''),b.vendor&&lbr(b.vendor.dari,b.vendor.sampai)>=70?`<em>${esc(b.vendor.nama)}</em>`:'',`Vendor ${b.vendor?b.vendor.nama:''}: ${b.vendor?fdp2(b.vendor.dari)+' sampai '+fdp2(b.vendor.sampai):''}`,si);
+  const ki=bar(b.kirim,'kirim',b.kirim&&lbr(b.kirim.dari,b.kirim.sampai)>=60?'<em>Kirim</em>':'',`Pengiriman ${b.kirim?fdp2(b.kirim.dari)+' sampai '+fdp2(b.kirim.sampai):''}`,si);
+  const dueM=b.due?`<i class="gt-due${b.telat?' late':''}" style="left:${kiri(b.due)+px-2}px" ${ta('Due '+fdp2(b.due),si)}></i>`:'';
+  const pk=b.perkiraan?`<i class="gt-est${b.risiko?' risk':''}" style="left:${kiri(b.perkiraan)+px/2}px" ${ta('Perkiraan selesai '+fdp2(b.perkiraan)+(b.risiko?' (melewati due date)':''),si)}></i>`:'';
   return plan+pr+ve+ki+dueM+pk;
  };
  const STL={selesai:['Selesai','ok'],telat:['Telat','crit'],risiko:['Berisiko telat','warn'],jalan:['Berjalan','info'],belum:['Belum mulai','plain']};
  const tutup=f.tutup||(f.tutup={});
- const langkahBar=(it,l)=>{const qy=it.q||0,pc=qy?Math.min(1,l.qty/qy):0,w=Math.max(px,lbr(l.dari,l.sampai));
-  return `<span class="gt-b step ${wcKelas(l.wc)}${l.live?' live':''}" style="left:${kiri(l.dari)}px;width:${w}px" title="${esc(l.wc)}${l.mesin.length?' · '+esc(l.mesin.join(', ')):''} · ${fdp2(l.dari)}${l.dari!==l.sampai?' sampai '+fdp2(l.sampai):''} · ${n(l.qty)} dari ${n(qy)}${l.reject?' · reject '+n(l.reject):''}"><i style="width:${Math.round(pc*100)}%"></i><em>${w>=64?esc(l.wc)+(w>=104?' · '+n(l.qty):''):''}</em></span>`};
+ const langkahBar=(b,it,l)=>{const qy=it.q||0,pc=qy?Math.min(1,l.qty/qy):0,w=Math.max(px,lbr(l.dari,l.sampai));
+  return `<span class="gt-b step ${wcKelas(l.wc)}${l.live?' live':''}" style="left:${kiri(l.dari)}px;width:${w}px" ${ta(l.wc+(l.mesin.length?' · '+l.mesin.join(', '):'')+' · '+fdp2(l.dari)+(l.dari!==l.sampai?' sampai '+fdp2(l.sampai):'')+' · '+n(l.qty)+' dari '+n(qy)+(l.reject?' · reject '+n(l.reject):''),{k:'step',b,it,l})}><i style="width:${Math.round(pc*100)}%"></i><em>${w>=64?esc(l.wc)+(w>=104?' · '+n(l.qty):''):''}</em></span>`};
  let rows='';
  if(!mesinView){
   rows=J.baris.map(b=>{
@@ -520,13 +523,13 @@ function spkJadwal(){
    const sisa=b.sisaHari==null?'':b.sisaHari<0?`<span class="gt-sisa crit">${-b.sisaHari} hr lewat</span>`:b.sisaHari===0?'<span class="gt-sisa warn">due hari ini</span>':`<span class="gt-sisa">${b.sisaHari} hr lagi</span>`;
    const head=`<div class="gt-nm" data-act="jdbuka" data-id="${b.id}"><span class="gt-car">${buka?'▾':'▸'}</span><div><b>SPK ${esc(String(b.no))}</b>${b.sedang?' <span class="gt-dot" title="Sedang dikerjakan"></span>':''}<div class="note">${esc(b.customer)}</div></div><span class="gt-pct">${pct}%</span></div>`;
    const sub=buka?b.items.map(it=>{const aktif=it.wcAktif&&it.wcAktif.length?' · di '+esc(it.wcAktif.join(', ')):' · dikerjakan';
-    return `<div class="gt-row gt-it"><div class="gt-nm gt-nm-it"><div><span class="gt-itd">${esc(it.d)}</span><div class="note">${n(it.q)} ${esc(it.u||'')} · ${Math.round(it.pct*100)}%${it.sedang?`<b class="gt-live">${aktif}</b>`:''}</div></div></div><div class="gt-tr" style="width:${lebar}px">${it.langkah.length?it.langkah.map(l=>langkahBar(it,l)).join(''):`<span class="gt-b none" style="left:${kiri(t)}px;width:${px*2}px" title="Belum dikerjakan"></span>`}</div></div>`}).join(''):'';
+    return `<div class="gt-row gt-it"><div class="gt-nm gt-nm-it"><div><span class="gt-itd">${esc(it.d)}</span><div class="note">${n(it.q)} ${esc(it.u||'')} · ${Math.round(it.pct*100)}%${it.sedang?`<b class="gt-live">${aktif}</b>`:''}</div></div></div><div class="gt-tr" style="width:${lebar}px">${it.langkah.length?it.langkah.map(l=>langkahBar(b,it,l)).join(''):`<span class="gt-b none" style="left:${kiri(t)}px;width:${px*2}px" title="Belum dikerjakan"></span>`}</div></div>`}).join(''):'';
    return `<div class="gt-row gt-spk"><div class="gt-nmw">${head}<div class="gt-info">${chip(stT,stC)}${sisa}<button class="linkbtn" data-act="openspk" data-id="${b.id}">Buka</button></div></div><div class="gt-tr" style="width:${lebar}px">${rowH(b)}</div></div>${sub}`}).join('');
  }else{
   rows=M.kelompok.map(g=>{
    const hd=`<div class="gt-row gt-grp ${wcKelas(g.wc)}"><div class="gt-nmw"><b>${esc(g.wc)}</b><span class="note">${g.baris.length} mesin</span></div><div class="gt-tr" style="width:${lebar}px"></div></div>`;
    return hd+g.baris.map(r=>{const h=Math.max(46,r.lajur*28+16);
-    const bl=r.blok.map(b=>{const w=Math.max(px,lbr(b.dari,b.sampai));return `<span class="gt-b blk ${wcKelas(b.wc)}${b.live?' live':''}" style="left:${kiri(b.dari)}px;width:${w}px;top:${8+b.lajur*28}px" title="SPK ${esc(String(b.no||''))} · ${esc(b.d)} · ${n(b.qty)} selesai${b.live?' · sedang dikerjakan'+(b.operator?' ('+esc(b.operator)+')':''):''} · ${fdp2(b.dari)}${b.dari!==b.sampai?' sampai '+fdp2(b.sampai):''}"><em>${w>=60?`SPK ${esc(String(b.no||''))}${w>=130?' · '+esc(b.d):''}${w>=100?' · '+n(b.qty):''}`:''}</em></span>`}).join('');
+    const bl=r.blok.map(b=>{const w=Math.max(px,lbr(b.dari,b.sampai));return `<span class="gt-b blk ${wcKelas(b.wc)}${b.live?' live':''}" style="left:${kiri(b.dari)}px;width:${w}px;top:${8+b.lajur*28}px" ${ta('SPK '+String(b.no||'')+' · '+(b.d||'')+' · '+n(b.qty)+' selesai'+(b.live?' · sedang dikerjakan'+(b.operator?' ('+b.operator+')':''):'')+' · '+fdp2(b.dari)+(b.dari!==b.sampai?' sampai '+fdp2(b.sampai):''),{k:'blk',b,mesin:r.mesin,wc:g.wc})}><em>${w>=60?`SPK ${esc(String(b.no||''))}${w>=130?' · '+esc(b.d):''}${w>=100?' · '+n(b.qty):''}`:''}</em></span>`}).join('');
     return `<div class="gt-row gt-mc" style="min-height:${h}px"><div class="gt-nmw"><b class="gt-mn">${esc(r.mesin)}</b><div class="gt-info">${r.sedang?chip('Sedang dikerjakan','warn'):r.blok.length?chip('Pernah dipakai','plain'):chip('Kosong','plain')}</div></div><div class="gt-tr" style="width:${lebar}px">${bl}</div></div>`}).join('')}).join('');
  }
  const hit=k=>J.baris.filter(b=>b.status===k).length;
@@ -535,11 +538,32 @@ function spkJadwal(){
  const wcLeg=wcUrut.map(w=>`<span><i class="gt-sw ${wcKelas(w.nama)}"></i>${esc(w.nama)}</span>`).join('');
  const legend=mesinView?`<div class="gt-leg">${wcLeg}<span><i class="gt-ico now"></i>Hari ini</span></div>`:`<div class="gt-leg">${wcLeg}<span><i class="gt-b plan"></i>Rencana (terbit sampai due)</span><span><i class="gt-b vend"></i>Di vendor</span><span><i class="gt-b kirim"></i>Pengiriman</span><span><i class="gt-ico due"></i>Due date</span><span><i class="gt-ico est"></i>Perkiraan selesai</span><span><i class="gt-ico now"></i>Hari ini</span></div>`;
  const bantu=mesinView?'Tiap balok adalah pekerjaan sebuah SPK di mesin itu, dari hari pertama sampai terakhir dikerjakan. Terisi sendiri dari tombol Mulai dan Catat di Produksi Hari Ini.':'Setiap SPK menampilkan item dan langkah mesinnya. Batang terisi sendiri dari catatan produksi, vendor, dan pengiriman; tidak ada yang perlu diisi di halaman ini. Ketuk nama SPK untuk melipat atau membuka item.';
- return `${kp}<section class="panel gt"><div class="gt-scroll" id="gt-scroll" data-sk="${bulan?'b':'m'}${mesinView?'m':'s'}" data-now="${kiri(t)}"><div class="gt-in" style="min-width:calc(var(--gt-nm) + ${lebar}px)">
+ GTX=GT;GTX.wcK=wcKelas;
+ return `${kp}<section class="panel gt"><div class="gt-scroll" id="gt-scroll" data-sk="${bulan?'b':f.skala==='lebar'?'l':'m'}${mesinView?'m':'s'}" data-now="${kiri(t)}" data-awal="${awal}" data-px="${px}"><div class="gt-in" style="min-width:calc(var(--gt-nm) + ${lebar}px)">
   <div class="gt-row gt-hd"><div class="gt-nmw gt-hdn">${mesinView?'Mesin':'SPK dan item'}</div><div class="gt-tr" style="width:${lebar}px"><div class="gt-h1">${hdBulan}</div><div class="gt-h2">${hdHari}</div></div></div>
-  <div class="gt-body"><div class="gt-ov" style="left:var(--gt-nm);width:${lebar}px">${wkend}${grid}${garisHariIni}</div>${rows}</div></div></div></section>${legend}<div class="note gt-note">${bantu}</div>`;
+  <div class="gt-body"><div class="gt-ov" style="left:var(--gt-nm);width:${lebar}px">${wkend}${grid}${garisHariIni}<i class="gt-cross" id="gt-cross"></i><span class="gt-xl" id="gt-xl"></span></div>${rows}</div></div></div></section>${legend}<div class="note gt-note">${bantu}</div>`;
 }
 const fdp2=d=>String(fd(d)).replace(/&nbsp;/g,' ');
+
+/* ---------- Papan jadwal: tooltip kaya dan panel detail ---------- */
+let GTX=[];
+const GT_STL={selesai:['Selesai','ok'],telat:['Telat','crit'],risiko:['Berisiko telat','warn'],jalan:['Berjalan','info'],belum:['Belum mulai','plain']};
+const gtKv=(k,v)=>v==null||v===''?'':`<div class="gt-kv"><span>${k}</span><b>${v}</b></div>`;
+const gtRentang=(a,b)=>a?(b&&b!==a?fdp2(a)+' – '+fdp2(b):fdp2(a)):'';
+const gtSisa=b=>b.sisaHari==null?'':b.sisaHari<0?' · '+(-b.sisaHari)+' hari lewat due':b.sisaHari===0?' · due hari ini':' · '+b.sisaHari+' hari lagi';
+function gtTipHtml(o){
+ if(o.k==='step'){const {b,it,l}=o;const pc=it.q?Math.round(Math.min(1,l.qty/it.q)*100):0;
+  return `<h5>${esc(l.wc)}${l.live?' <em class="gt-liveb">sedang dikerjakan</em>':''}</h5><div class="gt-sub">SPK ${esc(String(b.no))} · ${esc(it.d)}</div>${gtKv('Mesin',esc(l.mesin.join(', ')||'–'))}${gtKv('Tanggal',gtRentang(l.dari,l.sampai))}${gtKv('Hasil',`${n(l.qty)} dari ${n(it.q)} ${esc(it.u||'')} (${pc}%)`)}${l.reject?gtKv('Reject',n(l.reject)):''}<div class="gt-mini"><i style="width:${pc}%"></i></div><div class="gt-hint">Klik untuk detail</div>`}
+ if(o.k==='blk'){const x=o.b;return `<h5>${esc(o.mesin)}${x.live?' <em class="gt-liveb">sedang dikerjakan</em>':''}</h5><div class="gt-sub">SPK ${esc(String(x.no||''))} · ${esc(x.d||'')}</div>${gtKv('Work center',esc(o.wc))}${gtKv('Tanggal',gtRentang(x.dari,x.sampai))}${gtKv('Selesai',n(x.qty)+' pcs')}${x.operator?gtKv('Operator',esc(x.operator)):''}<div class="gt-hint">Klik untuk detail</div>`}
+ const b=o.b;
+ return `<h5>SPK ${esc(String(b.no))} · ${esc(b.customer)}</h5><div class="gt-sub">${GT_STL[b.status][0]}${gtSisa(b)}</div>${gtKv('Produksi',Math.round(b.pP*100)+'%'+(b.prod?' ('+gtRentang(b.prod.dari,b.prod.sampai)+')':''))}${gtKv('Terkirim',Math.round((o.pK||0)*100)+'%')}${b.vendor?gtKv('Vendor',esc(b.vendor.nama)+' ('+gtRentang(b.vendor.dari,b.vendor.sampai)+')'):''}${b.kirim?gtKv('Kirim',gtRentang(b.kirim.dari,b.kirim.sampai)):''}${b.due?gtKv('Rencana',gtRentang(b.terbit,b.due)):''}${b.perkiraan?gtKv('Perkiraan selesai',fdp2(b.perkiraan)+(b.risiko?' (lewat due)':'')):''}<div class="gt-hint">Klik untuk detail</div>`}
+function gtDetail(o){
+ const wk=GTX.wcK||(()=>'wc0');
+ if(o.k==='blk'){const x=o.b;const id=x.spk_id||x.spk||'';
+  openDrawer(()=>({t:`${esc(o.mesin)}`,s:`${chip(o.wc,'info')}${x.live?chip('Sedang dikerjakan','warn'):''}`,b:`<div class="gt-dd">${gtKv('SPK','SPK '+esc(String(x.no||'')))}${gtKv('Item',esc(x.d||''))}${gtKv('Tanggal',gtRentang(x.dari,x.sampai))}${gtKv('Hasil selesai',n(x.qty)+' pcs')}${x.operator?gtKv('Operator',esc(x.operator)):''}${id&&byId('spk',id)?`<div class="gt-act"><button class="btn primary" data-act="openspk" data-id="${esc(id)}">Buka SPK</button></div>`:''}</div>`}));return}
+ const b=o.b;const [stT,stC]=GT_STL[b.status];
+ const items=b.items.map(it=>`<div class="gt-dit${o.k==='step'&&o.it&&o.it.idx===it.idx?' hl':''}"><div class="gt-dih"><b>${esc(it.d)}</b><span>${n(it.q)} ${esc(it.u||'')} · ${Math.round(it.pct*100)}%</span></div><div class="jb"><i style="width:${Math.round(it.pct*100)}%"></i></div>${it.langkah.length?it.langkah.map(l=>`<div class="gt-dst"><i class="gt-sw ${wk(l.wc)}"></i><b>${esc(l.wc)}</b>${l.mesin.length?`<em>${esc(l.mesin.join(', '))}</em>`:''}<small>${gtRentang(l.dari,l.sampai)} · ${n(l.qty)} pcs${l.reject?' · reject '+n(l.reject):''}${l.live?' · berjalan':''}</small></div>`).join(''):'<div class="note">Belum dikerjakan</div>'}</div>`).join('');
+ openDrawer(()=>({t:`SPK ${esc(String(b.no))}`,s:`${esc(b.customer)} ${chip(stT,stC)}<span class="muted">${esc(gtSisa(b).replace(/^ · /,''))}</span>`,b:`<div class="gt-dd">${gtKv('Progres produksi',Math.round(b.pP*100)+'%')}${gtKv('Terkirim',Math.round((o.pK||0)*100)+'%')}${b.due?gtKv('Rencana',gtRentang(b.terbit,b.due)):''}${b.perkiraan?gtKv('Perkiraan selesai',fdp2(b.perkiraan)+(b.risiko?' (lewat due)':'')):''}${b.vendor?gtKv('Vendor',esc(b.vendor.nama)+' ('+gtRentang(b.vendor.dari,b.vendor.sampai)+')'):''}${b.kirim?gtKv('Pengiriman',gtRentang(b.kirim.dari,b.kirim.sampai)):''}<h4 class="gt-dh">Item dan langkah mesin</h4>${items}<div class="gt-act"><button class="btn primary" data-act="openspk" data-id="${b.id}">Buka SPK</button></div></div>`}))}
 
 /* ---------- Kinerja & Analisa (dulu Dashboard Produksi): Work Center, Vendor, Laporan harian ---------- */
 /* ---------- Kinerja & Analisa (Tahap 2): work center, produk, vendor, pengiriman ---------- */
@@ -3972,7 +3996,7 @@ const okChip=(ok,yes='Tepat',no='Telat')=>ok==null?'':chip(ok?yes:no,ok?'ok':'cr
 const dTxt=v=>v==null?'–':v+' hk';
 
 /* ---------- SPK KPI tab ---------- */
-F.spk.tab=F.spk.tab||'berjalan';F.spk.skala=F.spk.skala||'minggu';F.spk.buka=F.spk.buka||{};F.spk.tutup=F.spk.tutup||{};F.spk.vw=F.spk.vw||'spk';F.spk.p='90';
+F.spk.tab=F.spk.tab||'list';F.spk.skala=F.spk.skala||'minggu';F.spk.buka=F.spk.buka||{};F.spk.tutup=F.spk.tutup||{};F.spk.vw=F.spk.vw||'spk';F.spk.p='90';
 function spkPeriod(p){const t=today();if(p==='all')return ['0000-00-00',t,'semua SPK'];if(p==='bln')return [t.slice(0,8)+'01',t,'SPK bulan ini'];const k=+p||90;return [addDays(t,-(k-1)),t,`SPK ${k} hari terakhir`]}
 const avgOf=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
 const r1=v=>v==null?'–':String(Math.round(v*10)/10).replace('.',',');
@@ -4300,6 +4324,8 @@ document.addEventListener('click',async e=>{
   case 'spktarget':spkTargetForm();break;
   case 'kpivendor':kpiVendor(ds.v);break;
   case 'pmpilih':{F.mesin.mesin=ds.m;lsSet('mni-mesin',ds.m);renderTools();renderBody();break}
+  case 'gtbar':{const o=GTX[+ds.i];if(o)gtDetail(o);break}
+  case 'jdsemua':{F.spk.tutup={};if(ds.v==='lipat')S.spk.forEach(s=>{F.spk.tutup[s._id]=true});renderBody();break}
   case 'jdbuka':F.spk.tutup=F.spk.tutup||{};F.spk.tutup[ds.id]=!F.spk.tutup[ds.id];renderBody();break;
   case 'jdhariini':{const g=document.getElementById('gt-scroll');if(g)g.scrollLeft=Math.max(0,(+g.dataset.now)-90);break}
   case 'spkstage':F.spk.stage=ds.st||'';F.spk.tab='list';if(ds.st)F.spk.st='';renderTools();renderBody();break;
@@ -4314,6 +4340,29 @@ document.addEventListener('change',e=>{const el=e.target;const a=el.dataset.act;
  else if(a==='mesinmsn'){F.mesin.mesin=el.value;lsSet('mni-mesin',el.value);renderTools();renderBody()}
  else if(a==='mesinop'){lsSet(opKey(mesinPilih().mesin),el.value.trim())}
  else if(a==='lapf'){const f=F['laporan-produksi'];f[el.dataset.key]=el.value;if(el.dataset.key==='wc')f.mesin='';renderTools();renderBody()}});
+/* papan jadwal: tooltip saat hover, penunjuk tanggal, geser dengan drag, Enter membuka detail */
+(()=>{let tip=null,pan=null;
+ const mk=()=>{if(!tip){tip=document.createElement('div');tip.className='gt-tip';tip.hidden=true;document.body.appendChild(tip)}return tip};
+ const sembunyi=()=>{if(tip)tip.hidden=true};
+ const HRF=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+ document.addEventListener('mousemove',e=>{
+  if(pan)return;
+  const el=e.target&&e.target.closest?e.target:null;if(!el){sembunyi();return}
+  const bar=el.closest('.gt [data-act="gtbar"]');
+  if(bar){const o=GTX[+bar.dataset.i];if(o){const t=mk();if(t.dataset.i!==bar.dataset.i){t.innerHTML=gtTipHtml(o);t.dataset.i=bar.dataset.i}t.hidden=false;const w=t.offsetWidth,h=t.offsetHeight;let x=e.clientX+14,y=e.clientY+16;if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-14;t.style.left=Math.max(8,x)+'px';t.style.top=Math.max(8,y)+'px'}}else sembunyi();
+  const sc=el.closest('#gt-scroll'),cr=document.getElementById('gt-cross'),xl=document.getElementById('gt-xl');
+  if(sc&&cr&&xl){const r=sc.getBoundingClientRect();const nm=parseInt(getComputedStyle(sc.closest('.gt')).getPropertyValue('--gt-nm'))||244;const rel=e.clientX-r.left;const x=rel+sc.scrollLeft-nm;
+   if(rel>nm&&x>=0&&window.MNIProduksi){const px=+sc.dataset.px,i=Math.floor(x/px),d=window.MNIProduksi.geserHari(sc.dataset.awal,i);const dw=new Date(d+'T00:00:00Z').getUTCDay();cr.style.display='block';cr.style.left=(i*px+px/2)+'px';cr.style.width='1px';xl.style.display='block';xl.style.left=(i*px+px/2)+'px';xl.textContent=HRF[dw]+' '+fdp2(d)}
+   else{cr.style.display='none';xl.style.display='none'}}
+ });
+ document.addEventListener('mouseout',e=>{if(!e.relatedTarget)sembunyi()});
+ document.addEventListener('scroll',sembunyi,true);
+ document.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button!==0)return;const sc=e.target.closest&&e.target.closest('#gt-scroll');if(!sc||e.target.closest('[data-act],button,a,input,.gt-nmw,.gt-nm-it'))return;pan={sc,x:e.clientX,l:sc.scrollLeft};sc.classList.add('pan');sembunyi()});
+ document.addEventListener('pointermove',e=>{if(pan)pan.sc.scrollLeft=pan.l-(e.clientX-pan.x)});
+ const lepas=()=>{if(pan){pan.sc.classList.remove('pan');pan=null}};
+ document.addEventListener('pointerup',lepas);document.addEventListener('pointercancel',lepas);
+ document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches&&e.target.matches('.gt [data-act="gtbar"]')){const o=GTX[+e.target.dataset.i];if(o)gtDetail(o)}});
+})();
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#modal').hidden)closeModal();else if(ED)return;else if(SHEET)closeSheet();else if(DRAWER)closeDrawer()}});
 $('#editor').addEventListener('input',edInput);$('#editor').addEventListener('change',edInput);$('#editor').addEventListener('paste',edPaste);
 $('#editor').addEventListener('keydown',e=>{if(e.target.id==='ed-distnew'&&e.key==='Enter'){e.preventDefault();const v=e.target.value.trim();if(v&&ED){ED.dist=[...new Set([...ED.dist,v])];EDDIRTY=true;const keep=ED;renderEditor()}}});

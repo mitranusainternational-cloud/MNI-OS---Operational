@@ -42,6 +42,10 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ## Log kerja
 
+### 2026-11-05 — Papan jadwal v3 interaktif dan urutan tab SPK (T-185, lokal)
+
+Tinjauan pemilik: urutan tab diubah menjadi Daftar SPK, Jadwal, Berjalan, KPI & Analisa (Daftar SPK dibuka lebih dulu); Gantt bagus secara tampilan tetapi kaku dipakai. Hasil: hover batang menampilkan kartu keterangan, klik batang membuka panel detail SPK (item dan langkah mesin), penunjuk tanggal mengikuti kursor, zoom Detail, Harian, Ringkas, Buka semua dan Lipat semua, geser garis waktu dengan drag. Bukti: e2e regresi 42, role 12, akses 34, produksi 118, tampilan 72, alur lengkap 15 (0 FAIL; mock, bukan bukti Supabase). Kebutuhan di [[PRD_PRODUKSI]] bagian 15. Belum ditayangkan; migration 14 tetap draf. Langkah berikut: tinjauan pemilik.
+
 ### 2026-11-05 — Audit progres proyek
 
 - Selesai: audit silang vault, git, GitHub, dan Supabase production; laporan di [[AUDIT_PROGRESS_2026-11-05]]. Posisi: tugas selesai 29 dari 105 (28%), effort 16%, jalur kritis sisa 26,5 hari kerja menuju go-live.

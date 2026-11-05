@@ -915,3 +915,31 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 @media(max-width:520px){.pm-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.pm-tile{padding:12px}.pm-stats{grid-template-columns:minmax(0,1fr)}}
 .mq-grid{grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr))}
 @media(max-width:520px){.pm-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.pm-st{padding:10px 12px}.pm-st b{font-size:24px}}
+
+/* ---------- Papan jadwal: interaksi (tooltip, penunjuk tanggal, geser, panel detail) ---------- */
+.gt-scroll{cursor:grab}
+.gt-scroll.pan{cursor:grabbing;user-select:none}
+.gt-scroll.pan .gt-b{pointer-events:none}
+.gt-b[data-act],.gt-due[data-act],.gt-est[data-act]{cursor:pointer;transition:filter .12s,box-shadow .12s}
+.gt-b[data-act]:hover,.gt-b[data-act]:focus-visible{filter:brightness(.94) saturate(1.15);box-shadow:0 0 0 2px var(--accent);outline:none;z-index:3}
+.gt-row:not(.gt-hd):not(.gt-grp):hover>.gt-tr{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+.gt-row:not(.gt-hd):not(.gt-grp):hover>.gt-nmw,.gt-row.gt-it:hover>.gt-nm-it{background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.gt-cross{position:absolute;top:0;bottom:0;width:1px;background:var(--accent);opacity:.55;display:none;pointer-events:none;z-index:2}
+.gt-xl{position:absolute;top:2px;transform:translateX(-50%);display:none;background:var(--fg);color:var(--surface);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;pointer-events:none;white-space:nowrap;z-index:6}
+.gt-tip{position:fixed;z-index:60;max-width:300px;min-width:200px;background:var(--surface);color:var(--fg);border:1px solid var(--line-2);border-radius:12px;box-shadow:0 12px 36px rgba(0,0,0,.22);padding:11px 13px;font-size:12.5px;pointer-events:none}
+.gt-tip h5{margin:0 0 2px;font-size:13.5px;font-family:var(--f-display)}
+.gt-sub{color:var(--muted);font-size:12px;margin-bottom:6px}
+.gt-kv{display:flex;gap:10px;justify-content:space-between;padding:3px 0;border-top:1px solid var(--line)}
+.gt-kv span{color:var(--muted)}.gt-kv b{font-weight:600;text-align:right}
+.gt-mini{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:7px}.gt-mini i{display:block;height:100%;background:var(--accent)}
+.gt-hint{margin-top:7px;font-size:11px;color:var(--faint)}
+.gt-liveb{font-style:normal;font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-soft);padding:1px 7px;border-radius:9px;margin-left:4px}
+.gt-dd{display:flex;flex-direction:column;gap:2px;padding:4px 2px 8px}
+.gt-dh{margin:14px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.gt-dit{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px}
+.gt-dit.hl{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.gt-dih{display:flex;justify-content:space-between;gap:10px;margin-bottom:7px}.gt-dih span{color:var(--muted);font-size:12px;white-space:nowrap}
+.gt-dst{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:12.5px;padding:6px 0 0}
+.gt-dst em{font-style:normal;color:var(--muted)}.gt-dst small{width:100%;padding-left:22px;color:var(--muted);font-size:11.5px}
+.gt-dst .gt-sw{width:12px;height:12px}
+.gt-act{margin-top:12px;display:flex;gap:8px}

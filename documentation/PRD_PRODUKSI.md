@@ -146,3 +146,19 @@ Tujuan pemilik: mengetahui kapasitas aktual produksi tiap mesin secara realtime,
 | Input tetap mudah | Tidak berubah: Mulai, isi jumlah, Selesai | M-12 |
 
 Keputusan terbuka untuk pemilik: jam kerja standar per mesin dan target KPI (pcs per jam) per work center atau mesin; saat ini 8 jam dan kapasitas per hari dari Master Data. Tugas [[T-183-produksi-hari-ini-papan-mesin-dan-kapasitas-aktual]].
+
+
+## 15. Papan jadwal v3 dan urutan tab SPK (2026-11-05)
+
+Masukan pemilik: urutan tab SPK menjadi Daftar SPK, Jadwal, Berjalan, KPI & Analisa; Gantt masih kaku dipakai meski tampilannya sudah bagus. Referensi: pola papan jadwal Bryntum, DHTMLX, dan Precursive (kolom nama tetap terlihat, buka dan lipat semua, panel detail saat klik, warna status, isi progres di dalam batang), serta praktik Gantt manufaktur (warna menandai risiko, rentang waktu bisa diperbesar dan diperkecil).
+
+| Kebutuhan | Penyelesaian | Uji |
+|---|---|---|
+| Urutan dan tampilan awal tab | Daftar SPK, Jadwal, Berjalan, KPI & Analisa; Daftar SPK dibuka lebih dulu | M-105, M-105b |
+| Tahu isi batang tanpa membuka SPK | Hover menampilkan kartu: mesin, tanggal, hasil, reject, progres | M-148, M-149 |
+| Lihat rincian progres | Klik batang membuka panel SPK: item, langkah mesin per tanggal dan jumlah, item terpilih disorot, tombol Buka SPK | M-150 |
+| Baca tanggal dengan cepat | Penunjuk tanggal mengikuti kursor | M-149 |
+| Atur kepadatan | Zoom Detail, Harian, Ringkas; Buka semua dan Lipat semua | M-151, M-152 |
+| Navigasi garis waktu | Geser dengan drag; Ke hari ini tetap ada | M-153 |
+
+Tidak ada input baru dan tidak ada perubahan skema. Belum dibuat: mengubah jadwal dengan menggeser batang (jadwal diturunkan dari catatan, bukan diatur tangan) dan panah ketergantungan antarlangkah. Tugas [[T-185-papan-jadwal-v3-interaktif-dan-urutan-tab-spk]].
