@@ -108,7 +108,7 @@ generated: 2026-11-05
 - [[tasks/T-182-papan-jadwal-v2-dan-rapikan-layout-spk|T-182]] Papan jadwal v2 (per SPK dan per mesin) dan perapian layout Berjalan, KPI & Analisa, Target waktu proses · dev + pemilik
 - [[tasks/T-183-produksi-hari-ini-papan-mesin-dan-kapasitas-aktual|T-183]] Produksi Hari Ini: papan mesin dan kapasitas aktual (output, laju, pemakaian mesin, proyeksi, tren) · dev + pemilik
 - [[tasks/T-185-papan-jadwal-v3-interaktif-dan-urutan-tab-spk|T-185]] Papan jadwal v3 interaktif (tooltip, panel detail, zoom, geser, buka/lipat semua) dan urutan tab SPK · dev + pemilik
-- [[tasks/T-186-jadwal-tampilan-progres-matriks-posisi-item|T-186]] Berjalan memuat matriks posisi item; Jadwal menjadi papan jadwal mingguan dengan rencana otomatis · dev + pemilik
+- [[tasks/T-186-jadwal-tampilan-progres-matriks-posisi-item|T-186]] Berjalan memuat matriks posisi item; Jadwal menjadi timeline bersih per SPK dengan perkiraan otomatis · dev + pemilik
 
 ## Tugas P0 yang belum selesai
 

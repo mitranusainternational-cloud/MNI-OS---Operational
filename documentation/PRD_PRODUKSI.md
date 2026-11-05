@@ -166,17 +166,17 @@ Tidak ada input baru dan tidak ada perubahan skema. Belum dibuat: mengubah jadwa
 
 ## 16. Berjalan dan Jadwal dibedakan (2026-11-05)
 
-Masukan pemilik: Gantt kurang bagus untuk memantau; Jadwal dan Berjalan masih sama; Jadwal dibuat seperti papan jadwal Antlia tetapi lebih baik; tampilan pertama terlalu membingungkan. Keputusan: **Berjalan** menjawab sekarang di mana dan sudah berapa; **Jadwal** menjawab kapan dikerjakan dan apakah akan telat.
+Masukan pemilik berurutan: Gantt kurang bagus untuk memantau; Jadwal dan Berjalan masih sama; Jadwal seperti papan jadwal Antlia (Production Calendar) tetapi lebih baik; papan per work center terlalu membingungkan; Jadwal cukup timeline bersih dan modern dengan nama PT karena rincian per work center sudah ada di Berjalan. Keputusan: **Berjalan** menjawab sekarang di mana dan sudah berapa; **Jadwal** menjawab kapan selesai dan apakah akan telat.
 
 | Kebutuhan | Penyelesaian | Uji |
 |---|---|---|
 | Tahu posisi tiap item sekarang (Berjalan) | Matriks per item: kolom langkah Shearing sampai Kirim, centang, cincin posisi, label posisi dan nomor langkah | M-154, M-155 |
 | Sebaran pekerjaan dan item macet | Strip posisi item sekarang (klik menyaring), penanda Diam N hari, mode Ringkas dan Rinci | M-156, M-159, M-160 |
-| Tahu kapan dikerjakan (Jadwal) | Papan mingguan per SPK: kotak per work center per hari, realisasi, rencana otomatis, oranye sedang berjalan, hatch vendor | M-161, M-162 |
-| Tahu SPK mana berisiko telat | Status prediksi per SPK (Aman, Mepet due, Berisiko telat), bendera due date, perkiraan siap kirim | M-164, R-07 |
-| Navigasi | Panah minggu dan Hari ini; klik baris atau kotak membuka rencana SPK per item | M-163, M-165, M-166 |
-| Cek kapasitas | Beban work center per hari di bagian lipat; terbuka otomatis bila ada hari melebihi kapasitas | M-162 |
-| Dipakai di HP | Matriks dan papan bergulir di dalam kotaknya sendiri | M-158, M-167 |
-| Pilihan lama tetap ada | Garis waktu (Gantt) dan Per mesin | M-168 |
+| Tahu kapan SPK selesai (Jadwal) | Timeline: satu batang per SPK dengan nama customer, dari terbit sampai perkiraan siap kirim; isi batang = progres | M-161, M-162 |
+| Tahu SPK mana berisiko telat | Status prediksi per SPK (Aman, Mepet due, Berisiko telat), bendera due date, bagian yang melewati due date bergaris merah | M-162, R-07 |
+| Navigasi | Panah minggu, Hari ini, zoom 2 minggu, 1 bulan, 3 bulan | M-163, M-164 |
+| Ringkasan tanpa rincian work center | Klik batang atau nama membuka ringkasan SPK dan tombol Lihat posisi di Berjalan | M-165, M-166, M-166b |
+| Dipakai di HP | Matriks dan timeline bergulir di dalam kotaknya sendiri | M-158, M-167 |
+| Pilihan lama tetap ada | Rinci per item (Gantt) dan Per mesin | M-168 |
 
-Rencana otomatis (mesin murni `rencana.js`, uji R-01 sampai R-10): SPK dengan due date terdekat dikerjakan lebih dulu, tiap langkah mengisi kapasitas work center per hari kerja (Senin sampai Jumat), langkah berikutnya mulai hari kerja berikutnya, vendor 3 hari kerja; work center tanpa kapasitas dianggap selesai dalam satu hari. Hanya usulan untuk dipantau. Tidak ada input baru dan tidak ada perubahan skema. Tugas [[T-186-jadwal-tampilan-progres-matriks-posisi-item]].
+Perkiraan siap kirim (mesin murni `rencana.js`, uji R-01 sampai R-10): SPK dengan due date terdekat dikerjakan lebih dulu, tiap langkah mengisi kapasitas work center per hari kerja (Senin sampai Jumat), langkah berikutnya mulai hari kerja berikutnya, vendor 3 hari kerja; work center tanpa kapasitas dianggap selesai dalam satu hari. Hanya usulan untuk dipantau. Tidak ada input baru dan tidak ada perubahan skema. Tugas [[T-186-jadwal-tampilan-progres-matriks-posisi-item]].
