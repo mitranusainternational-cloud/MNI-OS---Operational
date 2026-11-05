@@ -421,7 +421,7 @@ B['pengiriman']=()=>{
 };
 
 /* ---------- SPK ---------- */
-T['spk']=()=>F.spk.tab==='jadwal'?`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','skala',[['minggu','Per minggu'],['bulan','Per bulan']])}${segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn ghost" data-act="jdhariini">Ke hari ini</button>`:F.spk.tab==='berjalan'?`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button>`:F.spk.tab==='kpi'?`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','p',[['30','30 hari'],['90','90 hari'],['bln','Bulan ini'],['all','Semua']])}<span class="grow"></span><button class="btn ghost" data-act="spktarget">Atur target</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="xlsx">${ic('dl')}Excel</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="pdf">${ic('file')}PDF</button>`:`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','st',[['aktif','Aktif'],['Terlambat','Terlambat'],['Selesai','Selesai'],['','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button><button class="btn ghost" data-act="csv" data-what="spk">${ic('dl')}CSV</button>`;
+T['spk']=()=>F.spk.tab==='jadwal'?`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','vw',[['spk','Per SPK'],['mesin','Per mesin']])}${segBtns('spk','skala',[['minggu','Harian'],['bulan','Ringkas']])}${F.spk.vw==='mesin'?'':segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn ghost" data-act="jdhariini">Ke hari ini</button>`:F.spk.tab==='berjalan'?`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button>`:F.spk.tab==='kpi'?`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','p',[['30','30 hari'],['90','90 hari'],['bln','Bulan ini'],['all','Semua']])}<span class="grow"></span><button class="btn ghost" data-act="spktarget">Atur target</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="xlsx">${ic('dl')}Excel</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="pdf">${ic('file')}PDF</button>`:`${segBtns('spk','tab',[['berjalan','Berjalan'],['jadwal','Jadwal'],['list','Daftar SPK'],['kpi','KPI & Analisa']])}${segBtns('spk','st',[['aktif','Aktif'],['Terlambat','Terlambat'],['Selesai','Selesai'],['','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button><button class="btn ghost" data-act="csv" data-what="spk">${ic('dl')}CSV</button>`;
 B['spk']=()=>{
  if(F.spk.tab==='kpi')return spkKpiBody();
  if(F.spk.tab==='berjalan')return spkBerjalan();
@@ -452,11 +452,11 @@ function spkBerjalan(){
   const sek=ses.filter(e=>e.spk_id===s._id);
   const sekTeks=sek.length?`<div class="sb-now">${chip('Sedang dikerjakan','warn')} ${sek.map(e=>`${esc(e.mesin||e.wc)}${e.operator?' ('+esc(e.operator)+')':''}`).join(' · ')}</div>`:'';
   const pct=Math.round((x.pP||0)*100)||0;
-  return `<section class="panel sb-card"><div class="pbody">
+  return `<section class="panel sb-card t-${j}"><div class="pbody">
    <div class="sb-h" data-act="openspk" data-id="${s._id}"><div><b class="sb-no">SPK ${esc(String(s.no))}</b> <span class="sb-cust">${esc(s.customer)}</span><div class="note">${esc(s.po||'')} · ${s.items.length} item</div></div><div class="sb-chips">${dueC}${j==='selesai'?chip('Selesai','ok'):chip(stage(s)||x.st,STAGE_CLS[stage(s)]||'plain')}</div></div>
    <div class="sb-bar"><div class="jb"><i style="width:${pct}%"></i></div><b>${pct}%</b></div>
    ${sekTeks}
-   <details class="sb-det"${i<3?' open':''}><summary>Lihat jalur tiap item sampai barang jadi</summary>${jejakHtml(s._id)}</details></div></section>`};
+   <details class="sb-det"${sek.length||j==='vendor'||i<3?' open':''}><summary>Lihat jalur tiap item sampai barang jadi</summary>${jejakHtml(s._id)}</details></div></section>`};
  return kp+(xs.length?xs.map(kartu).join(''):empty('Tidak ada SPK di filter ini','Ganti filter di atas, atau buat SPK baru.'));
 }
 
@@ -469,7 +469,8 @@ function spkJadwal(){
  const cocok=(s,k)=>{const x=c.spk[s._id];return k==='semua'||(k==='jalan'?x.st!=='Selesai':k==='telat'?x.st==='Terlambat':k==='vendor'?stage(s)==='Di vendor':k==='siap'?(stage(s)==='Siap kirim'||stage(s)==='Kirim sebagian'):x.st==='Selesai')};
  const pilih=semua.filter(s=>cocok(s,f.fl||'jalan')&&(!q||(s.no+' '+s.customer+' '+(s.po||'')).toLowerCase().includes(q)))
   .sort((a,b)=>(a.tgl||'').localeCompare(b.tgl||'')||a.no-b.no);
- if(!pilih.length)return empty('Tidak ada SPK di filter ini','Ganti filter di atas, atau buat SPK baru.');
+ const mesinView=f.vw==='mesin';
+ if(!pilih.length&&!mesinView)return empty('Tidak ada SPK di filter ini','Ganti filter di atas, atau buat SPK baru.');
  const ses=P.sesiAktifSemua(S.produksi_log||[]);
  const aktifSpk=new Set(ses.map(e=>e.spk_id));
  const aktifItem=new Set(ses.map(e=>e.spk_id+'|'+e.item_idx));
@@ -477,41 +478,66 @@ function spkJadwal(){
   items:(s.items||[]).map((it,idx)=>{const pe=prodFromEvents(s,it,idx);const qty=+it.q||0;return {idx,d:it.d,q:qty,u:it.u,pct:pe!=null?pe:(qty?Math.min(1,(+it.prod||0)/qty):0),sedang:aktifItem.has(s._id+'|'+idx)}})}});
  const vend=S.vendor.map(v=>{const last=(v.riwayat||[]).slice(-1)[0];const sel=v.status==='Selesai';return {spk:v.spk,vendor:v.vendor,tgl:v.tgl,status:v.status,tglKembali:sel?((last&&last.tgl)||String(v.updAt||'').slice(0,10)||null):null}});
  const kir=S.kirim.map(k=>({spk:k.spk,tgl:k.tgl,tglTerima:k.tglTerima||null,status:k.status}));
- const J=P.susunJadwal({spk,kejadian:evData(),vendor:vend,kirim:kir,hariIni:t,aktif:aktifSpk});
- const bulan=f.skala==='bulan',px=bulan?9:30,lebar=J.hari*px;
- const kiri=d=>P.selisihHari(J.awal,d)*px,lbr=(a,b)=>(P.selisihHari(a,b)+1)*px;
- const sumbu=P.sumbuTanggal(J.awal,J.akhir,bulan?'bulan':'minggu');
- const BLNP=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
- const lab=d=>{const p=d.split('-');return bulan?BLNP[+p[1]-1]+' '+p[0].slice(2):(+p[2])+' '+BLNP[+p[1]-1]};
- const hdr=sumbu.map(s=>`<span class="gt-tk" style="left:${s.i*px}px">${lab(s.tgl)}</span>`).join('');
- const grid=sumbu.map(s=>`<i class="gt-gl" style="left:${s.i*px}px"></i>`).join('');
- const wkend=bulan?'':Array.from({length:J.hari},(_,i)=>P.geserHari(J.awal,i)).map((d,i)=>P.hariKerjaAkhirPekan(d)?`<i class="gt-we" style="left:${i*px}px;width:${px}px"></i>`:'').join('');
+ const J=P.susunJadwal({spk,kejadian:evData(),vendor:vend,kirim:kir,hariIni:t,aktif:aktifSpk,sesi:ses});
+ // papan per mesin
+ const wcUrut=S.mwc.filter(w=>w.aktif!==false).sort((a,b)=>a.urutan-b.urutan);
+ const wcKelas=nm=>{const i=wcUrut.findIndex(w=>w.nama===nm);return 'wc'+((i<0?wcUrut.length:i)%8)};
+ let M=null;
+ if(mesinView){const info={};S.spk.forEach(s=>{info[s._id]={no:s.no,customer:s.customer,items:Object.fromEntries((s.items||[]).map((it,i)=>[i,it.d]))}});
+  M=P.susunMesin({kejadian:evData(),sesi:ses,mesinMaster:wcUrut.map(w=>({wc:w.nama,mesin:mesinWC(w.nama).map(m=>m.nama)})),info,hariIni:t})}
+ // sumbu waktu
+ const titik=[...(mesinView?M.titik:[]),...J.baris.flatMap(b=>[b.terbit,b.due,b.perkiraan,b.prod&&b.prod.dari,b.prod&&b.prod.sampai,b.vendor&&b.vendor.sampai,b.kirim&&b.kirim.sampai]),t,P.geserHari(t,7)].filter(Boolean).sort();
+ const awal=P.geserHari(titik[0],-1),akhir=P.geserHari(titik[titik.length-1],2);const hari=P.selisihHari(awal,akhir)+1;
+ const bulan=f.skala==='bulan',px=bulan?12:38,lebar=hari*px;
+ const kiri=d=>P.selisihHari(awal,d)*px,lbr=(a,b)=>(P.selisihHari(a,b)+1)*px;
+ const BLNP=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],BLNF=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'],HR=['M','S','S','R','K','J','S'];
+ const hariList=Array.from({length:hari},(_,i)=>P.geserHari(awal,i));
+ const dow=d=>new Date(d+'T00:00:00Z').getUTCDay();
+ const bandBulan=[];hariList.forEach((d,i)=>{const k=d.slice(0,7);const l=bandBulan[bandBulan.length-1];if(l&&l.k===k)l.n++;else bandBulan.push({k,n:1,i,d})});
+ const hdBulan=bandBulan.map(b=>`<span class="gt-mo" style="left:${b.i*px}px;width:${b.n*px}px">${b.n*px<80?BLNP[+b.k.slice(5)-1]:BLNF[+b.k.slice(5)-1]+' '+b.k.slice(0,4)}</span>`).join('');
+ const hdHari=bulan?P.sumbuTanggal(awal,akhir,'minggu').map(s=>`<span class="gt-tk" style="left:${s.i*px}px">${+s.tgl.slice(8)}</span>`).join(''):hariList.map((d,i)=>`<span class="gt-dy${P.hariKerjaAkhirPekan(d)?' we':''}${d===t?' now':''}" style="left:${i*px}px;width:${px}px"><small>${HR[dow(d)]}</small><b>${+d.slice(8)}</b></span>`).join('');
+ const grid=hariList.map((d,i)=>(bulan?d.slice(8)==='01':dow(d)===1)?`<i class="gt-gl" style="left:${i*px}px"></i>`:'').join('');
+ const wkend=hariList.map((d,i)=>P.hariKerjaAkhirPekan(d)?`<i class="gt-we" style="left:${i*px}px;width:${px}px"></i>`:'').join('');
  const garisHariIni=`<i class="gt-now" style="left:${kiri(t)+px/2}px" title="Hari ini ${fdp2(t)}"></i>`;
  const bar=(seg,cls,teks,tip)=>seg?`<span class="gt-b ${cls}" style="left:${kiri(seg.dari)}px;width:${Math.max(px,lbr(seg.dari,seg.sampai))}px" title="${esc(tip)}">${teks||''}</span>`:'';
- const rowH=(b)=>{
+ const rowH=b=>{
   const plan=b.due?`<span class="gt-b plan" style="left:${kiri(b.terbit)}px;width:${Math.max(px,lbr(b.terbit,b.due))}px" title="Rencana: ${fdp2(b.terbit)} sampai ${fdp2(b.due)} (due)"></span>`:'';
   const pr=b.prod?`<span class="gt-b prod${b.sedang?' live':''}" style="left:${kiri(b.prod.dari)}px;width:${Math.max(px,lbr(b.prod.dari,b.prod.sampai))}px" title="Produksi ${fdp2(b.prod.dari)} sampai ${fdp2(b.prod.sampai)} · ${Math.round(b.pP*100)}%"><i style="width:${Math.round(b.pP*100)}%"></i>${lbr(b.prod.dari,b.prod.sampai)>=48?`<em>${Math.round(b.pP*100)}%</em>`:''}</span>`:'';
-  const ve=bar(b.vendor,'vend'+(b.vendor&&b.vendor.terbuka?' open':''),'',`Vendor ${b.vendor?b.vendor.nama:''}: ${b.vendor?fdp2(b.vendor.dari)+' sampai '+fdp2(b.vendor.sampai):''}`);
-  const ki=bar(b.kirim,'kirim','',`Pengiriman ${b.kirim?fdp2(b.kirim.dari)+' sampai '+fdp2(b.kirim.sampai):''}`);
+  const ve=bar(b.vendor,'vend'+(b.vendor&&b.vendor.terbuka?' open':''),b.vendor&&lbr(b.vendor.dari,b.vendor.sampai)>=70?`<em>${esc(b.vendor.nama)}</em>`:'',`Vendor ${b.vendor?b.vendor.nama:''}: ${b.vendor?fdp2(b.vendor.dari)+' sampai '+fdp2(b.vendor.sampai):''}`);
+  const ki=bar(b.kirim,'kirim',b.kirim&&lbr(b.kirim.dari,b.kirim.sampai)>=60?'<em>Kirim</em>':'',`Pengiriman ${b.kirim?fdp2(b.kirim.dari)+' sampai '+fdp2(b.kirim.sampai):''}`);
   const dueM=b.due?`<i class="gt-due${b.telat?' late':''}" style="left:${kiri(b.due)+px-2}px" title="Due ${fdp2(b.due)}"></i>`:'';
   const pk=b.perkiraan?`<i class="gt-est${b.risiko?' risk':''}" style="left:${kiri(b.perkiraan)+px/2}px" title="Perkiraan selesai ${fdp2(b.perkiraan)}${b.risiko?' (melewati due date)':''}"></i>`:'';
   return plan+pr+ve+ki+dueM+pk;
  };
  const STL={selesai:['Selesai','ok'],telat:['Telat','crit'],risiko:['Berisiko telat','warn'],jalan:['Berjalan','info'],belum:['Belum mulai','plain']};
- const rows=J.baris.map(b=>{
-  const [stT,stC]=STL[b.status];const buka=!!f.buka[b.id];
-  const sisa=b.sisaHari==null?'':b.sisaHari<0?`<span class="gt-sisa crit">${-b.sisaHari} hr lewat</span>`:b.sisaHari===0?'<span class="gt-sisa warn">due hari ini</span>':`<span class="gt-sisa">${b.sisaHari} hr lagi</span>`;
-  const head=`<div class="gt-nm" data-act="jdbuka" data-id="${b.id}"><span class="gt-car">${buka?'▾':'▸'}</span><div><b>SPK ${esc(String(b.no))}</b>${b.sedang?' <span class="gt-dot" title="Sedang dikerjakan"></span>':''}<div class="note">${esc(b.customer)}</div></div></div>`;
-  const track=`<div class="gt-tr" style="width:${lebar}px">${rowH(b)}</div>`;
-  const sub=buka?b.items.map(it=>`<div class="gt-row gt-it"><div class="gt-nm gt-nm-it"><div><span class="gt-itd">${esc(it.d)}</span><div class="note">${n(it.q)} ${esc(it.u||'')} · ${Math.round(it.pct*100)}%${it.sedang?' · sedang dikerjakan':''}</div></div></div><div class="gt-tr" style="width:${lebar}px">${it.dari?`<span class="gt-b prod${it.sedang?' live':''}" style="left:${kiri(it.dari)}px;width:${Math.max(px,lbr(it.dari,it.sampai))}px" title="${esc(it.d)} · ${Math.round(it.pct*100)}%"><i style="width:${Math.round(it.pct*100)}%"></i></span>`:`<span class="gt-b none" style="left:${kiri(t)}px;width:${px}px" title="Belum dikerjakan"></span>`}</div></div>`).join(''):'';
-  return `<div class="gt-row"><div class="gt-nmw">${head}<div class="gt-info">${chip(stT,stC)}${sisa}<button class="linkbtn" data-act="openspk" data-id="${b.id}">Buka</button></div></div>${track}</div>${sub}`;
- }).join('');
+ const tutup=f.tutup||(f.tutup={});
+ const langkahBar=(it,l)=>{const qy=it.q||0,pc=qy?Math.min(1,l.qty/qy):0,w=Math.max(px,lbr(l.dari,l.sampai));
+  return `<span class="gt-b step ${wcKelas(l.wc)}${l.live?' live':''}" style="left:${kiri(l.dari)}px;width:${w}px" title="${esc(l.wc)}${l.mesin.length?' · '+esc(l.mesin.join(', ')):''} · ${fdp2(l.dari)}${l.dari!==l.sampai?' sampai '+fdp2(l.sampai):''} · ${n(l.qty)} dari ${n(qy)}${l.reject?' · reject '+n(l.reject):''}"><i style="width:${Math.round(pc*100)}%"></i><em>${w>=64?esc(l.wc)+(w>=104?' · '+n(l.qty):''):''}</em></span>`};
+ let rows='';
+ if(!mesinView){
+  rows=J.baris.map(b=>{
+   const [stT,stC]=STL[b.status];const buka=!tutup[b.id];const pct=Math.round(b.pP*100);
+   const sisa=b.sisaHari==null?'':b.sisaHari<0?`<span class="gt-sisa crit">${-b.sisaHari} hr lewat</span>`:b.sisaHari===0?'<span class="gt-sisa warn">due hari ini</span>':`<span class="gt-sisa">${b.sisaHari} hr lagi</span>`;
+   const head=`<div class="gt-nm" data-act="jdbuka" data-id="${b.id}"><span class="gt-car">${buka?'▾':'▸'}</span><div><b>SPK ${esc(String(b.no))}</b>${b.sedang?' <span class="gt-dot" title="Sedang dikerjakan"></span>':''}<div class="note">${esc(b.customer)}</div></div><span class="gt-pct">${pct}%</span></div>`;
+   const sub=buka?b.items.map(it=>{const aktif=it.wcAktif&&it.wcAktif.length?' · di '+esc(it.wcAktif.join(', ')):' · dikerjakan';
+    return `<div class="gt-row gt-it"><div class="gt-nm gt-nm-it"><div><span class="gt-itd">${esc(it.d)}</span><div class="note">${n(it.q)} ${esc(it.u||'')} · ${Math.round(it.pct*100)}%${it.sedang?`<b class="gt-live">${aktif}</b>`:''}</div></div></div><div class="gt-tr" style="width:${lebar}px">${it.langkah.length?it.langkah.map(l=>langkahBar(it,l)).join(''):`<span class="gt-b none" style="left:${kiri(t)}px;width:${px*2}px" title="Belum dikerjakan"></span>`}</div></div>`}).join(''):'';
+   return `<div class="gt-row gt-spk"><div class="gt-nmw">${head}<div class="gt-info">${chip(stT,stC)}${sisa}<button class="linkbtn" data-act="openspk" data-id="${b.id}">Buka</button></div></div><div class="gt-tr" style="width:${lebar}px">${rowH(b)}</div></div>${sub}`}).join('');
+ }else{
+  rows=M.kelompok.map(g=>{
+   const hd=`<div class="gt-row gt-grp ${wcKelas(g.wc)}"><div class="gt-nmw"><b>${esc(g.wc)}</b><span class="note">${g.baris.length} mesin</span></div><div class="gt-tr" style="width:${lebar}px"></div></div>`;
+   return hd+g.baris.map(r=>{const h=Math.max(46,r.lajur*28+16);
+    const bl=r.blok.map(b=>{const w=Math.max(px,lbr(b.dari,b.sampai));return `<span class="gt-b blk ${wcKelas(b.wc)}${b.live?' live':''}" style="left:${kiri(b.dari)}px;width:${w}px;top:${8+b.lajur*28}px" title="SPK ${esc(String(b.no||''))} · ${esc(b.d)} · ${n(b.qty)} selesai${b.live?' · sedang dikerjakan'+(b.operator?' ('+esc(b.operator)+')':''):''} · ${fdp2(b.dari)}${b.dari!==b.sampai?' sampai '+fdp2(b.sampai):''}"><em>${w>=60?`SPK ${esc(String(b.no||''))}${w>=130?' · '+esc(b.d):''}${w>=100?' · '+n(b.qty):''}`:''}</em></span>`}).join('');
+    return `<div class="gt-row gt-mc" style="min-height:${h}px"><div class="gt-nmw"><b class="gt-mn">${esc(r.mesin)}</b><div class="gt-info">${r.sedang?chip('Sedang dikerjakan','warn'):r.blok.length?chip('Pernah dipakai','plain'):chip('Kosong','plain')}</div></div><div class="gt-tr" style="width:${lebar}px">${bl}</div></div>`}).join('')}).join('');
+ }
  const hit=k=>J.baris.filter(b=>b.status===k).length;
- const kp=`<div class="gt-sum">${chip(J.baris.length+' SPK','info')}${hit('telat')?chip(hit('telat')+' telat','crit'):''}${hit('risiko')?chip(hit('risiko')+' berisiko telat','warn'):''}${chip(hit('jalan')+' berjalan','plain')}${hit('belum')?chip(hit('belum')+' belum mulai','plain'):''}</div>`;
- const legend=`<div class="gt-leg"><span><i class="gt-b plan"></i>Rencana (terbit sampai due)</span><span><i class="gt-b prod"></i>Produksi (isi = progres)</span><span><i class="gt-b vend"></i>Di vendor</span><span><i class="gt-b kirim"></i>Pengiriman</span><span><i class="gt-ico due"></i>Due date</span><span><i class="gt-ico est"></i>Perkiraan selesai</span><span><i class="gt-ico now"></i>Hari ini</span></div>`;
- return `${kp}<section class="panel gt"><div class="gt-scroll" id="gt-scroll" data-sk="${bulan?'b':'m'}" data-now="${kiri(t)}"><div class="gt-in" style="min-width:calc(var(--gt-nm) + ${lebar}px)">
-  <div class="gt-row gt-hd"><div class="gt-nmw gt-hdn">SPK</div><div class="gt-tr" style="width:${lebar}px">${hdr}</div></div>
-  <div class="gt-body"><div class="gt-ov" style="left:var(--gt-nm);width:${lebar}px">${wkend}${grid}${garisHariIni}</div>${rows}</div></div></div></section>${legend}<div class="note gt-note">Batang terisi sendiri dari catatan produksi, vendor, dan pengiriman. Tidak ada yang perlu diisi di halaman ini. Ketuk nama SPK untuk melihat jadwal tiap item.</div>`;
+ const jmlMesin=M?M.kelompok.reduce((a,g)=>a+g.baris.filter(r=>r.sedang).length,0):0;
+ const kp=mesinView?`<div class="gt-sum">${chip(jmlMesin+' mesin sedang bekerja',jmlMesin?'warn':'plain')}${chip(M.blok.length+' pekerjaan tercatat','info')}</div>`:`<div class="gt-sum">${chip(J.baris.length+' SPK','info')}${hit('telat')?chip(hit('telat')+' telat','crit'):''}${hit('risiko')?chip(hit('risiko')+' berisiko telat','warn'):''}${chip(hit('jalan')+' berjalan','plain')}${hit('belum')?chip(hit('belum')+' belum mulai','plain'):''}</div>`;
+ const wcLeg=wcUrut.map(w=>`<span><i class="gt-sw ${wcKelas(w.nama)}"></i>${esc(w.nama)}</span>`).join('');
+ const legend=mesinView?`<div class="gt-leg">${wcLeg}<span><i class="gt-ico now"></i>Hari ini</span></div>`:`<div class="gt-leg">${wcLeg}<span><i class="gt-b plan"></i>Rencana (terbit sampai due)</span><span><i class="gt-b vend"></i>Di vendor</span><span><i class="gt-b kirim"></i>Pengiriman</span><span><i class="gt-ico due"></i>Due date</span><span><i class="gt-ico est"></i>Perkiraan selesai</span><span><i class="gt-ico now"></i>Hari ini</span></div>`;
+ const bantu=mesinView?'Tiap balok adalah pekerjaan sebuah SPK di mesin itu, dari hari pertama sampai terakhir dikerjakan. Terisi sendiri dari tombol Mulai dan Catat di Produksi Hari Ini.':'Setiap SPK menampilkan item dan langkah mesinnya. Batang terisi sendiri dari catatan produksi, vendor, dan pengiriman; tidak ada yang perlu diisi di halaman ini. Ketuk nama SPK untuk melipat atau membuka item.';
+ return `${kp}<section class="panel gt"><div class="gt-scroll" id="gt-scroll" data-sk="${bulan?'b':'m'}${mesinView?'m':'s'}" data-now="${kiri(t)}"><div class="gt-in" style="min-width:calc(var(--gt-nm) + ${lebar}px)">
+  <div class="gt-row gt-hd"><div class="gt-nmw gt-hdn">${mesinView?'Mesin':'SPK dan item'}</div><div class="gt-tr" style="width:${lebar}px"><div class="gt-h1">${hdBulan}</div><div class="gt-h2">${hdHari}</div></div></div>
+  <div class="gt-body"><div class="gt-ov" style="left:var(--gt-nm);width:${lebar}px">${wkend}${grid}${garisHariIni}</div>${rows}</div></div></div></section>${legend}<div class="note gt-note">${bantu}</div>`;
 }
 const fdp2=d=>String(fd(d)).replace(/&nbsp;/g,' ');
 
@@ -3529,7 +3555,7 @@ B.kinerja=()=>{
  const E=K.E.filter(e=>!f.role||userRole(e.u)===f.role);
  const act=new Set(E.map(e=>e.u)).size;const meas=E.filter(e=>e.tgl).length,late=E.filter(e=>e.tgl&&e.late>0).length;
  const tw=meas?(meas-late)/meas:null;
- const kp=(cls,lb,v,unit,s)=>`<div class="kpi ${cls}" style="cursor:default"><span class="lb">${lb}</span><span class="v">${v}${unit?`<small>${unit}</small>`:''}</span><span class="s">${s}</span></div>`;
+ const kp=(cls,lb,v,unit,s,g)=>`<div class="kpi ${cls}" style="cursor:default"><span class="lb">${lb}</span><span class="v">${v}${unit?`<small>${unit}</small>`:''}</span><span class="s">${s}</span>${g!=null?`<div class="kgauge"><i style="width:${Math.max(0,Math.min(100,Math.round(g*100)))}%"></i></div>`:''}</div>`;
  let h=`<section class="kpis">
   ${kp('info','Total aktivitas',n(E.length),'entri',`${lbl} · ${n(Math.round(E.length/K.wd*10)/10)} per hari kerja`)}
   ${kp(act?'ok':'warn','Pengguna aktif',act,'/ '+rows.length,`mencatat minimal 1 transaksi ${lbl}`)}
@@ -3601,7 +3627,7 @@ B.pengguna=()=>{
   ${us.map(u=>{const o=K.U[u.email]||{total:0};const me=String(u.email||'').toLowerCase()===String(ME||'').toLowerCase();
    return `<tr class="click" data-act="kpiuser" data-uid="${esc(u.email)}"><td><div class="ucell">${av(u.email)}<div><b>${esc(u.nama||u.email)}</b>${me?' <span class="note">(Anda)</span>':''}<div class="note">${esc(u.email||'')}${u.jabatan?' · '+esc(u.jabatan):''}</div></div></div></td><td>${esc(roleL(u.role))}</td><td><div class="wchips">${modulChips(u)}</div></td><td class="num">${n(o.total)}</td><td class="muted">${o.lastAll?ago(o.lastAll):'–'}</td><td>${u.aktif===false?chip('Nonaktif','crit'):chip('Aktif','ok')}</td><td class="act"><button class="btn sm" data-act="uedit" data-uid="${esc(u._id)}">${ic('edit2')}Atur</button> <button class="btn sm ghost" data-act="upw" data-uid="${esc(u._id)}">Password</button></td></tr>`}).join('')}</tbody></table></div>`:empty('Belum ada pengguna','Tambahkan anggota tim agar setiap transaksi tercatat atas nama mereka.')}</section>`;
  h+=`<section class="panel"><header><h2>Paket peran bawaan</h2><span class="hint">titik awal; hak tiap orang tetap bisa diatur satu per satu</span></header><div class="tbl-wrap"><table class="mx"><thead><tr><th>Peran</th>${MODS.map(([,l])=>`<th class="c">${l}</th>`).join('')}</tr></thead><tbody>
-  ${Object.entries(ROLES).map(([k,r])=>{const p=presetModul(k);return `<tr><td><b>${r.l}</b><div class="note">${r.d}</div></td>${MODS.map(([m])=>`<td class="c">${k==='admin'?'<span class="yes">✓</span>':p[m]==='ubah'?'<span class="yes" title="Lihat dan ubah">✓</span>':p[m]==='lihat'?'<span class="part" title="Lihat saja">lihat</span>':'<span class="no">–</span>'}</td>`).join('')}</tr>`}).join('')}</tbody></table></div>
+  ${Object.entries(ROLES).map(([k,r])=>{const p=presetModul(k);return `<tr><td><b>${r.l}</b><div class="note">${r.d}</div></td>${MODS.map(([m])=>`<td class="c">${k==='admin'?'<span class="yes">✓</span>':p[m]==='ubah'?'<span class="yes" title="Lihat dan ubah">✓</span>':p[m]==='lihat'?'<span class="part" title="Lihat saja">lihat</span>':'<span class="sn">–</span>'}</td>`).join('')}</tr>`}).join('')}</tbody></table></div>
   <div class="pbody note">✓ = lihat dan ubah · lihat = hanya melihat · – = modul tidak tampil. Aturan dijaga di database sehingga tidak bisa diakali dari browser. Data tetap satu dan terhubung: perubahan oleh satu pengguna terlihat oleh pengguna lain yang punya akses ke modul itu.</div></section>`;
  h+=auditPanel();
  return h;
@@ -3922,7 +3948,7 @@ const okChip=(ok,yes='Tepat',no='Telat')=>ok==null?'':chip(ok?yes:no,ok?'ok':'cr
 const dTxt=v=>v==null?'–':v+' hk';
 
 /* ---------- SPK KPI tab ---------- */
-F.spk.tab=F.spk.tab||'berjalan';F.spk.skala=F.spk.skala||'minggu';F.spk.buka=F.spk.buka||{};F.spk.p='90';
+F.spk.tab=F.spk.tab||'berjalan';F.spk.skala=F.spk.skala||'minggu';F.spk.buka=F.spk.buka||{};F.spk.tutup=F.spk.tutup||{};F.spk.vw=F.spk.vw||'spk';F.spk.p='90';
 function spkPeriod(p){const t=today();if(p==='all')return ['0000-00-00',t,'semua SPK'];if(p==='bln')return [t.slice(0,8)+'01',t,'SPK bulan ini'];const k=+p||90;return [addDays(t,-(k-1)),t,`SPK ${k} hari terakhir`]}
 const avgOf=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
 const r1=v=>v==null?'–':String(Math.round(v*10)/10).replace('.',',');
@@ -3943,13 +3969,13 @@ function spkKpi(p){
 }
 function spkKpiBody(){
  const K=spkKpi(F.spk.p);const T=K.T;
- const kp=(cls,lb,v,unit,s)=>`<div class="kpi ${cls}" style="cursor:default"><span class="lb">${lb}</span><span class="v">${v}${unit?`<small>${unit}</small>`:''}</span><span class="s">${s}</span></div>`;
+ const kp=(cls,lb,v,unit,s,g)=>`<div class="kpi ${cls}" style="cursor:default"><span class="lb">${lb}</span><span class="v">${v}${unit?`<small>${unit}</small>`:''}</span><span class="s">${s}</span>${g!=null?`<div class="kgauge"><i style="width:${Math.max(0,Math.min(100,Math.round(g*100)))}%"></i></div>`:''}</div>`;
  const cls=(a,b,g=.9,w=.75)=>!b?'':a/b>=g?'ok':a/b>=w?'warn':'crit';
  const vOk=K.vDone.filter(o=>o.ok).length;
- let h=`<section class="kpis">
-  ${kp(cls(K.otd.length,K.kir.length),'Kirim tepat waktu (OTD)',pctTxt(K.otd.length,K.kir.length),'',`${K.otd.length} dari ${K.kir.length} SPK terkirim penuh ≤ due date`)}
-  ${kp(cls(K.prodOk.length,K.prod.length),'Produksi tepat target',pctTxt(K.prodOk.length,K.prod.length),'',`rata-rata ${r1(K.avgProd)} hari kerja · target ${T.prod} hk`)}
-  ${kp(cls(vOk,K.vDone.length),'Vendor tepat target',pctTxt(vOk,K.vDone.length),'',`rata-rata ${r1(K.avgTurn)} hk di vendor · ${K.vDone.length} SJ kembali penuh`)}
+ let h=`<div class="spk-kpi"><section class="kpis">
+  ${kp(cls(K.otd.length,K.kir.length),'Kirim tepat waktu (OTD)',pctTxt(K.otd.length,K.kir.length),'',`${K.otd.length} dari ${K.kir.length} SPK terkirim penuh ≤ due date`,K.kir.length?K.otd.length/K.kir.length:null)}
+  ${kp(cls(K.prodOk.length,K.prod.length),'Produksi tepat target',pctTxt(K.prodOk.length,K.prod.length),'',`rata-rata ${r1(K.avgProd)} hari kerja · target ${T.prod} hk`,K.prod.length?K.prodOk.length/K.prod.length:null)}
+  ${kp(cls(vOk,K.vDone.length),'Vendor tepat target',pctTxt(vOk,K.vDone.length),'',`rata-rata ${r1(K.avgTurn)} hk di vendor · ${K.vDone.length} SJ kembali penuh`,K.vDone.length?vOk/K.vDone.length:null)}
   ${kp(K.avgKirim==null?'':K.avgKirim<=T.kirim?'ok':'warn','Siap → kirim customer',r1(K.avgKirim),'hk',`target ${T.kirim} hk setelah barang siap`)}
   ${kp('info','Siklus SPK → terkirim',r1(K.avgCycle),'hk',`dari tanggal SPK sampai surat jalan terakhir`)}
   ${kp(K.lateOpen.length?'crit':'ok','Lewat due, belum terkirim',K.lateOpen.length,'SPK',K.lateOpen.length?`tertua ${Math.max(...K.lateOpen.map(f=>wd(f.s.due,today())))} hk lewat`:'tidak ada')}
@@ -3960,31 +3986,33 @@ function spkKpiBody(){
  // 1 production
  const prodRows=K.prodOpen.slice(0,8).map(o=>`<tr class="click" data-act="openspk" data-id="${o.f.s._id}"><td class="mono"><b>${o.f.s.no}</b></td><td>${esc(o.f.s.customer)}</td><td>${prog(o.f.x.pP)}</td><td class="num ${o.age>T.prod?'bad':''}">${o.age} hk</td><td>${fd(o.f.s.due)}</td></tr>`).join('');
  const slowProd=K.prod.filter(f=>!f.okProd).sort((a,b)=>b.dProd-a.dProd).slice(0,6).map(f=>`<tr class="click" data-act="openspk" data-id="${f.s._id}"><td class="mono"><b>${f.s.no}</b></td><td>${esc(f.s.customer)}</td><td>${fd(f.s.tgl)} → ${fd(f.P)}${f.Pest?` <span class="note">(est.)</span>`:''}</td><td class="num bad">${f.dProd} hk</td><td class="muted">${esc(f.s.alasan||'')}</td></tr>`).join('');
- h+=`<section class="panel"><header><h2>1 · Kecepatan & ketepatan produksi</h2><span class="hint">target ${T.prod} hari kerja dari tanggal SPK</span></header>
+ h+=`<section class="panel"><header><h2><span class="sn">1</span>Kecepatan & ketepatan produksi</h2><span class="hint">target ${T.prod} hari kerja dari tanggal SPK</span></header>
   <div class="ana"><div class="ana-c"><h3>Masih di produksi</h3>${prodRows?`<div class="tbl-wrap"><table><thead><tr><th>SPK</th><th>Customer</th><th>Progres</th><th class="num">Umur</th><th>Due</th></tr></thead><tbody>${prodRows}</tbody></table></div>`:'<p class="note">Semua SPK di periode ini sudah selesai produksi.</p>'}</div>
   <div class="ana-c"><h3>Produksi melewati target</h3>${slowProd?`<div class="tbl-wrap"><table><thead><tr><th>SPK</th><th>Customer</th><th>Mulai → selesai</th><th class="num">Durasi</th><th>Kendala</th></tr></thead><tbody>${slowProd}</tbody></table></div>`:'<p class="note">Tidak ada.</p>'}</div></div>
   <div class="pbody note">${K.prod.filter(f=>f.Pest).length} dari ${K.prod.length} tanggal selesai produksi masih <b>estimasi</b> (diambil dari tanggal kirim ke vendor/customer) karena belum diisi lewat Update progres produksi. Mulai sekarang setiap update menyimpan tanggalnya.</div></section>`;
  // 2 vendor
  const vRows=K.byV.map(z=>{const av=avgOf(z.turns);return `<tr class="click" data-act="kpivendor" data-v="${esc(z.k)}"><td><b>${esc(z.k)}</b><div class="note">${esc([...z.proses].join(', '))}</div></td><td class="num">${z.sj}</td><td class="num">${n(z.out)}</td><td class="num">${n(z.back)}</td><td class="num ${z.rej?'bad':''}">${z.rej?n(z.rej)+' <span class="note">('+pctTxt(z.rej,z.out)+')</span>':'0'}</td><td class="num"><b>${r1(av)}</b> hk${z.est?` <span class="note" title="${z.est} SJ tanggal kembali diestimasi">*</span>`:''}</td><td class="num">${z.meas?chip(pctTxt(z.ok,z.meas),z.ok/z.meas>=.9?'ok':z.ok/z.meas>=.75?'warn':'crit'):'–'}</td><td class="num ${z.late?'bad':''}">${z.open?`${z.open} SJ · ${z.oldest} hk`:'–'}</td></tr>`}).join('');
- h+=`<section class="panel"><header><h2>2 · Kirim ke finishing & kepulangan dari vendor</h2><span class="hint">target: HDG ${T.hdg} · ELG ${T.elg} · PDC ${T.pdc} · lain ${T.lain} hari kerja</span></header>
+ h+=`<section class="panel"><header><h2><span class="sn">2</span>Kirim ke finishing & kepulangan dari vendor</h2><span class="hint">target: HDG ${T.hdg} · ELG ${T.elg} · PDC ${T.pdc} · lain ${T.lain} hari kerja</span></header>
   <div class="kpis inner">${kp('',`Produksi selesai → kirim vendor`,r1(K.avgWait),'hk',`${K.waits.length} SPK dengan tanggal produksi tercatat`)}${kp('','Lama di vendor',r1(K.avgTurn),'hk',`${K.vDone.length} SJ kembali penuh`)}${kp(K.VL.some(o=>o.late)?'crit':'ok','Melewati target, belum kembali',K.VL.filter(o=>o.late).length,'SJ',`${K.VL.filter(o=>!o.done).length} SJ masih di vendor`)}</div>
   ${vRows?`<div class="tbl-wrap"><table><thead><tr><th>Vendor</th><th class="num">SJ</th><th class="num">Qty kirim</th><th class="num">Kembali OK</th><th class="num">Reject</th><th class="num">Rata-rata di vendor</th><th class="num">Tepat target</th><th class="num">Masih di vendor</th></tr></thead><tbody>${vRows}</tbody></table></div>`:empty('Belum ada kiriman vendor','Kiriman ke vendor finishing di periode ini akan muncul di sini.')}
   <div class="pbody note">* Sebagian tanggal kembali dari data lama tidak tercatat, jadi diestimasi = tanggal kirim customer pertama setelahnya. Penerimaan baru lewat tombol Terima kembali selalu tercatat tanggal & qty per item.</div></section>`;
  // 3 logistics
  const lateRows=K.kir.filter(f=>!f.otd).sort((a,b)=>b.lateK-a.lateK).slice(0,8).map(f=>`<tr class="click" data-act="openspk" data-id="${f.s._id}"><td class="mono"><b>${f.s.no}</b></td><td>${esc(f.s.customer)}</td><td>${fd(f.s.due)}</td><td>${fd(f.Kfull)}</td><td class="num bad">+${f.lateK} hk</td><td class="num">${f.dKirim==null?'–':f.dKirim+' hk'}</td></tr>`).join('');
  const openRows=K.lateOpen.sort((a,b)=>a.s.due.localeCompare(b.s.due)).slice(0,8).map(f=>`<tr class="click" data-act="openspk" data-id="${f.s._id}"><td class="mono"><b>${f.s.no}</b></td><td>${esc(f.s.customer)}</td><td>${fd(f.s.due)}</td><td>${chip(f.stage,STAGE_CLS[f.stage])}</td><td class="num bad">+${wd(f.s.due,today())} hk</td></tr>`).join('');
- h+=`<section class="panel"><header><h2>3 · Kecepatan & ketepatan kirim ke customer</h2><span class="hint">tepat waktu = surat jalan terakhir ≤ due date SPK</span></header>
+ h+=`<section class="panel"><header><h2><span class="sn">3</span>Kecepatan & ketepatan kirim ke customer</h2><span class="hint">tepat waktu = surat jalan terakhir ≤ due date SPK</span></header>
   <div class="kpis inner">${kp(cls(K.otd.length,K.kir.length),'On-time delivery',pctTxt(K.otd.length,K.kir.length),'',`rata-rata telat ${r1(K.avgLate)} hk bila telat`)}${kp('','Barang siap → surat jalan',r1(K.avgKirim),'hk',`${K.kSpeed.length} SPK terukur · target ${T.kirim} hk`)}${kp('','Surat jalan → diterima',r1(K.avgTransit),'hk',`${K.transit.length} dari ${K.sjs.length} SJ ada tanggal terima`)}</div>
   <div class="ana"><div class="ana-c"><h3>Terkirim tapi telat</h3>${lateRows?`<div class="tbl-wrap"><table><thead><tr><th>SPK</th><th>Customer</th><th>Due</th><th>Kirim penuh</th><th class="num">Telat</th><th class="num">Siap→kirim</th></tr></thead><tbody>${lateRows}</tbody></table></div>`:'<p class="note">Tidak ada.</p>'}</div>
   <div class="ana-c"><h3>Lewat due, belum terkirim penuh</h3>${openRows?`<div class="tbl-wrap"><table><thead><tr><th>SPK</th><th>Customer</th><th>Due</th><th>Posisi</th><th class="num">Lewat</th></tr></thead><tbody>${openRows}</tbody></table></div>`:'<p class="note">Tidak ada.</p>'}</div></div></section>`;
- return h;
+ return h+'</div>';
 }
 function kpiVendor(name){openDrawer(()=>{const K=spkKpi(F.spk.p);const L=K.VL.filter(o=>(o.v.vendor||'(tanpa nama)')===name).sort((a,b)=>b.v.tgl.localeCompare(a.v.tgl));
  return {t:esc(name),s:`Kiriman finishing · ${esc(K.lbl)}`,b:`<div class="tbl-wrap"><table><thead><tr><th>SJ</th><th>SPK</th><th>Kirim</th><th>Kembali</th><th class="num">Durasi</th><th>Target</th><th></th></tr></thead><tbody>${L.map(o=>`<tr class="click" data-act="openvendor" data-id="${o.v._id}"><td class="mono">${esc(o.v.noSJ||'')}<div class="note">${esc(o.v.proses||'')}</div></td><td>${esc(spkName(o.v.spk))}</td><td>${fd(o.v.tgl)}</td><td>${o.done?fd(o.last)+(o.est?' <span class="note">est.</span>':''):`<span class="note">sisa ${n(o.sisa)}</span>`}</td><td class="num">${o.turn!=null?o.turn+' hk':o.age+' hk'+(o.done?'':' …')}</td><td>${o.tDays} hk</td><td>${o.done?okChip(o.ok):o.late?chip('Lewat target','crit'):chip('Di vendor','warn')}</td></tr>`).join('')}</tbody></table></div>`}})}
 function spkTargetForm(){const T=SPKT();
- openModal('Target waktu proses (hari kerja)',fld('Produksi (dari tanggal SPK)',inp('prod',T.prod,'number','min="0"'))+fld('Siap → surat jalan customer',inp('kirim',T.kirim,'number','min="0"'))+
-  fld('Vendor HDG',inp('hdg',T.hdg,'number','min="0"'))+fld('Vendor ELG',inp('elg',T.elg,'number','min="0"'))+fld('Vendor Powder Coating',inp('pdc',T.pdc,'number','min="0"'))+fld('Vendor proses lain',inp('lain',T.lain,'number','min="0"'))+
-  `<div class="note full">Hari kerja = Senin–Jumat. Bila form Kirim ke vendor mengisi "Target kembali", tanggal itu yang dipakai untuk SJ tersebut. Ketepatan kirim customer selalu dibandingkan dengan due date SPK.</div>`,
+ const r=(nm,judul,ket)=>`<label class="tgt-r" for="m-${nm}"><span><b>${judul}</b><small>${ket}</small></span><span class="tgt-in">${inp(nm,T[nm],'number','min="0" inputmode="numeric"')}<em>hari kerja</em></span></label>`;
+ openModal('Target waktu proses',`<div class="full tgt">
+  <div class="tgt-sec"><h4>Produksi dan pengiriman</h4>${r('prod','Produksi','Batas waktu dari tanggal SPK sampai produksi selesai')}${r('kirim','Siap sampai surat jalan','Batas waktu dari barang siap sampai surat jalan customer dibuat')}</div>
+  <div class="tgt-sec"><h4>Lama di vendor finishing</h4>${r('hdg','HDG (galvanis celup panas)','Dari dikirim ke vendor sampai kembali')}${r('elg','ELG (electro galvanizing)','Dari dikirim ke vendor sampai kembali')}${r('pdc','Powder coating','Dari dikirim ke vendor sampai kembali')}${r('lain','Proses lain','Dipakai untuk vendor di luar tiga jenis di atas')}</div>
+  <div class="tgt-help"><span><b>Catatan.</b> Hari kerja dihitung Senin sampai Jumat. Bila form Kirim ke vendor mengisi Target kembali, tanggal itu yang dipakai untuk surat jalan tersebut. Ketepatan kirim ke customer selalu dibandingkan dengan due date SPK.</span></div></div>`,
   async d=>{const spkT={};for(const k in SPKT_DEF)spkT[k]=Math.max(0,num0(d[k]));need('master',{},'setting');const cur={...(byId('master','setting')||{})};delete cur._id;await DB.doc('master/setting').set({...cur,spkT});})}
 
 /* ---------- drawer timeline ---------- */
@@ -4247,7 +4275,7 @@ document.addEventListener('click',async e=>{
   case 'doc':await downloadDoc(ds.kind,ds.ref,ds.fmt);break;
   case 'spktarget':spkTargetForm();break;
   case 'kpivendor':kpiVendor(ds.v);break;
-  case 'jdbuka':F.spk.buka[ds.id]=!F.spk.buka[ds.id];renderBody();break;
+  case 'jdbuka':F.spk.tutup=F.spk.tutup||{};F.spk.tutup[ds.id]=!F.spk.tutup[ds.id];renderBody();break;
   case 'jdhariini':{const g=document.getElementById('gt-scroll');if(g)g.scrollLeft=Math.max(0,(+g.dataset.now)-90);break}
   case 'spkstage':F.spk.stage=ds.st||'';F.spk.tab='list';if(ds.st)F.spk.st='';renderTools();renderBody();break;
   case 'dwtab':{const tab=ds.tab;document.querySelectorAll('.dw-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));document.querySelectorAll('.dw-pane').forEach(p=>p.classList.toggle('on',p.id==='dw-pane-'+tab));break}

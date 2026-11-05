@@ -1,5 +1,5 @@
 // Uji Papan Jadwal (Gantt) SPK.  node tests/unit/jadwal.test.mjs
-import { susunJadwal, perkiraanSelesai, selisihHari, geserHari, hasilBerlaku, sumbuTanggal } from '../../src/lib/produksi/jadwal.js';
+import { susunJadwal, perkiraanSelesai, selisihHari, geserHari, hasilBerlaku, sumbuTanggal, langkahItem, susunMesin } from '../../src/lib/produksi/jadwal.js';
 
 const R = []; const ok = (id, pass, info = '') => R.push((pass ? 'PASS ' : 'FAIL ') + id + (info ? ' · ' + info : ''));
 const H = '2026-11-04';
@@ -38,6 +38,18 @@ ok('J-15 tanpa SPK tetap menghasilkan rentang di sekitar hari ini', (() => { con
 const sm = sumbuTanggal('2026-11-01', '2026-11-22', 'minggu');
 ok('J-16 sumbu minggu memberi label tiap Senin; tanggal awal dilewati bila terlalu dekat Senin pertama', sm.map((x) => x.tgl).join() === '2026-11-02,2026-11-09,2026-11-16' && sumbuTanggal('2026-11-05', '2026-11-22', 'minggu')[0].tgl === '2026-11-05', sm.map((x) => x.tgl).join());
 ok('J-17 sumbu bulan memberi label tiap tanggal 1; awal ikut hanya bila lebih dari 14 hari dari tanggal 1 berikutnya', sumbuTanggal('2026-10-20', '2026-12-05', 'bulan').map((x) => x.tgl).join() === '2026-11-01,2026-12-01' && sumbuTanggal('2026-10-05', '2026-12-05', 'bulan').map((x) => x.tgl).join() === '2026-10-05,2026-11-01,2026-12-01');
+
+// Langkah per work center dan papan per mesin
+const hw = (id, spkId, item, tgl, wc, qty, mesin) => ({ id, jenis: 'hasil', spk_id: spkId, item_idx: item, tgl, wc, qty, mesin: mesin || wc, at: tgl + 'T05:00:00.000Z' });
+const lk = langkahItem([hw(1, 'a', 0, '2026-11-02', 'Shearing', 10), hw(2, 'a', 0, '2026-11-03', 'Shearing', 10), hw(3, 'a', 0, '2026-11-03', 'Punching', 5, 'Punching 1')], [{ spk_id: 'a', item_idx: 0, wc: 'Bending', mesin: 'Bending 1', tgl: H }], H);
+ok('J-18 langkah item: tanggal dan jumlah per work center, urut tanggal, sesi berjalan ditandai', lk.length === 3 && lk[0].wc === 'Shearing' && lk[0].dari === '2026-11-02' && lk[0].sampai === '2026-11-03' && lk[0].qty === 20 && lk[1].wc === 'Punching' && lk[1].mesin[0] === 'Punching 1' && lk[2].wc === 'Bending' && lk[2].live === true, JSON.stringify(lk.map((x) => [x.wc, x.dari, x.sampai, x.qty, x.live])));
+const jj = susunJadwal({ spk: [{ id: 'a', no: '1', customer: 'X', tgl: '2026-11-01', due: '2026-11-09', pP: 0.2, pK: 0, items: [{ idx: 0, d: 'CT', q: 20, u: 'Btg', pct: 0.2 }] }], kejadian: [hw(1, 'a', 0, '2026-11-02', 'Shearing', 20)], hariIni: H, sesi: [{ spk_id: 'a', item_idx: 0, wc: 'Punching', mesin: 'Punching 1', tgl: H }] });
+ok('J-19 baris item membawa langkah dan work center yang sedang aktif', jj.baris[0].items[0].langkah.length === 2 && jj.baris[0].items[0].wcAktif.join() === 'Punching');
+const inf = { a: { no: '1001', customer: 'A', items: { 0: 'CT' } }, b: { no: '1002', customer: 'B', items: { 0: 'LD' } } };
+const mm = susunMesin({ kejadian: [hw(1, 'a', 0, '2026-11-02', 'Shearing', 20, 'Shearing 1'), hw(2, 'b', 0, '2026-11-02', 'Shearing', 5, 'Shearing 1'), hw(3, 'b', 0, '2026-11-02', 'Punching', 5, 'Punching 2')], sesi: [{ spk_id: 'a', item_idx: 0, wc: 'Punching', mesin: 'Punching 1', tgl: H }], mesinMaster: [{ wc: 'Shearing', mesin: ['Shearing 1', 'Shearing 2'] }, { wc: 'Punching', mesin: ['Punching 1', 'Punching 2'] }], info: inf, hariIni: H });
+const sh = mm.kelompok[0].baris, pu = mm.kelompok[1].baris;
+ok('J-20 papan mesin: mesin tanpa pekerjaan tetap tampil kosong, urutan work center dari master', mm.kelompok.map((g) => g.wc).join() === 'Shearing,Punching' && sh.map((r) => r.mesin).join() === 'Shearing 1,Shearing 2' && sh[1].blok.length === 0 && sh[1].sedang === false);
+ok('J-21 balok bertumpuk diberi lajur berbeda dan sesi berjalan memanjang sampai hari ini', sh[0].blok.length === 2 && sh[0].lajur === 2 && sh[0].blok[0].lajur !== sh[0].blok[1].lajur && pu[0].sedang === true && pu[0].blok[0].sampai === H && pu[0].blok[0].no === '1001', JSON.stringify(sh[0].blok.map((b) => [b.dari, b.sampai, b.lajur])));
 
 const fail = R.filter((x) => x.startsWith('FAIL')).length;
 console.log(R.join('\n')); console.log(fail ? `\n${fail} FAIL` : '\nSEMUA PASS (' + R.length + ')');

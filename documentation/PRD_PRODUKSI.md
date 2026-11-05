@@ -117,3 +117,18 @@ Permintaan pemilik: papan jadwal seperti timeline proyek untuk SPK yang berjalan
 | Nyaman di HP | Garis waktu bergulir di kotaknya sendiri, kolom nama menempel | M-136 |
 
 Mesin hitung: `src/lib/produksi/jadwal.js` (uji J-01 sampai J-17). Rancangan: [[RUTE_PRODUKSI]] bagian 21; tugas [[T-180-jadwal-spk-gantt]].
+
+## 13. Papan jadwal v2 dan perapian layout (2026-11-05)
+
+Masukan pemilik: jadwal masih kaku dan perlu mengikuti standar schedule board agar pergerakan tiap SPK dan material yang sedang diproduksi mudah dilihat; layout Berjalan, KPI & Analisa, dan Target waktu proses perlu disesuaikan.
+
+| Kebutuhan | Pemenuhan | Bukti |
+|---|---|---|
+| Schedule board standar | Header bulan dan tanggal harian, akhir pekan dan hari ini disorot, batang berwarna per work center | M-137 |
+| Lihat material yang sedang diproduksi | Item terbuka sejak awal dengan langkah mesin per item dan penanda sedang berjalan | M-135, M-137 |
+| Lihat pergerakan per mesin | Tampilan Per mesin: balok pekerjaan per SPK di tiap mesin, mesin kosong tetap tampil | M-138 |
+| Berjalan tidak kaku | Kartu bernada status, jalur item dua kolom | M-142 |
+| KPI & Analisa lebih nyaman | Kartu tiga kolom dengan pengukur, bagian bernomor | M-139 |
+| Target waktu proses jelas | Dua kelompok, keterangan per isian, satuan hari kerja | M-140, M-141 |
+
+Mesin hitung: `langkahItem`, `susunMesin` (uji J-18 sampai J-21). Tugas [[T-182-papan-jadwal-v2-dan-rapikan-layout-spk]].

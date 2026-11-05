@@ -138,4 +138,5 @@ Checklist ini menjelaskan urutan kerja antar-tools. Status hanya dicentang jika 
 - [x] Produksi Hari Ini v2 dan Laporan Produksi (input otomatis, analisa jumlah, tonase, kecepatan, produk bertingkat, KPI operator dan mesin) ([[T-179-produksi-hari-ini-v2-dan-laporan-produksi]]), lokal
 - [x] Jadwal SPK (Gantt): garis waktu SPK berjalan dari terbit sampai due date ([[T-180-jadwal-spk-gantt]]), lokal
 - [x] Uji alur lengkap SPK awal sampai akhir dengan tangkapan layar ([[T-181-uji-alur-spk-awal-sampai-akhir]], [[UJI_ALUR_SPK]]), lokal
+- [x] Papan jadwal v2 (Per SPK dan Per mesin) dan perapian layout Berjalan, KPI & Analisa, Target ([[T-182-papan-jadwal-v2-dan-rapikan-layout-spk]]), lokal
 - [ ] Penayangan: migration 14, push, PR ke `main` setelah persetujuan pemilik. Kebutuhan: [[PRD_PRODUKSI]]

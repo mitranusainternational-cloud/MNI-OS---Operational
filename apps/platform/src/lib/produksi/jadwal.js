@@ -22,7 +22,7 @@ export function perkiraanSelesai(mulaiProduksi, hariIni, progres) {
 }
 
 /* spk: [{id,no,customer,tgl,due,pP,pK,items:[{idx,d,q,u,pct}]}]; aktif: Set id SPK yang sedang dikerjakan */
-export function susunJadwal({ spk = [], kejadian = [], vendor = [], kirim = [], hariIni, aktif = new Set() }) {
+export function susunJadwal({ spk = [], kejadian = [], vendor = [], kirim = [], hariIni, aktif = new Set(), sesi = [] }) {
   const hasil = hasilBerlaku(kejadian);
   const mulaiEv = kejadian.filter((e) => e.jenis === 'mulai');
   const baris = spk.map((s) => {
@@ -52,7 +52,8 @@ export function susunJadwal({ spk = [], kejadian = [], vendor = [], kirim = [], 
       const ie = eh.filter((e) => e.item_idx === it.idx);
       const im = em.filter((e) => e.item_idx === it.idx);
       const r2 = awalAkhir([...ie, ...im].map(tglEv));
-      return { idx: it.idx, d: it.d, q: it.q, u: it.u, sedang: !!it.sedang, pct: Math.max(0, Math.min(1, it.pct || 0)), dari: r2 ? r2[0] : null, sampai: r2 ? ((it.pct || 0) >= 1 && ie.length ? awalAkhir(ie.map(tglEv))[1] : (r2[1] < hariIni ? hariIni : r2[1])) : null };
+      const langkah = langkahItem(ie, sesi.filter((e) => e.spk_id === s.id && +e.item_idx === it.idx), hariIni);
+      return { idx: it.idx, d: it.d, q: it.q, u: it.u, sedang: !!it.sedang, langkah, wcAktif: langkah.filter((l) => l.live).map((l) => l.wc), pct: Math.max(0, Math.min(1, it.pct || 0)), dari: r2 ? r2[0] : null, sampai: r2 ? ((it.pct || 0) >= 1 && ie.length ? awalAkhir(ie.map(tglEv))[1] : (r2[1] < hariIni ? hariIni : r2[1])) : null };
     });
 
     return { id: s.id, no: s.no, customer: s.customer, terbit: s.tgl || (ar ? ar[0] : hariIni), due: s.due || null, pP: s.pP || 0, pK: s.pK || 0,
@@ -82,3 +83,35 @@ export function sumbuTanggal(awal, akhir, skala = 'minggu') {
 }
 
 export const hariKerjaAkhirPekan = (d) => { const w = new Date(ms(d)).getUTCDay(); return w === 0 || w === 6; };
+
+/* Langkah per work center untuk satu item: tanggal pertama sampai terakhir, jumlah selesai, dan penanda sedang berjalan */
+export function langkahItem(hasilItem, sesiItem = [], hariIni) {
+  const per = new Map();
+  const ambil = (wc) => { if (!per.has(wc)) per.set(wc, { wc, tgl: [], qty: 0, reject: 0, mesin: new Set(), live: false }); return per.get(wc); };
+  hasilItem.slice().sort((a, b) => tglEv(a).localeCompare(tglEv(b))).forEach((e) => { const p = ambil(e.wc); p.tgl.push(tglEv(e)); p.qty += +e.qty || 0; p.reject += +e.reject || 0; if (e.mesin) p.mesin.add(e.mesin); });
+  sesiItem.forEach((e) => { const p = ambil(e.wc); p.tgl.push(tglEv(e) || hariIni); p.live = true; if (e.mesin) p.mesin.add(e.mesin); });
+  return [...per.values()].map((p) => { const ar = awalAkhir(p.tgl); return { wc: p.wc, dari: ar[0], sampai: p.live && ar[1] < hariIni ? hariIni : ar[1], qty: p.qty, reject: p.reject, mesin: [...p.mesin], live: p.live }; })
+    .sort((a, b) => a.dari.localeCompare(b.dari));
+}
+
+/* Papan per mesin: tiap mesin punya balok pekerjaan (SPK, item) dari tanggal pertama sampai terakhir dikerjakan di mesin itu.
+ * Balok yang bertumpuk pada hari yang sama diberi lajur berbeda. mesinMaster: [{wc, mesin:[nama]}] menurut urutan work center. */
+export function susunMesin({ kejadian = [], sesi = [], mesinMaster = [], info = {}, hariIni }) {
+  const hasil = hasilBerlaku(kejadian);
+  const kunci = new Map();
+  const taruh = (e, live) => {
+    const m = e.mesin || e.wc; const k = e.wc + '|' + m + '|' + e.spk_id + '|' + e.item_idx;
+    if (!kunci.has(k)) kunci.set(k, { wc: e.wc, mesin: m, spk_id: e.spk_id, item_idx: +e.item_idx, tgl: [], qty: 0, live: false, operator: '' });
+    const b = kunci.get(k); b.tgl.push(tglEv(e) || hariIni); if (!live) b.qty += +e.qty || 0; else { b.live = true; b.operator = e.operator || ''; }
+  };
+  hasil.forEach((e) => taruh(e, false)); sesi.forEach((e) => taruh(e, true));
+  const blok = [...kunci.values()].map((b) => { const ar = awalAkhir(b.tgl); const it = (info[b.spk_id] || {}).items || {}; return { ...b, dari: ar[0], sampai: b.live && ar[1] < hariIni ? hariIni : ar[1], no: (info[b.spk_id] || {}).no, customer: (info[b.spk_id] || {}).customer, d: it[b.item_idx] || '' }; });
+  const wcUrut = mesinMaster.map((m) => m.wc); blok.forEach((b) => { if (!wcUrut.includes(b.wc)) wcUrut.push(b.wc); });
+  const kelompok = wcUrut.map((wc) => {
+    const nama = new Set((mesinMaster.find((m) => m.wc === wc) || { mesin: [] }).mesin); blok.filter((b) => b.wc === wc).forEach((b) => nama.add(b.mesin)); if (!nama.size) nama.add(wc);
+    const baris = [...nama].map((m) => { const bs = blok.filter((b) => b.wc === wc && b.mesin === m).sort((a, b) => a.dari.localeCompare(b.dari)); const lajurAkhir = []; bs.forEach((b) => { let l = lajurAkhir.findIndex((a) => a < b.dari); if (l < 0) { l = lajurAkhir.length; lajurAkhir.push(b.sampai); } else lajurAkhir[l] = b.sampai; b.lajur = l; }); return { mesin: m, blok: bs, lajur: Math.max(1, lajurAkhir.length), sedang: bs.some((b) => b.live) }; });
+    return { wc, baris };
+  });
+  const titik = [hariIni, geserHari(hariIni, 7), ...blok.flatMap((b) => [b.dari, b.sampai])];
+  return { kelompok, blok, titik };
+}

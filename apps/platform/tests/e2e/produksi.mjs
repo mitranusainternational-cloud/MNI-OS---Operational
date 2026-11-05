@@ -130,7 +130,7 @@ export async function runProduksi(page, base) {
   const bodyV = await page.evaluate(() => document.getElementById('body').innerText);
   await go('spk'); await page.click('#tools [data-view="spk"][data-val="berjalan"]'); await page.waitForTimeout(400);
   const bodySpk = await page.evaluate(() => document.getElementById('body').innerText);
-  ok('M-19c sesudah dikirim tidak lagi siap kirim, jalur SPK menyebut kiriman ke vendor', !/Siap dikirim ke Vendor ELG/.test(bodyV) && /dikirim 8/.test(bodySpk), bodySpk.slice(0, 0));
+  ok('M-19c sesudah dikirim tidak lagi siap kirim, jalur SPK menyebut kiriman ke vendor', !/Siap dikirim ke Vendor ELG/.test(bodyV) && /dikirim 8/.test(bodySpk), JSON.stringify([/Siap dikirim ke Vendor ELG/.test(bodyV), /dikirim 8/.test(bodySpk), bodySpk.replace(/s+/g, ' ').slice(0, 400)]));
 
   // Vendor: kecepatan dan kualifikasi dari riwayat kiriman (4 selesai: TAT 4, 4, 3, 8 hari kerja; 1 masih di vendor)
   await page.evaluate(() => {
@@ -444,7 +444,7 @@ export async function runProduksi(page, base) {
   const sesudah = await page.evaluate(() => document.querySelectorAll('.gt-row.gt-it').length);
   await page.click('.gt-nm[data-act="jdbuka"]'); await page.waitForTimeout(400);
   const tutup = await page.evaluate(() => document.querySelectorAll('.gt-row.gt-it').length);
-  ok('M-131 ketuk nama SPK membuka lalu menutup jadwal tiap item', antar === 0 && sesudah >= 2 && tutup === 0, JSON.stringify([antar, sesudah, tutup]));
+  ok('M-131 jadwal tiap item terbuka sejak awal; ketuk nama SPK melipat lalu membukanya lagi', antar >= 2 && sesudah < antar && tutup === antar, JSON.stringify([antar, sesudah, tutup]));
   const lebarHari = () => page.evaluate(() => document.querySelector('.gt-ov').getBoundingClientRect().width);
   const wMinggu = await lebarHari();
   await page.click('#tools [data-view="spk"][data-key="skala"][data-val="bulan"]'); await page.waitForTimeout(500);
@@ -464,8 +464,29 @@ export async function runProduksi(page, base) {
   await page.click('#mesin-antri .mcard:first-child [data-act="mesinmulai"]'); await page.waitForTimeout(1200);
   const jalan = await page.evaluate(() => { const m = (document.querySelector('.mesin-run') || { innerText: '' }).innerText.match(/mnt\s+(.+?)\s+SPK (\d+)/s); return m ? { item: m[1].trim(), spk: m[2] } : { raw: (document.querySelector('.mesin-run') || { innerText: 'tidak ada kartu berjalan' }).innerText.slice(0, 160) }; });
   await gtTab();
-  const tampil = jalan && jalan.spk ? await page.evaluate(async (j) => { const nm = [...document.querySelectorAll('.gt-row:not(.gt-it) .gt-nm')].find((x) => x.innerText.includes('SPK ' + j.spk)); if (!nm) return 'baris SPK tidak ada'; nm.click(); await new Promise((r) => setTimeout(r, 400)); const r = [...document.querySelectorAll('.gt-row.gt-it')].find((x) => x.innerText.includes(j.item)); return r ? !!r.querySelector('.gt-b.prod.live') : 'baris item tidak ada'; }, jalan) : 'tidak ada sesi';
+  const tampil = jalan && jalan.spk ? await page.evaluate(async (j) => { const nm = [...document.querySelectorAll('.gt-row:not(.gt-it) .gt-nm')].find((x) => x.innerText.includes('SPK ' + j.spk)); if (!nm) return 'baris SPK tidak ada'; const r = [...document.querySelectorAll('.gt-row.gt-it')].find((x) => x.innerText.includes(j.item)); return r ? !!r.querySelector('.gt-b.step.live') : 'baris item tidak ada'; }, jalan) : 'tidak ada sesi';
   ok('M-135 menekan Mulai di Produksi Hari Ini langsung menandai item yang dikerjakan di jadwal (batang bertanda sedang dikerjakan), tanpa input di halaman jadwal', tampil === true, JSON.stringify([jalan, tampil]));
+
+  // papan jadwal: langkah per work center, tampilan per mesin, header tanggal, dan dialog target
+  await gtTab();
+  const bd = await page.evaluate(() => ({ hari: document.querySelectorAll('.gt-dy').length, bulan: document.querySelectorAll('.gt-mo').length, langkah: document.querySelectorAll('.gt-row.gt-it .gt-b.step').length, warna: new Set([...document.querySelectorAll('.gt-b.step')].map((x) => [...x.classList].find((c) => /^wc\d$/.test(c)))).size, legenda: document.querySelectorAll('.gt-leg .gt-sw').length }));
+  ok('M-137 papan per SPK: header bulan dan tanggal harian, langkah mesin berwarna per work center, legenda warna', bd.hari >= 20 && bd.bulan >= 1 && bd.langkah >= 3 && bd.warna >= 2 && bd.legenda >= 3, JSON.stringify(bd));
+  await page.click('#tools [data-key="vw"][data-val="mesin"]'); await page.waitForTimeout(700);
+  const pm = await page.evaluate(() => ({ grup: document.querySelectorAll('.gt-grp').length, mesin: document.querySelectorAll('.gt-mc').length, blok: document.querySelectorAll('.gt-b.blk').length, fl: !!document.querySelector('#tools [data-key="fl"]'), inputs: document.querySelectorAll('.gt input, .gt select, .gt textarea').length }));
+  ok('M-138 tampilan Per mesin: kelompok work center, baris mesin, balok pekerjaan; filter status disembunyikan; tanpa kolom isian', pm.grup >= 3 && pm.mesin >= 4 && pm.blok >= 3 && !pm.fl && pm.inputs === 0, JSON.stringify(pm));
+  await page.click('#tools [data-key="vw"][data-val="spk"]'); await page.waitForTimeout(500);
+  await go('spk'); await page.click('#tools [data-view="spk"][data-key="tab"][data-val="kpi"]'); await page.waitForTimeout(700);
+  const kp2 = await page.evaluate(() => ({ wrap: !!document.querySelector('.spk-kpi'), gauge: document.querySelectorAll('.spk-kpi .kgauge').length, nomor: document.querySelectorAll('.spk-kpi h2 .sn').length, kol: getComputedStyle(document.querySelector('.spk-kpi .kpis')).gridTemplateColumns.split(' ').length }));
+  ok('M-139 KPI & Analisa: kartu tiga kolom dengan pengukur, bagian bernomor', kp2.wrap && kp2.gauge >= 2 && kp2.nomor === 3 && kp2.kol === 3, JSON.stringify(kp2));
+  await page.click('#tools [data-act="spktarget"]'); await page.waitForTimeout(500);
+  const tg = await page.evaluate(() => ({ grup: document.querySelectorAll('#modal .tgt-sec').length, baris: document.querySelectorAll('#modal .tgt-r').length, ids: ['prod', 'kirim', 'hdg', 'elg', 'pdc', 'lain'].every((k) => !!document.getElementById('m-' + k)) }));
+  ok('M-140 dialog Target waktu proses: dua kelompok, enam isian dengan keterangan, satuan hari kerja', tg.grup === 2 && tg.baris === 6 && tg.ids, JSON.stringify(tg));
+  await page.fill('#m-prod', '4'); await page.evaluate(() => document.getElementById('msub').click()); await page.waitForTimeout(1200);
+  const tsetting = (await tab('master')).find((r) => r.kode === 'setting' || r.id === 'setting' || r.key === 'setting' || (r.data && r.data.spkT) || r.spkT);
+  ok('M-141 target tersimpan setelah Simpan (produksi 4 hari kerja)', !!tsetting && Number((((tsetting.value || tsetting.data || tsetting).spkT) || {}).prod) === 4, JSON.stringify(tsetting && (tsetting.data || tsetting)).slice(0, 120));
+  await go('spk'); await page.click('#tools [data-view="spk"][data-key="tab"][data-val="berjalan"]'); await page.waitForTimeout(600);
+  const bj = await page.evaluate(() => ({ kartu: document.querySelectorAll('.sb-card').length, nada: [...document.querySelectorAll('.sb-card')].every((c) => /\bt-(telat|vendor|siap|jalan|selesai)\b/.test(c.className)), kolom: !!document.querySelector('.sb-card .jejak-item') && getComputedStyle(document.querySelector('.sb-card .jejak-item')).display === 'grid' }));
+  ok('M-142 SPK Berjalan: kartu bernada status dan jalur item berbentuk baris dua kolom', bj.kartu >= 2 && bj.nada && bj.kolom, JSON.stringify(bj));
   await page.setViewportSize({ width: 390, height: 844 });
   await gtTab();
   const swHp = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

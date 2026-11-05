@@ -443,3 +443,7 @@ Permintaan pemilik: papan jadwal seperti timeline proyek untuk SPK berjalan, den
 ### 2026-11-05 — Uji alur lengkap SPK dengan tangkapan layar (T-181, lokal)
 
 Permintaan pemilik: uji dari SPK sampai akhir, ambil tangkapan layar, dan dokumentasikan. Hasil: skrip `alur-spk.mjs` menjalankan satu SPK dari terbit, Shearing, Punching, Bending, kirim dan terima kembali vendor, surat jalan customer, sampai Diterima, dengan 27 tangkapan layar. 15 PASS, 0 FAIL. Bukti: `verified in browser` (mock), bukan bukti Supabase. Temuan: Jadwal berfilter awal Berjalan sehingga SPK selesai tidak tampil sampai filter Selesai dipilih; seluruh alur satu hari sehingga batang pendek. Dokumen: [[UJI_ALUR_SPK]]; tugas [[T-181-uji-alur-spk-awal-sampai-akhir]].
+
+### 2026-11-05 — Papan jadwal v2 dan perapian layout (T-182, lokal)
+
+Masukan pemilik: jadwal kaku, layout Berjalan, KPI & Analisa, dan Target waktu proses kurang nyaman. Hasil: Jadwal menjadi schedule board dengan tampilan Per SPK (langkah mesin berwarna per work center) dan Per mesin (balok pekerjaan per mesin); kartu SPK Berjalan, KPI & Analisa, dan dialog Target dirapikan. Bukti: unit semua PASS (jadwal 21); e2e regresi 42, role 12, akses 34, produksi 106, tampilan 71, alur lengkap 15, semuanya 0 FAIL (mock, bukan bukti Supabase). Tangkapan layar di `documentation/screenshots/layout-v2/`. Tugas [[T-182-papan-jadwal-v2-dan-rapikan-layout-spk]]; kebutuhan [[PRD_PRODUKSI]] bagian 13.
