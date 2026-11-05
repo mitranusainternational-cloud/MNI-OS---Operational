@@ -145,7 +145,7 @@ export async function runProduksi(page, base) {
   await go('produksi');
   const bodyV = await page.evaluate(() => document.getElementById('body').innerText);
   await go('spk'); await page.click('#tools [data-view="spk"][data-val="berjalan"]'); await page.waitForTimeout(400);
-  const bodySpk = await page.evaluate(() => document.getElementById('body').innerText);
+  const bodySpk = await page.evaluate(() => document.getElementById('body').textContent);
   ok('M-19c sesudah dikirim tidak lagi siap kirim, jalur SPK menyebut kiriman ke vendor', !/Siap dikirim ke Vendor ELG/.test(bodyV) && /dikirim 8/.test(bodySpk), JSON.stringify([/Siap dikirim ke Vendor ELG/.test(bodyV), /dikirim 8/.test(bodySpk), bodySpk.replace(/\s+/g, ' ').slice(0, 400)]));
 
   // Vendor: kecepatan dan kualifikasi dari riwayat kiriman (4 selesai: TAT 4, 4, 3, 8 hari kerja; 1 masih di vendor)
@@ -328,8 +328,8 @@ export async function runProduksi(page, base) {
   const menuProd = await page.evaluate(() => { const hs = [...document.querySelectorAll('#nav a')].map((a) => a.getAttribute('href')); return { hs, teks: document.getElementById('nav').innerText }; });
   ok('M-99 menu Produksi hanya tiga pintu: SPK Berjalan, Produksi Hari Ini, Kinerja & Analisa', ['#spk', '#mesin', '#produksi'].every((h) => menuProd.hs.includes(h)) && !menuProd.hs.includes('#papan') && !menuProd.hs.includes('#laporan-produksi') && /SPK Berjalan/.test(menuProd.teks) && /Produksi Hari Ini/.test(menuProd.teks) && /Kinerja & Analisa/.test(menuProd.teks), menuProd.hs.join(','));
   await go('spk'); await page.click('#tools [data-view="spk"][data-val="berjalan"]'); await page.waitForTimeout(500);
-  const sb = await page.evaluate(() => ({ kartu: document.querySelectorAll('.sb-card').length, txt: document.getElementById('body').innerText, kpi: document.querySelectorAll('.kpi').length, jalur: document.querySelectorAll('.sb-card .jstep').length }));
-  ok('M-100 SPK Berjalan: kartu per SPK dengan status, progres, dan jalur tiap item sampai barang jadi', sb.kartu >= 3 && sb.kpi === 4 && sb.jalur > 5 && /jalur tiap item/i.test(sb.txt) && /%/.test(sb.txt), JSON.stringify({ k: sb.kartu, j: sb.jalur }));
+  const sb = await page.evaluate(() => ({ kartu: document.querySelectorAll('.sb-card').length, txt: document.getElementById('body').innerText, kpi: document.querySelectorAll('.kpi').length, jalur: document.querySelectorAll('.sb-card .pg-c').length }));
+  ok('M-100 SPK Berjalan: kartu per SPK dengan status, progres, dan posisi tiap item di setiap langkah', sb.kartu >= 3 && sb.kpi === 4 && sb.jalur > 15 && /posisi tiap item/i.test(sb.txt) && /%/.test(sb.txt), JSON.stringify({ k: sb.kartu, j: sb.jalur }));
   await page.click('#tools [data-view="spk"][data-key="fl"][data-val="telat"]'); await page.waitForTimeout(400);
   const telat = await page.evaluate(() => ({ kartu: [...document.querySelectorAll('.sb-card')].map((c) => c.innerText), kpiTelat: Number(document.querySelectorAll('.kpi')[1].querySelector('.v').textContent) }));
   ok('M-101 filter Telat menampilkan SPK lewat due (Customer Kartu) dan jumlahnya sama dengan ringkasan', telat.kartu.length === telat.kpiTelat && telat.kartu.some((x) => /Customer Kartu/.test(x)) && telat.kartu.every((x) => /Telat/.test(x)), JSON.stringify([telat.kartu.length, telat.kpiTelat]));
@@ -503,8 +503,8 @@ export async function runProduksi(page, base) {
   const tsetting = (await tab('master')).find((r) => r.kode === 'setting' || r.id === 'setting' || r.key === 'setting' || (r.data && r.data.spkT) || r.spkT);
   ok('M-141 target tersimpan setelah Simpan (produksi 4 hari kerja)', !!tsetting && Number((((tsetting.value || tsetting.data || tsetting).spkT) || {}).prod) === 4, JSON.stringify(tsetting && (tsetting.data || tsetting)).slice(0, 120));
   await go('spk'); await page.click('#tools [data-view="spk"][data-key="tab"][data-val="berjalan"]'); await page.waitForTimeout(600);
-  const bj = await page.evaluate(() => ({ kartu: document.querySelectorAll('.sb-card').length, nada: [...document.querySelectorAll('.sb-card')].every((c) => /\bt-(telat|vendor|siap|jalan|selesai)\b/.test(c.className)), kolom: !!document.querySelector('.sb-card .jejak-item') && getComputedStyle(document.querySelector('.sb-card .jejak-item')).display === 'grid' }));
-  ok('M-142 SPK Berjalan: kartu bernada status dan jalur item berbentuk baris dua kolom', bj.kartu >= 2 && bj.nada && bj.kolom, JSON.stringify(bj));
+  const bj = await page.evaluate(() => ({ kartu: document.querySelectorAll('.sb-card').length, nada: [...document.querySelectorAll('.sb-card')].every((c) => /\bt-(telat|vendor|siap|jalan|selesai)\b/.test(c.className)), kolom: !!document.querySelector('.sb-card .pg-r') && getComputedStyle(document.querySelector('.sb-card .pg-r')).display === 'grid' }));
+  ok('M-142 SPK Berjalan: kartu bernada status dan posisi item berbentuk baris berkolom langkah', bj.kartu >= 2 && bj.nada && bj.kolom, JSON.stringify(bj));
   await page.setViewportSize({ width: 390, height: 844 });
   await gtTab();
   const swHp = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -541,12 +541,11 @@ export async function runProduksi(page, base) {
   ok('M-153 menggeser garis waktu dengan drag mouse pada area kosong', x1 > pan.x0 + 100, JSON.stringify([pan.x0, x1]));
   await page.click('#tools [data-view="spk"][data-key="skala"][data-val="minggu"]'); await page.waitForTimeout(300);
 
-  // Jadwal > Progres: matriks posisi item per langkah
-  await page.evaluate(() => { location.hash = '#spk'; }); await page.waitForTimeout(400);
-  await page.click('#tools [data-view="spk"][data-key="tab"][data-val="jadwal"]'); await page.waitForTimeout(500);
-  await page.click('#tools [data-key="vw"][data-val="prog"]'); await page.waitForTimeout(600);
-  const pg = await page.evaluate(() => ({ kartu: document.querySelectorAll('.pg-card').length, baris: document.querySelectorAll('.pg-r:not(.pg-hd):not(.pg-nr)').length, kolom: [...document.querySelector('.pg-card .pg-hd').querySelectorAll('.pg-h')].map((h) => h.textContent), pill: [...document.querySelectorAll('.pg-pill')].map((p) => p.innerText.replace(/\s+/g, ' ')), gantt: !!document.querySelector('.gt-scroll'), input: document.querySelectorAll('#body input, #body select, #body textarea').length }));
-  ok('M-154 Jadwal terbuka di tampilan Progres: kartu per SPK, baris per item, kolom langkah dari Shearing sampai Kirim, strip posisi sekarang, tanpa isian', pg.kartu >= 1 && pg.baris >= 3 && pg.kolom[0] === 'Shearing' && pg.kolom[pg.kolom.length - 1] === 'Kirim' && pg.pill.length >= 4 && !pg.gantt && pg.input === 0, JSON.stringify(pg).slice(0, 300));
+  // SPK Berjalan: matriks posisi item per langkah
+  const bukaTab = async (v) => { await page.evaluate(() => { location.hash = '#spk'; }); await page.waitForTimeout(400); await page.click('#tools [data-view="spk"][data-key="tab"][data-val="' + v + '"]'); await page.waitForTimeout(600); };
+  await bukaTab('berjalan');
+  const pg = await page.evaluate(() => ({ kartu: document.querySelectorAll('.sb-card').length, baris: document.querySelectorAll('.pg-r:not(.pg-hd):not(.pg-nr)').length, kolom: [...document.querySelector('.sb-card .pg-hd').querySelectorAll('.pg-h')].map((h) => h.textContent), pill: [...document.querySelectorAll('.pg-pill')].map((p) => p.innerText.replace(/\s+/g, ' ')), gantt: !!document.querySelector('.gt-scroll'), input: document.querySelectorAll('#body input, #body select, #body textarea').length }));
+  ok('M-154 SPK Berjalan memuat matriks posisi: kartu per SPK, baris per item, kolom langkah dari Shearing sampai Kirim, strip posisi sekarang, tanpa isian', pg.kartu >= 1 && pg.baris >= 3 && pg.kolom[0] === 'Shearing' && pg.kolom[pg.kolom.length - 1] === 'Kirim' && pg.pill.length >= 4 && !pg.gantt && pg.input === 0, JSON.stringify(pg).slice(0, 300));
   const sl = await page.evaluate(() => { const r = [...document.querySelectorAll('.pg-r:not(.pg-hd):not(.pg-nr)')][0]; const cs = [...r.querySelectorAll('.pg-c')]; return { selesai: cs.filter((c) => c.classList.contains('ok')).length, posisi: cs.filter((c) => c.classList.contains('cur')).length, label: r.querySelector('.pg-pos').textContent, langkah: r.querySelector('.pg-it small').textContent }; });
   ok('M-155 baris item: langkah selesai bertanda centang, satu kolom posisi sekarang, label posisi dan nomor langkah', sl.selesai >= 1 && sl.posisi === 1 && /^(Di|Antri di|Menunggu|Siap|Terkirim)/.test(sl.label) && /langkah \d+ dari \d+|semua langkah selesai/.test(sl.langkah), JSON.stringify(sl));
   const totalBaris = pg.baris;
@@ -555,15 +554,68 @@ export async function runProduksi(page, base) {
   await page.click('.pg-pill.on'); await page.waitForTimeout(400);
   const bal = await page.$$eval('.pg-r:not(.pg-hd):not(.pg-nr)', (a) => a.length);
   ok('M-156 klik posisi di strip menyaring item di langkah itu; klik lagi mengembalikan semua', fp.on === 1 && fp.pos.length >= 1 && fp.pos.length < totalBaris && bal === totalBaris, JSON.stringify([fp.pos.length, totalBaris, bal]));
-  await page.click('#tools [data-act="jdsemua"][data-v="lipat"]'); await page.waitForTimeout(300);
-  const lp2 = await page.$$eval('.pg-r:not(.pg-hd)', (a) => a.length);
-  await page.click('#tools [data-act="jdsemua"][data-v="buka"]'); await page.waitForTimeout(300);
-  const bk2 = await page.$$eval('.pg-r:not(.pg-hd)', (a) => a.length);
-  ok('M-157 Progres: Lipat semua menyembunyikan baris item, Buka semua menampilkannya kembali', lp2 === 0 && bk2 >= 3, JSON.stringify([lp2, bk2]));
+  await page.click('.sb-card .sb-det summary'); await page.waitForTimeout(300);
+  const lp2 = await page.evaluate(() => document.querySelector('.sb-card .sb-det').open);
+  await page.click('.sb-card .sb-det summary'); await page.waitForTimeout(300);
+  const bk2 = await page.evaluate(() => document.querySelector('.sb-card .sb-det').open);
+  ok('M-157 matriks tiap SPK bisa dilipat dan dibuka kembali', lp2 === false && bk2 === true, JSON.stringify([lp2, bk2]));
   await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(400);
   const hpPg = await page.evaluate(() => ({ lebar: document.documentElement.scrollWidth, layar: window.innerWidth, gulirKartu: (() => { const s = document.querySelector('.pg-sc'); return s ? s.scrollWidth > s.clientWidth : false; })() }));
-  ok('M-158 di HP (390 px) halaman tanpa gulir mendatar; kartu SPK bergulir di dalam kotaknya sendiri', hpPg.lebar <= hpPg.layar + 1 && hpPg.gulirKartu, JSON.stringify(hpPg));
+  ok('M-158 di HP (390 px) halaman tanpa gulir mendatar; matriks bergulir di dalam kotaknya sendiri', hpPg.lebar <= hpPg.layar + 1 && hpPg.gulirKartu, JSON.stringify(hpPg));
   await page.setViewportSize({ width: 1280, height: 800 });
+
+  // Berjalan: mode Ringkas dan Rinci
+  await bukaTab('berjalan');
+  const rgOn = await page.evaluate(() => ({ rg: !!document.querySelector('.pg.rg'), pc: !!document.querySelector('.pg-pc') && document.querySelector('.pg-pc').offsetParent !== null, q: !!document.querySelector('.pg-q') && document.querySelector('.pg-q').offsetParent !== null }));
+  await page.click('#tools [data-key="pgd"][data-val="rinci"]'); await page.waitForTimeout(400);
+  const rcOn = await page.evaluate(() => ({ rg: !!document.querySelector('.pg.rg'), pc: !!document.querySelector('.pg-pc') && document.querySelector('.pg-pc').offsetParent !== null, q: !!document.querySelector('.pg-q') && document.querySelector('.pg-q').offsetParent !== null }));
+  await page.click('#tools [data-key="pgd"][data-val="ringkas"]'); await page.waitForTimeout(300);
+  ok('M-159 mode Ringkas menampilkan persen saja dan mode Rinci menampilkan jumlah; bisa berpindah', rgOn.rg && rgOn.pc && !rgOn.q && !rcOn.rg && !rcOn.pc && rcOn.q, JSON.stringify([rgOn, rcOn]));
+
+  // Jadwal: papan kalender mingguan dengan rencana otomatis
+  await bukaTab('jadwal');
+  await page.click('#tools [data-key="vw"][data-val="papan"]'); await page.waitForTimeout(600);
+  const pb = await page.evaluate(() => ({ papan: !!document.querySelector('.pb'), hari: document.querySelectorAll('#pb-sc .pb-dh').length, sekarang: document.querySelectorAll('#pb-sc .pb-dh.now').length, baris: document.querySelectorAll('.pb-sp').length, kotak: document.querySelectorAll('#pb-sc .pb-chip').length, matriks: !!document.querySelector('.pg-r'), input: document.querySelectorAll('#body input, #body select, #body textarea').length }));
+  ok('M-161 Jadwal membuka Papan jadwal mingguan: satu baris per SPK, tujuh hari dengan hari ini ditandai, kotak pekerjaan terisi, tanpa isian', pb.papan && pb.hari === 7 && pb.sekarang === 1 && pb.baris >= 1 && pb.kotak >= 3 && !pb.matriks && pb.input === 0, JSON.stringify(pb));
+  const kt = await page.evaluate(() => ({ done: document.querySelectorAll('#pb-sc .pb-chip.done').length, plan: document.querySelectorAll('#pb-sc .pb-chip.plan').length, status: document.querySelectorAll('.pb-sp .chip').length, beban: document.querySelectorAll('.pb-bn .pb-ld').length, lipat: !!document.querySelector('.pb-bn details') }));
+  ok('M-162 kotak membedakan realisasi dan rencana otomatis; tiap SPK punya status prediksi; beban work center tersedia di bagian lipat', kt.done >= 1 && kt.plan >= 1 && kt.status >= 1 && kt.beban >= 1 && kt.lipat, JSON.stringify(kt));
+  const judul0 = await page.textContent('.pb-title');
+  await page.click('#tools [data-act="pbnav"][data-d="1"]'); await page.waitForTimeout(400);
+  const judul1 = await page.textContent('.pb-title');
+  await page.click('#tools [data-act="pbnav"][data-d="0"]'); await page.waitForTimeout(400);
+  const judul2 = await page.textContent('.pb-title');
+  ok('M-163 navigasi minggu: panah maju memajukan satu minggu, Hari ini kembali ke minggu ini', judul0 !== judul1 && /\+1 minggu/.test(judul1) && judul2 === judul0 && /minggu ini/.test(judul2), JSON.stringify([judul0, judul1, judul2]));
+  const fl = await page.evaluate(() => ({ n: document.querySelectorAll('.pb-flag').length, telat: document.querySelectorAll('.pb-flag.late').length }));
+  ok('M-164 due date ditandai bendera di hari jatuh temponya (warna merah ditentukan status prediksi, diuji di R-07)', fl.n >= 1 && fl.telat <= fl.n, JSON.stringify(fl));
+  await page.click('.pb-sp'); await page.waitForTimeout(400);
+  const pd0 = await page.evaluate(() => { const d = document.querySelector('.drawer-panel'); return { teks: d ? d.innerText : '', buka: !!(d && d.querySelector('[data-act="openspk"]')) }; });
+  ok('M-165 klik baris SPK membuka rencana: due date, perkiraan siap kirim, rencana per item, tombol Buka SPK', /rencana per item/i.test(pd0.teks) && /Perkiraan siap kirim/.test(pd0.teks) && /Due date/.test(pd0.teks) && pd0.buka, JSON.stringify({ buka: pd0.buka, teks: pd0.teks.slice(0, 120) }));
+  await closeAll();
+  await page.click('#pb-sc .pb-chip[data-act="pbcard"]'); await page.waitForTimeout(400);
+  const pd = await page.evaluate(() => { const d = document.querySelector('.drawer-panel'); return { teks: d ? d.innerText : '', sorot: d ? d.querySelectorAll('.gt-dit.hl').length : 0 }; });
+  ok('M-166 klik kotak pekerjaan membuka rencana SPK dengan item terkait disorot', /rencana per item/i.test(pd.teks) && pd.sorot === 1, JSON.stringify({ sorot: pd.sorot }));
+  await closeAll();
+  await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(400);
+  const hpPb = await page.evaluate(() => ({ lebar: document.documentElement.scrollWidth, layar: window.innerWidth, gulir: (() => { const s = document.getElementById('pb-sc'); return s ? s.scrollWidth > s.clientWidth : false; })() }));
+  ok('M-167 di HP (390 px) papan jadwal bergulir di dalam kotaknya sendiri tanpa melebarkan halaman', hpPb.lebar <= hpPb.layar + 1 && hpPb.gulir, JSON.stringify(hpPb));
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.click('#tools [data-key="vw"][data-val="spk"]'); await page.waitForTimeout(500);
+  const gtOk = !!(await page.$('.gt-scroll'));
+  await page.click('#tools [data-key="vw"][data-val="mesin"]'); await page.waitForTimeout(500);
+  const msOk = !!(await page.$('.gt-mc'));
+  ok('M-168 Garis waktu dan Per mesin tetap tersedia dari tab Jadwal', gtOk && msOk, JSON.stringify([gtOk, msOk]));
+
+  // Berjalan: penanda item diam
+  const sebelum = await page.$$eval('.pg-dm', (a) => a.length);
+  await page.evaluate(() => {
+    const s = JSON.parse(localStorage.getItem('mni-local-mock-db')); const d = new Date(); d.setDate(d.getDate() - 5); const tgl = d.toISOString().slice(0, 10);
+    (s.tables.produksi_log || []).forEach((r) => { if ((r.jenis || 'hasil') === 'hasil') { r.tgl = tgl; if (r.data && typeof r.data === 'object') r.data.tgl = tgl; } });
+    localStorage.setItem('mni-local-mock-db', JSON.stringify(s));
+  });
+  await page.reload(); await page.waitForTimeout(3500);
+  await bukaTab('berjalan');
+  const dm = await page.evaluate(() => ({ n: document.querySelectorAll('.pg-dm').length, teks: [...document.querySelectorAll('.pg-dm')].map((e) => e.textContent).slice(0, 3), crit: document.querySelectorAll('.pg-dm.crit').length, chip: /item diam/.test(document.querySelector('.pg-strip').innerText) }));
+  ok('M-160 item tanpa catatan baru lebih dari 2 hari ditandai Diam N hari (merah bila 4 hari atau lebih) dan dihitung di strip posisi', dm.n >= 1 && dm.crit >= 1 && dm.chip && dm.teks.every((x) => /^Diam \d+ hari$/.test(x)), JSON.stringify({ sebelum, ...dm }));
 
   ok('M-14 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;

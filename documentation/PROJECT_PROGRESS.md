@@ -42,9 +42,9 @@ Halaman ini menyimpan pekerjaan, temuan, bukti, dan hambatan. Checklist berikutn
 
 ## Log kerja
 
-### 2026-11-05 — Jadwal: tampilan Progres (T-186, lokal)
+### 2026-11-05 — Berjalan dan Jadwal dibedakan (T-186, lokal)
 
-Tinjauan pemilik: Gantt masih kurang bagus untuk memantau progres. Keputusan: tab Jadwal dibuka di tampilan **Progres**, yaitu satu kartu per SPK dan satu baris per item dengan kolom langkah Shearing sampai Kirim; tiap sel menunjukkan jumlah selesai, cincin menandai posisi sekarang, strip di atas menghitung item di tiap langkah dan bisa menyaring. Gantt tetap tersedia sebagai Garis waktu. Bukti: e2e regresi 42, role 12, akses 34, produksi 123, tampilan 72, alur lengkap 15 (0 FAIL; mock, bukan bukti Supabase). Kebutuhan di [[PRD_PRODUKSI]] bagian 16. Belum ditayangkan; migration 14 tetap draf. Langkah berikut: tinjauan pemilik.
+Tinjauan pemilik: Gantt kurang bagus untuk memantau, Jadwal dan Berjalan masih sama, minta papan jadwal seperti Antlia (Production Calendar) tetapi lebih baik, lalu tampilan pertama dinilai terlalu membingungkan. Hasil: **Berjalan** memuat matriks posisi tiap item per langkah (centang, cincin posisi, strip posisi, penanda Diam N hari, mode Ringkas dan Rinci); **Jadwal** menjadi papan mingguan per SPK dengan realisasi dan rencana otomatis (mesin baru rencana.js, kapasitas terbatas, urut due date), status prediksi, bendera due date, beban work center di bagian lipat; Garis waktu dan Per mesin tetap ada. Bukti: unit rencana 11 (semua unit PASS), e2e regresi 42, role 12, akses 34, produksi 133, tampilan 72, alur lengkap 15 (0 FAIL; mock, bukan bukti Supabase). Kebutuhan di [[PRD_PRODUKSI]] bagian 16. Belum ditayangkan; migration 14 tetap draf. Langkah berikut: tinjauan pemilik.
 
 ### 2026-11-05 — Papan jadwal v3 interaktif dan urutan tab SPK (T-185, lokal)
 

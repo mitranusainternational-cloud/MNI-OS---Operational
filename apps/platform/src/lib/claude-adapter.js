@@ -572,7 +572,8 @@ import * as _analisa from './produksi/analisa.js';
 import * as _statistik from './produksi/statistik.js';
 import * as _jadwal from './produksi/jadwal.js';
 import * as _kapasitas from './produksi/kapasitas.js';
-window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan, ..._analisa, ..._statistik, ..._jadwal, ..._kapasitas };
+import * as _rencana from './produksi/rencana.js';
+window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan, ..._analisa, ..._statistik, ..._jadwal, ..._kapasitas, ..._rencana };
 
 window.claude = CLAUDE_SHIM;
 window.__supabase = supabase;
