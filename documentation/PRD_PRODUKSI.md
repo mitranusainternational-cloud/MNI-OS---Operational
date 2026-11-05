@@ -162,3 +162,19 @@ Masukan pemilik: urutan tab SPK menjadi Daftar SPK, Jadwal, Berjalan, KPI & Anal
 | Navigasi garis waktu | Geser dengan drag; Ke hari ini tetap ada | M-153 |
 
 Tidak ada input baru dan tidak ada perubahan skema. Belum dibuat: mengubah jadwal dengan menggeser batang (jadwal diturunkan dari catatan, bukan diatur tangan) dan panah ketergantungan antarlangkah. Tugas [[T-185-papan-jadwal-v3-interaktif-dan-urutan-tab-spk]].
+
+
+## 16. Jadwal: tampilan Progres (2026-11-05)
+
+Masukan pemilik: Gantt masih kurang bagus untuk memantau; boleh dibuat bentuk lain asal progres mudah dipantau. Keputusan: tampilan awal tab Jadwal berubah menjadi **Progres** (matriks), Gantt tetap sebagai **Garis waktu** untuk pertanyaan "kapan", dan **Per mesin** tetap ada.
+
+| Kebutuhan | Penyelesaian | Uji |
+|---|---|---|
+| Tahu posisi tiap item sekarang | Baris per item, kolom langkah Shearing sampai Kirim; cincin menandai posisi; label Antri di, Di, Menunggu, Siap kirim, Terkirim | M-154, M-155 |
+| Tahu berapa banyak yang lewat tiap langkah | Sel menunjukkan jumlah selesai terhadap jumlah SPK, batang, centang bila penuh, keterangan mesin berjalan atau jumlah dikirim ke vendor | M-155 |
+| Lihat sebaran pekerjaan sekilas | Strip "Posisi item sekarang" menghitung item di tiap langkah dan menyaring saat diklik | M-156 |
+| Prioritas jelas | Kartu SPK urut telat dulu, lalu due date; chip sisa hari | M-154 |
+| Atur kepadatan | Buka semua dan Lipat semua | M-157 |
+| Dipakai di HP | Kartu bergulir di dalam kotaknya sendiri, halaman tidak melebar | M-158 |
+
+Tidak ada input baru dan tidak ada perubahan skema. Tugas [[T-186-jadwal-tampilan-progres-matriks-posisi-item]].

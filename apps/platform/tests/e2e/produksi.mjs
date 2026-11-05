@@ -450,7 +450,7 @@ export async function runProduksi(page, base) {
   await closeAll();
 
   // Jadwal SPK (Gantt): garis waktu SPK dari data yang sudah ada, tanpa input baru
-  const gtTab = async () => { await page.evaluate(() => { location.hash = '#spk'; }); await page.waitForTimeout(500); await page.click('#tools [data-view="spk"][data-key="tab"][data-val="jadwal"]'); await page.waitForTimeout(700); };
+  const gtTab = async () => { await page.evaluate(() => { location.hash = '#spk'; }); await page.waitForTimeout(500); await page.click('#tools [data-view="spk"][data-key="tab"][data-val="jadwal"]'); await page.waitForTimeout(500); await page.click('#tools [data-key="vw"][data-val="spk"]'); await page.waitForTimeout(500); };
   const gtProd = () => page.evaluate(() => [...document.querySelectorAll('.gt-row:not(.gt-hd):not(.gt-it)')].map((r) => (r.querySelector('.gt-nmw b') || {}).textContent + ':' + ((r.querySelector('.gt-b.prod') || {}).dataset ? r.querySelector('.gt-b.prod').dataset.tip : '-')).join(' | '));
   await gtTab();
   const g1 = await page.evaluate(() => ({ tab: !!document.querySelector('#tools [data-val="jadwal"].on'), baris: document.querySelectorAll('.gt-row:not(.gt-hd):not(.gt-it)').length, nama: [...document.querySelectorAll('.gt-nmw b')].map((b) => b.textContent), bar: document.querySelectorAll('.gt-b.plan').length, now: document.querySelectorAll('.gt-now').length, due: document.querySelectorAll('.gt-due').length, inputs: document.querySelectorAll('#body input, #body select, #body textarea').length }));
@@ -540,6 +540,30 @@ export async function runProduksi(page, base) {
   const x1 = await page.evaluate(() => document.getElementById('gt-scroll').scrollLeft);
   ok('M-153 menggeser garis waktu dengan drag mouse pada area kosong', x1 > pan.x0 + 100, JSON.stringify([pan.x0, x1]));
   await page.click('#tools [data-view="spk"][data-key="skala"][data-val="minggu"]'); await page.waitForTimeout(300);
+
+  // Jadwal > Progres: matriks posisi item per langkah
+  await page.evaluate(() => { location.hash = '#spk'; }); await page.waitForTimeout(400);
+  await page.click('#tools [data-view="spk"][data-key="tab"][data-val="jadwal"]'); await page.waitForTimeout(500);
+  await page.click('#tools [data-key="vw"][data-val="prog"]'); await page.waitForTimeout(600);
+  const pg = await page.evaluate(() => ({ kartu: document.querySelectorAll('.pg-card').length, baris: document.querySelectorAll('.pg-r:not(.pg-hd):not(.pg-nr)').length, kolom: [...document.querySelector('.pg-card .pg-hd').querySelectorAll('.pg-h')].map((h) => h.textContent), pill: [...document.querySelectorAll('.pg-pill')].map((p) => p.innerText.replace(/\s+/g, ' ')), gantt: !!document.querySelector('.gt-scroll'), input: document.querySelectorAll('#body input, #body select, #body textarea').length }));
+  ok('M-154 Jadwal terbuka di tampilan Progres: kartu per SPK, baris per item, kolom langkah dari Shearing sampai Kirim, strip posisi sekarang, tanpa isian', pg.kartu >= 1 && pg.baris >= 3 && pg.kolom[0] === 'Shearing' && pg.kolom[pg.kolom.length - 1] === 'Kirim' && pg.pill.length >= 4 && !pg.gantt && pg.input === 0, JSON.stringify(pg).slice(0, 300));
+  const sl = await page.evaluate(() => { const r = [...document.querySelectorAll('.pg-r:not(.pg-hd):not(.pg-nr)')][0]; const cs = [...r.querySelectorAll('.pg-c')]; return { selesai: cs.filter((c) => c.classList.contains('ok')).length, posisi: cs.filter((c) => c.classList.contains('cur')).length, label: r.querySelector('.pg-pos').textContent, langkah: r.querySelector('.pg-it small').textContent }; });
+  ok('M-155 baris item: langkah selesai bertanda centang, satu kolom posisi sekarang, label posisi dan nomor langkah', sl.selesai >= 1 && sl.posisi === 1 && /^(Di|Antri di|Menunggu|Siap|Terkirim)/.test(sl.label) && /langkah \d+ dari \d+|semua langkah selesai/.test(sl.langkah), JSON.stringify(sl));
+  const totalBaris = pg.baris;
+  await page.click('.pg-pill:not(.nol)'); await page.waitForTimeout(400);
+  const fp = await page.evaluate(() => ({ pos: [...document.querySelectorAll('.pg-r:not(.pg-hd):not(.pg-nr) .pg-pos')].map((e) => e.textContent), on: document.querySelectorAll('.pg-pill.on').length }));
+  await page.click('.pg-pill.on'); await page.waitForTimeout(400);
+  const bal = await page.$$eval('.pg-r:not(.pg-hd):not(.pg-nr)', (a) => a.length);
+  ok('M-156 klik posisi di strip menyaring item di langkah itu; klik lagi mengembalikan semua', fp.on === 1 && fp.pos.length >= 1 && fp.pos.length < totalBaris && bal === totalBaris, JSON.stringify([fp.pos.length, totalBaris, bal]));
+  await page.click('#tools [data-act="jdsemua"][data-v="lipat"]'); await page.waitForTimeout(300);
+  const lp2 = await page.$$eval('.pg-r:not(.pg-hd)', (a) => a.length);
+  await page.click('#tools [data-act="jdsemua"][data-v="buka"]'); await page.waitForTimeout(300);
+  const bk2 = await page.$$eval('.pg-r:not(.pg-hd)', (a) => a.length);
+  ok('M-157 Progres: Lipat semua menyembunyikan baris item, Buka semua menampilkannya kembali', lp2 === 0 && bk2 >= 3, JSON.stringify([lp2, bk2]));
+  await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(400);
+  const hpPg = await page.evaluate(() => ({ lebar: document.documentElement.scrollWidth, layar: window.innerWidth, gulirKartu: (() => { const s = document.querySelector('.pg-sc'); return s ? s.scrollWidth > s.clientWidth : false; })() }));
+  ok('M-158 di HP (390 px) halaman tanpa gulir mendatar; kartu SPK bergulir di dalam kotaknya sendiri', hpPg.lebar <= hpPg.layar + 1 && hpPg.gulirKartu, JSON.stringify(hpPg));
+  await page.setViewportSize({ width: 1280, height: 800 });
 
   ok('M-14 tanpa pageerror', errs.length === 0, errs.join(' | '));
   const fail = R.filter((x) => x.startsWith('FAIL')).length;

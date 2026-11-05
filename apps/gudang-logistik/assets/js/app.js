@@ -421,11 +421,11 @@ B['pengiriman']=()=>{
 };
 
 /* ---------- SPK ---------- */
-T['spk']=()=>F.spk.tab==='jadwal'?`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','vw',[['spk','Per SPK'],['mesin','Per mesin']])}${segBtns('spk','skala',[['lebar','Detail'],['minggu','Harian'],['bulan','Ringkas']])}${F.spk.vw==='mesin'?'':segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span>${F.spk.vw==='mesin'?'':'<button class="btn ghost" data-act="jdsemua" data-v="buka">Buka semua</button><button class="btn ghost" data-act="jdsemua" data-v="lipat">Lipat semua</button>'}<button class="btn ghost" data-act="jdhariini">Ke hari ini</button>`:F.spk.tab==='berjalan'?`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button>`:F.spk.tab==='kpi'?`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','p',[['30','30 hari'],['90','90 hari'],['bln','Bulan ini'],['all','Semua']])}<span class="grow"></span><button class="btn ghost" data-act="spktarget">Atur target</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="xlsx">${ic('dl')}Excel</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="pdf">${ic('file')}PDF</button>`:`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','st',[['aktif','Aktif'],['Terlambat','Terlambat'],['Selesai','Selesai'],['','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button><button class="btn ghost" data-act="csv" data-what="spk">${ic('dl')}CSV</button>`;
+T['spk']=()=>F.spk.tab==='jadwal'?`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','vw',[['prog','Progres'],['spk','Garis waktu'],['mesin','Per mesin']])}${F.spk.vw==='prog'?'':segBtns('spk','skala',[['lebar','Detail'],['minggu','Harian'],['bulan','Ringkas']])}${F.spk.vw==='mesin'?'':segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span>${F.spk.vw==='mesin'?'':'<button class="btn ghost" data-act="jdsemua" data-v="buka">Buka semua</button><button class="btn ghost" data-act="jdsemua" data-v="lipat">Lipat semua</button>'}${F.spk.vw==='prog'?'':'<button class="btn ghost" data-act="jdhariini">Ke hari ini</button>'}`:F.spk.tab==='berjalan'?`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','fl',[['jalan','Berjalan'],['telat','Telat'],['vendor','Di vendor'],['siap','Siap kirim'],['selesai','Selesai'],['semua','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button>`:F.spk.tab==='kpi'?`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','p',[['30','30 hari'],['90','90 hari'],['bln','Bulan ini'],['all','Semua']])}<span class="grow"></span><button class="btn ghost" data-act="spktarget">Atur target</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="xlsx">${ic('dl')}Excel</button><button class="btn ghost" data-act="doc" data-kind="kpi" data-ref="-" data-fmt="pdf">${ic('file')}PDF</button>`:`${segBtns('spk','tab',[['list','Daftar SPK'],['jadwal','Jadwal'],['berjalan','Berjalan'],['kpi','KPI & Analisa']])}${segBtns('spk','st',[['aktif','Aktif'],['Terlambat','Terlambat'],['Selesai','Selesai'],['','Semua']])}<input class="inp search" id="q-spk" placeholder="Cari no SPK, customer, PO…" value="${esc(F.spk.q)}" data-act="q" data-view="spk"><span class="grow"></span><button class="btn primary" data-act="newspk">${ic('plus')}SPK baru</button><button class="btn ghost" data-act="csv" data-what="spk">${ic('dl')}CSV</button>`;
 B['spk']=()=>{
  if(F.spk.tab==='kpi')return spkKpiBody();
  if(F.spk.tab==='berjalan')return spkBerjalan();
- if(F.spk.tab==='jadwal')return spkJadwal();
+ if(F.spk.tab==='jadwal')return F.spk.vw==='prog'?spkProgres():spkJadwal();
  const c=calc(),f=F.spk,q=f.q.toLowerCase();
  const xs=S.spk.filter(s=>{const x=c.spk[s._id];if(f.stage&&flow(s._id).stage!==f.stage)return false;if(f.st==='aktif'&&x.st==='Selesai')return false;if(f.st&&f.st!=='aktif'&&x.st!==f.st)return false;if(q&&!`${s.no} ${s.customer} ${s.po} ${s.sales}`.toLowerCase().includes(q))return false;return true}).sort((a,b)=>b.no-a.no);
  const all=Object.values(c.spk);
@@ -458,6 +458,63 @@ function spkBerjalan(){
    ${sekTeks}
    <details class="sb-det"${sek.length||j==='vendor'||i<3?' open':''}><summary>Lihat jalur tiap item sampai barang jadi</summary>${jejakHtml(s._id)}</details></div></section>`};
  return kp+(xs.length?xs.map(kartu).join(''):empty('Tidak ada SPK di filter ini','Ganti filter di atas, atau buat SPK baru.'));
+}
+
+/* ---------- Jadwal > Progres: matriks posisi tiap item di setiap langkah, untuk memantau sekilas ---------- */
+function spkProgres(){
+ const P=PXL();if(!P)return empty('Papan progres belum siap','Muat ulang halaman.');
+ const c=calc(),f=F.spk,q=(f.q||'').toLowerCase(),t=today();
+ const semua=S.spk.filter(s=>{const x=c.spk[s._id];return x&&x.st!=='Draft'&&x.st!=='Batal'});
+ const stage=s=>(flow(s._id)||{}).stage||'';
+ const cocok=(s,k)=>{const x=c.spk[s._id];return k==='semua'||(k==='jalan'?x.st!=='Selesai':k==='telat'?x.st==='Terlambat':k==='vendor'?stage(s)==='Di vendor':k==='siap'?(stage(s)==='Siap kirim'||stage(s)==='Kirim sebagian'):x.st==='Selesai')};
+ const pilih=semua.filter(s=>cocok(s,f.fl||'jalan')&&(!q||(s.no+' '+s.customer+' '+(s.po||'')).toLowerCase().includes(q)))
+  .sort((a,b)=>{const ra=c.spk[a._id].st==='Terlambat'?0:1,rb=c.spk[b._id].st==='Terlambat'?0:1;return ra-rb||(a.due||'9999').localeCompare(b.due||'9999')||b.no-a.no});
+ if(!pilih.length)return empty('Tidak ada SPK di filter ini','Ganti filter di atas, atau buat SPK baru.');
+ const ses=P.sesiAktifSemua(S.produksi_log||[]);
+ const papan=pilih.map(s=>{const x=c.spk[s._id];
+  const items=(s.items||[]).map((it,ix)=>{
+   const qq=+it.q||0,l=x.lines[ix]||{},st=itemState(s,it,ix);
+   if(!st)return {it,ix,q:qq,tanpaRute:true};
+   const steps=st.rute.map((w,i)=>{const vend=P.langkahVendor(w);return {w,i,vend,key:vend?'Vendor':w,val:Math.min(st.kum[w]||0,qq),out:vend?(st.vendorKirim[w]||0):0,live:ses.some(e=>e.spk_id===s._id&&+e.item_idx===ix&&P.indeksLangkah(st.rute,st.alt,e.wc)===i),mesin:[...new Set(ses.filter(e=>e.spk_id===s._id&&+e.item_idx===ix&&P.indeksLangkah(st.rute,st.alt,e.wc)===i).map(e=>e.mesin||e.wc))]}});
+   const kir=Math.min(l.kirim||0,qq);const cur=steps.find(z=>z.val<qq);
+   let pos,label,nada;
+   if(cur){pos=cur.key;if(cur.vend){label=cur.out>cur.val?'Di '+cur.w:'Menunggu '+cur.w;nada=cur.out>cur.val?'warn':'plain'}else{const mulai=cur.live||cur.val>0;label=(mulai?'Di ':'Antri di ')+cur.w;nada=mulai?'run':'plain'}}
+   else if(kir>=qq&&qq>0){pos='Terkirim';label='Terkirim ke customer';nada='ok'}
+   else{pos='Siap kirim';label='Siap kirim';nada='info'}
+   return {it,ix,q:qq,steps,kir,cur,pos,label,nada,pct:qq?Math.min(1,(l.prodEff||0)/qq):0};
+  });
+  return {s,x,items}});
+ // kolom langkah yang dipakai item yang tampil
+ const wcNama=wcInternal().map(w=>w.nama);const ada=new Set();
+ papan.forEach(b=>b.items.forEach(i=>(i.steps||[]).forEach(z=>ada.add(z.key))));
+ const kolom=[...wcNama.filter(k=>ada.has(k)),...[...ada].filter(k=>k!=='Vendor'&&!wcNama.includes(k)),...(ada.has('Vendor')?['Vendor']:[]),'Kirim'];
+ // ringkasan posisi sekarang (hanya item yang belum terkirim)
+ const urutPos=[...kolom.filter(k=>k!=='Kirim'),'Siap kirim'];
+ const hitung={};papan.forEach(b=>b.items.forEach(i=>{if(i.pos&&i.pos!=='Terkirim')hitung[i.pos]=(hitung[i.pos]||0)+1}));
+ const strip=urutPos.map(k=>`<button type="button" class="pg-pill${f.pos===k?' on':''}${hitung[k]?'':' nol'}" data-act="pgpos" data-p="${esc(k)}"><b>${hitung[k]||0}</b><span>${esc(k)}</span></button>`).join('');
+ const nTelat=papan.filter(b=>b.x.st==='Terlambat').length;
+ const totalItem=papan.reduce((a,b)=>a+b.items.length,0);
+ const ringkas=`<div class="pg-top"><div class="pg-sumr">${chip(papan.length+' SPK','info')}${chip(totalItem+' item','plain')}${nTelat?chip(nTelat+' telat','crit'):''}${ses.length?chip(ses.length+' sesi mesin berjalan','warn'):''}</div><div class="pg-strip"><span class="pg-lb">Posisi item sekarang</span>${strip}${f.pos?`<button type="button" class="linkbtn" data-act="pgpos" data-p="">hapus filter</button>`:''}</div></div>`;
+ const persen=v=>Math.round(Math.max(0,Math.min(1,v))*100);
+ const sel=(val,qq,nada,o={})=>{const pc=qq?persen(val/qq):0;const st=qq>0&&val>=qq?'ok':val>0?'run':'wait';
+  return `<div class="pg-c ${st}${o.cur?' cur':''}${o.live?' live':''}" title="${esc(o.tip||'')}"><div class="pg-n"><b>${n(val)}</b><span>/ ${n(qq)}</span>${st==='ok'?'<em class="pg-ck">✓</em>':o.live?'<em class="pg-lv"></em>':''}</div><i class="pg-b"><u style="width:${pc}%"></u></i><small>${o.sub||(st==='wait'?'belum mulai':'')}</small></div>`};
+ const baris=(b,i)=>{
+  if(i.tanpaRute)return `<div class="pg-r pg-nr"><div class="pg-it"><b>${esc(i.it.d)}</b><small>${n(i.q)} ${esc(i.it.u||'')}</small></div><div class="pg-note">Rute belum dikenali. Pastikan judul section SPK memuat produk.</div></div>`;
+  const info=`<div class="pg-it"><b title="${esc(i.it.d)}">${esc(i.it.d)}</b><small>${n(i.q)} ${esc(i.it.u||'')} · ${i.cur?`langkah ${i.steps.indexOf(i.cur)+1} dari ${i.steps.length}`:'semua langkah selesai'}</small><span class="pg-pos ${i.nada}">${esc(i.label)}</span></div>`;
+  const sel2=kolom.map(k=>{
+   if(k==='Kirim'){const kk=i.kir,cur=i.pos==='Siap kirim';return sel(kk,i.q,'',{cur,tip:`Terkirim ke customer ${n(kk)} dari ${n(i.q)}`,sub:kk>=i.q&&i.q>0?'surat jalan customer':kk>0?'kirim sebagian':(i.pos==='Siap kirim'?'siap dikirim':'menunggu produksi')})}
+   const z=i.steps.find(z=>z.key===k);if(!z)return '<div class="pg-c none" title="Tidak ada di rute item ini">–</div>';
+   const rj=0;const sub=z.vend?(z.out?`dikirim ${n(z.out)}`:'belum dikirim'):(z.live?'berjalan'+(z.mesin.length?' · '+esc(z.mesin.join(', ')):''):'');
+   return sel(z.val,i.q,'',{cur:i.cur===z,live:z.live,sub,tip:`${z.w}: ${n(z.val)} dari ${n(i.q)}${z.vend?' (kembali dari vendor, dikirim '+n(z.out)+')':''}${z.live?' · sedang dikerjakan':''}`})}).join('');
+  return `<div class="pg-r">${info}${sel2}</div>`};
+ const tutup=f.tutup||(f.tutup={});
+ const kartu=papan.map(b=>{const s=b.s,x=b.x;const buka=!tutup[s._id];const sisa=s.due?days(t,s.due):null;
+  const due=x.st==='Selesai'?chip('Selesai','ok'):sisa==null?'':sisa<0?chip((-sisa)+' hari telat','crit'):sisa===0?chip('Due hari ini','warn'):chip(sisa+' hari lagi',sisa<=2?'warn':'plain');
+  const item=b.items.filter(i=>!f.pos||i.pos===f.pos);
+  if(f.pos&&!item.length)return '';
+  return `<section class="panel pg-card${x.st==='Terlambat'?' telat':''}"><div class="pg-sh" data-act="jdbuka" data-id="${s._id}"><span class="gt-car">${buka?'▾':'▸'}</span><b class="pg-no">SPK ${esc(String(s.no))}</b><span class="pg-cu">${esc(s.customer)}</span>${due}<span class="pg-sp"></span><span class="pg-ov" title="Progres produksi"><i class="jb"><i style="width:${persen(x.pP)}%"></i></i><b>${persen(x.pP)}%</b></span><button type="button" class="linkbtn" data-act="openspk" data-id="${s._id}">Buka</button></div>
+   ${buka?`<div class="pg-sc"><div class="pg-r pg-hd"><div class="pg-it">Item</div>${kolom.map(k=>`<div class="pg-h">${esc(k)}</div>`).join('')}</div>${item.map(i=>baris(b,i)).join('')}</div>`:''}</section>`}).join('');
+ return `${ringkas}<div class="pg" style="--pg-n:${kolom.length}">${kartu||empty('Tidak ada item di posisi ini','Hapus filter posisi di atas.')}</div><div class="note gt-note">Tiap baris adalah satu item SPK; tiap kolom adalah satu langkah. Angka menunjukkan jumlah yang sudah lewat langkah itu dibanding jumlah SPK. Kolom bertanda cincin biru adalah posisi item sekarang. Terisi sendiri dari catatan produksi, vendor, dan pengiriman; tidak ada isian di halaman ini.</div>`;
 }
 
 /* ---------- Jadwal SPK (Gantt): garis waktu tiap SPK dari terbit, produksi, vendor, kirim sampai due date ---------- */
@@ -3996,7 +4053,7 @@ const okChip=(ok,yes='Tepat',no='Telat')=>ok==null?'':chip(ok?yes:no,ok?'ok':'cr
 const dTxt=v=>v==null?'–':v+' hk';
 
 /* ---------- SPK KPI tab ---------- */
-F.spk.tab=F.spk.tab||'list';F.spk.skala=F.spk.skala||'minggu';F.spk.buka=F.spk.buka||{};F.spk.tutup=F.spk.tutup||{};F.spk.vw=F.spk.vw||'spk';F.spk.p='90';
+F.spk.tab=F.spk.tab||'list';F.spk.skala=F.spk.skala||'minggu';F.spk.buka=F.spk.buka||{};F.spk.tutup=F.spk.tutup||{};F.spk.vw=F.spk.vw||'prog';F.spk.pos=F.spk.pos||'';F.spk.p='90';
 function spkPeriod(p){const t=today();if(p==='all')return ['0000-00-00',t,'semua SPK'];if(p==='bln')return [t.slice(0,8)+'01',t,'SPK bulan ini'];const k=+p||90;return [addDays(t,-(k-1)),t,`SPK ${k} hari terakhir`]}
 const avgOf=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
 const r1=v=>v==null?'–':String(Math.round(v*10)/10).replace('.',',');
@@ -4325,6 +4382,7 @@ document.addEventListener('click',async e=>{
   case 'kpivendor':kpiVendor(ds.v);break;
   case 'pmpilih':{F.mesin.mesin=ds.m;lsSet('mni-mesin',ds.m);renderTools();renderBody();break}
   case 'gtbar':{const o=GTX[+ds.i];if(o)gtDetail(o);break}
+  case 'pgpos':F.spk.pos=F.spk.pos===ds.p?'':(ds.p||'');renderBody();break;
   case 'jdsemua':{F.spk.tutup={};if(ds.v==='lipat')S.spk.forEach(s=>{F.spk.tutup[s._id]=true});renderBody();break}
   case 'jdbuka':F.spk.tutup=F.spk.tutup||{};F.spk.tutup[ds.id]=!F.spk.tutup[ds.id];renderBody();break;
   case 'jdhariini':{const g=document.getElementById('gt-scroll');if(g)g.scrollLeft=Math.max(0,(+g.dataset.now)-90);break}

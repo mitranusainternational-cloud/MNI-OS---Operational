@@ -19,7 +19,8 @@ let nomor = 0;
 const shot = async (nama, sel) => { nomor++; const f = path.join(out, nama + '.png'); await page.waitForTimeout(350); if (sel && await page.$(sel)) await (await page.$(sel)).screenshot({ path: f }); else await page.screenshot({ path: f }); return f; };
 const tab = (t) => page.evaluate((t) => JSON.parse(localStorage.getItem('mni-local-mock-db')).tables[t] || [], t);
 const closeAll = async () => { await page.evaluate(() => { document.querySelector('#modal [data-act="closemodal"]')?.click(); document.querySelector('#drawer [data-act="closedrawer"]')?.click(); document.querySelector('#sheet [data-act="sheet-close"]')?.click(); }); await page.waitForTimeout(300); };
-const go = async (r, sub) => { await closeAll(); const l = await page.$(`#nav a[href="#${r}"]`); if (l) await l.click(); else await page.evaluate((h) => { location.hash = h; }, r); await page.waitForTimeout(400); if (sub) { const b = await page.$(`#tools [data-view="${r}"][data-val="${sub}"]`); if (b) await b.click(); } await page.waitForTimeout(800); };
+const go = async (r, sub) => { await closeAll(); const l = await page.$(`#nav a[href="#${r}"]`); if (l) await l.click(); else await page.evaluate((h) => { location.hash = h; }, r); await page.waitForTimeout(400); if (sub) { const b = await page.$(`#tools [data-view="${r}"][data-val="${sub}"]`); if (b) await b.click(); if (r === 'spk' && sub === 'jadwal') { await page.waitForTimeout(300); const v = await page.$('#tools [data-key="vw"][data-val="spk"]'); if (v) await v.click(); } } await page.waitForTimeout(800); };
+const keProgres = async () => { const v = await page.$('#tools [data-key="vw"][data-val="prog"]'); if (v) await v.click(); await page.waitForTimeout(600); };
 const teks = (s = '#body') => page.evaluate((s) => (document.querySelector(s) || { innerText: '' }).innerText, s);
 const spkBaris = async () => (await tab('spk')).find((s) => /Alur Lengkap/.test(JSON.stringify(s)));
 const hasilEv = async () => (await tab('produksi_log')).filter((e) => (e.jenis || 'hasil') === 'hasil');
@@ -81,6 +82,7 @@ await kerjakan('Shearing', '05-shearing-sedang-dikerjakan', '06-shearing-isi-jum
 let ev = await hasilEv();
 ok('A-04 Shearing 20 tercatat', ev.length === 1 && ev[0].wc === 'Shearing' && Number(ev[0].qty) === 20, JSON.stringify(ev.map((e) => [e.wc, e.qty])));
 await go('spk', 'jadwal'); await shot('07-jadwal-setelah-shearing');
+await keProgres(); await shot('07b-progres-setelah-shearing');
 ok('A-05 Jadwal menandai SPK mulai produksi (status bukan Belum mulai)', !/Belum mulai/.test(await teks()) || (await page.$$eval('.gt-row:not(.gt-it) .gt-b.prod', (a) => a.length)) > 0);
 
 // 5. Punching dan Bending
