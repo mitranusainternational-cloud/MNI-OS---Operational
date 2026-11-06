@@ -46,6 +46,7 @@ Dashboard interaktif: [[PROGRESS_DASHBOARD]] · Kesehatan vault: [[VAULT_HEALTH]
 | Mempelajari cara memakai aplikasi | [[apps/gudang-logistik/docs/USER_GUIDE]] |
 | Melihat bukti (screenshot) | [[documentation/screenshots/README]] |
 | Mengetahui nama dan lokasi semua sumber daya (GitHub, Vercel, Supabase, lokal) | [[documentation/SISTEM_MAP]] |
+| Melanjutkan proyek dengan sesi atau akun Claude baru | [[documentation/HANDOFF]] |
 | Memeriksa kesiapan dipakai tim | [[documentation/AUDIT_KESIAPAN]] |
 | Melihat riwayat perubahan per versi | [[CHANGELOG]] |
 | Merilis ke pengguna | [[documentation/RELEASE_CHECKLIST]] |

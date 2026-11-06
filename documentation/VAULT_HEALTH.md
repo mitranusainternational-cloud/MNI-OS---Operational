@@ -16,10 +16,10 @@ updated: 2026-11-06
 
 - Tidak ada
 
-## Properti wajib hilang (1)
+## Properti wajib hilang (0)
 
-- documentation/HANDOFF.md: kurang status
+- Tidak ada
 
-## Catatan yatim (tidak ditautkan dari mana pun) (1)
+## Catatan yatim (tidak ditautkan dari mana pun) (0)
 
-- documentation/HANDOFF.md
+- Tidak ada

@@ -1,5 +1,6 @@
 ---
-type: doc
+type: registry
+status: active
 title: "Serah terima sesi (ganti akun Claude)"
 updated: 2026-11-06
 ---
