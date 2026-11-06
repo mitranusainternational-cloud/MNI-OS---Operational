@@ -46,7 +46,7 @@ export function penawaranBaru({ tgl, sales = '', a, nomor = '', no = 0 }) {
   return { no, nomor, rev: 0, tgl, berlaku: geserTanggal(tgl, a.berlakuHari), customer: '', attn: '', proyek: '', sales, franco: '', kirim: '', bayar: '', catatan: '', status: 'Draft', pilih: null, varian: [varianBaru('A', 0, a)], riwayat: [] };
 }
 let _id = 0;
-export function itemBaru(kel = '', bentuk = '', q = 1) { return { id: 'i' + Date.now().toString(36) + (_id++).toString(36), kel, bentuk, u: {}, q, ket: '' }; }
+export function itemBaru(kel = '', bentuk = '', q = 1) { return { id: 'i' + Date.now().toString(36) + (_id++).toString(36), kel, bentuk, u: {}, q, ket: '', tebal: '', fin: '' }; }
 
 /** Daftar keluarga produk dan bentuk di katalog (untuk pilihan di lembar). */
 export const daftarKeluarga = (katalog) => [...new Set((katalog.bentuk || []).map((b) => b.keluarga))];

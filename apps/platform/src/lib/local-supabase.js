@@ -68,7 +68,7 @@ function seed() {
       items: [{ d: 'Pipa Bulat 2in t1.2 ELG', g: 'Pipa', q: 3, u: 'Btg', w: 0, ket: '', catatan: '', prod: 0 }],
       prod_log: [], catatan: 'Data sintetis, sengaja lewat jatuh tempo', terbit_at: now, terbit_by: 'admin@mni.local' }),
   ];
-  for (const t of ['mutasi', 'rmhist', 'vendor', 'pr', 'kirim', 'bongkar', 'opname', 'log', 'ureq', 'uinv', 'penawaran']) db[t] = [];
+  for (const t of ['mutasi', 'rmhist', 'vendor', 'pr', 'kirim', 'bongkar', 'opname', 'log', 'ureq', 'uinv', 'penawaran', 'salesorder']) db[t] = [];
   db.master = [['app_name', 'MNI Gudang'], ['app_version', '1.0.0-lokal'], ['spk_counter', 1002], ['pr_counter', 1]]
     .map(([key, value]) => ({ id: uid(), key, value, ket: 'seed', updated_at: now }));
   return { v: VERSION, tables: db };
@@ -89,7 +89,7 @@ function save(state) {
 }
 
 // Meniru fungsi SQL mod_level/can_view: hak per modul (muser.data.modul) atau, bila kosong, peta peran bawaan.
-const MOD_OF = { rm: 'bahan-baku', rmhist: 'bahan-baku', pr: 'bahan-baku', opname: 'bahan-baku', fg: 'barang-jadi', spk: 'spk', vendor: 'vendor', kirim: 'pengiriman', bongkar: 'bongkar-muat', penawaran: 'penawaran' };
+const MOD_OF = { rm: 'bahan-baku', rmhist: 'bahan-baku', pr: 'bahan-baku', opname: 'bahan-baku', fg: 'barang-jadi', spk: 'spk', vendor: 'vendor', kirim: 'pengiriman', bongkar: 'bongkar-muat', penawaran: 'penawaran', salesorder: 'penawaran' };
 const ROLE_MODS = { ppic: ['spk', 'vendor'], produksi: ['spk'], gbb: ['bahan-baku', 'bongkar-muat'], gbj: ['barang-jadi', 'vendor', 'pengiriman', 'bongkar-muat'], logistik: ['pengiriman', 'bongkar-muat'], sales: ['penawaran'] };
 const levelOf = (u, m) => {
   if (!u || u.aktif === false) return null;

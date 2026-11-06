@@ -1,4 +1,4 @@
-// Uji alur hulu ke hilir (mock): Penawaran -> disetujui -> Muat ke SPK -> terbit -> Jadwal -> Shearing, dengan tangkapan layar.
+// Uji alur hulu ke hilir (mock): Penawaran -> disetujui -> Sales Order -> konfirmasi -> SPK Draft otomatis -> terbit -> Jadwal -> Shearing, dengan tangkapan layar.
 //   node tests/e2e/alur-penawaran.mjs [url] [folder-tangkapan]
 // Vendor, kirim, dan terima tidak bergantung asal SPK; urutan itu diuji di alur-spk.mjs.
 import { chromium } from 'playwright';
@@ -60,36 +60,45 @@ if (await page.$('#m-varian')) { await page.selectOption('#m-varian', { index: 0
 await page.waitForTimeout(400);
 const st1 = await page.evaluate(() => (document.querySelector('.pq-tt .chip') || {}).textContent);
 ok('H-01 penawaran dibuat, dikirim, dan disetujui customer', st1 === 'Disetujui', st1);
-await shot('02-penawaran-disetujui-tombol-muat');
+await shot('02-penawaran-disetujui-tombol-buat-so');
 
-// 2. Muat ke SPK -> editor -> terbitkan
+// 2. Buat Sales Order dari penawaran, lengkapi tebal dan finishing, konfirmasi -> SPK Draft otomatis
 const n0 = (await tab('spk')).length;
-await page.click('[data-act="pqmuatspk"]'); await page.waitForSelector('#m-po'); await page.fill('#m-po', 'PO-HULU-01'); await shot('03-dialog-muat-ke-spk'); await kirimModal();
-await page.waitForSelector('#editor:not([hidden])'); await page.waitForTimeout(500);
-await page.fill('#ed-due', new Date(Date.now() + 9 * 86400000).toISOString().slice(0, 10));
-await shot('04-editor-spk-dari-penawaran');
-await page.click('#editor button:has-text("Terbitkan SPK")'); await page.waitForTimeout(1800);
+await page.click('[data-act="pqbuatso"]'); await page.waitForSelector('#m-po'); await page.fill('#m-po', 'PO-HULU-01'); await page.fill('#m-due', new Date(Date.now() + 9 * 86400000).toISOString().slice(0, 10)); await page.fill('#m-alamat', 'Gudang Customer, Cikarang');
+await shot('03-dialog-buat-sales-order'); await kirimModal();
+await page.waitForSelector('#so-items'); await page.waitForTimeout(500);
+for (const sel of ['[data-sot]', '[data-sof]']) for (const el of await page.$$('#so-items tbody ' + sel)) await el.selectOption(sel === '[data-sot]' ? '1.2' : 'ELECTRO GALVANIZED');
+await page.click('[data-act="sosimpan"]'); await page.waitForTimeout(700);
+await shot('04-sales-order-draft-snapshot');
+ok('H-02 Sales Order Draft dibuat dari penawaran dengan PO, due date, item, dan snapshot; belum ada SPK', (await tab('salesorder')).length === 1 && (await tab('spk')).length === n0);
+await page.click('[data-act="sokonfirmasi"]'); await page.waitForTimeout(2200);
 const spk = (await tab('spk')).find((s) => /Alur Penawaran/.test(JSON.stringify(s)));
-ok('H-02 SPK terbit dari penawaran dengan PO dan tautan penawaran', (await tab('spk')).length === n0 + 1 && !!spk && spk.status === 'Terbit' && spk.po === 'PO-HULU-01' && !!(spk.data || {}).penawaran, JSON.stringify(((spk || {}).data || {}).penawaran));
-await shot('05-lembar-spk-dari-penawaran');
-await closeAll();
-await go('penawaran'); await page.evaluate(() => document.querySelector('[data-act="pqtutup"]')?.click()); await page.waitForTimeout(300); await page.click('#pq-list tbody tr'); await page.waitForTimeout(500);
-const tinjau = await page.evaluate(() => ({ buka: !!document.querySelector('[data-act="pqbukaspk"]'), muat: !!document.querySelector('[data-act="pqmuatspk"]'), snap: /snapshot po/i.test(document.querySelector('.pq-side').innerText) }));
-ok('H-03 penawaran menunjukkan SPK tertaut dan snapshot PO; tidak bisa dimuat dua kali', tinjau.buka && !tinjau.muat && tinjau.snap, JSON.stringify(tinjau));
-await shot('06-penawaran-tertaut-snapshot');
+ok('H-03 Konfirmasi SO membuat SPK Draft otomatis dengan PO, tautan SO dan penawaran', (await tab('spk')).length === n0 + 1 && !!spk && spk.status === 'Draft' && spk.po === 'PO-HULU-01' && !!(spk.data || {}).so && !!(spk.data || {}).penawaran, JSON.stringify(((spk || {}).data || {}).so));
+await shot('05-spk-draft-otomatis-dari-so');
 
-// 3. SPK tampil di Jadwal, produksi lewat Shearing memakai berat dari penawaran
+// 3. SPK diperiksa PPIC lalu diterbitkan lewat editor yang sudah terisi (tanpa mengetik ulang)
+await page.evaluate(() => document.querySelector('[data-act="spkedit"]')?.click()); await page.waitForTimeout(900);
+const editorIsi = await page.evaluate(() => ({ buka: !document.getElementById('editor').hidden, cust: (document.getElementById('ed-cust') || {}).value, baris: document.querySelectorAll('#ed-secs tbody tr').length }));
+await shot('06-editor-spk-terisi-dari-so');
+if (editorIsi.buka) { await page.click('#editor button:has-text("Terbitkan SPK")'); await page.waitForTimeout(1800); }
+const spk2 = (await tab('spk')).find((s) => /Alur Penawaran/.test(JSON.stringify(s)));
+ok('H-04 PPIC cukup memeriksa dan menerbitkan: editor SPK sudah terisi dari SO, status menjadi Terbit', editorIsi.buka && /Alur Penawaran/.test(editorIsi.cust) && editorIsi.baris >= 1 && spk2.status === 'Terbit', JSON.stringify(editorIsi));
+await closeAll();
+await go('penawaran'); await page.evaluate(() => document.querySelector('[data-act="pqtutup"]')?.click()); await page.waitForTimeout(300);
+await go('salesorder'); await page.waitForTimeout(400); await shot('07-daftar-sales-order');
+
+// 4. SPK tampil di Jadwal; produksi lewat Shearing memakai rute dari judul (tebal dan finishing dari SO)
 await go('spk', 'jadwal');
-ok('H-04 SPK dari penawaran tampil di Jadwal', /Alur Penawaran/.test(await teks()));
-await shot('07-jadwal-spk-dari-penawaran');
+ok('H-05 SPK dari Sales Order tampil di Jadwal', /Alur Penawaran/.test(await teks()));
+await shot('08-jadwal-spk-dari-so');
 await go('mesin'); await page.selectOption('#f-mesin', 'Shearing'); await page.waitForTimeout(600);
 await page.click('#mesin-antri .mcard:first-child [data-act="mesinmulai"]'); await page.waitForTimeout(1200);
 await page.click('.mesin-run [data-act="mesinsemua"]'); await page.waitForTimeout(300);
 await page.click('.mesin-run [data-act="mesinselesai"]'); await page.waitForTimeout(1500);
 const ev = await hasilEv();
-ok('H-05 Shearing mencatat seluruh jumlah dari SPK hasil penawaran', ev.length === 1 && ev[0].wc === 'Shearing' && Number(ev[0].qty) === 12, JSON.stringify(ev.map((e) => [e.wc, e.qty])));
-await go('spk', 'berjalan'); await shot('08-spk-berjalan-dari-penawaran');
-ok('H-06 tanpa pageerror sepanjang alur', errs.length === 0, errs.slice(0, 2).join(' | '));
+ok('H-06 Shearing mencatat seluruh jumlah dari SPK hasil Sales Order', ev.length === 1 && ev[0].wc === 'Shearing' && Number(ev[0].qty) === 12, JSON.stringify(ev.map((e) => [e.wc, e.qty])));
+await go('spk', 'berjalan'); await shot('09-spk-berjalan-dari-so');
+ok('H-07 tanpa pageerror sepanjang alur', errs.length === 0, errs.slice(0, 2).join(' | '));
 const fail = R.filter((x) => x.startsWith('FAIL')).length;
 console.log(R.join('\n')); console.log(`\n${R.length - fail} PASS, ${fail} FAIL · tangkapan: ${out}`);
 await browser.close();

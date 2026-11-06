@@ -1146,3 +1146,4 @@ html.rail-mini .rail-tg svg{transform:rotate(180deg)}
 @media(max-width:900px){.pq-main{grid-template-columns:minmax(0,1fr)}.pq-bar{gap:8px}.pq-vs{overflow-x:auto;flex-wrap:nowrap}.pq-vt{flex:none}.pq-head .egrid{grid-template-columns:minmax(0,1fr)}.pq-vset{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 .pq-sn-h{margin:16px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#667)}
 .sh-pnw{display:inline-block;padding:1px 8px;border-radius:999px;background:rgba(80,120,200,.12);font-size:11px}
+.pq-tf{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.pq-tf .sel{min-width:0;flex:1 1 90px;font-size:12px}

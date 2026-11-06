@@ -49,7 +49,7 @@ const I={
 const ic=(k,s=16)=>`<svg viewBox="0 0 24 24" width="${s}" height="${s}" style="flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle">${I[k]||''}</svg>`;
 
 /* ---------- state ---------- */
-const COLS=['rm','fg','mutasi','spk','vendor','kirim','bongkar','master','mvendor','mcustomer','msupplier','marmada','rmhist','pr','opname','muser','ureq','log','uinv','mwc','produksi_log','penawaran'];
+const COLS=['rm','fg','mutasi','spk','vendor','kirim','bongkar','master','mvendor','mcustomer','msupplier','marmada','rmhist','pr','opname','muser','ureq','log','uinv','mwc','produksi_log','penawaran','salesorder'];
 const S={};COLS.forEach(c=>S[c]=[]);
 const loaded=new Set();
 let DB=null,USER=null,DLS=null,ME=null,CAN=true,LIVE='wait',LAST=null,C=null;
@@ -59,6 +59,7 @@ const F={ /* per-view filters, kept for the session */
  'vendor':{st:'aktif',vendor:'',q:''},
  'pengiriman':{st:'',q:''},
  'penawaran':{q:'',st:'',id:null},
+ 'salesorder':{q:'',st:'',id:null},
  'spk':{st:'aktif',q:'',tab:'list',fl:'jalan'},
  'produksi':{wc:'',p:'aktif',tab:'wc',hari:'30',lper:'bulan',lmet:'qty',lby:'produk',lakm:'operator'}
 };
@@ -66,6 +67,7 @@ const ROLE_ON=false; /* login & peran per user: ditunda, aktifkan nanti */
 const VIEWS=[
  {id:'dashboard',t:'Dashboard',ic:'dash',sec:'Pantauan'},
  {id:'penawaran',t:'Penawaran',ic:'file',sec:'Penjualan'},
+ {id:'salesorder',t:'Sales Order',ic:'file',sec:'Penjualan'},
  {id:'bahan-baku',t:'Gudang Bahan Baku',ic:'rm',sec:'Gudang'},
  {id:'barang-jadi',t:'Gudang Barang Jadi',ic:'fg'},
  {id:'bongkar-muat',t:'Bongkar Muat',ic:'dock',sec:'Logistik'},
@@ -82,14 +84,14 @@ const VIEWS=[
  {id:'pengguna',t:'Pengguna & Akses',ic:'users'}
 ];
 /* modul yang menjadi dasar hak tiap tampilan; dashboard terbuka untuk semua pengguna terdaftar, tampilan tim khusus admin */
-const VIEW_MOD={'papan':'spk','mesin':'spk','laporan-produksi':'spk','bahan-baku':'bahan-baku','barang-jadi':'barang-jadi','bongkar-muat':'bongkar-muat','vendor':'vendor','pengiriman':'pengiriman','spk':'spk','produksi':'spk','penawaran':'penawaran'};
+const VIEW_MOD={'papan':'spk','mesin':'spk','laporan-produksi':'spk','bahan-baku':'bahan-baku','barang-jadi':'barang-jadi','bongkar-muat':'bongkar-muat','vendor':'vendor','pengiriman':'pengiriman','spk':'spk','produksi':'spk','penawaran':'penawaran','salesorder':'penawaran'};
 const ADMIN_VIEWS=['cek-data','kinerja','pengguna'];
 function viewOk(v){const id=v.id||v;
  if(!ME_P)return !['kinerja','pengguna'].includes(id);
  const adm=myRole()==='admin';
  if(ADMIN_VIEWS.includes(id))return adm;
  if(id==='master-data')return adm||myAnyEdit();
- if(id==='penawaran')return adm||myLevel('penawaran')==='ubah'||!!(ME_P.modul&&ME_P.modul.penawaran); /* harga rahasia: hanya pemegang hak modul */
+ if(id==='penawaran'||id==='salesorder')return adm||myLevel('penawaran')==='ubah'||!!(ME_P.modul&&ME_P.modul.penawaran); /* harga rahasia: hanya pemegang hak modul */
  const m=VIEW_MOD[id];return !m||!!myLevel(m)}
 let VIEW='dashboard';
 const issues=()=>{const c=calc();return c._iss||(c._iss=dataIssues())};
@@ -187,7 +189,8 @@ function route(){
   'cek-data':'Temuan data yang belum lengkap, tidak konsisten, atau statusnya tertinggal',
   'master-data':'Daftar resmi vendor, customer, supplier, dan armada yang dipakai semua form',
   'kinerja':'Siapa mencatat apa, seberapa aktif, dan seberapa tepat waktu input data tiap anggota tim',
-  'penawaran':'Penawaran harga dan estimasi cable tray dan ladder; dari penawaran yang disetujui SPK dibuat',
+  'penawaran':'Penawaran harga dan estimasi cable tray dan ladder; penawaran yang disetujui dijadikan Sales Order',
+  'salesorder':'Sales Order: PO customer yang dikunci dari penawaran; saat dikonfirmasi SPK Draft dibuat otomatis tanpa mengetik ulang',
   'mesin':'Satu-satunya tempat input produksi: pilih mesin, tekan Mulai, isi jumlah, tekan Selesai',
   'papan':'Posisi semua item per work center: yang sedang berjalan dan yang antri',
   'laporan-produksi':'Laporan harian per mesin, rekap, dan waktu proses nyata (pengganti form Excel)',
@@ -523,7 +526,7 @@ function pqBaris(v,h,edit){
   return `<tr data-i="${i}" id="pq-r-${i}"><td class="num muted">${i+1}</td>
   <td><select class="sel" data-pqk${dis}>${kels.map(k=>`<option ${k===it.kel?'selected':''}>${esc(k)}</option>`).join('')}</select></td>
   <td><select class="sel" data-pqb${dis}>${bs.map(x=>`<option value="${esc(x.id)}" ${x.id===it.bentuk?'selected':''}>${esc(x.judul)}</option>`).join('')}</select></td>
-  <td><div class="pq-us">${names.length?names.map(nm=>`<label class="pq-u"><span>${esc(nm.toUpperCase())}</span><input class="inp" type="number" min="0" step="any" inputmode="decimal" data-pqu="${esc(nm)}" value="${it.u&&it.u[nm]!=null?esc(it.u[nm]):''}"${dis}></label>`).join(''):'<span class="muted">ukuran tetap</span>'}</div></td>
+  <td><div class="pq-us">${names.length?names.map(nm=>`<label class="pq-u"><span>${esc(nm.toUpperCase())}</span><input class="inp" type="number" min="0" step="any" inputmode="decimal" data-pqu="${esc(nm)}" value="${it.u&&it.u[nm]!=null?esc(it.u[nm]):''}"${dis}></label>`).join(''):'<span class="muted">ukuran tetap</span>'}</div><div class="pq-tf"><select class="sel" data-pqt${dis}>${['<option value="">Tebal</option>',...HB.tb.map(x=>`<option ${x===it.tebal?'selected':''}>${x}</option>`)].join('')}</select><select class="sel" data-pqf${dis}>${['<option value="">Finishing</option>',...HB.f.map(x=>`<option ${x===it.fin?'selected':''}>${x}</option>`)].join('')}</select></div></td>
   <td><input class="inp pq-q" type="number" min="0" step="any" inputmode="decimal" data-pqq value="${esc(it.q)}"${dis}></td>
   <td class="num pq-hs">${pqSelHarga(r,'hargaSatuan')}</td><td class="num pq-jm">${pqSelHarga(r,'jumlah')}</td><td class="num pq-kg">${r.kgEstimasiTotal!=null?n(Math.round(r.kgEstimasiTotal*100)/100):'–'}</td>
   <td class="pq-ak">${edit?`<button class="btn ghost sm" data-act="pqsalin" data-i="${i}" title="Salin baris">Salin</button><button class="btn ghost sm" data-act="pqhapus" data-i="${i}" title="Hapus baris">×</button>`:''}</td></tr>`}).join('');
@@ -548,10 +551,10 @@ function pqSheet(){
  const edit=p.status==='Draft';const dis=edit?'':' disabled';const aks=H.aksiTersedia(p,peran);
  const v=pqVar();PQ.v=v.k;const h=pqHit(v);
  const perlu=H.perluPersetujuan(a,peran,p);
- const bisaSpk=p.status==='Disetujui'&&!!p._id&&!PQ.dirty&&pqBisaSpk();
+ const bisaSo=p.status==='Disetujui'&&!!p._id&&!PQ.dirty&&!p.soId;
  const btn=(act,txt,cls='')=>`<button class="btn ${cls}" data-act="${act}">${txt}</button>`;
  const bar=`<div class="pq-bar"><button class="btn ghost" data-act="pqtutup">‹ Daftar</button><div class="pq-tt"><b>Penawaran ${esc(p._id||p.nomor?H.labelNomor(p):'baru')}</b> ${pqStChip(p)}${PQ.dirty?'<span class="pq-dirty">belum disimpan</span>':''}</div><span class="grow"></span>
-  ${aks.includes('simpan')?btn('pqsimpan','Simpan draft'):''}${aks.includes('kirim')?btn('pqkirim',perlu?'Ajukan persetujuan diskon':'Kirim ke customer','primary'):''}${aks.includes('setujuDiskon')?btn('pqsetujudiskon','Setujui diskon','primary')+btn('pqkembalikan','Kembalikan ke draft'):''}${aks.includes('setujuCustomer')?btn('pqsetujucustomer','Customer setuju','primary')+btn('pqtolak','Ditolak customer'):''}${aks.includes('revisi')?btn('pqrevisi','Buat revisi'):''}${bisaSpk&&!p.spkId?btn('pqmuatspk','Muat ke SPK','primary'):''}${bisaSpk&&p.spkId&&p.rev>(p.spkRev||0)?btn('pqperbaruispk','Perbarui SPK dari Rev.'+p.rev,'primary'):''}${p.spkId?btn('pqbukaspk','SPK '+esc(String(p.spkNo||''))):''}${btn('pqcetak',ic('file')+'Cetak')}</div>`;
+  ${aks.includes('simpan')?btn('pqsimpan','Simpan draft'):''}${aks.includes('kirim')?btn('pqkirim',perlu?'Ajukan persetujuan diskon':'Kirim ke customer','primary'):''}${aks.includes('setujuDiskon')?btn('pqsetujudiskon','Setujui diskon','primary')+btn('pqkembalikan','Kembalikan ke draft'):''}${aks.includes('setujuCustomer')?btn('pqsetujucustomer','Customer setuju','primary')+btn('pqtolak','Ditolak customer'):''}${aks.includes('revisi')?btn('pqrevisi','Buat revisi'):''}${bisaSo?btn('pqbuatso','Buat Sales Order','primary'):''}${p.soId?btn('pqbukaso','Sales Order '+esc(String(p.soNo||''))):''}${btn('pqcetak',ic('file')+'Cetak')}</div>`;
  const catatanStatus=p.status==='Menunggu persetujuan'?`<div class="pq-info warn">${peran==='admin'?'Diskon melewati batas Sales. Setujui untuk mengirim atau kembalikan ke draft.':'Menunggu persetujuan super admin: diskon melewati batas Anda ('+Math.round(H.batasDiskon(a,peran)*100)+'%).'}</div>`:p.catatanPenyetuju&&p.status==='Draft'?`<div class="pq-info">Dikembalikan penyetuju: ${esc(p.catatanPenyetuju)}</div>`:p.status==='Ditolak'&&p.alasan?`<div class="pq-info">Alasan ditolak: ${esc(p.alasan)}</div>`:'';
  const kust=S.mcustomer.filter(x=>x.aktif!==false).map(x=>`<option value="${esc(x.nama)}">`).join('');
  const hf=(k,l,tp='text',cls='')=>`<label class="fld ${cls}"><span>${l}</span><input class="inp" type="${tp}" data-pqh="${k}" value="${esc(p[k]||'')}"${dis}></label>`;
@@ -569,7 +572,7 @@ function pqSheet(){
   <div class="pq-info warn" id="pq-perlu"${perlu?'':' hidden'}>Diskon melewati batas ${Math.round(H.batasDiskon(a,peran)*100)}%: penawaran perlu persetujuan sebelum dikirim.</div>`;
  const items=`<section class="panel"><div class="tbl-wrap"><table id="pq-items" class="pq-t"><thead><tr><th class="num">#</th><th>Keluarga</th><th>Bentuk</th><th>Ukuran (mm)</th><th>Jumlah</th><th class="num">Harga satuan</th><th class="num">Jumlah (Rp)</th><th class="num">Berat est. (kg)</th><th></th></tr></thead><tbody>${pqBaris(v,h,edit)}</tbody></table></div>${edit?`<div class="pbody"><button class="btn" data-act="pqtambah">${ic('plus')}Tambah baris</button></div>`:''}</section>`;
  const riw=(p.riwayat||[]).length?`<details class="panel pq-rw"><summary>Riwayat revisi (${p.riwayat.length})</summary><div class="pbody">${p.riwayat.slice().reverse().map(r=>`<div class="note">Rev.${r.rev} · ${esc(r.status)} · ${fd(r.tgl)} · ${(r.varian||[]).length} varian</div>`).join('')}</div></details>`:'';
- return `${bar}${catatanStatus}${head}${tabs}<div class="pq-main"><div>${vset}${items}</div><aside class="panel pq-side"><div class="pbody"><h4>Ringkasan ${esc(v.nama||v.k)}</h4><div id="pq-tot">${pqTotalHtml(v,h)}</div>${p.snapshot?pqSnapHtml(p.snapshot):''}</div></aside></div>${riw}`;
+ return `${bar}${catatanStatus}${head}${tabs}<div class="pq-main"><div>${vset}${items}</div><aside class="panel pq-side"><div class="pbody"><h4>Ringkasan ${esc(v.nama||v.k)}</h4><div id="pq-tot">${pqTotalHtml(v,h)}</div></div></aside></div>${riw}`;
 }
 B['penawaran']=()=>PQ.p?pqSheet():pqList();
 
@@ -605,30 +608,136 @@ function pqAlasan(aksi,judul,label){
  openModal(judul,fld(label,`<textarea class="inp" name="alasan" rows="3" id="m-alasan"></textarea>`,true),async d=>{await pqAksi(aksi,{alasan:d.alasan||''})},{submit:'Simpan',done:' '});
 }
 
-/* ---- muat ke SPK, snapshot PO, pembaruan dari revisi (T-191) ---- */
+/* ---------- Sales Order: penghubung Penawaran -> SPK (T-194) ---------- */
 const pqBisaSpk=()=>{try{guard('spk',null,null,'upd');return !!CAN}catch(e){return false}};
-function pqMuatSpk(){
+const SO={s:null,dirty:false};
+const SO_ST={Draft:'plain',Dikonfirmasi:'ok',Batal:'crit'};
+const soChip=s=>chip(s.status,SO_ST[s.status]||'plain')+(HG().belumPunyaSpk(s)?chip('Belum ada SPK','warn'):'')+(HG().perluPerbaruiSpkSo(s)?chip('SPK perlu diperbarui','warn'):'');
+const soEditable=()=>SO.s&&SO.s.status==='Draft';
+const plain=h=>String(h==null?'':h).replace(/<[^>]*>/g,'').trim();
+async function nextSoNo(tgl){
+ need();const y=String(tgl||today()).slice(0,4);const ref=DB.doc('counter/SO-'+y);
+ let got=false;for(let i=0;i<6&&!got;i++){try{const r=await ref.acquire({holder:(ME||'u')+HOLDER,ttlMs:6000});got=!r||r.acquired!==false}catch(_){got=true}if(!got)await new Promise(r=>setTimeout(r,300+Math.random()*700))}
+ if(!got)throw new Error('Penomoran sedang dipakai pengguna lain. Coba lagi.');
+ const g=await ref.get();const used=Math.max(0,...S.salesorder.filter(p=>String(p.tgl||'').slice(0,4)===y).map(p=>+p.no||0));
+ const nn=Math.max((g.exists?(+((g.data()||{}).n)||0):0),used)+1;await ref.set({n:nn});return nn;
+}
+T['salesorder']=()=>SO.s?'':`${segBtns('salesorder','st',[['','Semua'],['Draft','Draft'],['Dikonfirmasi','Dikonfirmasi'],['Batal','Batal']])}<input class="inp search" id="q-salesorder" placeholder="Cari nomor SO, PO, customer…" value="${esc(F.salesorder.q)}" data-act="q" data-view="salesorder"><span class="grow"></span>`;
+function soList(){
+ const f=F.salesorder,q=(f.q||'').toLowerCase();
+ const semua=S.salesorder.slice().sort((a,b)=>(b.tgl||'').localeCompare(a.tgl||'')||(+b.no||0)-(+a.no||0));
+ const xs=semua.filter(s=>(!f.st||s.status===f.st)&&(!q||`${s.nomor} ${s.po} ${s.customer} ${s.proyek||''}`.toLowerCase().includes(q)));
+ const hit=k=>semua.filter(s=>s.status===k).length;const tanpaSpk=semua.filter(s=>HG().belumPunyaSpk(s)).length;
+ const kp=`<div class="kpi-row"><div class="kpi"><span class="lb">Draft</span><span class="v">${hit('Draft')}</span><span class="s">belum dikonfirmasi</span></div><div class="kpi ok"><span class="lb">Dikonfirmasi</span><span class="v">${hit('Dikonfirmasi')}</span><span class="s">PO customer terkunci</span></div><div class="kpi ${tanpaSpk?'warn':''}"><span class="lb">Belum ada SPK</span><span class="v">${tanpaSpk}</span><span class="s">menunggu dibuat SPK</span></div></div>`;
+ const rows=xs.map(s=>`<tr class="click" data-act="sobuka" data-id="${s._id}"><td class="mono"><b>${esc(HG().labelSO(s))}</b></td><td>${fd(s.tgl)}</td><td><b>${esc(s.customer||'–')}</b><div class="note">PO ${esc(s.po||'–')}${s.proyek?' · '+esc(s.proyek):''}</div></td><td class="mono">${s.penawaran?esc(s.penawaran.nomor)+(s.penawaran.rev?' Rev.'+s.penawaran.rev:''):'–'}</td><td>${s.due?fd(s.due):'–'}</td><td class="num">${(s.items||[]).length}</td><td class="num">${rpf(+s.total||0)}</td><td>${soChip(s)}</td></tr>`).join('');
+ return `${kp}<section class="panel">${xs.length?`<div class="tbl-wrap"><table id="so-list"><thead><tr><th>Nomor SO</th><th>Tanggal</th><th>Customer / PO</th><th>Penawaran</th><th>Due date</th><th class="num">Item</th><th class="num">Total saat PO</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`:empty('Belum ada Sales Order','Sales Order dibuat dari penawaran yang disetujui customer, lewat tombol Buat Sales Order di lembar penawaran.')}</section>`;
+}
+function soBuka(s){SO.s=pqKlon(s);SO.dirty=false;F.salesorder.id=s._id||null;renderTools();renderBody()}
+function soTutup(){
+ if(SO.dirty&&SO.s&&!confirm('Perubahan belum disimpan. Tutup tanpa menyimpan?'))return;
+ SO.s=null;SO.dirty=false;F.salesorder.id=null;renderTools();renderBody();
+}
+function soSelisih(s){const sn=s.snapshot;if(!sn||!sn.baris)return 0;return (s.items||[]).filter(it=>{const i=+String(it.id).slice(1);return sn.baris[i]&&+sn.baris[i].q!==+it.q}).length+(Math.max(0,sn.baris.length-(s.items||[]).length))}
+function soSheet(){
+ const s=SO.s,H=HG(),ed=soEditable(),dis=ed?'':' disabled';
+ const bisaSpk=pqBisaSpk()&&!SO.dirty&&!!s._id;
+ const btn=(act,txt,cls='')=>`<button class="btn ${cls}" data-act="${act}">${txt}</button>`;
+ const spk=(s.spk||[])[0];
+ const bar=`<div class="pq-bar"><button class="btn ghost" data-act="sotutup">‹ Daftar</button><div class="pq-tt"><b>Sales Order ${esc(s._id?H.labelSO(s):'baru')}</b> ${soChip(s)}${SO.dirty?'<span class="pq-dirty">belum disimpan</span>':''}</div><span class="grow"></span>
+  ${ed?btn('sosimpan','Simpan draft')+btn('sokonfirmasi','Konfirmasi SO','primary')+btn('sobatal','Batalkan SO'):''}
+  ${s.status==='Dikonfirmasi'&&!SO.dirty?btn('soamandemen','Amandemen PO'):''}
+  ${bisaSpk&&H.belumPunyaSpk(s)?btn('sobuatspk','Buat SPK','primary'):''}${bisaSpk&&H.perluPerbaruiSpkSo(s)?btn('soperbaruispk','Perbarui SPK dari Rev.'+s.rev,'primary'):''}${spk?btn('sobukaspk','SPK '+esc(String(spk.no))):''}${s.penawaran&&s.penawaran.id?btn('sopnw','Penawaran '+esc(s.penawaran.nomor)):''}</div>`;
+ const hf=(k,l,tp='text',cls='')=>`<label class="fld ${cls}"><span>${l}</span><input class="inp" type="${tp}" data-soh="${k}" value="${esc(s[k]||'')}"${dis}></label>`;
+ const selisih=soSelisih(s);
+ const info=s.status==='Batal'?`<div class="pq-info">Dibatalkan${s.alasan?': '+esc(s.alasan):''}</div>`:selisih?`<div class="pq-info warn">${selisih} item berbeda dari penawaran. Snapshot di samping tetap menunjukkan harga penawaran asli; selisih harga ditinjau manual.</div>`:'';
+ const head=`<section class="panel pq-head"><div class="pbody"><div class="egrid">
+  ${hf('customer','Customer','text','span2')}${hf('po','No. PO customer')}${hf('tglPo','Tanggal PO','date')}${hf('due','Due date (permintaan customer)','date')}${hf('proyek','Proyek')}
+  <label class="fld span2"><span>Alamat kirim</span><input class="inp" data-soh="alamat" value="${esc(s.alamat||'')}"${dis}></label>
+  <label class="fld span2"><span>Catatan</span><textarea class="inp" rows="2" data-soh="catatan"${dis}>${esc(s.catatan||'')}</textarea></label></div></div></section>`;
+ const opt=(arr,sel,ph)=>`<option value="">${ph}</option>`+arr.map(x=>`<option ${x===sel?'selected':''}>${esc(x)}</option>`).join('');
+ const rows=(s.items||[]).map((it,i)=>`<tr data-i="${i}"><td class="num muted">${i+1}</td><td><b>${esc(it.d)}</b><div class="note">${esc(it.produk||'')}</div></td>
+  <td><input class="inp pq-q" type="number" min="0" step="any" inputmode="decimal" data-soq value="${esc(it.q)}"${dis}></td><td>${esc(it.u||'Pcs')}</td><td class="num">${it.w?n(it.w):'–'}</td>
+  <td><select class="sel" data-sot${dis}>${opt(HB.tb,it.tebal,'Tebal')}</select></td><td><select class="sel" data-sof${dis}>${opt(HB.f,it.fin,'Finishing')}</select></td>
+  <td>${ed&&s.items.length>1?`<button class="btn ghost sm" data-act="sohapus" data-i="${i}" title="Hapus item">×</button>`:''}</td></tr>`).join('');
+ const kg=(s.items||[]).reduce((a,it)=>a+(+it.q||0)*(+it.w||0),0);
+ const items=`<section class="panel"><div class="tbl-wrap"><table id="so-items" class="pq-t"><thead><tr><th class="num">#</th><th>Deskripsi</th><th>Jumlah</th><th>Satuan</th><th class="num">Berat/pcs (kg)</th><th>Tebal</th><th>Finishing</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+ const riw=(s.amandemen||[]).length?`<details class="panel pq-rw"><summary>Riwayat amandemen (${s.amandemen.length})</summary><div class="pbody">${s.amandemen.slice().reverse().map(r=>`<div class="note">Rev.${r.rev} · ${fd(r.at)} · ${esc(r.alasan)}</div>`).join('')}</div></details>`:'';
+ const sisi=`<aside class="panel pq-side"><div class="pbody"><h4>Ringkasan</h4><div class="pq-in"><span>Item</span><b>${(s.items||[]).length}</b></div><div class="pq-in"><span>Berat total SPK</span><b>${n(Math.round(kg*10)/10)} kg</b></div>${s.snapshot?pqSnapHtml(s.snapshot):''}${s.tglKonfirmasi?`<div class="pq-in"><span>Dikonfirmasi</span><b>${esc(fdp2(s.tglKonfirmasi))}</b></div>`:''}</div></aside>`;
+ return `${bar}${info}${head}<div class="pq-main"><div>${items}</div>${sisi}</div>${riw}`;
+}
+B['salesorder']=()=>SO.s?soSheet():soList();
+async function soSimpan(senyap){
+ const s=SO.s;if(!String(s.customer||'').trim()){toast('Isi customer dulu.');return false}
+ try{
+  if(!s._id){const no=await nextSoNo(s.tgl);s.no=no;s.nomor=HG().nomorSO(no,s.tgl);const r=await addDoc('salesorder',pqBersih(s));s._id=r.id;F.salesorder.id=s._id}
+  else await updDoc('salesorder',s._id,pqBersih(s));
+  SO.dirty=false;if(!senyap)toast('Sales Order tersimpan');renderTools();renderBody();return true;
+ }catch(e){toast('Gagal menyimpan: '+(e.message||e));return false}
+}
+/* dari penawaran Disetujui: PO, tanggal PO, due date, alamat; SO Draft dibuat dan dibuka */
+function pqBuatSo(){
  const p=PQ.p;if(PQ.dirty||!p._id){toast('Simpan penawaran dulu.');return}
- if(p.spkId&&byId('spk',p.spkId)){openSheet(p.spkId);return}
- let sp;try{sp=HG().susunSpk(p,HG().katalog,HG().skenario)}catch(e){toast(e.message);return}
- openModal('Muat ke SPK',fld('No. PO customer',`<input class="inp" name="po" id="m-po" value="${esc(p.po||'')}" placeholder="opsional, dapat diisi nanti di SPK">`,false)+`<p class="note">Dibuat SPK Draft dengan ${sp.sections.reduce((a,s)=>a+s.lines.length,0)} item dari varian ${esc(p.pilih)}. Harga dan biaya dibekukan sebagai snapshot PO di penawaran; SPK hanya memuat jumlah dan berat.</p>`,async d=>{
-  const sn=HG().snapshotPO(p,HG().katalog,HG().skenario,{tgl:today(),oleh:ME||'',po:String(d.po||'').trim()});
-  const ed=newEd();Object.assign(ed,{customer:sp.customer,sales:p.sales?String(who(p.sales)).replace(/<[^>]*>/g,'').trim():'',po:String(d.po||'').trim(),sections:sp.sections,penawaran:sp.penawaran,pqSnapshot:sn});
-  setTimeout(()=>openEditor(ed),60);
- },{submit:'Buat SPK Draft',done:' '});
+ if(p.soId&&byId('salesorder',p.soId)){pqBukaSo();return}
+ const m=HG().masalahMuatSpk(p);if(m.length){toast(m[0]);return}
+ openModal('Buat Sales Order',`${fld('No. PO customer',`<input class="inp" name="po" id="m-po" placeholder="dapat diisi nanti sebelum konfirmasi">`,false)}${fld('Tanggal PO',`<input class="inp" type="date" name="tglPo" value="${today()}">`,false)}${fld('Due date (permintaan customer)',`<input class="inp" type="date" name="due" id="m-due">`,false)}${fld('Alamat kirim',`<input class="inp" name="alamat" id="m-alamat">`,false)}
+  <div class="full note">Item, jumlah, berat, dan harga diambil dari varian ${esc(p.pilih)} yang disetujui. Harga dibekukan sebagai snapshot di Sales Order; jumlah dan tebal masih bisa disesuaikan dengan PO customer sebelum dikonfirmasi.</div>`,
+  async d=>{
+   const no=await nextSoNo(today());
+   const so=HG().soDariPenawaran(p,HG().katalog,HG().skenario,{tgl:today(),oleh:ME||'',po:d.po||'',tglPo:d.tglPo||'',due:d.due||'',alamat:d.alamat||'',no,nomor:HG().nomorSO(no,today())});
+   so.penawaran.id=p._id;
+   const r=await addDoc('salesorder',pqBersih(so));
+   await updDoc('penawaran',p._id,{soId:r.id,soNo:so.nomor,po:so.po});Object.assign(p,{soId:r.id,soNo:so.nomor,po:so.po});
+   so._id=r.id;SO.s=so;SO.dirty=false;F.salesorder.id=r.id;PQ.p=null;location.hash='#salesorder';setTimeout(()=>{renderTools();renderBody()},60);
+  },{submit:'Buat Sales Order',done:' '});
 }
-function pqPerbaruiSpk(){
- const p=PQ.p;const s=p.spkId&&byId('spk',p.spkId);if(!s){toast('SPK tertaut tidak ditemukan.');return}
- let sp,sn;try{sp=HG().susunSpk(p,HG().katalog,HG().skenario);sn=HG().snapshotPO(p,HG().katalog,HG().skenario,{tgl:today(),oleh:ME||'',po:p.po||s.po||''})}catch(e){toast(e.message);return}
- const g=HG().gabungRevisiSpk(sp.sections,s.items||[]);
- const ed=edFrom(s,false);ed.sections=g.sections;ed.penawaran=sp.penawaran;ed.pqSnapshot=sn;
- if((s.status||'Terbit')==='Terbit')ed.revAlasan='Revisi penawaran Rev.'+p.rev;
- openEditor(ed).then(()=>{if(g.hilang.length)toast(`${g.hilang.length} item lama tidak ada di revisi: ${g.hilang.slice(0,2).join('; ')}${g.hilang.length>2?'…':''}. Periksa sebelum menyimpan.`)});
+function pqBukaSo(){const s=byId('salesorder',PQ.p&&PQ.p.soId);if(!s){toast('Sales Order tidak ditemukan.');return}SO.s=pqKlon(s);SO.dirty=false;F.salesorder.id=s._id;location.hash='#salesorder';setTimeout(()=>{renderTools();renderBody()},60)}
+function soKePenawaran(){const s=SO.s,d=s&&s.penawaran&&byId('penawaran',s.penawaran.id);if(!d){toast('Penawaran tidak ditemukan.');return}SO.s=null;PQ.p=pqKlon(d);PQ.dirty=false;PQ.v=(d.pilih&&d.varian.some(v=>v.k===d.pilih))?d.pilih:d.varian[0].k;F.penawaran.id=d._id;location.hash='#penawaran';setTimeout(()=>{renderTools();renderBody()},60)}
+/* konfirmasi: SO terkunci dan SPK Draft langsung dibuat (atau diperbarui lewat editor bila SPK sudah ada) */
+async function soKonfirmasi(){
+ let baru;try{baru=HG().terapkanSo(SO.s,'konfirmasi',{oleh:ME||'',tgl:today()})}catch(e){toast(e.message);return}
+ const lama=SO.s;SO.s=baru;SO.dirty=true;
+ if(!(await soSimpan(true))){SO.s=lama;return}
+ toast(`Sales Order ${baru.nomor} dikonfirmasi`);
+ if(!pqBisaSpk()){toast('SO dikonfirmasi. SPK dibuat oleh admin atau PPIC.');return}
+ if((baru.spk||[]).length)soPerbaruiSpk();else await soBuatSpk();
 }
-async function pqTautkan(e,spkId,no){
- const r=e.penawaran;if(!r||!r.id)return;const pd=byId('penawaran',r.id);if(!pd)return;
- const up={spkId,spkNo:no,spkRev:r.rev,po:String(e.po||pd.po||'').trim()};if(e.pqSnapshot)up.snapshot=e.pqSnapshot;
- try{await updDoc('penawaran',r.id,up);if(PQ.p&&PQ.p._id===r.id){Object.assign(PQ.p,up);if(VIEW==='penawaran')renderBody()}}catch(x){toast('SPK tersimpan, tetapi tautan ke penawaran gagal: '+(x.message||x))}
+/* SPK Draft langsung dari SO tanpa mengetik ulang (meniru jalur simpan editor SPK) */
+async function soBuatSpk(){
+ const s=SO.s;if(!s||!s._id){toast('Simpan SO dulu.');return}
+ if((s.spk||[]).length&&byId('spk',s.spk[0].id)){openSheet(s.spk[0].id);return}
+ try{need('spk');
+  const sp=HG().spkDariSo(s);const tgl=today();const no=nextNo();const id='spk-'+no;
+  const items=[];sp.sections.forEach(sec=>sec.lines.forEach(l=>items.push({d:l.d,g:sec.h,q:l.q,u:l.u,w:l.w,...(l.w>0?{ws:'m'}:{}),ket:l.ket,catatan:'',prod:0})));
+  const lead='5 Hari Kerja';const due=s.due||(leadMax(lead)?addWorkdays(tgl,leadMax(lead)):'');
+  const d0=derive(sp.sections[0]?sp.sections[0].h:'');const type=[...new Set(sp.sections.map(x=>derive(x.h).type).filter(Boolean))].join(' & ');
+  const data={no,nomor:`${no}/SPK/${tgl.slice(0,4)}/WS`,tgl,customer:cleanName(sp.customer),po:sp.po,sales:s.sales?plain(who(s.sales)):'',lead,due,material:d0.material||'',tebal:d0.tebal||'',type,note:due?'NOTE : ESTIMASI KIRIM '+tglLong(due).toUpperCase():'',dist:DIST_DEF.slice(),signProc:'Halimah',signPpic:'Muin M.K.',items,status:'Draft',penawaran:sp.penawaran,so:sp.so};
+  const lk=await DB.doc('lock/new-'+no).acquire({holder:ME||HOLDER,ttlMs:20000}).catch(()=>null);if(lk&&lk.acquired===false)throw new Error(`Nomor ${no} sedang diklaim pengguna lain. Coba lagi.`);
+  const ex=await DB.doc('spk/'+id).get();if(ex.exists)throw new Error(`SPK ${no} sudah dipakai. Coba lagi.`);
+  const now=new Date().toISOString();Object.assign(data,{alasan:'',rev:0,revisi:[],at:now,by:ME||null});
+  await DB.doc('spk/'+id).set(data);logAct('spk',id,'add',data);
+  if(!inMaster('customer',data.customer))addDoc('mcustomer',{nama:data.customer,pic:'',telp:'',alamat:'',aktif:true}).catch(()=>{});
+  SO.s.spk=[{id,no}];SO.s.spkRev=SO.s.rev||0;SO.dirty=true;await soSimpan(true);
+  toast(`SPK ${no} (Draft) dibuat dari ${s.nomor}. Periksa lalu terbitkan.`);setTimeout(()=>openSheet(id),60);
+ }catch(e){toast(e.message||String(e))}
+}
+function soPerbaruiSpk(){
+ const s=SO.s;const spk=byId('spk',(s.spk||[])[0]&&s.spk[0].id);if(!spk){toast('SPK tertaut tidak ditemukan.');return}
+ const sp=HG().spkDariSo(s);const g=HG().gabungRevisiSpk(sp.sections,spk.items||[]);
+ const ed=edFrom(spk,false);ed.sections=g.sections;ed.po=sp.po||ed.po;if(sp.due)ed.due=sp.due,ed.dueAuto=false;ed.penawaran=sp.penawaran;ed.so=sp.so;
+ if((spk.status||'Terbit')==='Terbit')ed.revAlasan='Amandemen '+s.nomor+' Rev.'+s.rev;
+ openEditor(ed).then(()=>{if(g.hilang.length)toast(`${g.hilang.length} item lama tidak ada di SO: ${g.hilang.slice(0,2).join('; ')}${g.hilang.length>2?'…':''}. Periksa sebelum menyimpan.`)});
+}
+async function soTautkan(e,spkId,no){
+ const r=e.so;if(!r||!r.id)return;const d=byId('salesorder',r.id);if(!d)return;
+ const up={spk:[{id:spkId,no}],spkRev:r.rev};
+ try{await updDoc('salesorder',r.id,up);if(SO.s&&SO.s._id===r.id){Object.assign(SO.s,up);if(VIEW==='salesorder')renderBody()}}catch(x){toast('SPK tersimpan, tetapi tautan ke Sales Order gagal: '+(x.message||x))}
+}
+function soAlasan(aksi,judul,label){
+ openModal(judul,fld(label,`<textarea class="inp" name="alasan" rows="3" id="m-alasan"></textarea>`,true),async d=>{
+  let baru;try{baru=HG().terapkanSo(SO.s,aksi,{oleh:ME||'',tgl:today(),alasan:d.alasan||''})}catch(e){throw e}
+  const lama=SO.s;SO.s=baru;SO.dirty=true;if(!(await soSimpan(true))){SO.s=lama;throw new Error('Gagal menyimpan')}
+  toast(aksi==='amandemen'?`Amandemen Rev.${baru.rev}: ubah item atau PO lalu konfirmasi lagi`:'Sales Order dibatalkan');
+ },{submit:'Simpan',done:' '});
 }
 
 /* ---- cetak (untuk customer: tanpa berat dan tanpa biaya) ---- */
@@ -3680,7 +3789,7 @@ async function saveEditor(mode){
   const editTerbit=e.id&&e.orig&&(e.orig.status||'Terbit')==='Terbit';
   if(editTerbit&&!String(e.revAlasan).trim())throw new Error('Isi alasan revisi.');
   const status=mode==='terbit'?'Terbit':'Draft';const now=new Date().toISOString();
-  const data={no,nomor:`${no}/SPK/${String(e.tgl).slice(0,4)}/WS`,tgl:e.tgl,customer:String(e.customer).trim(),po:String(e.po||'').trim(),sales:String(e.sales||'').trim(),lead:String(e.lead||'').trim(),due:e.due||'',material:e.material||'',tebal:e.tebal||'',type:e.type||'',note:e.note||'',dist:e.dist,signProc:e.signProc||'',signPpic:e.signPpic||'',items,status,...(e.penawaran?{penawaran:e.penawaran}:{})};
+  const data={no,nomor:`${no}/SPK/${String(e.tgl).slice(0,4)}/WS`,tgl:e.tgl,customer:String(e.customer).trim(),po:String(e.po||'').trim(),sales:String(e.sales||'').trim(),lead:String(e.lead||'').trim(),due:e.due||'',material:e.material||'',tebal:e.tebal||'',type:e.type||'',note:e.note||'',dist:e.dist,signProc:e.signProc||'',signPpic:e.signPpic||'',items,status,...(e.penawaran?{penawaran:e.penawaran}:{}),...(e.so?{so:e.so}:{})};
   const btns=document.querySelectorAll('#editor [data-act=ed-save]');btns.forEach(b=>b.disabled=true);
   try{
    if(!e.id||(e.orig&&e.orig.no!==no)){
@@ -3699,7 +3808,7 @@ async function saveEditor(mode){
    }
   }finally{btns.forEach(b=>b.disabled=false)}
   learnKatalog(items,e);if(!inMaster('customer',data.customer))addDoc('mcustomer',{nama:data.customer,pic:'',telp:'',alamat:'',aktif:true}).catch(()=>{});
-  if(e.penawaran)await pqTautkan(e,e.id,no);
+  if(e.so)await soTautkan(e,e.id,no);
   const id=e.id;closeEditor();toast(status==='Terbit'?(editTerbit?`SPK ${no} Rev.${(e.orig.rev||0)+1} tersimpan · tim langsung melihat`:`SPK ${no} terbit · tim langsung melihat`):`Draft SPK ${no} tersimpan`);
   setTimeout(()=>openSheet(id),60);
  }catch(x){err.textContent=x.message||('Gagal menyimpan ('+(x.code||'error')+')')}
@@ -3804,7 +3913,7 @@ function renderSheet(){
    <div class="pp-sign"><div><b>Procurement/Estimator</b><span class="sp"></span><b>( ${esc(s.signProc||'Halimah')} )</b></div><div><b>PPIC</b><span class="sp"></span><b>( ${esc(s.signPpic||'Muin M.K.')} )</b></div></div>
   </div>
   <div class="sh-meta">${st==='Draft'?'<span class="chip warn">Draft · belum terbit, belum masuk monitoring produksi</span>':''}
-   ${s.penawaran?`<span class="sh-pnw">Dari penawaran ${esc(s.penawaran.nomor)}${s.penawaran.rev?' Rev.'+s.penawaran.rev:''}${s.penawaran.varian&&s.penawaran.varian!=='A'?' · varian '+esc(s.penawaran.varian):''}</span> `:''}${s.terbitAt?`<span>Terbit ${fd(s.terbitAt)} oleh ${who(s.terbitBy)}</span>`:''}${revs.length?`<div><b>Riwayat revisi</b><ul>${revs.map(r=>`<li>Rev.${r.rev} · ${fd(r.at)} · ${who(r.by)} — ${esc(r.alasan||'')}</li>`).join('')}</ul></div>`:''}
+   ${s.so?`<span class="sh-pnw">Sales Order ${esc(s.so.nomor)}${s.so.rev?' Rev.'+s.so.rev:''}</span> `:''}${s.penawaran?`<span class="sh-pnw">Dari penawaran ${esc(s.penawaran.nomor)}${s.penawaran.rev?' Rev.'+s.penawaran.rev:''}${s.penawaran.varian&&s.penawaran.varian!=='A'?' · varian '+esc(s.penawaran.varian):''}</span> `:''}${s.terbitAt?`<span>Terbit ${fd(s.terbitAt)} oleh ${who(s.terbitBy)}</span>`:''}${revs.length?`<div><b>Riwayat revisi</b><ul>${revs.map(r=>`<li>Rev.${r.rev} · ${fd(r.at)} · ${who(r.by)} — ${esc(r.alasan||'')}</li>`).join('')}</ul></div>`:''}
    <span class="note">Kolom produksi, subcont/vendor, dan progress terisi otomatis dari transaksi realtime. Kolom "Balik" menampilkan qty kembali / qty yang dikirim ke vendor. ✓ = sudah selesai semua. Tanggal kecil di bawah qty = referensi surat jalan.</span></div>
   </div></div>`;
  resolveNames();
@@ -3866,7 +3975,7 @@ function canMod(m){if(!ME_P&&!ME)return false;if(m==='*any')return myAnyEdit();r
 const canManage=()=>!!ME_P&&myRole()==='admin';
 function modOf(c,data,id,op){
  if(['rm','rmhist','pr','opname'].includes(c))return 'bahan-baku';
- if(c==='penawaran')return 'penawaran';
+ if(c==='penawaran'||c==='salesorder')return 'penawaran';
  if(c==='fg')return 'barang-jadi';
  if(c==='mutasi'){const g=(data&&data.gudang)||(byId('mutasi',id)||{}).gudang;return g==='rm'?'bahan-baku':'barang-jadi'}
  if(c==='spk'||c==='produksi_log')return 'spk';if(c==='vendor')return 'vendor';if(c==='kirim')return 'pengiriman';
@@ -3884,7 +3993,7 @@ function guard(c,data,id,op){
  if(!canMod(m))throw new Error(`Akses Anda (${roleL(a.role)}) tidak mencakup pencatatan di ${MODL[m]||'modul ini'}. Minta super admin menambah akses.`);
 }
 /* ---- audit log: one row per write ---- */
-const CNM={rm:'item bahan baku',fg:'item barang jadi',mutasi:'mutasi stok',spk:'SPK',vendor:'kiriman vendor',kirim:'surat jalan',bongkar:'bongkar muat',pr:'PR',opname:'opname',master:'pengaturan',mvendor:'master vendor',mcustomer:'master customer',msupplier:'master supplier',marmada:'master armada',rmhist:'riwayat harga',muser:'data pengguna',produksi_log:'hasil produksi per mesin',penawaran:'penawaran'};
+const CNM={rm:'item bahan baku',fg:'item barang jadi',mutasi:'mutasi stok',spk:'SPK',vendor:'kiriman vendor',kirim:'surat jalan',bongkar:'bongkar muat',pr:'PR',opname:'opname',master:'pengaturan',mvendor:'master vendor',mcustomer:'master customer',msupplier:'master supplier',marmada:'master armada',rmhist:'riwayat harga',muser:'data pengguna',produksi_log:'hasil produksi per mesin',penawaran:'penawaran',salesorder:'sales order'};
 function actLabel(c,op,d){
  if(op==='del')return 'Hapus '+(CNM[c]||c);
  if(op==='add'){
@@ -4704,7 +4813,7 @@ document.addEventListener('click',async e=>{
   case 'pqvarian':PQ.v=ds.k;renderBody();break;
   case 'pqvbaru':{const used=PQ.p.varian.map(v=>v.k);const k='ABCDEFGH'.split('').find(x=>!used.includes(x));if(!k){toast('Maksimal 8 varian.');break}const src=pqVar();const v=HG().varianBaru(k,src.skenario,pqAturan());v.diskon=src.diskon;v.ppn=src.ppn;v.items=pqKlon(src.items).map(it=>({...it,id:HG().itemBaru().id}));PQ.p.varian.push(v);PQ.v=k;PQ.dirty=true;renderBody();break}
   case 'pqvhapus':{if(PQ.p.varian.length<2)break;PQ.p.varian=PQ.p.varian.filter(v=>v.k!==PQ.v);PQ.v=PQ.p.varian[0].k;PQ.dirty=true;renderBody();break}
-  case 'pqtambah':{const v=pqVar();const last=v.items[v.items.length-1];const kel=last?last.kel:HG().daftarKeluarga(HG().katalog)[0];const bs=HG().bentukDiKeluarga(HG().katalog,kel);v.items.push(HG().itemBaru(kel,last?last.bentuk:(bs[0]||{}).id,1));PQ.dirty=true;renderBody();break}
+  case 'pqtambah':{const v=pqVar();const last=v.items[v.items.length-1];const kel=last?last.kel:HG().daftarKeluarga(HG().katalog)[0];const bs=HG().bentukDiKeluarga(HG().katalog,kel);{const ni=HG().itemBaru(kel,last?last.bentuk:(bs[0]||{}).id,1);if(last){ni.tebal=last.tebal||'';ni.fin=last.fin||''}v.items.push(ni)}PQ.dirty=true;renderBody();break}
   case 'pqsalin':{const v=pqVar();const it=v.items[+ds.i];if(it){v.items.splice(+ds.i+1,0,{...pqKlon(it),id:HG().itemBaru().id});PQ.dirty=true;renderBody()}break}
   case 'pqhapus':{const v=pqVar();if(v.items.length<2){toast('Minimal satu baris.');break}v.items.splice(+ds.i,1);PQ.dirty=true;renderBody();break}
   case 'pqsimpan':pqSimpan();break;
@@ -4715,9 +4824,19 @@ document.addEventListener('click',async e=>{
   case 'pqtolak':pqAlasan('tolak','Penawaran ditolak customer','Alasan (opsional)');break;
   case 'pqrevisi':pqAksi('revisi');break;
   case 'pqcetak':pqCetak();break;
-  case 'pqmuatspk':pqMuatSpk();break;
-  case 'pqperbaruispk':pqPerbaruiSpk();break;
-  case 'pqbukaspk':if(PQ.p&&PQ.p.spkId)openSheet(PQ.p.spkId);break;
+  case 'pqbuatso':pqBuatSo();break;
+  case 'pqbukaso':pqBukaSo();break;
+  case 'sobuka':{const d=byId('salesorder',ds.id);if(d)soBuka(d);break}
+  case 'sotutup':soTutup();break;
+  case 'sosimpan':soSimpan();break;
+  case 'sokonfirmasi':soKonfirmasi();break;
+  case 'sobuatspk':soBuatSpk();break;
+  case 'soperbaruispk':soPerbaruiSpk();break;
+  case 'sobukaspk':if(SO.s&&(SO.s.spk||[])[0])openSheet(SO.s.spk[0].id);break;
+  case 'sopnw':soKePenawaran();break;
+  case 'soamandemen':soAlasan('amandemen','Amandemen Sales Order','Alasan amandemen (perubahan PO customer)');break;
+  case 'sobatal':soAlasan('batal','Batalkan Sales Order','Alasan (opsional)');break;
+  case 'sohapus':{if(SO.s&&soEditable()&&SO.s.items.length>1){SO.s.items.splice(+ds.i,1);SO.dirty=true;renderBody()}break}
   case 'gtbar':{const o=GTX[+ds.i];if(o)gtDetail(o);break}
   case 'pbnav':F.spk.mg=ds.d==='0'?0:(F.spk.mg||0)+(+ds.d);renderTools();renderBody();break;
   case 'pbcard':{const o=PBX[+ds.i];if(o)pbDetail(o);break}
@@ -4738,6 +4857,15 @@ document.addEventListener('change',e=>{const el=e.target;const a=el.dataset.act;
  else if(a==='mesinmsn'){F.mesin.mesin=el.value;lsSet('mni-mesin',el.value);renderTools();renderBody()}
  else if(a==='mesinop'){lsSet(opKey(mesinPilih().mesin),el.value.trim())}
  else if(a==='lapf'){const f=F['laporan-produksi'];f[el.dataset.key]=el.value;if(el.dataset.key==='wc')f.mesin='';renderTools();renderBody()}});
+/* sales order: isian lembar memperbarui salinan kerja */
+document.addEventListener('input',e=>{const el=e.target;if(!SO.s||!el.matches)return;
+ if(el.matches('[data-soh]')){SO.s[el.dataset.soh]=el.value;SO.dirty=true;return}
+ if(el.matches('[data-soq]')){const row=el.closest('tr[data-i]');const it=row&&SO.s.items[+row.dataset.i];if(it){const v=parseFloat(String(el.value).replace(',','.'));it.q=Number.isFinite(v)?v:0;SO.dirty=true}}
+});
+document.addEventListener('change',e=>{const el=e.target;if(!SO.s||!el.matches)return;
+ const row=el.closest('tr[data-i]');const it=row&&SO.s.items[+row.dataset.i];if(!it)return;
+ if(el.matches('[data-sot]')){it.tebal=el.value;SO.dirty=true}else if(el.matches('[data-sof]')){it.fin=el.value;SO.dirty=true}
+});
 /* penawaran: isian lembar memperbarui salinan kerja dan hanya menyegarkan angka (fokus tidak hilang) */
 document.addEventListener('input',e=>{const el=e.target;if(!PQ.p||!el.matches)return;
  const num=x=>{const v=parseFloat(String(x).replace(',','.'));return Number.isFinite(v)?v:null};
@@ -4750,6 +4878,8 @@ document.addEventListener('input',e=>{const el=e.target;if(!PQ.p||!el.matches)re
 document.addEventListener('change',e=>{const el=e.target;if(!PQ.p||!el.matches)return;
  const row=el.closest('tr[data-i]');const it=row?pqVar().items[+row.dataset.i]:null;
  if(it&&el.matches('[data-pqk]')){it.kel=el.value;const bs=HG().bentukDiKeluarga(HG().katalog,it.kel);it.bentuk=(bs[0]||{}).id||'';it.u={};PQ.dirty=true;renderBody();return}
+ if(it&&el.matches('[data-pqt]')){it.tebal=el.value;PQ.dirty=true;return}
+ if(it&&el.matches('[data-pqf]')){it.fin=el.value;PQ.dirty=true;return}
  if(it&&el.matches('[data-pqb]')){const bs=HG().bentukDiKeluarga(HG().katalog,it.kel);const b=bs.find(x=>x.id===el.value);const lama=it.u||{};it.bentuk=el.value;it.u={};(b?b.masukan:[]).forEach(nm=>{if(lama[nm]!=null)it.u[nm]=lama[nm]});PQ.dirty=true;renderBody();return}
  if(el.matches('[data-pqv="skenario"]')){pqVar().skenario=+el.value;PQ.dirty=true;pqPatch()}
 });

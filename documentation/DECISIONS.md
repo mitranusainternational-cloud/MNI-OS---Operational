@@ -120,3 +120,11 @@ updated: 2026-11-02
 - **Alasan:** sheet utama paling baru dan sudah memperbaiki Reducer; satu model rumus mencegah hasil berbeda antar skenario.
 - **Konsekuensi:** katalog harga dibangun dari sheet utama; satu cacat rujukan baris lain diperbaiki dan diuji; bila ada penawaran lama yang harus direproduksi persis dengan rumus lama, perlu versi rumus tersendiri (belum dikerjakan).
 - **Rujukan:** [[ERP_QUOTATION_ANALISIS]] bagian 10, [[T-189-mesin-harga-penawaran-dan-uji-emas]].
+
+## 2026-11-06 — Sales Order menjadi penghubung Penawaran dan SPK
+
+- **Konteks:** pemilik bertanya apakah SPK sebaiknya otomatis menarik data dari penawaran atau dari Sales Order, seperti alur ERP baku.
+- **Keputusan:** alur menjadi Penawaran, Sales Order (SO), SPK. SO dibuat dari penawaran Disetujui, memegang PO customer, due date, alamat, dan snapshot harga dan biaya. Konfirmasi SO membuat SPK Draft otomatis; PPIC memeriksa dan menerbitkan (gerbang terbit tetap manusia). Perubahan PO setelah deal lewat amandemen SO, bukan revisi penawaran. Tebal dan finishing diisi di penawaran atau SO agar rute produksi dan vendor terbentuk dari judul SPK.
+- **Alasan:** PO customer dapat berbeda dari penawaran, satu penawaran dapat menjadi beberapa PO, dan harga yang dijanjikan harus terkunci di dokumen komitmen, bukan di penawaran.
+- **Konsekuensi:** tabel salesorder (draf migration 16) memakai hak modul penawaran karena memuat harga; SPK tidak menyimpan harga; T-192 (kebutuhan material) dihitung dari SO atau SPK, bukan dari penawaran.
+- **Rujukan:** [[tasks/T-194-sales-order-penghubung-penawaran-dan-spk|T-194]].

@@ -41,6 +41,8 @@ Rancangan: [[documentation/ERP_QUOTATION_ANALISIS]]
 
 ## Catatan
 
+Diperbarui 2026-11-06: jalan pintas penawaran ke SPK digantikan alur Penawaran, Sales Order, SPK ([[tasks/T-194-sales-order-penghubung-penawaran-dan-spk|T-194]]). Mesin snapshot, idempotensi, dan pembaruan dari revisi tetap dipakai; sumbernya kini Sales Order.
+
 Muat ke SPK butuh hak modul penawaran sekaligus hak ubah SPK (praktisnya admin); Sales hanya melihat tautan. Tebal dan finishing tidak ada di penawaran, jadi dilengkapi di editor SPK (menentukan langkah vendor). Pemetaan keluarga ke judul produk SPK (ST* = tray, SL* = ladder, bentuk lurus = CABLE, lainnya ACCS) adalah dugaan yang perlu dikonfirmasi pemilik dengan katalog asli. Kolom referensi di tabel spk belum perlu migration; snapshot memakai kolom data penawaran (draf migration 15).
 
 Tahap E2. Kolom referensi baru di tabel spk hanya ditayangkan pada tahap yang disetujui. Lokal dulu; tidak menyentuh production sebelum persetujuan eksplisit pemilik.
