@@ -541,15 +541,17 @@ function pqPatch(){
  const vt=document.querySelector(`.pq-vt[data-k="${v.k}"] small`);if(vt)vt.textContent=rpf(h.total.total);
 }
 function pqNotePerlu(){const a=pqAturan(),peran=pqPeran();const perlu=HG().perluPersetujuan(a,peran,PQ.p);const el=document.getElementById('pq-perlu');if(el){el.hidden=!perlu;el.textContent=`Diskon melewati batas ${Math.round(HG().batasDiskon(a,peran)*100)}%: penawaran perlu persetujuan sebelum dikirim.`}const b=document.querySelector('[data-act="pqkirim"]');if(b)b.textContent=perlu?'Ajukan persetujuan diskon':'Kirim ke customer'}
+function pqSnapHtml(s){const b=s.biaya;return `<h4 class="pq-sn-h">Snapshot PO</h4><div class="pq-in"><span>Dibekukan</span><b>${esc(fdp2(s.tgl))} · Rev.${s.rev} · varian ${esc(s.varian)}</b></div>${s.po?`<div class="pq-in"><span>No. PO</span><b>${esc(s.po)}</b></div>`:''}<div class="pq-in"><span>Total saat PO</span><b>${rpf(s.total.total)}</b></div><div class="pq-in"><span>Berat real saat PO</span><b>${n(Math.round(s.kg.real*10)/10)} kg</b></div>${b?`<div class="pq-in"><span>Modal saat PO</span><b>${rpf(b.modal)}</b></div>`:''}`}
 function pqSheet(){
  const p=PQ.p,H=HG(),a=pqAturan(),peran=pqPeran();
  if(!H.ada())return `<div class="panel pq-warn"><div class="pbody"><b>Katalog harga belum dipasang.</b> Lembar penawaran butuh katalog. <button class="btn" data-act="pqtutup">Kembali</button></div></div>`;
  const edit=p.status==='Draft';const dis=edit?'':' disabled';const aks=H.aksiTersedia(p,peran);
  const v=pqVar();PQ.v=v.k;const h=pqHit(v);
  const perlu=H.perluPersetujuan(a,peran,p);
+ const bisaSpk=p.status==='Disetujui'&&!!p._id&&!PQ.dirty&&pqBisaSpk();
  const btn=(act,txt,cls='')=>`<button class="btn ${cls}" data-act="${act}">${txt}</button>`;
  const bar=`<div class="pq-bar"><button class="btn ghost" data-act="pqtutup">‹ Daftar</button><div class="pq-tt"><b>Penawaran ${esc(p._id||p.nomor?H.labelNomor(p):'baru')}</b> ${pqStChip(p)}${PQ.dirty?'<span class="pq-dirty">belum disimpan</span>':''}</div><span class="grow"></span>
-  ${aks.includes('simpan')?btn('pqsimpan','Simpan draft'):''}${aks.includes('kirim')?btn('pqkirim',perlu?'Ajukan persetujuan diskon':'Kirim ke customer','primary'):''}${aks.includes('setujuDiskon')?btn('pqsetujudiskon','Setujui diskon','primary')+btn('pqkembalikan','Kembalikan ke draft'):''}${aks.includes('setujuCustomer')?btn('pqsetujucustomer','Customer setuju','primary')+btn('pqtolak','Ditolak customer'):''}${aks.includes('revisi')?btn('pqrevisi','Buat revisi'):''}${btn('pqcetak',ic('file')+'Cetak')}</div>`;
+  ${aks.includes('simpan')?btn('pqsimpan','Simpan draft'):''}${aks.includes('kirim')?btn('pqkirim',perlu?'Ajukan persetujuan diskon':'Kirim ke customer','primary'):''}${aks.includes('setujuDiskon')?btn('pqsetujudiskon','Setujui diskon','primary')+btn('pqkembalikan','Kembalikan ke draft'):''}${aks.includes('setujuCustomer')?btn('pqsetujucustomer','Customer setuju','primary')+btn('pqtolak','Ditolak customer'):''}${aks.includes('revisi')?btn('pqrevisi','Buat revisi'):''}${bisaSpk&&!p.spkId?btn('pqmuatspk','Muat ke SPK','primary'):''}${bisaSpk&&p.spkId&&p.rev>(p.spkRev||0)?btn('pqperbaruispk','Perbarui SPK dari Rev.'+p.rev,'primary'):''}${p.spkId?btn('pqbukaspk','SPK '+esc(String(p.spkNo||''))):''}${btn('pqcetak',ic('file')+'Cetak')}</div>`;
  const catatanStatus=p.status==='Menunggu persetujuan'?`<div class="pq-info warn">${peran==='admin'?'Diskon melewati batas Sales. Setujui untuk mengirim atau kembalikan ke draft.':'Menunggu persetujuan super admin: diskon melewati batas Anda ('+Math.round(H.batasDiskon(a,peran)*100)+'%).'}</div>`:p.catatanPenyetuju&&p.status==='Draft'?`<div class="pq-info">Dikembalikan penyetuju: ${esc(p.catatanPenyetuju)}</div>`:p.status==='Ditolak'&&p.alasan?`<div class="pq-info">Alasan ditolak: ${esc(p.alasan)}</div>`:'';
  const kust=S.mcustomer.filter(x=>x.aktif!==false).map(x=>`<option value="${esc(x.nama)}">`).join('');
  const hf=(k,l,tp='text',cls='')=>`<label class="fld ${cls}"><span>${l}</span><input class="inp" type="${tp}" data-pqh="${k}" value="${esc(p[k]||'')}"${dis}></label>`;
@@ -567,7 +569,7 @@ function pqSheet(){
   <div class="pq-info warn" id="pq-perlu"${perlu?'':' hidden'}>Diskon melewati batas ${Math.round(H.batasDiskon(a,peran)*100)}%: penawaran perlu persetujuan sebelum dikirim.</div>`;
  const items=`<section class="panel"><div class="tbl-wrap"><table id="pq-items" class="pq-t"><thead><tr><th class="num">#</th><th>Keluarga</th><th>Bentuk</th><th>Ukuran (mm)</th><th>Jumlah</th><th class="num">Harga satuan</th><th class="num">Jumlah (Rp)</th><th class="num">Berat est. (kg)</th><th></th></tr></thead><tbody>${pqBaris(v,h,edit)}</tbody></table></div>${edit?`<div class="pbody"><button class="btn" data-act="pqtambah">${ic('plus')}Tambah baris</button></div>`:''}</section>`;
  const riw=(p.riwayat||[]).length?`<details class="panel pq-rw"><summary>Riwayat revisi (${p.riwayat.length})</summary><div class="pbody">${p.riwayat.slice().reverse().map(r=>`<div class="note">Rev.${r.rev} · ${esc(r.status)} · ${fd(r.tgl)} · ${(r.varian||[]).length} varian</div>`).join('')}</div></details>`:'';
- return `${bar}${catatanStatus}${head}${tabs}<div class="pq-main"><div>${vset}${items}</div><aside class="panel pq-side"><div class="pbody"><h4>Ringkasan ${esc(v.nama||v.k)}</h4><div id="pq-tot">${pqTotalHtml(v,h)}</div></div></aside></div>${riw}`;
+ return `${bar}${catatanStatus}${head}${tabs}<div class="pq-main"><div>${vset}${items}</div><aside class="panel pq-side"><div class="pbody"><h4>Ringkasan ${esc(v.nama||v.k)}</h4><div id="pq-tot">${pqTotalHtml(v,h)}</div>${p.snapshot?pqSnapHtml(p.snapshot):''}</div></aside></div>${riw}`;
 }
 B['penawaran']=()=>PQ.p?pqSheet():pqList();
 
@@ -601,6 +603,32 @@ function pqSetujuCustomer(){
 }
 function pqAlasan(aksi,judul,label){
  openModal(judul,fld(label,`<textarea class="inp" name="alasan" rows="3" id="m-alasan"></textarea>`,true),async d=>{await pqAksi(aksi,{alasan:d.alasan||''})},{submit:'Simpan',done:' '});
+}
+
+/* ---- muat ke SPK, snapshot PO, pembaruan dari revisi (T-191) ---- */
+const pqBisaSpk=()=>{try{guard('spk',null,null,'upd');return !!CAN}catch(e){return false}};
+function pqMuatSpk(){
+ const p=PQ.p;if(PQ.dirty||!p._id){toast('Simpan penawaran dulu.');return}
+ if(p.spkId&&byId('spk',p.spkId)){openSheet(p.spkId);return}
+ let sp;try{sp=HG().susunSpk(p,HG().katalog,HG().skenario)}catch(e){toast(e.message);return}
+ openModal('Muat ke SPK',fld('No. PO customer',`<input class="inp" name="po" id="m-po" value="${esc(p.po||'')}" placeholder="opsional, dapat diisi nanti di SPK">`,false)+`<p class="note">Dibuat SPK Draft dengan ${sp.sections.reduce((a,s)=>a+s.lines.length,0)} item dari varian ${esc(p.pilih)}. Harga dan biaya dibekukan sebagai snapshot PO di penawaran; SPK hanya memuat jumlah dan berat.</p>`,async d=>{
+  const sn=HG().snapshotPO(p,HG().katalog,HG().skenario,{tgl:today(),oleh:ME||'',po:String(d.po||'').trim()});
+  const ed=newEd();Object.assign(ed,{customer:sp.customer,sales:p.sales?String(who(p.sales)).replace(/<[^>]*>/g,'').trim():'',po:String(d.po||'').trim(),sections:sp.sections,penawaran:sp.penawaran,pqSnapshot:sn});
+  setTimeout(()=>openEditor(ed),60);
+ },{submit:'Buat SPK Draft',done:' '});
+}
+function pqPerbaruiSpk(){
+ const p=PQ.p;const s=p.spkId&&byId('spk',p.spkId);if(!s){toast('SPK tertaut tidak ditemukan.');return}
+ let sp,sn;try{sp=HG().susunSpk(p,HG().katalog,HG().skenario);sn=HG().snapshotPO(p,HG().katalog,HG().skenario,{tgl:today(),oleh:ME||'',po:p.po||s.po||''})}catch(e){toast(e.message);return}
+ const g=HG().gabungRevisiSpk(sp.sections,s.items||[]);
+ const ed=edFrom(s,false);ed.sections=g.sections;ed.penawaran=sp.penawaran;ed.pqSnapshot=sn;
+ if((s.status||'Terbit')==='Terbit')ed.revAlasan='Revisi penawaran Rev.'+p.rev;
+ openEditor(ed).then(()=>{if(g.hilang.length)toast(`${g.hilang.length} item lama tidak ada di revisi: ${g.hilang.slice(0,2).join('; ')}${g.hilang.length>2?'…':''}. Periksa sebelum menyimpan.`)});
+}
+async function pqTautkan(e,spkId,no){
+ const r=e.penawaran;if(!r||!r.id)return;const pd=byId('penawaran',r.id);if(!pd)return;
+ const up={spkId,spkNo:no,spkRev:r.rev,po:String(e.po||pd.po||'').trim()};if(e.pqSnapshot)up.snapshot=e.pqSnapshot;
+ try{await updDoc('penawaran',r.id,up);if(PQ.p&&PQ.p._id===r.id){Object.assign(PQ.p,up);if(VIEW==='penawaran')renderBody()}}catch(x){toast('SPK tersimpan, tetapi tautan ke penawaran gagal: '+(x.message||x))}
 }
 
 /* ---- cetak (untuk customer: tanpa berat dan tanpa biaya) ---- */
@@ -3652,7 +3680,7 @@ async function saveEditor(mode){
   const editTerbit=e.id&&e.orig&&(e.orig.status||'Terbit')==='Terbit';
   if(editTerbit&&!String(e.revAlasan).trim())throw new Error('Isi alasan revisi.');
   const status=mode==='terbit'?'Terbit':'Draft';const now=new Date().toISOString();
-  const data={no,nomor:`${no}/SPK/${String(e.tgl).slice(0,4)}/WS`,tgl:e.tgl,customer:String(e.customer).trim(),po:String(e.po||'').trim(),sales:String(e.sales||'').trim(),lead:String(e.lead||'').trim(),due:e.due||'',material:e.material||'',tebal:e.tebal||'',type:e.type||'',note:e.note||'',dist:e.dist,signProc:e.signProc||'',signPpic:e.signPpic||'',items,status};
+  const data={no,nomor:`${no}/SPK/${String(e.tgl).slice(0,4)}/WS`,tgl:e.tgl,customer:String(e.customer).trim(),po:String(e.po||'').trim(),sales:String(e.sales||'').trim(),lead:String(e.lead||'').trim(),due:e.due||'',material:e.material||'',tebal:e.tebal||'',type:e.type||'',note:e.note||'',dist:e.dist,signProc:e.signProc||'',signPpic:e.signPpic||'',items,status,...(e.penawaran?{penawaran:e.penawaran}:{})};
   const btns=document.querySelectorAll('#editor [data-act=ed-save]');btns.forEach(b=>b.disabled=true);
   try{
    if(!e.id||(e.orig&&e.orig.no!==no)){
@@ -3671,6 +3699,7 @@ async function saveEditor(mode){
    }
   }finally{btns.forEach(b=>b.disabled=false)}
   learnKatalog(items,e);if(!inMaster('customer',data.customer))addDoc('mcustomer',{nama:data.customer,pic:'',telp:'',alamat:'',aktif:true}).catch(()=>{});
+  if(e.penawaran)await pqTautkan(e,e.id,no);
   const id=e.id;closeEditor();toast(status==='Terbit'?(editTerbit?`SPK ${no} Rev.${(e.orig.rev||0)+1} tersimpan · tim langsung melihat`:`SPK ${no} terbit · tim langsung melihat`):`Draft SPK ${no} tersimpan`);
   setTimeout(()=>openSheet(id),60);
  }catch(x){err.textContent=x.message||('Gagal menyimpan ('+(x.code||'error')+')')}
@@ -3775,7 +3804,7 @@ function renderSheet(){
    <div class="pp-sign"><div><b>Procurement/Estimator</b><span class="sp"></span><b>( ${esc(s.signProc||'Halimah')} )</b></div><div><b>PPIC</b><span class="sp"></span><b>( ${esc(s.signPpic||'Muin M.K.')} )</b></div></div>
   </div>
   <div class="sh-meta">${st==='Draft'?'<span class="chip warn">Draft · belum terbit, belum masuk monitoring produksi</span>':''}
-   ${s.terbitAt?`<span>Terbit ${fd(s.terbitAt)} oleh ${who(s.terbitBy)}</span>`:''}${revs.length?`<div><b>Riwayat revisi</b><ul>${revs.map(r=>`<li>Rev.${r.rev} · ${fd(r.at)} · ${who(r.by)} — ${esc(r.alasan||'')}</li>`).join('')}</ul></div>`:''}
+   ${s.penawaran?`<span class="sh-pnw">Dari penawaran ${esc(s.penawaran.nomor)}${s.penawaran.rev?' Rev.'+s.penawaran.rev:''}${s.penawaran.varian&&s.penawaran.varian!=='A'?' · varian '+esc(s.penawaran.varian):''}</span> `:''}${s.terbitAt?`<span>Terbit ${fd(s.terbitAt)} oleh ${who(s.terbitBy)}</span>`:''}${revs.length?`<div><b>Riwayat revisi</b><ul>${revs.map(r=>`<li>Rev.${r.rev} · ${fd(r.at)} · ${who(r.by)} — ${esc(r.alasan||'')}</li>`).join('')}</ul></div>`:''}
    <span class="note">Kolom produksi, subcont/vendor, dan progress terisi otomatis dari transaksi realtime. Kolom "Balik" menampilkan qty kembali / qty yang dikirim ke vendor. ✓ = sudah selesai semua. Tanggal kecil di bawah qty = referensi surat jalan.</span></div>
   </div></div>`;
  resolveNames();
@@ -4686,6 +4715,9 @@ document.addEventListener('click',async e=>{
   case 'pqtolak':pqAlasan('tolak','Penawaran ditolak customer','Alasan (opsional)');break;
   case 'pqrevisi':pqAksi('revisi');break;
   case 'pqcetak':pqCetak();break;
+  case 'pqmuatspk':pqMuatSpk();break;
+  case 'pqperbaruispk':pqPerbaruiSpk();break;
+  case 'pqbukaspk':if(PQ.p&&PQ.p.spkId)openSheet(PQ.p.spkId);break;
   case 'gtbar':{const o=GTX[+ds.i];if(o)gtDetail(o);break}
   case 'pbnav':F.spk.mg=ds.d==='0'?0:(F.spk.mg||0)+(+ds.d);renderTools();renderBody();break;
   case 'pbcard':{const o=PBX[+ds.i];if(o)pbDetail(o);break}

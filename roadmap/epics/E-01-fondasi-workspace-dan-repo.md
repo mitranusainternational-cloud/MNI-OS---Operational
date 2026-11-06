@@ -9,7 +9,7 @@ status: active
 progress: 96
 tasks_total: 8
 tasks_done: 7
-updated: 2026-11-05
+updated: 2026-11-06
 ---
 
 # E-01 Fondasi workspace dan repo

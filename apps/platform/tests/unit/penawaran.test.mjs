@@ -1,5 +1,5 @@
 // Uji aturan dan alur penawaran.  node tests/unit/penawaran.test.mjs   (memakai katalog sintetis, aman untuk CI)
-import { aturan, ATURAN_DEFAULT, nomorPenawaran, labelNomor, batasDiskon, perluPersetujuan, kedaluwarsa, penawaranBaru, varianBaru, itemBaru, daftarKeluarga, bentukDiKeluarga, deskripsiItem, hitungVarian, periksaKirim, aksiTersedia, terapkan, buatRevisi } from '../../src/lib/erp/penawaran.js';
+import { aturan, ATURAN_DEFAULT, nomorPenawaran, labelNomor, batasDiskon, perluPersetujuan, kedaluwarsa, penawaranBaru, varianBaru, itemBaru, daftarKeluarga, bentukDiKeluarga, deskripsiItem, hitungVarian, periksaKirim, aksiTersedia, terapkan, buatRevisi, masalahMuatSpk, produkSpk, susunSpk, snapshotPO, perluPerbaruiSpk, gabungRevisiSpk } from '../../src/lib/erp/penawaran.js';
 
 const R = []; const ok = (id, pass, info = '') => R.push((pass ? 'PASS ' : 'FAIL ') + id + (info ? ' · ' + info : ''));
 const keluaran = { harga: 'S', jumlah: 'U', estimasi: 'AF', estimasiQty: 'AG', real: 'AS', realQty: 'AT' };
@@ -49,6 +49,23 @@ let r1 = terapkan(p5, 'revisi', { ...ctx, tgl: '2026-11-20' });
 ok('P-17 revisi: nomor dasar tetap, Rev bertambah, kembali Draft, riwayat menyimpan versi lama, masa berlaku baru', r1.rev === 1 && r1.nomor === p5.nomor && r1.status === 'Draft' && r1.pilih === null && r1.riwayat.length === 1 && r1.riwayat[0].rev === 0 && r1.riwayat[0].status === 'Disetujui' && r1.berlaku === '2026-11-27' && p5.rev === 0);
 const r2 = buatRevisi(r1, { tgl: '2026-12-01', a });
 ok('P-18 revisi berulang menumpuk riwayat tanpa menyalin riwayat ke dalam riwayat', r2.rev === 2 && r2.riwayat.length === 2 && r2.riwayat.every((x) => !x.riwayat));
+
+// ---- T-191: muat dari penawaran ke SPK
+const pSetuju = { ...terapkan(p1, 'setujuCustomer', { ...ctx, varian: 'A' }), id: 'pnw-1' };
+ok('P-19 hanya penawaran Disetujui dengan varian terpilih yang boleh dimuat', masalahMuatSpk(p1).length === 1 && masalahMuatSpk(pSetuju).length === 0 && masalahMuatSpk({ ...pSetuju, pilih: 'Z' }).length === 1 && (() => { try { susunSpk(p1, kat, sks); return false; } catch (e) { return /Disetujui/.test(e.message); } })());
+const spk = susunSpk(pSetuju, kat, sks);
+ok('P-20 SPK tersusun per keluarga, jumlah dan berat real per pcs, tautan penawaran, tanpa harga', spk.customer === 'PT Contoh' && spk.sections.map((s) => s.h).join() === 'CABLE LADDER TYPE SLU,CABLE TRAY TYPE STU' && spk.sections[0].lines[0].q === 10 && spk.sections[0].lines[0].d === 'SLU Straight Ladder W200xH50xL3000' && Math.abs(spk.sections[0].lines[0].w - 200 * 50 * 3000 / 1e6) < 1e-9 && spk.penawaran.nomor === pSetuju.nomor && spk.penawaran.rev === 0 && spk.penawaran.varian === 'A' && !/harga|jumlah|total/i.test(JSON.stringify(spk.sections)));
+ok('P-21 baris bergalat menghalangi muat dan tidak membuat SPK sebagian', (() => { try { susunSpk({ ...pSetuju, varian: [{ ...pSetuju.varian[0], items: [...pSetuju.varian[0].items, { ...itemBaru('SLU', 'SLU_ELBOW', 1), u: {} }] }] }, kat, sks); return false; } catch (e) { return /belum dapat dihitung/.test(e.message); } })());
+ok('P-20b judul produk SPK mengikuti konvensi rute: lurus = CABLE, bentuk lain = ACCS, cover, dan keluarga tak dikenal apa adanya', produkSpk('SLU', 'Straight Ladder') === 'CABLE LADDER' && produkSpk('STU', 'Straight Tray') === 'CABLE TRAY' && produkSpk('SLW', 'Horizontal Elbow 90') === 'ACCS LADDER' && produkSpk('STC', 'Tee') === 'ACCS TRAY' && produkSpk('STU', 'Cover Straight') === 'COVER TRAY' && produkSpk('XYZ', 'Apa') === 'XYZ' && produkSpk('', '') === 'LAINNYA');
+const sn = snapshotPO(pSetuju, kat, sks, { tgl: T, oleh: 'o@x', po: 'PO-77' });
+const snKunci = JSON.stringify(sn);
+const sksUbah = [{ nama: 'Skenario 1', param: { AW2: { v: 99999 }, AW6: { v: 2 }, AW7: { v: 2 } } }];
+const sn2 = snapshotPO(pSetuju, kat, sks, { tgl: T, oleh: 'o@x', po: 'PO-77' });
+ok('P-22 snapshot PO membekukan harga, berat, total, dan skenario; tidak berubah bila skenario berubah sesudahnya', sn.po === 'PO-77' && sn.baris.length === 2 && sn.baris[0].hargaSatuan === hargaLurus && sn.total.total === hitungVarian(kat, sks, pSetuju.varian[0]).total.total && sn.skenario.param.AW2.v === 10000 && snKunci === JSON.stringify(sn2) && (sks[0].param.AW2.v = 99999, sks[0].param.AW2.v = 10000, JSON.stringify(sn) === snKunci) && sksUbah[0].param.AW2.v === 99999);
+ok('P-23 penawaran direvisi membuat SPK tertaut perlu diperbarui', !perluPerbaruiSpk(pSetuju, spk.penawaran) && perluPerbaruiSpk({ ...pSetuju, rev: 1 }, spk.penawaran) && !perluPerbaruiSpk(pSetuju, null));
+const lama = [{ d: 'SLU Straight Ladder W200xH50xL3000', q: 10, prod: 6 }, { d: 'ITEM LAMA', q: 3, prod: 1 }];
+const gb = gabungRevisiSpk([{ h: 'SLU', lines: [{ d: 'SLU Straight Ladder W200xH50xL3000', q: 4 }, { d: 'ITEM BARU', q: 2 }] }], lama);
+ok('P-24 revisi mempertahankan jumlah produksi (dibatasi qty baru), item baru nol, item lama yang hilang dilaporkan', gb.sections[0].lines[0].prod === 4 && gb.sections[0].lines[1].prod === 0 && JSON.stringify(gb.hilang) === '["ITEM LAMA"]');
 
 const gagal = R.filter((x) => x.startsWith('FAIL')).length;
 console.log(R.join('\n')); console.log(`${R.length - gagal} PASS, ${gagal} FAIL`);

@@ -9,7 +9,7 @@ status: active
 progress: 8
 tasks_total: 7
 tasks_done: 1
-updated: 2026-11-05
+updated: 2026-11-06
 ---
 
 # E-09 Akses, peran, dan audit

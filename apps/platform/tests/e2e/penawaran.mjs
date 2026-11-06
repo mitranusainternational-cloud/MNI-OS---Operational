@@ -134,6 +134,58 @@ export async function runPenawaran(page, base) {
   await pop.close();
   await page.click('[data-act="pqtutup"]'); await page.waitForTimeout(300);
 
+  // ---------- T-191: muat ke SPK, snapshot PO, pembaruan dari revisi ----------
+  const pnwDb = async () => (await tab('penawaran'))[0];
+  const dataPnw = (r) => ({ ...(r.data || {}), ...r });
+  const spkAll = async () => (await tab('spk')).map((r) => ({ ...(r.data || {}), ...r }));
+  const setujui = async () => {
+    await page.click('[data-act="pqkirim"]'); await page.waitForTimeout(900);
+    await page.click('[data-act="pqsetujucustomer"]'); await page.waitForTimeout(500);
+    if (await page.$('#m-varian')) { await page.selectOption('#m-varian', { index: 0 }); await kirimModal(); }
+    await page.waitForTimeout(400);
+  };
+  await page.click('#pq-list tbody tr'); await page.waitForTimeout(400);
+  const sebelum = await page.evaluate(() => !!document.querySelector('[data-act="pqmuatspk"]'));
+  await setujui();
+  const siap = await page.evaluate(() => ({ muat: !!document.querySelector('[data-act="pqmuatspk"]'), buka: !!document.querySelector('[data-act="pqbukaspk"]') }));
+  ok('N-28 tombol Muat ke SPK hanya muncul pada penawaran Disetujui (admin berhak SPK)', !sebelum && (await status()) === 'Disetujui' && siap.muat && !siap.buka, JSON.stringify({ sebelum, siap }));
+  const n0 = (await spkAll()).length;
+  await page.click('[data-act="pqmuatspk"]'); await page.waitForSelector('#m-po'); await page.fill('#m-po', 'PO-UJI-1'); await kirimModal();
+  await page.waitForSelector('#editor:not([hidden])', { timeout: 8000 });
+  await page.waitForTimeout(500);
+  const ed = await page.evaluate(() => ({ cust: document.getElementById('ed-cust').value, po: document.getElementById('ed-po').value, sec: document.querySelectorAll('#ed-secs .esec').length, baris: document.querySelectorAll('#ed-secs tbody tr').length, desc: [...document.querySelectorAll('#ed-secs [data-f="d"]')].map((i) => i.value), w: [...document.querySelectorAll('#ed-secs [data-f="w"]')].map((i) => parseFloat(i.value)), q: [...document.querySelectorAll('#ed-secs [data-f="q"]')].map((i) => parseFloat(i.value)) }));
+  ok('N-29 Muat ke SPK membuka editor SPK baru berisi customer, PO, item per keluarga dengan jumlah dan berat real; belum ada SPK tersimpan', ed.cust === 'PT Contoh Uji' && ed.po === 'PO-UJI-1' && ed.sec >= 1 && ed.baris >= 1 && ed.desc.some((d) => /SLU Straight Ladder W200xH50xL3000/.test(d)) && ed.w.every((w) => w > 0) && ed.q.every((q) => q > 0) && (await spkAll()).length === n0, JSON.stringify(ed).slice(0, 220));
+  await page.click('[data-act="ed-save"][data-mode="draft"]'); await page.waitForTimeout(1800);
+  const lencana = await page.evaluate(() => (document.querySelector('.sh-pnw') || {}).textContent || '');
+  await page.evaluate(() => document.querySelector('[data-act="sheet-close"]')?.click()); await page.waitForTimeout(300);
+  const sAll = await spkAll(); const sBaru = sAll[sAll.length - 1]; const pn = dataPnw(await pnwDb());
+  ok('N-30 SPK Draft tersimpan dengan tautan ke penawaran (nomor, Rev, varian) dan tanpa harga; penawaran menyimpan spkId dan PO', sAll.length === n0 + 1 && sBaru.status === 'Draft' && sBaru.po === 'PO-UJI-1' && sBaru.penawaran && /^001\.MNI\//.test(sBaru.penawaran.nomor) && sBaru.penawaran.rev === pn.rev && pn.spkId === 'spk-' + sBaru.no && String(pn.spkNo) === String(sBaru.no) && pn.po === 'PO-UJI-1' && !/hargaSatuan|jumlah"|total/.test(JSON.stringify(sBaru.items)) && /Dari penawaran 001\.MNI/.test(lencana), JSON.stringify({ n: sAll.length, ref: sBaru.penawaran, spkId: pn.spkId, lencana }));
+  const snap1 = JSON.stringify(pn.snapshot);
+  const sn = pn.snapshot || {};
+  ok('N-31 snapshot PO tersimpan di penawaran: tanggal, PO, Rev, varian, total, berat dan harga per baris; panel Snapshot PO tampil', sn.po === 'PO-UJI-1' && sn.rev === pn.rev && sn.total && sn.total.total > 0 && sn.kg && sn.kg.real > 0 && sn.baris && sn.baris.length >= 1 && sn.baris[0].hargaSatuan > 0 && /snapshot po/i.test(await page.evaluate(() => document.querySelector('.pq-side').innerText)), snap1.slice(0, 120));
+  const idem = await page.evaluate(() => ({ muat: !!document.querySelector('[data-act="pqmuatspk"]'), buka: !!document.querySelector('[data-act="pqbukaspk"]'), perbarui: !!document.querySelector('[data-act="pqperbaruispk"]') }));
+  ok('N-32 idempoten: setelah ditautkan tidak ada tombol Muat ke SPK lagi, hanya Buka SPK; jumlah SPK tidak bertambah', !idem.muat && idem.buka && !idem.perbarui && (await spkAll()).length === n0 + 1, JSON.stringify(idem));
+  await page.click('[data-act="pqrevisi"]'); await page.waitForTimeout(900);
+  await isi(0, null, null, null, 20); await page.click('[data-act="pqsimpan"]'); await page.waitForTimeout(700);
+  await setujui();
+  const pn2 = dataPnw(await pnwDb());
+  const idem2 = await page.evaluate(() => (document.querySelector('[data-act="pqperbaruispk"]') || {}).textContent || '');
+  ok('N-33 revisi disetujui lagi: snapshot lama tetap beku (Rev lama, total lama) dan muncul Perbarui SPK dari Rev baru', pn2.rev === pn.rev + 1 && JSON.stringify(pn2.snapshot) === snap1 && new RegExp('Rev\\.' + pn2.rev).test(idem2), idem2);
+  await page.click('[data-act="pqperbaruispk"]'); await page.waitForSelector('#editor:not([hidden])', { timeout: 8000 }); await page.waitForTimeout(500);
+  const ed2 = await page.evaluate(() => ({ po: document.getElementById('ed-po').value, q: parseFloat(document.querySelector('#ed-secs [data-f="q"]').value) }));
+  await page.click('[data-act="ed-save"][data-mode="draft"]'); await page.waitForTimeout(1800);
+  await page.evaluate(() => document.querySelector('[data-act="sheet-close"]')?.click()); await page.waitForTimeout(300);
+  const sAll2 = await spkAll(); const pn3 = dataPnw(await pnwDb());
+  const sUpd = sAll2.find((x) => String(x.no) === String(pn.spkNo));
+  const sisa = await page.evaluate(() => !!document.querySelector('[data-act="pqperbaruispk"]'));
+  ok('N-34 Perbarui SPK memuat item revisi ke SPK yang sama (tanpa SPK baru), PO terjaga, tautan Rev dan snapshot diperbarui', ed2.po === 'PO-UJI-1' && ed2.q === 20 && sAll2.length === n0 + 1 && sUpd && sUpd.penawaran.rev === pn2.rev && sUpd.items.some((i) => i.q === 20) && pn3.spkRev === pn2.rev && pn3.snapshot.rev === pn2.rev && !sisa, JSON.stringify({ ed2, rev: sUpd && sUpd.penawaran, spkRev: pn3.spkRev }));
+  await page.click('[data-act="pqtutup"]'); await page.waitForTimeout(300);
+  await jalur('sales@mni.local');
+  await page.click('#pq-list tbody tr'); await page.waitForTimeout(500);
+  const sSpk = await page.evaluate(() => ({ muat: !!document.querySelector('[data-act="pqmuatspk"]'), perbarui: !!document.querySelector('[data-act="pqperbaruispk"]'), buka: !!document.querySelector('[data-act="pqbukaspk"]'), st: (document.querySelector('.pq-tt .chip') || {}).textContent }));
+  ok('N-35 Sales (tanpa hak ubah SPK) tidak melihat tombol Muat atau Perbarui SPK, hanya Buka SPK', sSpk.st === 'Disetujui' && !sSpk.muat && !sSpk.perbarui && sSpk.buka, JSON.stringify(sSpk));
+  await page.click('[data-act="pqtutup"]'); await page.waitForTimeout(300);
+
   // ---------- Sales dan persetujuan diskon ----------
   await jalur('sales@mni.local');
   const sNav = await page.evaluate(() => ({ nav: !!document.querySelector('#nav a[href="#penawaran"]'), katalog: !!document.querySelector('[data-act="pqkatalog"]'), aturan: !!document.querySelector('[data-act="pqaturan"]'), baru: !!document.querySelector('[data-act="pqbaru"]') }));

@@ -5,7 +5,7 @@
 //   { no, nomor, rev, tgl, berlaku, customer, attn, proyek, sales, franco, kirim, bayar, catatan, status, pilih,
 //     varian: [{ k:'A', nama, skenario, diskon, ppn, items:[{ id, kel, bentuk, u:{w,h,l,r..}, q, ket }] }],
 //     riwayat: [{ rev, status, tgl, varian }] }
-import { hitungBaris, masukanBentuk, cariBentuk, totalPenawaran, kebutuhanKg } from './harga.js';
+import { hitungBaris, masukanBentuk, cariBentuk, totalPenawaran, kebutuhanKg, biayaPO } from './harga.js';
 
 export const STATUS = ['Draft', 'Menunggu persetujuan', 'Terkirim', 'Disetujui', 'Ditolak'];
 /** Nilai awal aturan; pemilik dapat mengubahnya (tersimpan di master penawaran_aturan). batasSales: diskon tertinggi tanpa persetujuan. */
@@ -123,4 +123,85 @@ export function terapkan(p, aksi, { peran, a, tgl, oleh = '', varian = null, ala
     default: break;
   }
   return n;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// T-191: muat dari penawaran ke SPK, snapshot saat PO, pembaruan SPK dari revisi (fungsi murni)
+// Harga dan biaya HANYA masuk snapshot di dokumen penawaran (modul rahasia). SPK menyimpan berat dan tautan saja.
+// ---------------------------------------------------------------------------------------------------------------
+
+
+const bulat = (x, d) => (Number.isFinite(x) ? Math.round(x * 10 ** d) / 10 ** d : 0);
+
+/** Alasan penawaran belum bisa dimuat ke SPK; kosong berarti siap. */
+export function masalahMuatSpk(p) {
+  const m = [];
+  if (!p || p.status !== 'Disetujui') m.push('Penawaran harus berstatus Disetujui.');
+  else if (!(p.varian || []).some((v) => v.k === p.pilih)) m.push('Varian yang disetujui tidak ditemukan.');
+  return m;
+}
+
+/** Kunci tautan satu arah: penawaran menyimpan spkId; SPK menyimpan penawaran = { id, nomor, rev, varian }. */
+export const refSpk = (p) => ({ id: p.id || p._id || null, nomor: p.nomor || '', rev: p.rev || 0, varian: p.pilih });
+
+/** Judul produk SPK dari keluarga katalog dan nama bentuk. Mesin rute produksi membaca judul ini (CABLE TRAY, CABLE LADDER, ACCS ..., COVER TRAY).
+ *  Kode keluarga ST* = tray, SL* = ladder; bentuk selain lurus dianggap aksesoris. Keluarga tak dikenal dikembalikan apa adanya
+ *  (rute lalu ditentukan manual di editor SPK). Tebal dan finishing tidak ada di penawaran: dilengkapi pengguna di editor. */
+export function produkSpk(keluarga, judul) {
+  const k = String(keluarga || '').toUpperCase().trim();
+  const ladder = /^SL/.test(k), tray = /^ST/.test(k);
+  if (!ladder && !tray) return k || 'LAINNYA';
+  if (/cover/i.test(String(judul || ''))) return 'COVER TRAY';
+  if (/straight|lurus/i.test(String(judul || ''))) return ladder ? 'CABLE LADDER' : 'CABLE TRAY';
+  return ladder ? 'ACCS LADDER' : 'ACCS TRAY';
+}
+
+/** Susun isi SPK (bagian per judul produk) dari varian terpilih. Berat per pcs memakai berat real. */
+export function susunSpk(p, katalog, skenarioList) {
+  const mm = masalahMuatSpk(p);
+  if (mm.length) throw new Error(mm[0]);
+  const v = p.varian.find((x) => x.k === p.pilih);
+  const h = hitungVarian(katalog, skenarioList, v);
+  if (h.galat) throw new Error(`${h.galat} baris penawaran belum dapat dihitung; perbaiki penawaran lebih dulu.`);
+  const grup = new Map();
+  h.baris.forEach((b) => {
+    const bt = cariBentuk(katalog, b.bentuk);
+    const kel = bt ? `${produkSpk(bt.keluarga, bt.judul)}${/^S[LT]/i.test(bt.keluarga) ? ' TYPE ' + bt.keluarga.toUpperCase() : ''}` : 'LAINNYA';
+    if (!grup.has(kel)) grup.set(kel, []);
+    grup.get(kel).push({ d: deskripsiItem(katalog, b), q: +b.q, u: 'Pcs', w: bulat(b.hasil.kgReal, 3), wsrc: 'manual', ket: b.ket || '', catatan: '', prod: 0 });
+  });
+  return {
+    customer: p.customer || '', sales: p.sales || '', proyek: p.proyek || '', po: p.po || '',
+    sections: [...grup].map(([kel, lines]) => ({ h: kel, lines })),
+    penawaran: refSpk(p),
+  };
+}
+
+/** Salinan beku harga, berat, dan biaya saat PO. Tidak bergantung pada katalog atau skenario sesudahnya. */
+export function snapshotPO(p, katalog, skenarioList, { tgl, oleh = '', po = '' } = {}) {
+  const mm = masalahMuatSpk(p);
+  if (mm.length) throw new Error(mm[0]);
+  const v = p.varian.find((x) => x.k === p.pilih);
+  const sk = (skenarioList || [])[v.skenario || 0] || {};
+  const h = hitungVarian(katalog, skenarioList, v);
+  if (h.galat) throw new Error(`${h.galat} baris penawaran belum dapat dihitung.`);
+  const biaya = sk.biaya && Object.keys(sk.biaya).length ? biayaPO({ kgReal: h.kg.real, biaya: sk.biaya, dpp: h.total.dpp, subtotal: h.total.subtotal }) : null;
+  return salin({
+    tgl, oleh, po, rev: p.rev || 0, nomor: p.nomor || '', varian: v.k, skenario: { nama: sk.nama || '', param: sk.param || {}, biaya: sk.biaya || {} },
+    diskon: +v.diskon || 0, ppn: +v.ppn || 0, total: h.total, kg: h.kg, biaya,
+    baris: h.baris.map((b) => ({ d: deskripsiItem(katalog, b), q: +b.q, hargaSatuan: b.hasil.hargaSatuan, jumlah: b.hasil.jumlah, kgEstimasi: b.hasil.kgEstimasi, kgReal: b.hasil.kgReal, kgEstimasiTotal: b.hasil.kgEstimasiTotal, kgRealTotal: b.hasil.kgRealTotal })),
+  });
+}
+
+/** Apakah SPK tertaut sudah ketinggalan dari revisi penawaran. */
+export const perluPerbaruiSpk = (p, refTersimpan) => !!refTersimpan && (p.rev || 0) > (refTersimpan.rev || 0);
+
+/** Terapkan item baru dari revisi ke SPK lama: jumlah produksi (prod) yang sudah ada dipertahankan menurut deskripsi.
+ *  Mengembalikan { sections, hilang } — hilang = deskripsi item lama yang sudah tidak ada pada revisi (pengguna memutuskan). */
+export function gabungRevisiSpk(sectionsBaru, itemsLama = []) {
+  const prod = new Map(itemsLama.map((i) => [String(i.d).trim(), +i.prod || 0]));
+  const dipakai = new Set();
+  const sections = sectionsBaru.map((s) => ({ ...s, lines: s.lines.map((l) => { const k = String(l.d).trim(); dipakai.add(k); return { ...l, prod: Math.min(+l.q || 0, prod.get(k) || 0) }; }) }));
+  const hilang = itemsLama.filter((i) => !dipakai.has(String(i.d).trim())).map((i) => i.d);
+  return { sections, hilang };
 }

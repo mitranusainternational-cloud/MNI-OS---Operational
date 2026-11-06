@@ -9,7 +9,7 @@ status: active
 progress: 60
 tasks_total: 14
 tasks_done: 8
-updated: 2026-11-05
+updated: 2026-11-06
 ---
 
 # E-03 Kualitas aplikasi dan keamanan data
