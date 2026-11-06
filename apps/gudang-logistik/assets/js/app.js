@@ -663,7 +663,8 @@ function soSheet(){
  const items=`<section class="panel"><div class="tbl-wrap"><table id="so-items" class="pq-t"><thead><tr><th class="num">#</th><th>Deskripsi</th><th>Jumlah</th><th>Satuan</th><th class="num">Berat/pcs (kg)</th><th>Tebal</th><th>Finishing</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
  const riw=(s.amandemen||[]).length?`<details class="panel pq-rw"><summary>Riwayat amandemen (${s.amandemen.length})</summary><div class="pbody">${s.amandemen.slice().reverse().map(r=>`<div class="note">Rev.${r.rev} · ${fd(r.at)} · ${esc(r.alasan)}</div>`).join('')}</div></details>`:'';
  const sisi=`<aside class="panel pq-side"><div class="pbody"><h4>Ringkasan</h4><div class="pq-in"><span>Item</span><b>${(s.items||[]).length}</b></div><div class="pq-in"><span>Berat total SPK</span><b>${n(Math.round(kg*10)/10)} kg</b></div>${s.snapshot?pqSnapHtml(s.snapshot):''}${s.tglKonfirmasi?`<div class="pq-in"><span>Dikonfirmasi</span><b>${esc(fdp2(s.tglKonfirmasi))}</b></div>`:''}</div></aside>`;
- return `${bar}${info}${head}<div class="pq-main"><div>${items}</div>${sisi}</div>${riw}`;
+ const matItems=(s.items||[]).map(it=>({d:it.d,g:HG().judulItem(it),q:it.q,w:it.w}));
+ return `${bar}${info}${head}<div class="pq-main"><div>${items}${matPanelHtml(matItems,{spkId:(s.spk||[])[0]?s.spk[0].id:null,label:'Material '+(s.nomor||'')+' / PO '+(s.po||'')})}</div>${sisi}</div>${riw}`;
 }
 B['salesorder']=()=>SO.s?soSheet():soList();
 async function soSimpan(senyap){
@@ -757,6 +758,43 @@ function pqCetak(){
   <p>Demikian penawaran harga dari kami. Atas perhatian dan kerjasamanya kami ucapkan terima kasih.</p>
   <div class="sg"><div>Hormat kami</div><div>Konfirmasi customer</div></div><script>window.onload=function(){window.print()}<\/script></body></html>`);
  win.document.close();
+}
+
+/* ---------- Kebutuhan material dan reservasi (T-192): pratinjau, tidak mengubah stok ---------- */
+const MT=()=>window.MNIMaterial;
+const MAT={items:[],opt:{}};
+const matFaktor=()=>MT().faktorSisa((byId('master','setting')||{}).faktorSisa);
+function matRmSiap(){const c=calc();return S.rm.map(r=>{const g=grade(r);const lbr=String(r.satuan||'').toLowerCase()==='lbr';return {id:r._id,label:rmLabel(r),bahan:g==='SPCC'||g==='Lainnya'?'SPHC':g,tebal:thkR(r),kgPerLbr:lbr?kgLbr(r):0,stok:c.stock.rm[r._id]||0}})}
+function matKeluarKg(spkId,rs){const idx={};rs.forEach(r=>idx[r.id]=r);const per={};
+ S.mutasi.forEach(m=>{if(m.gudang!=='rm'||m.spk!==spkId||!(m.jenis==='keluar'||m.jenis==='koreksi'))return;const r=idx[m.item];if(!r||!r.kgPerLbr)return;const k=MT().kunciMaterial(r.bahan,r.tebal);per[k]=(per[k]||0)+(-(+m.delta||0))*r.kgPerLbr});return per}
+function matReservasi(rs,kecuali){const c=calc(),f=matFaktor();
+ return MT().reservasiAktif(S.spk.filter(s=>s._id!==kecuali).map(s=>{const sx=c.spk[s._id];const aktif=(s.status||'Terbit')==='Terbit'&&!!sx&&sx.st!=='Selesai'&&sx.st!=='Batal';
+  return {id:s._id,aktif,kelompok:aktif?MT().kelompokKebutuhan((s.items||[]).map(i=>({d:i.d,g:i.g,q:i.q,w:i.w})),{faktor:f,tebalSpk:s.tebal}):[],keluar:aktif?matKeluarKg(s._id,rs):{}}}))}
+function matDipesan(rs){const idx={};rs.forEach(r=>idx[r.id]=r);const per={};
+ S.pr.filter(p=>p.status==='Diajukan'||p.status==='Dipesan').forEach(p=>(p.items||[]).forEach(i=>{const r=idx[i.item];if(!r||!r.kgPerLbr)return;const k=MT().kunciMaterial(r.bahan,r.tebal);per[k]=(per[k]||0)+Math.max(0,(+i.q||0)-(+i.qTerima||0))*r.kgPerLbr}));return per}
+function matRencana(items,opt={}){const rs=matRmSiap();const kel=MT().kelompokKebutuhan(items,{faktor:matFaktor(),tebalSpk:opt.tebal});
+ return MT().rencanaMaterial(kel,rs,{reservasiLain:matReservasi(rs,opt.spkId).total,keluar:opt.spkId?matKeluarKg(opt.spkId,rs):{},dipesan:matDipesan(rs)})}
+const MAT_CLS={Cukup:'ok',Kurang:'crit','Tanpa item RM':'warn','Sudah dikeluarkan':'info','Sudah dipesan':'info'};
+function matPanelHtml(items,opt={}){
+ if(!MT()||!items||!items.length||!myLevel('bahan-baku')&&myRole()!=='admin')return '';
+ const rc=matRencana(items,opt);MAT.items=items;MAT.opt=opt;if(!rc.length)return '';
+ const kg=x=>n(Math.round(x));
+ const rows=rc.map(r=>`<tr><td><b>${esc(r.bahan)} ${r.tebal} mm</b><div class="note">${r.baris} item${r.tanpaBerat.length?` · <span class="red">${r.tanpaBerat.length} tanpa berat</span>`:''}${r.utama?' · '+esc(r.utama.label):''}</div></td><td class="num">${kg(r.netto)}</td><td class="num">${kg(r.bruto)}</td><td class="num">${r.butuhLbr==null?'–':n(r.butuhLbr)}</td><td class="num">${kg(r.fisikKg)}</td><td class="num">${kg(r.reservasiKg)}${r.dipesanKg?`<div class="note">+${kg(r.dipesanKg)} dipesan</div>`:''}</td><td class="num">${kg(r.tersediaKg)}</td><td>${chip(r.status,MAT_CLS[r.status]||'plain')}${r.kurangLbr>0?`<div class="note">kurang ${n(r.kurangLbr)} lbr</div>`:''}</td></tr>`).join('');
+ const pr=MT().usulanPr(rc);
+ return `<section class="panel mat-panel"><div class="pbody"><h4>Kebutuhan material</h4><div class="tbl-wrap"><table id="mat-tbl"><thead><tr><th>Bahan / tebal</th><th class="num">Netto (kg)</th><th class="num">Bruto (kg)</th><th class="num">Butuh (lbr)</th><th class="num">Stok fisik (kg)</th><th class="num">Reservasi SPK lain (kg)</th><th class="num">Tersedia (kg)</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="note">Pratinjau: stok tidak berubah. Bruto = netto × faktor sisa potong ${String(matFaktor()).replace('.',',')}. Tersedia = stok fisik − reservasi SPK Terbit lain. Reservasi berkurang saat gudang mencatat Pakai dengan nomor SPK.</p>
+  ${pr.length&&matBisaPr()?`<button class="btn" data-act="matpr">Buat PR untuk kekurangan (${pr.length} item)</button>`:''}</div></section>`;
+}
+const matBisaPr=()=>myRole()==='admin'||myLevel('bahan-baku')==='ubah';
+const matSpkItems=s=>(s.items||[]).map(i=>({d:i.d,g:i.g,q:i.q,w:i.w}));
+function matBuatPr(){
+ const pr=MT().usulanPr(matRencana(MAT.items,MAT.opt));if(!pr.length){toast('Tidak ada kekurangan.');return}
+ try{need('bahan-baku')}catch(e){toast('Anda tidak berhak membuat PR bahan baku.');return}
+ openModal('Buat PR untuk kekurangan material',`<div class="full tbl-wrap"><table class="lines"><thead><tr><th>Material</th><th class="num">Qty (lbr)</th><th class="num">Kg</th></tr></thead><tbody>${pr.map(i=>`<tr><td>${esc(i.label)}</td><td class="num">${n(i.q)}</td><td class="num">${n(Math.round(i.kg))}</td></tr>`).join('')}</tbody></table></div>`+
+  fld('Dibutuhkan paling lambat',inp('butuh',addDays(today(),SET().leadBeli),'date'))+fld('Catatan',inp('ket',MAT.opt.label||''),true),
+  async d=>{const t=today();const noPR=await nextDocNo('PR',t);
+   await addDoc('pr',{noPR,tgl:t,butuh:d.butuh||'',supplier:'',items:pr.map(i=>({item:i.item,q:i.q,qTerima:0})),status:'Diajukan',ket:d.ket||''});
+   toast(`${noPR} dibuat`);renderBody()},{submit:'Buat PR',done:' '});
 }
 
 /* ---------- SPK ---------- */
@@ -3347,8 +3385,8 @@ kartu=function(g,id){if(g!=='rm')return _kartuBase(g,id);openDrawer(()=>{const r
 /* ---------- forms: item edit, settings, PR ---------- */
 function rmEditForm(id){const r=byId('rm',id);openModal(`Ubah item · ${esc(rmLabel(r))}`,fld('Material',inp('item',r.item))+fld('Ukuran (t×l×p mm)',inp('ukuran',r.ukuran))+fld('Stok minimum',inp('min',r.min||0,'number','min="0"'))+fld('Buffer (target stok)',inp('buffer',r.buffer||0,'number','min="0"'))+fld('Lokasi rak',inp('lokasi',r.lokasi||'','text','placeholder="mis. A-03"'))+fld('Harga per kg (Rp, opsional)',inp('harga',r.harga||'','number','min="0"'))+fld('Satuan',inp('satuan',r.satuan||'Lembar'))+(r.usulan?`<div class="note full">Catatan Excel: ${esc(r.usulan)}</div>`:''),
  async d=>{if(!d.item||!d.ukuran)throw new Error('Material dan ukuran wajib diisi.');if(num0(d.min)>num0(d.buffer)&&num0(d.buffer)>0)throw new Error('Minimum tidak boleh lebih besar dari buffer.');const itm=d.item.trim(),ukr=d.ukuran.trim();const dup=S.rm.find(r=>r._id!==id&&r.item.trim().toLowerCase()===itm.toLowerCase()&&r.ukuran.trim().toLowerCase()===ukr.toLowerCase());if(dup)throw new Error(`Kombinasi "${itm} – ${ukr}" sudah dipakai item lain. Ubah spesifikasi atau hapus duplikat terlebih dahulu.`);await updDoc('rm',id,{item:itm,ukuran:ukr,min:num0(d.min),buffer:num0(d.buffer),lokasi:String(d.lokasi||'').trim(),harga:num0(d.harga),satuan:d.satuan||'Lembar'})})}
-function rmSetForm(){const s=SET();openModal('Pengaturan bahan baku',fld('Lead time pembelian (hari)',inp('leadBeli',s.leadBeli,'number','min="1"'))+fld('Target stok setelah order (lbr)',inp('cover',s.cover,'number','min="1"'))+`<div class="note full">Titik pesan ulang = minimum + pemakaian harian × lead time. Usulan order mengisi stok sampai buffer atau target, mana yang lebih besar. Untuk material besi, sesuaikan target dengan kebutuhan project aktif, bukan hari pemakaian.</div>`,
- async d=>{const v={leadBeli:Math.max(1,num0(d.leadBeli)),cover:Math.max(1,num0(d.cover))};if(byId('master','setting'))await updDoc('master','setting',v);else{need();await DB.doc('master/setting').set(v)}})}
+function rmSetForm(){const s=SET();openModal('Pengaturan bahan baku',fld('Lead time pembelian (hari)',inp('leadBeli',s.leadBeli,'number','min="1"'))+fld('Target stok setelah order (lbr)',inp('cover',s.cover,'number','min="1"'))+fld('Faktor sisa potong (×) untuk kebutuhan material SPK',inp('faktorSisa',MT().faktorSisa(s.faktorSisa),'number','min="1" max="2" step="0.01"'))+`<div class="note full">Titik pesan ulang = minimum + pemakaian harian × lead time. Usulan order mengisi stok sampai buffer atau target, mana yang lebih besar. Untuk material besi, sesuaikan target dengan kebutuhan project aktif, bukan hari pemakaian.</div>`,
+ async d=>{const v={leadBeli:Math.max(1,num0(d.leadBeli)),cover:Math.max(1,num0(d.cover)),faktorSisa:MT().faktorSisa(d.faktorSisa)};if(byId('master','setting'))await updDoc('master','setting',v);else{need();await DB.doc('master/setting').set(v)}})}
 function prNewForm(){
  const f=F['bahan-baku'],R=rmCalc();const items=Object.values(R.info).filter(x=>x.sug>0).map(x=>{const v=f.beli[x.r._id]||{on:true,q:x.sug};return {item:x.r._id,q:Math.round(+v.q||0),on:v.on}}).filter(i=>i.on&&i.q>0);
  if(!items.length){toast('Pilih minimal satu item dengan qty > 0.');return}
@@ -3912,6 +3950,7 @@ function renderSheet(){
    <div class="pp-foot"><div class="pp-note">${esc(s.note||'')}</div><div class="pp-dist"><span>Distributed to:</span><ul>${(s.dist||DIST_DEF).map(d=>`<li>~ ${esc(d)}</li>`).join('')}</ul></div></div>
    <div class="pp-sign"><div><b>Procurement/Estimator</b><span class="sp"></span><b>( ${esc(s.signProc||'Halimah')} )</b></div><div><b>PPIC</b><span class="sp"></span><b>( ${esc(s.signPpic||'Muin M.K.')} )</b></div></div>
   </div>
+  ${matPanelHtml(matSpkItems(s),{spkId:s._id,tebal:s.tebal,label:'Material SPK '+s.no+' '+s.customer})}
   <div class="sh-meta">${st==='Draft'?'<span class="chip warn">Draft · belum terbit, belum masuk monitoring produksi</span>':''}
    ${s.so?`<span class="sh-pnw">Sales Order ${esc(s.so.nomor)}${s.so.rev?' Rev.'+s.so.rev:''}</span> `:''}${s.penawaran?`<span class="sh-pnw">Dari penawaran ${esc(s.penawaran.nomor)}${s.penawaran.rev?' Rev.'+s.penawaran.rev:''}${s.penawaran.varian&&s.penawaran.varian!=='A'?' · varian '+esc(s.penawaran.varian):''}</span> `:''}${s.terbitAt?`<span>Terbit ${fd(s.terbitAt)} oleh ${who(s.terbitBy)}</span>`:''}${revs.length?`<div><b>Riwayat revisi</b><ul>${revs.map(r=>`<li>Rev.${r.rev} · ${fd(r.at)} · ${who(r.by)} — ${esc(r.alasan||'')}</li>`).join('')}</ul></div>`:''}
    <span class="note">Kolom produksi, subcont/vendor, dan progress terisi otomatis dari transaksi realtime. Kolom "Balik" menampilkan qty kembali / qty yang dikirim ke vendor. ✓ = sudah selesai semua. Tanggal kecil di bawah qty = referensi surat jalan.</span></div>
@@ -4824,6 +4863,7 @@ document.addEventListener('click',async e=>{
   case 'pqtolak':pqAlasan('tolak','Penawaran ditolak customer','Alasan (opsional)');break;
   case 'pqrevisi':pqAksi('revisi');break;
   case 'pqcetak':pqCetak();break;
+  case 'matpr':matBuatPr();break;
   case 'pqbuatso':pqBuatSo();break;
   case 'pqbukaso':pqBukaSo();break;
   case 'sobuka':{const d=byId('salesorder',ds.id);if(d)soBuka(d);break}

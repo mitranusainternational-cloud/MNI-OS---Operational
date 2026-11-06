@@ -578,8 +578,10 @@ import * as _rencana from './produksi/rencana.js';
 import * as _harga from './erp/harga.js';
 import * as _penawaran from './erp/penawaran.js';
 import * as _salesorder from './erp/salesorder.js';
+import * as _material from './erp/material.js';
 window.MNIProduksi = { ..._rute, ..._kinerja, ..._laporan, ..._analisa, ..._statistik, ..._jadwal, ..._kapasitas, ..._rencana };
 // Mesin penawaran (harga, aturan, alur). Katalog dan skenario harga dimuat dari tabel master setelah login (setKatalog).
+window.MNIMaterial = { ..._material };
 window.MNIHarga = {
   ..._harga, ..._penawaran, ..._salesorder, katalog: null, skenario: null,
   setKatalog(k, s) { this.katalog = k; this.skenario = s; },

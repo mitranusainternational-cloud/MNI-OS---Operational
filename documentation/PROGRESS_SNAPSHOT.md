@@ -111,6 +111,7 @@ generated: 2026-11-06
 - [[tasks/T-185-papan-jadwal-v3-interaktif-dan-urutan-tab-spk|T-185]] Papan jadwal v3 interaktif (tooltip, panel detail, zoom, geser, buka/lipat semua) dan urutan tab SPK · dev + pemilik
 - [[tasks/T-190-modul-penawaran-lokal|T-190]] Modul Penawaran lokal (daftar, lembar, revisi, cetak) · dev + pemilik
 - [[tasks/T-191-muat-dari-penawaran-ke-spk-dan-snapshot-po|T-191]] Muat dari penawaran ke SPK dan snapshot PO · dev + pemilik
+- [[tasks/T-192-kebutuhan-material-dan-reservasi-stok|T-192]] Kebutuhan material dan reservasi stok · dev + pemilik
 - [[tasks/T-194-sales-order-penghubung-penawaran-dan-spk|T-194]] Sales Order: penghubung Penawaran dan SPK · dev + pemilik
 
 ## Tugas P0 yang belum selesai

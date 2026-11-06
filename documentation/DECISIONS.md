@@ -128,3 +128,11 @@ updated: 2026-11-02
 - **Alasan:** PO customer dapat berbeda dari penawaran, satu penawaran dapat menjadi beberapa PO, dan harga yang dijanjikan harus terkunci di dokumen komitmen, bukan di penawaran.
 - **Konsekuensi:** tabel salesorder (draf migration 16) memakai hak modul penawaran karena memuat harga; SPK tidak menyimpan harga; T-192 (kebutuhan material) dihitung dari SO atau SPK, bukan dari penawaran.
 - **Rujukan:** [[tasks/T-194-sales-order-penghubung-penawaran-dan-spk|T-194]].
+
+## 2026-11-06 — Reservasi material diturunkan dari SPK, bukan disimpan
+
+- **Konteks:** T-192 butuh reservasi material saat SPK terbit tanpa mengubah stok fisik dan tanpa menambah tabel di production.
+- **Keputusan:** reservasi dihitung dari SPK berstatus Terbit yang belum Selesai atau Batal: kebutuhan bruto (netto x faktor sisa potong 1,1) per (bahan, tebal) dikurangi material yang sudah dikeluarkan gudang untuk SPK itu (mutasi Pakai bertanda SPK). Stok tersedia = stok fisik dikurangi reservasi SPK lain. Stok fisik hanya berkurang saat gudang mencatat Pakai. PR terbuka dihitung sebagai pasokan yang menutup kekurangan.
+- **Alasan:** tanpa tabel baru tidak ada migration dan tidak ada risiko reservasi menyimpang dari SPK; revisi, selesai, dan batal SPK otomatis tercermin.
+- **Konsekuensi:** keputusan pemilik tentang pengurangan stok otomatis saat SPK terbit masih terbuka; bila dipilih, reservasi diubah menjadi mutasi otomatis. Faktor 1,1 dan pemetaan per (bahan, tebal) bersifat sementara.
+- **Rujukan:** [[tasks/T-192-kebutuhan-material-dan-reservasi-stok|T-192]].

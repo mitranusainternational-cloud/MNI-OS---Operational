@@ -70,6 +70,8 @@ await page.waitForSelector('#so-items'); await page.waitForTimeout(500);
 for (const sel of ['[data-sot]', '[data-sof]']) for (const el of await page.$$('#so-items tbody ' + sel)) await el.selectOption(sel === '[data-sot]' ? '1.2' : 'ELECTRO GALVANIZED');
 await page.click('[data-act="sosimpan"]'); await page.waitForTimeout(700);
 await shot('04-sales-order-draft-snapshot');
+await page.evaluate(() => document.querySelector('#mat-tbl')?.scrollIntoView({ block: 'center' })); await shot('04b-kebutuhan-material-di-sales-order');
+await page.evaluate(() => window.scrollTo(0, 0));
 ok('H-02 Sales Order Draft dibuat dari penawaran dengan PO, due date, item, dan snapshot; belum ada SPK', (await tab('salesorder')).length === 1 && (await tab('spk')).length === n0);
 await page.click('[data-act="sokonfirmasi"]'); await page.waitForTimeout(2200);
 const spk = (await tab('spk')).find((s) => /Alur Penawaran/.test(JSON.stringify(s)));
